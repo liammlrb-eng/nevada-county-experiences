@@ -791,43 +791,54 @@
   .manage-tab-btn:hover { color: var(--brown); }
   .manage-tab-btn.active { color: var(--brown); border-bottom-color: var(--gold); font-weight: 600; }
 
-  /* ITINERARY EDITOR */
-  .itin-editor-list { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; max-height: 62vh; overflow-y: auto; }
-  .itin-editor-card { background: white; border: 1px solid #e0d8c8; border-radius: 8px; overflow: hidden; }
-  .itin-editor-header {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 12px; background: var(--fog);
-    border-bottom: 1px solid #e0d8c8;
+  /* ITINERARY EDITOR — 3-PANEL */
+  .itin-3panel { display: grid; grid-template-columns: 210px 1fr 250px; height: 64vh; overflow: hidden; border-top: 1px solid #e0d8c8; }
+  .itin-panel { display: flex; flex-direction: column; border-right: 1px solid #e0d8c8; overflow: hidden; min-width: 0; }
+  .itin-panel:last-child { border-right: none; }
+  .itin-panel-hd {
+    padding: 10px 14px; background: var(--fog); border-bottom: 1px solid #e0d8c8;
+    font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--gold); font-weight: 700;
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 6px;
   }
-  .itin-field {
-    font-family: 'Josefin Sans', sans-serif; font-size: 12px;
-    padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px;
-    color: var(--dark); background: white; transition: border-color 0.15s;
-  }
-  .itin-field:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.15); }
-  .itin-field-name     { flex: 2; min-width: 0; }
-  .itin-field-duration { width: 120px; flex-shrink: 0; }
-  .itin-field-time     { width: 120px; flex-shrink: 0; }
-  .itin-field-stopname { flex: 2; min-width: 0; }
-  .itin-field-area     { width: 120px; flex-shrink: 0; }
-  .itin-stops-editor { padding: 8px 12px 4px; display: flex; flex-direction: column; gap: 5px; }
-  .stop-editor-row { display: flex; align-items: center; gap: 6px; }
-  .stop-editor-num { font-size: 10px; color: var(--gold); font-weight: 700; min-width: 18px; text-align: right; flex-shrink: 0; }
-  .btn-del-stop {
-    background: none; border: none; color: var(--slate);
-    cursor: pointer; font-size: 15px; padding: 0 3px; line-height: 1;
-    opacity: 0.35; transition: opacity 0.15s, color 0.15s; flex-shrink: 0;
-  }
-  .btn-del-stop:hover { opacity: 1; color: var(--rust); }
-  .btn-add-stop {
-    display: inline-block; margin: 6px 12px 10px;
-    background: none; border: 1px dashed var(--gold); color: var(--gold);
-    border-radius: 4px; padding: 4px 12px;
-    font-family: 'Josefin Sans', sans-serif; font-size: 10px;
-    letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .btn-add-stop:hover { background: var(--gold); color: var(--dark); }
+  .itin-panel-body { flex: 1; overflow-y: auto; }
+  .itin-empty-msg { padding: 28px 14px; text-align: center; color: #a0aec0; font-size: 11px; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.04em; line-height: 1.6; }
+  /* Left panel */
+  .itin-row { display: flex; align-items: center; padding: 10px 12px; border-bottom: 1px solid #f0e8d8; cursor: pointer; gap: 6px; border-left: 3px solid transparent; transition: background 0.12s; }
+  .itin-row:hover { background: rgba(201,168,76,0.05); }
+  .itin-row.active { background: rgba(201,168,76,0.1); border-left-color: var(--gold); }
+  .itin-row-info { flex: 1; min-width: 0; }
+  .itin-row-name { font-family: 'Josefin Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--brown); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .itin-row-dur { font-size: 11px; color: var(--slate); margin-top: 1px; }
+  .itin-del-btn { background: none; border: none; cursor: pointer; color: #ccc; font-size: 16px; padding: 0 3px; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
+  .itin-del-btn:hover { color: var(--rust); }
+  /* Middle panel */
+  .itin-name-input { font-family: 'Josefin Sans', sans-serif; font-size: 13px; font-weight: 600; border: 1px solid transparent; border-radius: 4px; padding: 3px 6px; color: var(--brown); background: transparent; flex: 1; min-width: 0; }
+  .itin-name-input:focus { border-color: var(--gold); background: white; outline: none; }
+  .itin-duration-input { font-family: 'Josefin Sans', sans-serif; font-size: 11px; border: 1px solid transparent; border-radius: 4px; padding: 3px 6px; color: var(--slate); background: transparent; width: 80px; flex-shrink: 0; }
+  .itin-duration-input:focus { border-color: var(--gold); background: white; outline: none; }
+  .stop-row { display: flex; align-items: center; gap: 5px; padding: 7px 10px; border-bottom: 1px solid #f0e8d8; }
+  .stop-label-input { font-family: 'Josefin Sans', sans-serif; font-size: 10px; border: 1px solid #e0d8c8; border-radius: 3px; padding: 3px 5px; width: 72px; flex-shrink: 0; color: var(--slate); }
+  .stop-label-input:focus { outline: none; border-color: var(--gold); }
+  .stop-exp-info { flex: 1; min-width: 0; }
+  .stop-exp-name { font-size: 11px; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stop-exp-area { font-size: 10px; color: #a0aec0; }
+  .stop-move-btn { background: none; border: none; cursor: pointer; color: #bbb; font-size: 10px; padding: 1px 3px; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
+  .stop-move-btn:hover:not([disabled]) { color: var(--brown); }
+  .stop-del-btn { background: none; border: none; cursor: pointer; color: #ccc; font-size: 15px; padding: 0 2px; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
+  .stop-del-btn:hover { color: var(--rust); }
+  /* Right panel */
+  .browser-controls { padding: 8px 10px; border-bottom: 1px solid #e0d8c8; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; background: white; }
+  .browser-input { font-family: 'Josefin Sans', sans-serif; font-size: 11px; border: 1px solid #d4c9b0; border-radius: 4px; padding: 5px 8px; width: 100%; box-sizing: border-box; }
+  .browser-input:focus { outline: none; border-color: var(--gold); }
+  .browser-row { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid #f5f0e8; }
+  .browser-row:hover { background: rgba(201,168,76,0.05); }
+  .browser-row-info { flex: 1; min-width: 0; }
+  .browser-row-name { font-size: 11px; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .browser-row-area { font-size: 10px; color: #a0aec0; }
+  .browser-add-btn { background: none; border: 1.5px solid var(--gold); color: var(--gold); border-radius: 4px; font-size: 14px; font-weight: bold; padding: 0px 7px; cursor: pointer; flex-shrink: 0; transition: all 0.15s; line-height: 1.5; }
+  .browser-add-btn:hover:not([disabled]) { background: var(--gold); color: white; }
+  .browser-add-btn[disabled] { border-color: #ddd; color: #ddd; cursor: default; }
   .itin-empty-state { padding: 40px; text-align: center; color: var(--slate); font-size: 13px; }
 
   footer {
@@ -1506,64 +1517,45 @@ const EXPERIENCES = [
 ];
 
 const ITINERARIES = [
-  { theme: 'Rustic Gold Country', duration: '1 Day', stops: [
-    { time: 'Morning', name: 'Empire Mine Mineyard Tour + Blacksmith Shop', area: 'Grass Valley' },
-    { time: 'Lunch', name: "Tofanellis Gold Country Bistro", area: 'Grass Valley' },
-    { time: 'Afternoon', name: 'The Curious Forge – Blacksmithing Workshop', area: 'Nevada City' },
-    { time: 'Evening', name: 'Dinner at The Willo Steakhouse', area: 'Nevada City' },
-    { time: 'Night', name: 'Inn Town Glamping or Holbrooke Hotel', area: 'Nevada City / Grass Valley' },
-  ]},
-  { theme: 'Art + Music Weekend', duration: '2 Days', stops: [
-    { time: 'Day 1 Arrive', name: 'Check into National Exchange Hotel or Outside Inn', area: 'Nevada City' },
-    { time: 'Day 1 Eve', name: 'First Friday Art Walk or Miners Foundry / Crazy Horse', area: 'Nevada City' },
-    { time: 'Day 2 AM', name: 'Nevada City Farmers Market + gallery stroll + winery tasting', area: 'Nevada City' },
-    { time: 'Day 2 Eve', name: 'Center for the Arts show + dinner', area: 'Grass Valley' },
-  ]},
-  { theme: 'Spiritual Reset', duration: '2 Days', stops: [
-    { time: 'Day 1', name: 'Inner Path yoga / meditation + Petra or DaKan meal', area: 'Nevada City' },
-    { time: 'Day 1 Night', name: 'Stay at The Parsonage 1865', area: 'Nevada City' },
-    { time: 'Day 2', name: 'Ananda retreat / Mountain Stream / Rising Gaia', area: 'Nevada County' },
-  ]},
-  { theme: 'Active River + Town', duration: '1–2 Days', stops: [
-    { time: 'Morning', name: 'South Yuba River State Park or local trail', area: 'Near Nevada City' },
-    { time: 'Afternoon', name: 'Post-hike meal at The River Downtown or BrewBilt', area: 'Nevada City' },
-    { time: 'Night', name: 'Inn Town Campground', area: 'Nevada City' },
-  ]},
-  { theme: 'Summer Festival Weekend', duration: '2 Days', stops: [
-    { time: 'Day 1 Eve', name: 'Thursday Night Market – Downtown Grass Valley', area: 'Grass Valley' },
-    { time: 'Day 2', name: 'KVMR Celtic Festival / High Sierra / Fairgrounds event', area: 'Grass Valley' },
-  ]},
-  { theme: 'Romantic Getaway', duration: '2 Days', stops: [
-    { time: 'Day 1', name: 'Check into National Exchange Hotel', area: 'Nevada City' },
-    { time: 'Day 1 Afternoon', name: 'Nevada City Winery tasting', area: 'Nevada City' },
-    { time: 'Day 1 Evening', name: 'Dinner at Restaurant DaKan', area: 'Nevada City' },
-    { time: 'Day 2', name: 'Holbrooke Hotel brunch + downtown stroll', area: 'Grass Valley' },
-    { time: 'Day 2 Afternoon', name: 'Art galleries + Miners Foundry evening show', area: 'Nevada City' },
-  ]},
+  { id: 'itin-1', name: 'Gold Rush Day', duration: '1 Day', description: 'History, craft & Gold Country flavor' },
+  { id: 'itin-2', name: 'Wine & Relax Weekend', duration: '2 Days', description: 'Wineries, dining & relaxation in the foothills' },
 ];
+const ITINERARY_STOPS = [];
 
 // ── ITINERARY LIVE DATA + STORAGE ───────────────────────────────────
-const ITIN_STORAGE_KEY = 'ncexp:itineraries';
-let liveItineraries = JSON.parse(JSON.stringify(ITINERARIES)); // mutable copy
+const ITIN_KEY  = 'ncexp:itineraries2';
+const STOPS_KEY = 'ncexp:itin_stops';
+let liveItineraries = JSON.parse(JSON.stringify(ITINERARIES));
+let liveStops       = [];
+let selectedItinId  = null;
+let browserSearch   = '';
+let browserType     = '';
+
+function genId() {
+  return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
 
 function loadItineraries() {
   try {
-    const raw = localStorage.getItem(ITIN_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        liveItineraries = parsed;
-        console.log(`Loaded ${liveItineraries.length} itineraries from localStorage.`);
-      }
+    const ri = localStorage.getItem(ITIN_KEY);
+    const rs = localStorage.getItem(STOPS_KEY);
+    if (ri) {
+      const p = JSON.parse(ri);
+      if (Array.isArray(p) && p.length > 0 && p[0].id) liveItineraries = p;
+    }
+    if (rs) {
+      const p = JSON.parse(rs);
+      if (Array.isArray(p)) liveStops = p;
     }
   } catch(e) {}
 }
 
-function saveItineraries() {
+function saveAll() {
   try {
-    localStorage.setItem(ITIN_STORAGE_KEY, JSON.stringify(liveItineraries));
+    localStorage.setItem(ITIN_KEY,  JSON.stringify(liveItineraries));
+    localStorage.setItem(STOPS_KEY, JSON.stringify(liveStops));
     flashSaved();
-  } catch(e) { console.warn('Could not save itineraries:', e); }
+  } catch(e) { console.warn('Could not save:', e); }
 }
 
 const EVENTS = [
@@ -1767,33 +1759,32 @@ function updateFab() {
 }
 
 function renderItineraries() {
-  const themeTags = getActiveThemeTags();
-  let itins = liveItineraries;
-  if (themeTags) {
-    itins = liveItineraries.filter(i => {
-      const name = i.theme.toLowerCase();
-      return [...themeTags].some(t => name.includes(t) || 
-        (t === 'active' && name.includes('river')) ||
-        (t === 'romantic' && name.includes('romantic')) ||
-        (t === 'rustic' && name.includes('rustic')) ||
-        (t === 'music' && name.includes('festival')) ||
-        (t === 'spiritual' && name.includes('spiritual')));
-    });
-    if (itins.length === 0) itins = liveItineraries;
+  const grid = document.getElementById('itinGrid');
+  if (!liveItineraries.length) {
+    grid.innerHTML = '<div class="no-results">No itineraries yet.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Open ⚙ Manage Database → Itineraries to create one.</span></div>';
+    return;
   }
-  document.getElementById('itinGrid').innerHTML = itins.map(i => `
-    <div class="itin-card">
-      <div class="itin-theme">${i.duration}</div>
-      <div class="itin-title">${i.theme}</div>
-      <ul class="itin-stops">
-        ${i.stops.map(s => `
-          <li class="itin-stop">
-            <span class="stop-time">${s.time}</span>
-            <span>${s.name} <em style="color:#A0AEC0;font-size:10px">· ${s.area}</em></span>
-          </li>`).join('')}
-      </ul>
-    </div>
-  `).join('');
+  grid.innerHTML = liveItineraries.map(itin => {
+    const stops = liveStops
+      .filter(s => s.itinId === itin.id)
+      .sort((a, b) => a.order - b.order);
+    const stopsHtml = stops.length
+      ? stops.map(s => {
+          const exp = liveExperiences.find(e => e.id === s.expId);
+          if (!exp) return '';
+          return `<li class="itin-stop">
+            <span class="stop-time">${s.timeLabel || '—'}</span>
+            <span>${exp.name}<em style="color:#A0AEC0;font-size:10px"> · ${exp.area}</em></span>
+          </li>`;
+        }).filter(Boolean).join('')
+      : '<li style="color:#a0aec0;font-size:11px;font-family:Josefin Sans;list-style:none;padding:4px 0">No stops added yet</li>';
+    return `<div class="itin-card">
+      <div class="itin-theme">${itin.duration}</div>
+      <div class="itin-title">${itin.name}</div>
+      ${itin.description ? `<p style="font-size:12px;color:var(--slate);margin:0 0 10px;font-family:'Josefin Sans',sans-serif">${itin.description}</p>` : ''}
+      <ul class="itin-stops">${stopsHtml}</ul>
+    </div>`;
+  }).join('');
 }
 
 function renderEvents() {
@@ -2654,135 +2645,232 @@ function switchManageTab(tab) {
   renderManageData();
 }
 
-// ── ITINERARY EDITOR ─────────────────────────────────────────────────
+// ── ITINERARY EDITOR — 3-PANEL ───────────────────────────────────────
 function escVal(v) {
   return (v || '').toString()
-    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+    .replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function renderManageItinerariesHtml() {
-  const cardsHtml = liveItineraries.length === 0
-    ? `<div class="itin-empty-state">No itineraries yet. Click <strong>+ New Itinerary</strong> to get started.</div>`
-    : liveItineraries.map((it, idx) => itinEditorCard(it, idx)).join('');
   return `
     <div class="manage-toolbar">
-      <span>Changes save automatically as you type.</span>
+      <span>Select an itinerary, then click <strong>+</strong> on any experience to add it as a stop.</span>
       <span id="savedFlash" class="saved-flash">✓ Saved</span>
-      <button class="btn-add-row" onclick="addNewItinerary()">+ New Itinerary</button>
     </div>
-    <div class="itin-editor-list" id="itinEditorList">${cardsHtml}</div>`;
-}
-
-function itinEditorCard(it, idx) {
-  return `
-    <div class="itin-editor-card" id="itincard-${idx}">
-      <div class="itin-editor-header">
-        <div style="display:flex;gap:8px;flex:1;min-width:0">
-          <input class="itin-field itin-field-name" placeholder="Itinerary name…"
-            value="${escVal(it.theme)}"
-            onchange="updateItinerary(${idx},'theme',this.value)"
-            title="Itinerary name (e.g. Romantic Getaway)">
-          <input class="itin-field itin-field-duration" placeholder="Duration…"
-            value="${escVal(it.duration)}"
-            onchange="updateItinerary(${idx},'duration',this.value)"
-            title="Duration (e.g. 1 Day, 2 Days, Half Day)">
-        </div>
-        <button class="btn-del-row" onclick="deleteItinerary(${idx})" title="Delete this itinerary" style="margin-left:8px;flex-shrink:0">×</button>
-      </div>
-      <div class="itin-stops-editor" id="stops-${idx}">
-        ${it.stops.map((s, si) => stopEditorRow(idx, si, s)).join('')}
-      </div>
-      <button class="btn-add-stop" onclick="addStop(${idx})">+ Add Stop</button>
+    <div class="itin-3panel">
+      ${renderItinListPanel()}
+      ${renderStopsPanel()}
+      ${renderBrowserPanel()}
     </div>`;
 }
 
-function stopEditorRow(itIdx, stopIdx, s) {
+function renderItinListPanel() {
+  const rows = liveItineraries.map(it => `
+    <div class="itin-row ${it.id === selectedItinId ? 'active' : ''}" onclick="selectItin('${it.id}')">
+      <div class="itin-row-info">
+        <div class="itin-row-name">${escVal(it.name)}</div>
+        <div class="itin-row-dur">${escVal(it.duration)}</div>
+      </div>
+      <button class="itin-del-btn" onclick="event.stopPropagation();deleteItinerary('${it.id}')" title="Delete">×</button>
+    </div>`).join('');
   return `
-    <div class="stop-editor-row" id="stop-${itIdx}-${stopIdx}">
-      <span class="stop-editor-num">${stopIdx + 1}</span>
-      <input class="itin-field itin-field-time" placeholder="Time…"
-        value="${escVal(s.time)}"
-        onchange="updateStop(${itIdx},${stopIdx},'time',this.value)"
-        title="Time label (e.g. Morning, Day 1 Eve, Afternoon)">
-      <input class="itin-field itin-field-stopname" placeholder="Experience or venue name…"
-        value="${escVal(s.name)}"
-        onchange="updateStop(${itIdx},${stopIdx},'name',this.value)"
-        title="What to do at this stop">
-      <input class="itin-field itin-field-area" placeholder="Area…"
-        value="${escVal(s.area)}"
-        onchange="updateStop(${itIdx},${stopIdx},'area',this.value)"
-        title="Area (e.g. Nevada City, Grass Valley)">
-      <button class="btn-del-stop" onclick="deleteStop(${itIdx},${stopIdx})" title="Remove stop">×</button>
+    <div class="itin-panel">
+      <div class="itin-panel-hd">
+        Itineraries
+        <button class="btn-add-row" style="font-size:11px;padding:3px 10px" onclick="addItinerary()">+ New</button>
+      </div>
+      <div class="itin-panel-body">
+        ${rows || '<div class="itin-empty-msg">No itineraries yet.<br>Click + New to start.</div>'}
+      </div>
     </div>`;
 }
 
-function addNewItinerary() {
-  liveItineraries.push({
-    theme: 'New Itinerary',
-    duration: '1 Day',
-    stops: [{ time: 'Morning', name: '', area: 'Nevada City' }]
+function renderStopsPanel() {
+  const itin = liveItineraries.find(i => i.id === selectedItinId);
+  if (!itin) return `
+    <div class="itin-panel">
+      <div class="itin-panel-hd">Stops</div>
+      <div class="itin-panel-body"><div class="itin-empty-msg">← Select an itinerary</div></div>
+    </div>`;
+  const stops = liveStops.filter(s => s.itinId === itin.id).sort((a,b) => a.order - b.order);
+  const stopsHtml = stops.length ? stops.map((s, idx) => {
+    const exp = liveExperiences.find(e => e.id === s.expId);
+    if (!exp) return '';
+    const isFirst = idx === 0, isLast = idx === stops.length - 1;
+    return `<div class="stop-row">
+      <input class="stop-label-input" value="${escVal(s.timeLabel)}" placeholder="Time…"
+        onchange="updateStopLabel('${s.id}',this.value)" title="Time label (e.g. Morning, Day 1 Eve)">
+      <div class="stop-exp-info">
+        <div class="stop-exp-name" title="${escVal(exp.name)}">${exp.icon||''} ${escVal(exp.name)}</div>
+        <div class="stop-exp-area">${escVal(exp.area)}</div>
+      </div>
+      <button class="stop-move-btn" onclick="moveStop('${s.id}',-1)" ${isFirst?'disabled style="opacity:.2"':''}>▲</button>
+      <button class="stop-move-btn" onclick="moveStop('${s.id}',1)"  ${isLast ?'disabled style="opacity:.2"':''}>▼</button>
+      <button class="stop-del-btn"  onclick="removeStop('${s.id}')" title="Remove">×</button>
+    </div>`;
+  }).join('') : '<div class="itin-empty-msg">No stops yet.<br>Click + on an experience →</div>';
+  return `
+    <div class="itin-panel">
+      <div class="itin-panel-hd" style="flex-wrap:wrap;gap:4px">
+        <input class="itin-name-input" value="${escVal(itin.name)}" placeholder="Itinerary name…"
+          onchange="updateItinField('${itin.id}','name',this.value)">
+        <input class="itin-duration-input" value="${escVal(itin.duration)}" placeholder="Duration…"
+          onchange="updateItinField('${itin.id}','duration',this.value)">
+      </div>
+      <div class="itin-panel-body" id="stopsPanel">${stopsHtml}</div>
+    </div>`;
+}
+
+function renderBrowserPanel() {
+  const typeOpts = ['','Restaurant','Winery','Tasting room','Bakery','Brewery','Outdoor','Activity',
+    'Wellness','Lodging','Historic site','Museum','Music venue','Gallery','Art event']
+    .map(t => `<option value="${t}" ${browserType===t?'selected':''}>${t||'All categories'}</option>`).join('');
+  const exps = liveExperiences.filter(e => {
+    if (browserSearch && !e.name.toLowerCase().includes(browserSearch.toLowerCase())) return false;
+    if (browserType && e.type !== browserType) return false;
+    return true;
   });
-  saveItineraries();
+  const noItin = !selectedItinId;
+  const rows = exps.map(e => `
+    <div class="browser-row">
+      <div class="browser-row-info">
+        <div class="browser-row-name" title="${escVal(e.name)}">${e.icon||''} ${escVal(e.name)}</div>
+        <div class="browser-row-area">${escVal(e.area)}</div>
+      </div>
+      <button class="browser-add-btn" onclick="addStop('${e.id}')"
+        ${noItin?'disabled title="Select an itinerary first"':'title="Add to itinerary"'}>+</button>
+    </div>`).join('');
+  return `
+    <div class="itin-panel">
+      <div class="itin-panel-hd">Add Experience</div>
+      <div class="browser-controls">
+        <input class="browser-input" placeholder="🔍 Search experiences…" value="${escVal(browserSearch)}"
+          oninput="browserSearch=this.value;refreshBrowser()">
+        <select class="browser-input" onchange="browserType=this.value;refreshBrowser()">${typeOpts}</select>
+      </div>
+      <div class="itin-panel-body" id="expBrowser">
+        ${rows || '<div class="itin-empty-msg">No matches</div>'}
+      </div>
+    </div>`;
+}
+
+function refreshBrowser() {
+  const el = document.getElementById('expBrowser');
+  if (!el) return;
+  const noItin = !selectedItinId;
+  const exps = liveExperiences.filter(e => {
+    if (browserSearch && !e.name.toLowerCase().includes(browserSearch.toLowerCase())) return false;
+    if (browserType && e.type !== browserType) return false;
+    return true;
+  });
+  el.innerHTML = exps.map(e => `
+    <div class="browser-row">
+      <div class="browser-row-info">
+        <div class="browser-row-name" title="${escVal(e.name)}">${e.icon||''} ${escVal(e.name)}</div>
+        <div class="browser-row-area">${escVal(e.area)}</div>
+      </div>
+      <button class="browser-add-btn" onclick="addStop('${e.id}')"
+        ${noItin?'disabled title="Select an itinerary first"':'title="Add to itinerary"'}>+</button>
+    </div>`).join('') || '<div class="itin-empty-msg">No matches</div>';
+}
+
+function refreshStopsPanel() {
+  const panel = document.getElementById('stopsPanel');
+  if (!panel || !selectedItinId) return;
+  const stops = liveStops.filter(s => s.itinId === selectedItinId).sort((a,b) => a.order - b.order);
+  panel.innerHTML = stops.map((s, idx) => {
+    const exp = liveExperiences.find(e => e.id === s.expId);
+    if (!exp) return '';
+    const isFirst = idx === 0, isLast = idx === stops.length - 1;
+    return `<div class="stop-row">
+      <input class="stop-label-input" value="${escVal(s.timeLabel)}" placeholder="Time…"
+        onchange="updateStopLabel('${s.id}',this.value)" title="Time label">
+      <div class="stop-exp-info">
+        <div class="stop-exp-name">${exp.icon||''} ${escVal(exp.name)}</div>
+        <div class="stop-exp-area">${escVal(exp.area)}</div>
+      </div>
+      <button class="stop-move-btn" onclick="moveStop('${s.id}',-1)" ${isFirst?'disabled style="opacity:.2"':''}>▲</button>
+      <button class="stop-move-btn" onclick="moveStop('${s.id}',1)"  ${isLast ?'disabled style="opacity:.2"':''}>▼</button>
+      <button class="stop-del-btn"  onclick="removeStop('${s.id}')" title="Remove">×</button>
+    </div>`;
+  }).join('') || '<div class="itin-empty-msg">No stops yet.<br>Click + on an experience →</div>';
+}
+
+function selectItin(id) {
+  selectedItinId = id;
+  renderManageData();
+}
+
+function addItinerary() {
+  const itin = { id: genId(), name: 'New Itinerary', duration: '1 Day', description: '' };
+  liveItineraries.push(itin);
+  selectedItinId = itin.id;
+  saveAll();
   renderItineraries();
   renderManageData();
-  setTimeout(() => {
-    const list = document.getElementById('itinEditorList');
-    if (list) list.scrollTop = list.scrollHeight;
-    const newCard = document.getElementById(`itincard-${liveItineraries.length - 1}`);
-    if (newCard) newCard.querySelector('.itin-field-name')?.select();
-  }, 60);
 }
 
-function deleteItinerary(idx) {
-  const name = liveItineraries[idx]?.theme || 'this itinerary';
-  if (!confirm(`Remove "${name}"?`)) return;
-  liveItineraries.splice(idx, 1);
-  saveItineraries();
+function deleteItinerary(id) {
+  const it = liveItineraries.find(i => i.id === id);
+  if (!confirm(`Remove "${it?.name || 'this itinerary'}"?`)) return;
+  liveItineraries = liveItineraries.filter(i => i.id !== id);
+  liveStops = liveStops.filter(s => s.itinId !== id);
+  if (selectedItinId === id) selectedItinId = liveItineraries[0]?.id || null;
+  saveAll();
   renderItineraries();
   renderManageData();
 }
 
-function updateItinerary(idx, field, value) {
-  if (!liveItineraries[idx]) return;
-  liveItineraries[idx][field] = value;
-  saveItineraries();
-  renderItineraries(); // keep main Itineraries tab live
-}
-
-function addStop(itIdx) {
-  if (!liveItineraries[itIdx]) return;
-  liveItineraries[itIdx].stops.push({ time: '', name: '', area: '' });
-  saveItineraries();
+function updateItinField(id, field, value) {
+  const it = liveItineraries.find(i => i.id === id);
+  if (!it) return;
+  it[field] = value;
+  saveAll();
   renderItineraries();
-  // Only re-render the stops container, not the whole panel (preserves focus elsewhere)
-  const stopsEl = document.getElementById(`stops-${itIdx}`);
-  if (stopsEl) {
-    stopsEl.innerHTML = liveItineraries[itIdx].stops
-      .map((s, si) => stopEditorRow(itIdx, si, s)).join('');
-    const rows = stopsEl.querySelectorAll('.stop-editor-row');
-    const lastRow = rows[rows.length - 1];
-    if (lastRow) lastRow.querySelector('.itin-field-time')?.focus();
-  }
 }
 
-function deleteStop(itIdx, stopIdx) {
-  if (!liveItineraries[itIdx]) return;
-  liveItineraries[itIdx].stops.splice(stopIdx, 1);
-  saveItineraries();
+function addStop(expId) {
+  if (!selectedItinId) return;
+  const maxOrder = liveStops.filter(s => s.itinId === selectedItinId)
+    .reduce((m, s) => Math.max(m, s.order), 0);
+  liveStops.push({ id: genId(), itinId: selectedItinId, expId, timeLabel: '', order: maxOrder + 1 });
+  saveAll();
   renderItineraries();
-  const stopsEl = document.getElementById(`stops-${itIdx}`);
-  if (stopsEl) {
-    stopsEl.innerHTML = liveItineraries[itIdx].stops
-      .map((s, si) => stopEditorRow(itIdx, si, s)).join('');
-  }
+  refreshStopsPanel();
+  const panel = document.getElementById('stopsPanel');
+  if (panel) panel.scrollTop = panel.scrollHeight;
 }
 
-function updateStop(itIdx, stopIdx, field, value) {
-  if (!liveItineraries[itIdx]?.stops[stopIdx]) return;
-  liveItineraries[itIdx].stops[stopIdx][field] = value;
-  saveItineraries();
-  renderItineraries(); // keep main tab live without disturbing the editor
+function removeStop(stopId) {
+  liveStops = liveStops.filter(s => s.id !== stopId);
+  liveStops.filter(s => s.itinId === selectedItinId)
+    .sort((a,b) => a.order - b.order)
+    .forEach((s,i) => s.order = i + 1);
+  saveAll();
+  renderItineraries();
+  refreshStopsPanel();
+}
+
+function moveStop(stopId, dir) {
+  const itinStops = liveStops.filter(s => s.itinId === selectedItinId).sort((a,b) => a.order - b.order);
+  const idx = itinStops.findIndex(s => s.id === stopId);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= itinStops.length) return;
+  const tmp = itinStops[idx].order;
+  itinStops[idx].order = itinStops[swapIdx].order;
+  itinStops[swapIdx].order = tmp;
+  saveAll();
+  renderItineraries();
+  refreshStopsPanel();
+}
+
+function updateStopLabel(stopId, value) {
+  const s = liveStops.find(s => s.id === stopId);
+  if (!s) return;
+  s.timeLabel = value;
+  saveAll();
+  renderItineraries();
 }
 
 // ── BOOT ─────────────────────────────────────────────────────────────
