@@ -1,0 +1,2793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nevada County — Discover Your Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --brown: #6B4A2A;
+    --cream: #F5F0E8;
+    --dark: #1E1508;
+    --forest: #3A5A3A;
+    --rust: #8B4A2A;
+    --slate: #4A5568;
+    --fog: #EDE8DE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'Josefin Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--dark);
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(139,74,42,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(58,90,58,0.3) 0%, transparent 55%),
+      radial-gradient(ellipse at 60% 80%, rgba(201,168,76,0.15) 0%, transparent 50%);
+    padding: 56px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 1;
+  }
+  .hero-eyebrow {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 58px);
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .hero h1 em {
+    color: var(--gold-light);
+    font-style: italic;
+  }
+  .hero-sub {
+    color: rgba(245,240,232,0.65);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 300;
+  }
+  .gold-rule {
+    width: 80px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 20px auto;
+  }
+
+  /* THEME SECTION */
+  .section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 24px 0;
+  }
+  .section-label {
+    font-size: 12px;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 3.5vw, 32px);
+    color: var(--brown);
+    margin-bottom: 6px;
+  }
+  .section-desc {
+    color: var(--slate);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+  }
+
+  /* THEME CARDS */
+  .themes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .theme-card {
+    position: relative;
+    height: 110px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    user-select: none;
+  }
+  .theme-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .theme-card.selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold), 0 6px 20px rgba(201,168,76,0.35);
+  }
+  .theme-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+  .theme-card:hover img { transform: scale(1.06); }
+  .theme-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,6,2,0.78) 0%, rgba(10,6,2,0.15) 60%, transparent 100%);
+    transition: background 0.2s;
+  }
+  .theme-card.selected .theme-card-overlay {
+    background: linear-gradient(to top, rgba(30,10,0,0.82) 0%, rgba(201,168,76,0.18) 100%);
+  }
+  .theme-card-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 8px 10px;
+  }
+  .theme-name {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: white;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .theme-tagline {
+    display: block;
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.72);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+    margin-top: 1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .theme-check {
+    position: absolute;
+    top: 7px; right: 8px;
+    width: 20px; height: 20px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: none;
+    align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dark);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .theme-card.selected .theme-check { display: flex; }
+
+
+  /* FILTERS */
+  .filters-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+    align-items: flex-end;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; }
+  .filter-group label {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .filter-group select {
+    background: white;
+    border: 1.5px solid #d4c9b0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 15px;
+    color: var(--dark);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C9A84C' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .filter-group select:focus { outline: none; border-color: var(--gold); }
+
+  /* EXPERIENCE CARDS */
+  .exp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+  .exp-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    border: 1.5px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .exp-card:hover { border-color: #d4c9b0; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .exp-card.added { border-color: var(--gold); }
+
+  /* Photo header */
+  .exp-photo {
+    position: relative;
+    height: 140px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .exp-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+  .exp-card:hover .exp-photo img { transform: scale(1.04); }
+  .exp-photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,6,2,0.82) 0%, rgba(10,6,2,0.2) 55%, transparent 100%);
+  }
+  .exp-photo-name {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 10px 14px 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .exp-photo-area {
+    position: absolute;
+    top: 8px; right: 10px;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(4px);
+    padding: 3px 7px;
+    border-radius: 20px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 600;
+  }
+  .exp-added-badge {
+    position: absolute;
+    top: 8px; left: 10px;
+    background: var(--gold);
+    color: var(--dark);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-family: 'Josefin Sans', sans-serif;
+    display: none;
+  }
+  .exp-card.added .exp-added-badge { display: block; }
+
+  .exp-body { padding: 14px 16px 14px; }
+  .exp-sub {
+    font-size: 11px;
+    color: var(--slate);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .exp-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    color: var(--slate);
+  }
+  .exp-meta .dot { color: var(--gold); }
+  .exp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .tag {
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--fog);
+    color: var(--brown);
+    font-weight: 600;
+  }
+  .tag.highlight { background: #fef3d0; color: #8B6914; }
+  .exp-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .btn-add {
+    flex: 1;
+    padding: 9px 14px;
+    border-radius: 6px;
+    border: 1.5px solid var(--gold);
+    background: transparent;
+    color: var(--brown);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-add:hover { background: var(--gold); color: white; }
+  .btn-add.added-btn { background: var(--gold); color: white; }
+  .btn-visit {
+    padding: 9px 12px;
+    border-radius: 6px;
+    border: 1.5px solid #d4c9b0;
+    background: transparent;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--slate);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.18s;
+  }
+  .btn-visit:hover { border-color: var(--slate); color: var(--dark); }
+
+  /* ITINERARIES */
+  .itin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+  .itin-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    border: 1.5px solid #eae3d5;
+  }
+  .itin-theme {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .itin-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .itin-duration {
+    font-size: 11px;
+    color: var(--slate);
+    margin-bottom: 14px;
+  }
+  .itin-stops { list-style: none; }
+  .itin-stop {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--slate);
+  }
+  .stop-time {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    min-width: 60px;
+    font-weight: 600;
+    padding-top: 1px;
+  }
+
+  /* EVENTS */
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+  .event-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    border-left: 4px solid var(--gold);
+  }
+  .event-date {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .event-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .event-venue { font-size: 12px; color: var(--slate); margin-bottom: 8px; }
+  .event-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #e0d8c8;
+    margin-bottom: 28px;
+  }
+  .tab-btn {
+    padding: 12px 22px;
+    background: none;
+    border: none;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.18s;
+    font-weight: 400;
+  }
+  .tab-btn:hover { color: var(--brown); }
+  .tab-btn.active {
+    color: var(--brown);
+    border-bottom-color: var(--gold);
+    font-weight: 600;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* FLOATING LIST BUTTON */
+  .fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--dark);
+    color: var(--gold-light);
+    border: 2px solid var(--gold);
+    border-radius: 50px;
+    padding: 14px 24px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    z-index: 100;
+  }
+  .fab:hover { background: var(--gold); color: var(--dark); transform: translateY(-2px); }
+  .fab-count {
+    background: var(--gold);
+    color: var(--dark);
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--cream);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .modal-header {
+    background: var(--dark);
+    background-image: radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.15) 0%, transparent 70%);
+    padding: 28px 28px 22px;
+    border-radius: 14px 14px 0 0;
+    position: sticky; top: 0; z-index: 1;
+  }
+  .modal-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+  .modal-header p { font-size: 12px; color: rgba(245,240,232,0.6); letter-spacing: 0.05em; }
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none; border: none;
+    color: rgba(245,240,232,0.6);
+    font-size: 22px;
+    cursor: pointer;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    transition: all 0.18s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.1); color: white; }
+  .modal-body { padding: 24px 28px 28px; }
+  .itinerary-item {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border: 1.5px solid #e8e0d0;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .itinerary-item .num {
+    width: 28px; height: 28px;
+    background: var(--gold);
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .itinerary-item .item-body { flex: 1; }
+  .itinerary-item .item-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--dark);
+    margin-bottom: 3px;
+  }
+  .itinerary-item .item-sub {
+    font-size: 11px;
+    color: var(--slate);
+    margin-bottom: 8px;
+  }
+  .itinerary-item .item-links {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .item-link {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brown);
+    text-decoration: none;
+    border: 1px solid var(--gold-light);
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: all 0.15s;
+    font-weight: 600;
+  }
+  .item-link:hover { background: var(--gold); color: white; border-color: var(--gold); }
+  .item-remove {
+    background: none; border: none;
+    color: #ccc; font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .item-remove:hover { color: var(--rust); background: #fef0ee; }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    flex: 1;
+    padding: 13px 20px;
+    background: var(--dark);
+    color: var(--gold-light);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-primary:hover { background: var(--gold); color: var(--dark); }
+  .btn-secondary {
+    padding: 13px 20px;
+    background: transparent;
+    color: var(--slate);
+    border: 1.5px solid #d4c9b0;
+    border-radius: 8px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-secondary:hover { border-color: var(--slate); color: var(--dark); }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--slate);
+  }
+  .empty-state .big { font-size: 36px; margin-bottom: 10px; }
+  .empty-state p { font-size: 13px; }
+  .results-count {
+    font-size: 14px;
+    color: var(--slate);
+    margin-bottom: 16px;
+    letter-spacing: 0.03em;
+  }
+  .results-count strong { color: var(--gold); }
+  /* ACTIVE FILTER CHIPS */
+  .filter-chip-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 0 4px;
+  }
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px 6px 14px;
+    border: 1.5px solid var(--gold);
+    border-radius: 20px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--brown);
+    background: rgba(201,168,76,0.08);
+  }
+  .filter-chip.chip-meta {
+    border-color: #a0aec0;
+    color: var(--slate);
+    background: rgba(74,85,104,0.06);
+  }
+  .filter-chip-x {
+    cursor: pointer;
+    opacity: 0.55;
+    font-size: 13px;
+    line-height: 1;
+    margin-left: 4px;
+    transition: opacity 0.15s;
+  }
+  .filter-chip-x:hover { opacity: 1; color: var(--rust); }
+  .filter-chip-clear {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--slate);
+    background: none;
+    border: 1px solid #cbd5e0;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .filter-chip-clear:hover { border-color: var(--rust); color: var(--rust); }
+  .no-results {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--slate);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+  }
+
+  /* MANAGE MODE */
+  .manage-banner {
+    display: none;
+    background: linear-gradient(135deg, #1E1508, #3A2010);
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    font-size: 12px;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    align-items: center;
+    gap: 12px;
+  }
+  .manage-banner.visible { display: flex; }
+  .manage-banner strong { font-size: 13px; }
+  .manage-exit {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .manage-exit:hover { background: var(--gold); color: var(--dark); }
+
+  /* MANAGE MODAL TABS */
+  .manage-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0d8c8;
+    background: var(--cream);
+    flex-shrink: 0;
+  }
+  .manage-tab-btn {
+    padding: 12px 22px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    color: var(--slate);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 400;
+  }
+  .manage-tab-btn:hover { color: var(--brown); }
+  .manage-tab-btn.active { color: var(--brown); border-bottom-color: var(--gold); font-weight: 600; }
+
+  /* ITINERARY EDITOR */
+  .itin-editor-list { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; max-height: 62vh; overflow-y: auto; }
+  .itin-editor-card { background: white; border: 1px solid #e0d8c8; border-radius: 8px; overflow: hidden; }
+  .itin-editor-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; background: var(--fog);
+    border-bottom: 1px solid #e0d8c8;
+  }
+  .itin-field {
+    font-family: 'Josefin Sans', sans-serif; font-size: 12px;
+    padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px;
+    color: var(--dark); background: white; transition: border-color 0.15s;
+  }
+  .itin-field:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.15); }
+  .itin-field-name     { flex: 2; min-width: 0; }
+  .itin-field-duration { width: 120px; flex-shrink: 0; }
+  .itin-field-time     { width: 120px; flex-shrink: 0; }
+  .itin-field-stopname { flex: 2; min-width: 0; }
+  .itin-field-area     { width: 120px; flex-shrink: 0; }
+  .itin-stops-editor { padding: 8px 12px 4px; display: flex; flex-direction: column; gap: 5px; }
+  .stop-editor-row { display: flex; align-items: center; gap: 6px; }
+  .stop-editor-num { font-size: 10px; color: var(--gold); font-weight: 700; min-width: 18px; text-align: right; flex-shrink: 0; }
+  .btn-del-stop {
+    background: none; border: none; color: var(--slate);
+    cursor: pointer; font-size: 15px; padding: 0 3px; line-height: 1;
+    opacity: 0.35; transition: opacity 0.15s, color 0.15s; flex-shrink: 0;
+  }
+  .btn-del-stop:hover { opacity: 1; color: var(--rust); }
+  .btn-add-stop {
+    display: inline-block; margin: 6px 12px 10px;
+    background: none; border: 1px dashed var(--gold); color: var(--gold);
+    border-radius: 4px; padding: 4px 12px;
+    font-family: 'Josefin Sans', sans-serif; font-size: 10px;
+    letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-add-stop:hover { background: var(--gold); color: var(--dark); }
+  .itin-empty-state { padding: 40px; text-align: center; color: var(--slate); font-size: 13px; }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: rgba(107,74,42,0.5);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+  /* CLEAR THEMES BUTTON */
+
+  /* MAP MODAL */
+  .map-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .map-overlay.open { display: flex; }
+  .map-modal {
+    background: var(--cream);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 860px;
+    height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  }
+  .map-header {
+    background: var(--dark);
+    background-image: radial-gradient(ellipse at 70% 50%, rgba(201,168,76,0.12) 0%, transparent 70%);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .map-header h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-size: 18px;
+    flex: 1;
+  }
+  .map-header p { font-size: 11px; color: rgba(245,240,232,0.55); letter-spacing: 0.06em; }
+  .map-close {
+    background: none; border: none;
+    color: rgba(245,240,232,0.6);
+    font-size: 20px; cursor: pointer;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .map-close:hover { background: rgba(255,255,255,0.12); color: white; }
+  #mapContainer {
+    flex: 1;
+    width: 100%;
+    position: relative;
+  }
+  #leafletMap {
+    width: 100%;
+    height: 100%;
+  }
+  /* Leaflet popup styling */
+  .leaflet-popup-content-wrapper {
+    border-radius: 10px !important;
+    border: 2px solid #C9A84C !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.22) !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+  .leaflet-popup-content {
+    margin: 0 !important;
+    width: 240px !important;
+  }
+  .leaflet-popup-tip { background: #C9A84C !important; }
+  .popup-inner {
+    padding: 14px 16px 12px;
+    font-family: 'Josefin Sans', sans-serif;
+  }
+  .popup-num {
+    display: inline-block;
+    width: 22px; height: 22px;
+    background: #C9A84C;
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 22px;
+    margin-bottom: 7px;
+  }
+  .popup-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: #1E1508;
+    line-height: 1.25;
+    margin-bottom: 3px;
+  }
+  .popup-sub { font-size: 11px; color: #4A5568; margin-bottom: 4px; }
+  .popup-hours { font-size: 10px; color: #6B4A2A; margin-bottom: 8px; letter-spacing: 0.04em; }
+  .popup-notes { font-size: 10px; color: #718096; font-style: italic; margin-bottom: 10px; line-height: 1.4; }
+  .popup-links { display: flex; gap: 6px; flex-wrap: wrap; }
+  .popup-link {
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6B4A2A;
+    text-decoration: none;
+    border: 1px solid #C9A84C;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .popup-link:hover { background: #C9A84C; color: white; }
+
+  /* MANAGE DATA TABLE */
+  .manage-table-wrap {
+    overflow-x: auto;
+    max-height: calc(88vh - 180px);
+    overflow-y: auto;
+  }
+  .manage-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: var(--fog);
+    border-bottom: 1px solid #ddd6c8;
+    flex-wrap: wrap;
+  }
+  .manage-toolbar span { font-size: 12px; color: var(--slate); flex: 1; }
+  .btn-add-row {
+    padding: 8px 16px;
+    background: var(--forest);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .btn-add-row:hover { background: #2d4a2d; }
+  .btn-save-all {
+    padding: 8px 16px;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-save-all:hover { background: var(--gold-light); }
+  .saved-flash {
+    font-size: 11px;
+    color: var(--forest);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .saved-flash.show { opacity: 1; }
+  .manage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 900px;
+  }
+  .manage-table th {
+    background: var(--dark);
+    color: var(--gold-light);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 10px 10px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  .manage-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+  }
+  .manage-table th.sortable:hover { background: var(--brown); }
+  .manage-table th.sort-asc::after  { content: ' ▲'; color: var(--gold); font-size: 9px; }
+  .manage-table th.sort-desc::after { content: ' ▼'; color: var(--gold); font-size: 9px; }
+  .manage-table tr:nth-child(even) { background: #faf7f2; }
+  .manage-table tr:hover { background: #fdf5e0; }
+  .manage-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #eee6d8;
+    vertical-align: middle;
+  }
+  .manage-table td input,
+  .manage-table td textarea {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px;
+    background: transparent;
+    color: var(--dark);
+    transition: all 0.15s;
+    resize: none;
+  }
+  .manage-table td input:focus,
+  .manage-table td textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: white;
+    box-shadow: 0 0 0 2px rgba(201,168,76,0.15);
+  }
+  .manage-table td input.short { width: 80px; }
+  .manage-table td input.medium { width: 130px; }
+
+  /* Tag pill editor */
+  .tag-cell { position: relative; min-width: 200px; }
+  .tag-pills {
+    display: flex; flex-wrap: wrap; gap: 3px;
+    padding: 3px 4px; cursor: pointer;
+    min-height: 26px; align-items: center;
+    border: 1px solid transparent; border-radius: 4px;
+    transition: border-color 0.15s;
+  }
+  .tag-pills:hover { border-color: var(--gold); background: white; }
+  .tag-pill {
+    background: var(--gold); color: var(--dark);
+    font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+    padding: 2px 6px; border-radius: 10px;
+    white-space: nowrap; text-transform: uppercase;
+  }
+  .tag-pill-empty { font-size: 10px; color: var(--slate); font-style: italic; }
+  .tag-dropdown {
+    position: fixed; z-index: 9999;
+    background: white; border: 1px solid var(--gold);
+    border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    min-width: 220px; max-height: 280px; overflow-y: auto;
+    padding: 6px 0;
+  }
+  .tag-dropdown-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 12px; cursor: pointer; font-size: 11px;
+    color: var(--dark); transition: background 0.1s;
+  }
+  .tag-dropdown-item:hover { background: var(--cream); }
+  .tag-dropdown-item input[type=checkbox] { accent-color: var(--gold); cursor: pointer; }
+  .tag-dropdown-item.checked { font-weight: 700; color: var(--forest); }
+  .tag-dropdown-header {
+    padding: 4px 12px 6px; font-size: 9px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--slate);
+    border-bottom: 1px solid var(--fog); margin-bottom: 2px;
+  }
+  .btn-del-row {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .btn-del-row:hover { color: var(--rust); background: #fef0ee; }
+  .new-row { background: #f0fdf0 !important; }
+
+  @media (max-width: 600px) {
+    .themes-grid { grid-template-columns: repeat(2, 1fr); }
+    .filters-row { flex-direction: column; }
+    .fab { bottom: 16px; right: 16px; padding: 12px 18px; }
+    .map-modal { height: 92vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Grass Valley · Nevada City · North San Juan</div>
+  <h1>Nevada County<br><em>Experience Finder</em></h1>
+  <div class="gold-rule"></div>
+  <p class="hero-sub">Choose your vibe. Build your perfect Gold Country itinerary.</p>
+</div>
+
+<!-- THEME SELECTOR -->
+<div class="section">
+  <div class="section-label">Step 1</div>
+  <div class="section-title">Where & What</div>
+  <p class="section-desc">Filter by area and category to narrow your options.</p>
+
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>Area</label>
+      <select id="filterArea">
+        <option value="">All Areas</option>
+        <optgroup label="Western Foothills">
+          <option value="Nevada City">Nevada City</option>
+          <option value="Grass Valley">Grass Valley</option>
+          <option value="Near Nevada City">Near Nevada City</option>
+          <option value="North San Juan">North San Juan</option>
+          <option value="Penn Valley">Penn Valley</option>
+          <option value="Washington">Washington</option>
+          <option value="Rough and Ready">Rough and Ready</option>
+        </optgroup>
+        <optgroup label="Colfax Area">
+          <option value="Colfax">Colfax</option>
+        </optgroup>
+        <optgroup label="County-Wide">
+          <option value="Nevada County">County-Wide</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Category</label>
+      <select id="filterType">
+        <option value="">All Categories</option>
+        <optgroup label="Season">
+          <option value="season:Spring">🌸 Spring</option>
+          <option value="season:Summer">☀️ Summer</option>
+          <option value="season:Fall">🍂 Fall</option>
+          <option value="season:Winter">❄️ Winter</option>
+          <option value="season:Holiday">🎄 Holiday</option>
+        </optgroup>
+        <optgroup label="Category">
+        <option value="Outdoor">Outdoor</option>
+        <option value="Historic site">Historic Sites</option>
+        <option value="Museum">Museums</option>
+        <option value="Music venue">Music & Arts</option>
+        <option value="Restaurant">Dining</option>
+        <option value="Brewery">Breweries & Bars</option>
+        <option value="Tasting room">Wine Tasting</option>
+        <option value="Winery">Wineries</option>
+        <option value="Bakery">Bakeries</option>
+        <option value="Wellness">Wellness</option>
+        <option value="Lodging">Lodging</option>
+        <option value="Activity">Activities</option>
+        <option value="Art event">Festivals & Events</option>
+        <option value="Gallery">Galleries</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:8px">Step 2</div>
+  <div class="section-title">Choose Your Vibe</div>
+  <p class="section-desc">Pick one or more vibes — they combine with the filters above to narrow your results.</p>
+
+  <div class="themes-grid" id="themesGrid"></div>
+
+  <div class="section-label" style="margin-top:16px">Step 3</div>
+  <div class="section-title" style="margin-bottom:8px">Browse & Build Your List</div>
+
+  <div id="manageBanner" class="manage-banner">
+    <span>✏️ <strong>Manage Mode</strong> — Click × on any card to remove it from your itinerary.</span>
+    <button class="manage-exit" onclick="exitManage()">Done</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('experiences', this)">Experiences</button>
+    <button class="tab-btn" onclick="switchTab('itineraries', this)">Suggested Itineraries</button>
+    <button class="tab-btn" onclick="switchTab('events', this)">Upcoming Events</button>
+    <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()">⚙ Manage Database</button>
+  </div>
+
+  <div id="tab-experiences" class="tab-panel active">
+    <div id="activeFilterBar" style="display:none"></div>
+    <div id="resultsCount" class="results-count"></div>
+    <div id="expGrid" class="exp-grid"></div>
+  </div>
+
+  <div id="tab-itineraries" class="tab-panel">
+    <div id="itinGrid" class="itin-grid"></div>
+  </div>
+
+  <div id="tab-events" class="tab-panel">
+    <div id="eventsGrid" class="events-grid"></div>
+  </div>
+</div>
+
+<!-- FLOATING BUTTON -->
+<button class="fab" onclick="openModal()" id="fabBtn">
+  <span>My Itinerary</span>
+  <span class="fab-count" id="fabCount">0</span>
+</button>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2>Your Itinerary</h2>
+      <p id="modalSubtitle">Add experiences below to build your list</p>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- MANAGE DATA MODAL -->
+<div class="modal-overlay" id="manageDataOverlay" onclick="handleManageDataOverlayClick(event)">
+  <div class="modal" style="max-width:900px">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeManageData()">✕</button>
+      <h2>Manage Experience Database</h2>
+      <p id="manageDataSubtitle">Edit, add, or remove experiences. Changes are saved automatically.</p>
+    </div>
+    <div class="modal-body" id="manageDataBody" style="padding:0"></div>
+  </div>
+</div>
+
+<!-- TAG MANAGER MODAL -->
+<div class="modal-overlay" id="tagManagerOverlay" onclick="if(event.target===this)closeTagManager()" style="z-index:1100">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeTagManager()">✕</button>
+      <h2>Edit Master Tag List</h2>
+      <p>These tags appear in the dropdown for all experiences.</p>
+    </div>
+    <div class="modal-body" id="tagManagerBody"></div>
+  </div>
+</div>
+<div class="map-overlay" id="mapOverlay" onclick="handleMapOverlayClick(event)">
+  <div class="map-modal">
+    <div class="map-header">
+      <div style="flex:1">
+        <h3>🗺 My Itinerary — Map View</h3>
+        <p id="mapSubtitle">Click any marker to see details</p>
+      </div>
+      <button class="map-close" onclick="closeMap()">✕</button>
+    </div>
+    <div id="mapContainer">
+      <div id="leafletMap"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Nevada County, California · Gold Country · Data sourced from public venue & tourism listings</footer>
+
+<script>
+const THEMES = [
+  { id: 'historic',  name: 'Historic & Gold Rush',    tagline: 'Stories carved in stone, gold & time',      tags: ['Historic','Gold Rush'],            photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=320&h=200&fit=crop' },
+  { id: 'arts',      name: 'Arts, Culture & Music',   tagline: 'Studios, stages & storytelling',            tags: ['Artistic','Music','Film'],          photo: 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=320&h=200&fit=crop' },
+  { id: 'handson',   name: 'Hands-On & Creative',     tagline: 'Make, forge, bake & craft',                 tags: ['Hands-on'],                        photo: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=320&h=200&fit=crop' },
+  { id: 'foodie',    name: 'Foodie',                  tagline: 'Farm-to-table, wineries & local flavor',    tags: ['Foodie'],                          photo: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=320&h=200&fit=crop' },
+  { id: 'active',    name: 'Active & Outdoors',       tagline: 'Trails, rivers & wide-open Sierra',         tags: ['Active','Scenic','Sport'],          photo: 'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=320&h=200&fit=crop' },
+  { id: 'relaxed',   name: 'Relaxed',                 tagline: 'Slow down, unwind & settle in',             tags: ['Romantic','Rustic','Opulent'],      photo: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=320&h=200&fit=crop' },
+  { id: 'wellness',  name: 'Wellness & Spiritual',    tagline: 'Retreat, restore & reconnect',              tags: ['Spiritual'],                       photo: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=320&h=200&fit=crop' },
+  { id: 'family',    name: 'Family',                  tagline: 'Adventures the whole crew will love',       tags: ['Family'],                          photo: 'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?w=320&h=200&fit=crop' },
+];
+
+const EXPERIENCES = [
+  // HANDS-ON CREATIVE
+  { id: 1,  name: 'The Curious Forge', sub: 'Blacksmithing, ceramics, glass & making workshops', area: 'Nevada City', type: 'Activity', tags: ['Hands-on'], hours: 'Check calendar', notes: '20,000 sq ft makerspace; metalwork, ceramics, glass, woodworking, CNC', icon: '🔨', url: 'https://thecuriousforge.org/', directions: 'https://maps.google.com/?q=13024+Bitney+Springs+Rd+Nevada+City+CA+95959', lat: 39.2108, lng: -121.068, photo: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // ARTISTIC
+  { id: 8,  name: 'The Center for the Arts', sub: 'Concerts, performances, gallery, classes', area: 'Grass Valley', type: 'Music venue', tags: ['Music','Artistic'], hours: 'Box office Mon–Fri 1:30–5:30 PM; event times vary', notes: 'Major county arts anchor; hosts Music in the Mountains, Sierra Poetry Festival', icon: '🎭', url: 'https://thecenterforthearts.org/', directions: 'https://maps.google.com/?q=The+Center+for+the+Arts+Grass+Valley+CA', lat: 39.2188, lng: -121.0597, photo: 'https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 9,  name: 'Miners Foundry Cultural Center', sub: 'Live music, performances, community events', area: 'Nevada City', type: 'Music venue', tags: ['Music','Artistic'], hours: 'Event times vary; box office Tue–Fri 10–3:30', notes: 'Historic 1856 foundry; Wild & Scenic Film Festival venue', icon: '🎸', url: 'https://minersfoundry.org/', directions: 'https://maps.google.com/?q=Miners+Foundry+Cultural+Center+Nevada+City+CA', lat: 39.2615, lng: -121.0183, photo: 'https://images.unsplash.com/photo-1543443374-ac1d76f3609b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 11, name: 'First Friday Art Walk – Nevada City', sub: 'Art walk with music, performances & vendors', area: 'Nevada City', type: 'Activity', tags: ['Artistic','Music','Social'], hours: 'First Friday June–Aug, 6–9 PM', notes: 'Downtown-wide activation; free & walkable', icon: '🎨', url: 'https://www.nevadacitychamber.com/nevada-city-events/first-friday-artwalks/', directions: 'https://maps.google.com/?q=Nevada+City+CA+Downtown', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1531685250784-7569952593d2?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 12, name: 'Art Galleries – Nevada City / Grass Valley', sub: 'Gallery visits throughout both downtowns', area: 'Nevada City', type: 'Gallery', tags: ['Artistic'], hours: 'Hours vary by gallery', notes: 'Chamber pages aggregate local options; great rainy-day activity', icon: '🖼️', url: 'https://www.nevadacitychamber.com/m/art-galleries/', directions: 'https://maps.google.com/?q=Nevada+City+CA+Art+Galleries', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1577720580479-7d839d829c73?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 45, name: 'ArtWorks Gallery', sub: '35+ local artists in a 19th-century Grass Valley building', area: 'Grass Valley', type: 'Gallery', tags: ['Artistic'], hours: 'Wed–Sun 11–5; check current hours', notes: 'Part of California Cultural District; 2,000 sq ft of local art', icon: '🖼️', url: 'https://artworksgrassvalley.com/', directions: 'https://maps.google.com/?q=ArtWorks+Gallery+Grass+Valley+CA', lat: 39.2201, lng: -121.0558, photo: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 54, name: 'Hardy Books', sub: 'Rare & out-of-print books on all things Californian', area: 'Nevada City', type: 'Activity', tags: ['Artistic'], hours: 'Check current hours', notes: 'One-of-a-kind California titles & local authors; literary treasure trove', icon: '📖', url: 'https://hardybooks.com/', directions: 'https://maps.google.com/?q=Hardy+Books+Nevada+City+CA', lat: 39.2618, lng: -121.0179, photo: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // HISTORIC
+  { id: 2,  name: 'Empire Mine State Historic Park', sub: 'Mineyard tours + blacksmith shop viewing', area: 'Grass Valley', type: 'Historic site', tags: ['Historic','Rustic','Family','Gold Rush'], hours: 'Nov–Apr 12:00 daily; May–Oct varies', notes: "Richest hard-rock gold mine in CA; 5.8M oz over 106 years", icon: '⛏️', url: 'https://www.parks.ca.gov/EmpireMine/', directions: 'https://maps.google.com/?q=Empire+Mine+State+Historic+Park+Grass+Valley+CA', lat: 39.2095, lng: -121.0496, photo: 'https://images.unsplash.com/photo-1566632032684-57296b74e0b6?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 3,  name: 'Nevada County Narrow Gauge Railroad Museum', sub: 'Museum tours, railbus rides, Steam-Up Sunday', area: 'Nevada City', type: 'Museum', tags: ['Historic','Family'], hours: 'Sat–Sun 10–4; Mon/Tue/Fri 10–2; Railbus Sat Apr–Oct', notes: "Engine 5 starred in John Waynes The Spoilers; strong heritage add-on", icon: '🚂', url: 'https://ncngrrmuseum.org/', directions: 'https://maps.google.com/?q=Nevada+County+Narrow+Gauge+Railroad+Museum', lat: 39.2634, lng: -121.0154, photo: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 6,  name: 'Nevada County Historical Society', sub: 'Walking tours + Firehouse Museum', area: 'Nevada City', type: 'Museum', tags: ['Historic'], hours: 'Library Mon–Sat 1–4; museums/tours vary', notes: 'Self-guided downtown history layer; 1861 firehouse building', icon: '📚', url: 'https://nevadacountyhistory.org/', directions: 'https://maps.google.com/?q=Nevada+County+Historical+Society+Nevada+City+CA', lat: 39.2619, lng: -121.0173, photo: 'https://images.unsplash.com/photo-1568454537842-d933259bb4a9?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 7,  name: 'Grass Valley Museum and Cultural Center', sub: "Museum in St. Josephs Cultural Center", area: 'Grass Valley', type: 'Museum', tags: ['Historic'], hours: 'Wed–Sun 12:30–3:30 PM', notes: "Hear the story of Lola Montez exotic bathtub; easy add-on near downtown", icon: '🏛️', url: 'https://www.grassvalleymuseum.org/', directions: 'https://maps.google.com/?q=Grass+Valley+Museum+and+Cultural+Center+CA', lat: 39.2178, lng: -121.0583, photo: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 34, name: 'North Star Mining Museum & Pelton Wheel', sub: "Worlds largest Pelton Wheel exhibit", area: 'Grass Valley', type: 'Museum', tags: ['Historic','Gold Rush'], hours: 'May–Oct daily 10–5; check off-season', notes: '30-ft Pelton Wheel laid foundation for modern hydroelectric power; free admission', icon: '⚙️', url: 'https://northstarminingmuseum.com/', directions: 'https://maps.google.com/?q=North+Star+Mining+Museum+Grass+Valley+CA', lat: 39.2091, lng: -121.0559, photo: 'https://images.unsplash.com/photo-1565008576549-57569a49371d?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 44, name: 'Firehouse No. 1 Museum', sub: 'Victorian-era firehouse with Gold Country artifacts', area: 'Nevada City', type: 'Museum', tags: ['Historic','Gold Rush'], hours: 'Wed–Sun 11–4; check seasonal hours', notes: "Houses the Hou Wang Temple altar from Grass Valley Chinatown; free entry", icon: '🏛️', url: 'https://nevadacountyhistory.org/', directions: 'https://maps.google.com/?q=Firehouse+No+1+Museum+Nevada+City+CA', lat: 39.2619, lng: -121.0173, photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 33, name: 'Nevada Theatre', sub: 'Oldest continuously operated theater in California (1865)', area: 'Nevada City', type: 'Music venue', tags: ['Historic','Music','Artistic','Film'], hours: 'Check event calendar; box office varies', notes: 'Built 1865; stunning murals by Sarah Coleman; hosts Wild & Scenic, film festivals', icon: '🎭', url: 'https://nevadatheatre.com/', directions: 'https://maps.google.com/?q=Nevada+Theatre+401+Broad+St+Nevada+City+CA', lat: 39.2618, lng: -121.018, photo: 'https://images.unsplash.com/photo-1507924538820-ede94a04019d?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 55, name: 'Nevada City Smartphone Walking Tour', sub: '90-minute self-guided historic downtown audio tour', area: 'Nevada City', type: 'Activity', tags: ['Historic','Gold Rush','Family'], hours: 'Any time; self-guided', notes: 'Covers architecture & stories from 1850–1970s; free or low-cost', icon: '🚶', url: 'https://gonevadacounty.com/things-to-do-nevada-city/', directions: 'https://maps.google.com/?q=Nevada+City+Chamber+of+Commerce+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // MUSIC & NIGHTLIFE
+  { id: 10, name: 'Crazy Horse Saloon & Grill', sub: 'Live music + dining', area: 'Nevada City', type: 'Music venue', tags: ['Music','Rustic','Social'], hours: 'Shows vary; see venue calendar', notes: 'Live bands most weekends; good evening stop', icon: '🎤', url: 'https://crazyhorsenc.com/venue/crazy-horse-grill/', directions: 'https://maps.google.com/?q=Crazy+Horse+Saloon+Nevada+City+CA', lat: 39.2616, lng: -121.0185, photo: 'https://images.unsplash.com/photo-1543296236-69bb4a2fd0c5?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 57, name: 'Music in the Mountains', sub: 'Annual classical music festival', area: 'Grass Valley', type: 'Music venue', tags: ['Music','Artistic'], hours: 'Annual — typically June; musicinthemountains.org', notes: 'World-class classical & chamber music; community tradition since 1982', icon: '🎻', url: 'https://musicinthemountains.org/', directions: 'https://maps.google.com/?q=The+Center+for+the+Arts+Grass+Valley+CA', lat: 39.2188, lng: -121.0597, photo: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=400&h=260&fit=crop', season: 'Summer' },
+  // FILM & CULTURE
+  { id: 37, name: 'Wild & Scenic Film Festival', sub: 'Annual environmental & adventure film festival (SYRCL)', area: 'Nevada City', type: 'Art event', tags: ['Film','Social'], hours: 'Annual — typically February; wildandscenicfilmfestival.org', notes: "110+ films; one of nations largest env. film festivals; multiple venues", icon: '🎬', url: 'https://wildandscenicfilmfestival.org/', directions: 'https://maps.google.com/?q=Nevada+Theatre+Nevada+City+CA', lat: 39.2618, lng: -121.018, photo: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=260&fit=crop', season: 'Winter' },
+  { id: 38, name: 'Nevada City Film Festival', sub: '"Sundance of the Sierra" — independent film festival', area: 'Nevada City', type: 'Art event', tags: ['Film','Social','Artistic'], hours: 'Annual — typically June/July; outdoor screenings at sunset', notes: 'USA Today #3 Best Film Festival; outdoor screenings with lawn games, beer & wine', icon: '🎞️', url: 'https://nevadacityfilmfestival.com/', directions: 'https://maps.google.com/?q=Nevada+City+CA+Film+Festival', lat: 39.2618, lng: -121.018, photo: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&h=260&fit=crop', season: 'Summer' },
+  // FOODIE & DINING
+  { id: 19, name: 'Restaurant DaKan', sub: 'Farm-to-table dining', area: 'Nevada City', type: 'Restaurant', tags: ['Foodie','Romantic'], hours: 'Check venue for current hours', notes: 'Local ingredient-driven; creative seasonal menu', icon: '🌿', url: 'https://www.restaurantdakan.com/', directions: 'https://maps.google.com/?q=Restaurant+DaKan+Nevada+City+CA', lat: 39.2618, lng: -121.0179, photo: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 20, name: 'Petra', sub: 'Mediterranean farm-to-table', area: 'Nevada City', type: 'Restaurant', tags: ['Foodie'], hours: 'Check venue for current hours', notes: 'Women-owned; locally sourced; organic emphasis', icon: '🫒', url: 'https://www.petranevadacity.com/', directions: 'https://maps.google.com/?q=Petra+Restaurant+Nevada+City+CA', lat: 39.2619, lng: -121.018, photo: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 18, name: "Tofanellis Gold Country Bistro", sub: 'Breakfast / lunch / dinner — 101 omelets', area: 'Grass Valley', type: 'Restaurant', tags: ['Foodie','Family'], hours: '8 AM–9 PM, 7 days a week', notes: 'Award-winning breakfast; dog-friendly patio; downtown staple since 1986', icon: '🍳', url: 'https://www.tofanellis.com/', directions: 'https://maps.google.com/?q=Tofanellis+Gold+Country+Bistro+Grass+Valley+CA', lat: 39.2196, lng: -121.0579, photo: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 17, name: 'The Willo Steakhouse', sub: 'Steakhouse dinner', area: 'Nevada City', type: 'Restaurant', tags: ['Foodie','Rustic'], hours: 'Daily 5–9 PM; bar opens 1 PM', notes: 'Classic roadhouse steakhouse; strong rustic itinerary anchor', icon: '🥩', url: 'https://www.nevadacitychamber.com/members/the-willo-steakhouse/', directions: 'https://maps.google.com/?q=The+Willo+Steakhouse+Nevada+City+CA', lat: 39.2691, lng: -121.0398, photo: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 35, name: 'Three Forks Bakery & Brewing Co.', sub: 'Wood-fired pizza, craft beer & local wine', area: 'Nevada City', type: 'Restaurant', tags: ['Foodie','Social'], hours: 'Check venue; lunch and dinner service', notes: 'Farm-to-table sourcing; hosts Wild & Scenic Coffee Talks', icon: '🍕', url: 'https://www.threeforksbakery.com/', directions: 'https://maps.google.com/?q=Three+Forks+Bakery+Brewing+Nevada+City+CA', lat: 39.262, lng: -121.0181, photo: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 36, name: "Marshalls Pasties", sub: 'Authentic hand-rolled Cornish pasties since 1968', area: 'Grass Valley', type: 'Restaurant', tags: ['Foodie','Rustic','Gold Rush'], hours: 'Mon–Sat; check current hours', notes: 'A Gold Country institution; 203 Mill St; Cornish mining heritage in every bite', icon: '🥧', url: 'https://downtowngrassvalley.com/marshalls-pasties/', directions: 'https://maps.google.com/?q=Marshalls+Pasties+203+Mill+St+Grass+Valley+CA', lat: 39.2201, lng: -121.0571, photo: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 48, name: 'Communal Cafe', sub: 'Matcha drinks, espresso & artisan donuts', area: 'Nevada City', type: 'Restaurant', tags: ['Foodie','Social'], hours: 'Morning through afternoon; check hours', notes: '233 Broad St; Remedy Supply Co. espresso; local baker donuts', icon: '☕', url: 'https://www.communalcafenv.com/', directions: 'https://maps.google.com/?q=Communal+Cafe+233+Broad+St+Nevada+City+CA', lat: 39.2621, lng: -121.0181, photo: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 49, name: 'Lola Restaurant', sub: 'Farm-to-table dining at the National Exchange Hotel', area: 'Nevada City', type: 'Restaurant', tags: ['Foodie','Romantic','Opulent'], hours: 'Dinner Wed–Sun; lunch varies', notes: 'Named for Gold Rush outlaw Lola Montez; steak tartare, oyster mushrooms', icon: '🌹', url: 'https://www.thenationalexchangehotel.com/lola-restaurant/', directions: 'https://maps.google.com/?q=Lola+Restaurant+Nevada+City+CA', lat: 39.2621, lng: -121.018, photo: 'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 51, name: 'Fable Coffee', sub: 'Specialty craft coffee downtown Grass Valley', area: 'Grass Valley', type: 'Restaurant', tags: ['Foodie','Social'], hours: 'Morning to afternoon; check hours', notes: 'Indie café; great pre-gallery or pre-hike stop', icon: '☕', url: 'https://www.fablecoffee.com/', directions: 'https://maps.google.com/?q=Fable+Coffee+Grass+Valley+CA', lat: 39.2201, lng: -121.0569, photo: 'https://images.unsplash.com/photo-1521302200778-33500795e128?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 52, name: 'BriarPatch Food Co-op', sub: 'Community-owned organic grocery & deli', area: 'Nevada City', type: 'Restaurant', tags: ['Foodie','Social'], hours: 'Daily 7 AM–9 PM', notes: 'Community-owned since 1972; pasties, hot deli; great picnic provisioning', icon: '🥗', url: 'https://www.briarpatch.coop/', directions: 'https://maps.google.com/?q=BriarPatch+Co-op+Nevada+City+CA', lat: 39.2281, lng: -121.0381, photo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 143, name: 'Wyld Tiger Bakery', sub: 'Artisan sourdough, croissants & pastries baked fresh daily', area: 'Nevada City', type: 'Bakery', tags: ['Foodie','Social'], hours: 'Wed–Sun; morning through early afternoon; check current hours', notes: 'Beloved local bakery in downtown Nevada City; handcrafted sourdough loaves, croissants, seasonal pastries & morning baked goods; walk-in only; arrive early — popular items sell out', icon: '🥐', url: 'https://www.wyldtiger.com/', directions: 'https://maps.google.com/?q=Wyld+Tiger+Bakery+Nevada+City+CA', lat: 39.2618, lng: -121.0180, photo: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 16, name: "Jernigans Tap House & Grill", sub: '13 craft beers on tap + food', area: 'Nevada City', type: 'Restaurant', tags: ['Social','Foodie'], hours: 'Check venue for current hours', notes: 'Casual taproom; popular with locals after hikes', icon: '🍔', url: 'https://www.jernigansgrill.com/', directions: 'https://maps.google.com/?q=Jernigans+Tap+House+Nevada+City+CA', lat: 39.2622, lng: -121.0181, photo: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 21, name: 'The River Downtown', sub: 'Taproom + food', area: 'Nevada City', type: 'Restaurant', tags: ['Social','Foodie'], hours: 'Nightly; reservations / walk-ins', notes: 'Good post-hike / post-river option', icon: '🌊', url: 'https://www.theriverdowntown.com/', directions: 'https://maps.google.com/?q=The+River+Downtown+Nevada+City+CA', lat: 39.262, lng: -121.0181, photo: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // WINE TASTING
+  { id: 13, name: 'Nevada City Winery', sub: 'Production winery & tasting room — oldest in the Sierra Foothills', area: 'Nevada City', type: 'Winery', tags: ['Foodie','Romantic','Historic'], hours: 'Closed Wed; Thu 2–7pm; Fri–Sat 12–7pm; Sun 12–5pm; Mon–Tue 2–6pm', notes: 'Established 1980; full production winery & barrel room in historic Miners Foundry Garage; oldest continuously operating winery in the Sierra Foothills; walk-in tastings; revitalized the Nevada County wine industry', icon: '🍷', url: 'https://www.ncwinery.com/', directions: 'https://maps.google.com/?q=Nevada+City+Winery+CA', lat: 39.2588, lng: -121.0168, photo: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 42, name: 'Sierra Vintners Wine Trail', sub: '5 downtown tasting rooms, 8 local wineries', area: 'Grass Valley', type: 'Tasting room', tags: ['Foodie','Romantic','Social'], hours: 'Tasting rooms vary; most Fri–Sun', notes: 'All walkable from downtown GV; Lucchesi, Avanguardia, Nevada City Winery & more', icon: '🍇', url: 'https://gonevadacounty.com/sierra-vintners-california-wine-trail/', directions: 'https://maps.google.com/?q=Grass+Valley+Wine+tasting+Mill+Street+CA', lat: 39.2199, lng: -121.0575, photo: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 56, name: 'Lucchesi Vineyards Tasting Room', sub: 'Award-winning estate wines, intimate tasting', area: 'Grass Valley', type: 'Tasting room', tags: ['Foodie','Romantic'], hours: 'Fri–Sun; check current hours', notes: '"View Forever Vineyard" — solar-powered dry-farm; Zinfandel, Cab Franc', icon: '🍷', url: 'https://www.lucchesivineyards.com/', directions: 'https://maps.google.com/?q=Lucchesi+Vineyards+Tasting+Room+Grass+Valley+CA', lat: 39.2199, lng: -121.0573, photo: 'https://images.unsplash.com/photo-1474722883778-792e7990302f?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // DOWNTOWN GRASS VALLEY TASTING ROOMS
+  { id: 127, name: 'Avanguardia Wines', sub: 'Italian-inspired Sierra Foothills wines; downtown Grass Valley tasting room', area: 'Grass Valley', type: 'Tasting room', tags: ['Foodie','Social'], hours: 'Thu–Sun 12–5pm; check current hours', notes: 'Award-winning Barbera, Sangiovese & Italian-heritage varietals; family-owned; downtown Mill Street location; Sierra Vintners wine trail member', icon: '🍷', url: 'https://avanguardiawines.com/', directions: 'https://maps.google.com/?q=Avanguardia+Wines+Grass+Valley+CA', lat: 39.2199, lng: -121.0560, photo: 'https://images.unsplash.com/photo-1474722883778-792e7990302f?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 128, name: 'Sierra Starr Vineyard', sub: 'Boutique Rhône & Bordeaux varietals; downtown Grass Valley tasting room', area: 'Grass Valley', type: 'Tasting room', tags: ['Foodie','Social'], hours: 'Fri–Sun; check current hours', notes: 'Small-production estate wines; Syrah, Grenache, Cabernet Sauvignon; Sierra Vintners wine trail member; walkable downtown Grass Valley', icon: '⭐', url: 'https://sierrastarr.com/', directions: 'https://maps.google.com/?q=Sierra+Starr+Vineyard+Grass+Valley+CA', lat: 39.2200, lng: -121.0558, photo: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 129, name: 'Smith Vineyard', sub: 'Fourth-generation family estate Zinfandel & Cabernet; downtown tasting room', area: 'Grass Valley', type: 'Tasting room', tags: ['Foodie','Social'], hours: 'Check current hours', notes: 'Fourth-generation family winery; estate-grown grapes from Grass Valley foothills; classic Zinfandel and Cabernet; Sierra Vintners trail member', icon: '🍇', url: 'https://www.smithvineyard.com/', directions: 'https://maps.google.com/?q=Smith+Vineyard+Grass+Valley+CA', lat: 39.2201, lng: -121.0556, photo: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 130, name: 'Bent Metal Winery', sub: 'Artisan wines with a rock & roll spirit; downtown Grass Valley tasting room', area: 'Grass Valley', type: 'Tasting room', tags: ['Foodie','Social'], hours: 'Check current hours', notes: 'Small-batch handcrafted wines; irreverent labels; named for a guitar technique; casual and fun downtown Grass Valley stop; Sierra Vintners trail', icon: '🎸', url: 'https://bentmetalwinery.com/', directions: 'https://maps.google.com/?q=Bent+Metal+Winery+Grass+Valley+CA', lat: 39.2198, lng: -121.0562, photo: 'https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // DOWNTOWN NEVADA CITY WINE
+  { id: 131, name: 'Szabo Vineyards', sub: 'Hungarian-heritage Zinfandels & blends; Nevada City tasting room', area: 'Nevada City', type: 'Tasting room', tags: ['Foodie','Social'], hours: 'Check current hours', notes: 'Family-owned; Old Vine Zinfandel from Sierra Foothills hillsides; unique Hungarian heritage varietals; walkable from downtown Nevada City', icon: '🍷', url: 'https://szabovineyards.com/', directions: 'https://maps.google.com/?q=Szabo+Vineyards+Nevada+City+CA', lat: 39.2615, lng: -121.0185, photo: 'https://images.unsplash.com/photo-1474722883778-792e7990302f?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 132, name: "Carrington's Fine Wines", sub: 'Curated Sierra Foothills wine shop with tastings', area: 'Nevada City', type: 'Tasting room', tags: ['Foodie','Social'], hours: 'Check current hours', notes: 'Nevada City wine shop specializing in local Sierra Foothills producers; great single-stop way to discover the full Nevada County wine scene', icon: '🥂', url: 'https://carringtonswine.com/', directions: 'https://maps.google.com/?q=Carringtons+Fine+Wines+Nevada+City+CA', lat: 39.2617, lng: -121.0180, photo: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // ESTATE WINERIES (rural / destination)
+  { id: 133, name: 'Naggiar Vineyards & Winery', sub: 'Premier 80-acre estate with vineyard-view patio & full tasting room', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic','Romantic'], hours: 'Sat–Sun 11–5pm; weekdays by appointment', notes: 'Premier Nevada County estate winery in Penn Valley; Italian & French varietals; panoramic vineyard views from the terrace; Sangiovese, Barbera, Vermentino; 18095 Spring Hill Rd', icon: '🍷', url: 'https://naggiar.com/', directions: 'https://maps.google.com/?q=Naggiar+Vineyards+Penn+Valley+CA', lat: 39.2094, lng: -121.1503, photo: 'https://images.unsplash.com/photo-1523358526798-26af6c668f6b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 134, name: 'Mountain Ranch Winery', sub: 'Small-production estate wines in the Sierra foothills', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic'], hours: 'By appointment; check current hours', notes: 'Intimate family estate winery; Barbera, Sangiovese & Rhône varietals grown on-site; scenic rural Nevada County setting; personalized tasting experience', icon: '⛰️', url: 'https://www.mountainranchwinery.com/', directions: 'https://maps.google.com/?q=Mountain+Ranch+Winery+Nevada+County+CA', lat: 39.2450, lng: -121.1200, photo: 'https://images.unsplash.com/photo-1467002359-efefdc06b60e?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 135, name: 'Bent Metal Winery Estate', sub: 'Estate vineyard & production facility; rock & roll wines made in the foothills', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic'], hours: 'By appointment; check current hours', notes: 'Production home of Bent Metal wines; estate-grown grapes in the Sierra foothills; vineyard setting; best to visit downtown Grass Valley tasting room walk-in or call ahead for estate visit', icon: '🎸', url: 'https://bentmetalwinery.com/', directions: 'https://maps.google.com/?q=Bent+Metal+Winery+Nevada+County+CA', lat: 39.2350, lng: -121.0900, photo: 'https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 136, name: 'Avanguardia Wines Estate', sub: 'Italian-varietal estate vineyard producing Barbera, Sangiovese & Nebbiolo', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic','Romantic'], hours: 'By appointment; check current hours', notes: 'Production estate for Avanguardia\'s Italian-heritage wines; estate Sierra Foothills terroir; visit their downtown Grass Valley tasting room walk-in or call for vineyard experience', icon: '🍷', url: 'https://avanguardiawines.com/', directions: 'https://maps.google.com/?q=Avanguardia+Wines+Estate+Nevada+County+CA', lat: 39.2300, lng: -121.0800, photo: 'https://images.unsplash.com/photo-1523358526798-26af6c668f6b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 137, name: 'Solune Winegrowers', sub: 'Artisan natural wines from Sierra Foothills estate & sourced fruit', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic'], hours: 'By appointment; check current hours', notes: 'Small-batch natural and minimal-intervention winemaking; estate and sourced Sierra Foothills fruit; distinctive and unique style; passionate producers', icon: '🌙', url: 'https://solunewine.com/', directions: 'https://maps.google.com/?q=Solune+Winegrowers+Nevada+County+CA', lat: 39.2500, lng: -121.0750, photo: 'https://images.unsplash.com/photo-1545670723-196ed0954986?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 138, name: 'Coufos Cellars', sub: 'Boutique family winery with Greek heritage varietals & classic Sierra wines', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic'], hours: 'By appointment; check current hours', notes: 'Family-owned boutique winery; unique Greek-heritage varietals alongside classic Sierra Foothills wines; intimate and personal tasting experience', icon: '🍷', url: 'https://coufoscellars.com/', directions: 'https://maps.google.com/?q=Coufos+Cellars+Nevada+County+CA', lat: 39.2400, lng: -121.0950, photo: 'https://images.unsplash.com/photo-1474722883778-792e7990302f?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 139, name: 'Montoliva Vineyard & Winery', sub: 'Tuscan-inspired estate with olive groves, wine & estate olive oil', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic','Romantic'], hours: 'Sat–Sun; check current hours; weekdays by appointment', notes: 'Stunning Tuscan-style estate in Penn Valley; Sangiovese, Barbera & Super-Tuscan blends alongside estate olive oil; vineyard-view tasting; exceptional hospitality; 16990 Oak Hill Rd', icon: '🫒', url: 'https://montoliva.com/', directions: 'https://maps.google.com/?q=Montoliva+Vineyard+Penn+Valley+CA', lat: 39.2950, lng: -121.1400, photo: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 140, name: 'Gray Pine Vineyard', sub: 'Estate winery in the Sierra foothills named for the iconic local pines', area: 'Nevada County', type: 'Winery', tags: ['Foodie','Scenic'], hours: 'By appointment; check current hours', notes: 'Small family estate; named for the distinctive gray pine trees native to Sierra foothills; estate-grown varietals suited to the unique elevations and terroir of Nevada County', icon: '🌲', url: 'https://graypinevineyard.com/', directions: 'https://maps.google.com/?q=Gray+Pine+Vineyard+Nevada+County+CA', lat: 39.2600, lng: -121.1100, photo: 'https://images.unsplash.com/photo-1523358526798-26af6c668f6b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // SOCIAL / BREWERIES
+  { id: 14, name: 'Grass Valley Brewing Co.', sub: 'Brewery / taproom', area: 'Grass Valley', type: 'Brewery', tags: ['Social'], hours: 'Open regularly; check venue', notes: 'Downtown brewery; rotating craft selection', icon: '🍺', url: 'https://gvbrew.com/', directions: 'https://maps.google.com/?q=Grass+Valley+Brewing+Co+CA', lat: 39.2215, lng: -121.0558, photo: 'https://images.unsplash.com/photo-1559818896-946d8a20dcc3?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 15, name: 'BrewBilt BrewHaus', sub: 'Beer + food gathering place', area: 'Nevada City', type: 'Brewery', tags: ['Social','Family'], hours: 'Check venue for current hours', notes: 'Family-friendly, dog-friendly brewpub', icon: '🍻', url: 'https://brewbiltbrewhaus.com/', directions: 'https://maps.google.com/?q=BrewBilt+BrewHaus+Nevada+City+CA', lat: 39.2622, lng: -121.0181, photo: 'https://images.unsplash.com/photo-1436076863939-06870fe779c2?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 50, name: "Ol' Republic Brewery", sub: 'Craft brewery & taproom', area: 'Grass Valley', type: 'Brewery', tags: ['Social'], hours: 'Check taproom hours', notes: 'Local favorite; rotating craft selection', icon: '🍻', url: 'https://olrepublicbrewery.com/', directions: 'https://maps.google.com/?q=Ol+Republic+Brewery+Grass+Valley+CA', lat: 39.2199, lng: -121.0577, photo: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // ACTIVE / OUTDOORS
+  { id: 4,  name: 'South Yuba River State Park', sub: 'Covered bridge visits, river access, hiking', area: 'Near Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Park access varies by trail', notes: "Bridgeport Covered Bridge — longest single-span wooden bridge in US", icon: '🏞️', url: 'https://www.parks.ca.gov/?page_id=496', directions: 'https://maps.google.com/?q=South+Yuba+River+State+Park+Nevada+City+CA', lat: 39.3018, lng: -121.0633, photo: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=260&fit=crop', season: 'Spring,Summer' },
+  { id: 5,  name: 'Malakoff Diggins State Historic Park', sub: 'Diggins, Rim, and Humbug trails', area: 'North San Juan', type: 'Outdoor', tags: ['Active','Historic','Gold Rush'], hours: 'Trail access varies', notes: "CA largest hydraulic mine; dramatic cliffs; gold panning in Humbug Creek", icon: '⛰️', url: 'https://www.blm.gov/visit/south-yuba-recreation-area', directions: 'https://maps.google.com/?q=Malakoff+Diggins+State+Historic+Park+North+San+Juan+CA', lat: 39.3598, lng: -120.9021, photo: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=260&fit=crop', season: 'Spring,Fall' },
+  { id: 39, name: 'Buttermilk Bend Trail', sub: 'Easy wildflower trail above the South Yuba River', area: 'Near Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Always open; wildflowers peak Mar–May', notes: "1.2-mile easy trail; 100+ wildflower species; docent walks Sat-Sun 10am through Mothers Day", icon: '🌸', url: 'https://gonevadacounty.com/south-yuba-river-state-park/', directions: 'https://maps.google.com/?q=Buttermilk+Bend+Trail+Nevada+City+CA', lat: 39.3019, lng: -121.0633, photo: 'https://images.unsplash.com/photo-1490750967868-88df5691cc19?w=400&h=260&fit=crop', season: 'Spring' },
+  { id: 40, name: 'Cascade Canal Trail', sub: '4.5-mile forested trail with Nevada City overlook', area: 'Nevada City', type: 'Outdoor', tags: ['Active','Scenic'], hours: 'Always open', notes: "Douglas firs & dogwoods; bird's-eye view of downtown; easy grade", icon: '🌲', url: 'https://gonevadacounty.com/cascade-canal-trail/', directions: 'https://maps.google.com/?q=Cascade+Canal+Trail+Nevada+City+CA', lat: 39.2702, lng: -121.0286, photo: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 41, name: 'Scotts Flat Lake', sub: 'Swimming, kayaking, fishing & camping', area: 'Near Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Seasonal; check Nevada Irrigation District schedule', notes: '4 miles from downtown Nevada City; paddleboarding, hiking, wildlife spotting', icon: '🚣', url: 'https://www.nidwater.com/recreation/scotts-flat/', directions: 'https://maps.google.com/?q=Scotts+Flat+Lake+Nevada+City+CA', lat: 39.3039, lng: -120.9748, photo: 'https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 47, name: 'Deer Creek Tribute Trail', sub: 'Paved accessible trail through downtown riparian corridor', area: 'Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Dawn to dusk', notes: 'Paved, accessible; connects downtown Nevada City to nature; birdwatching', icon: '🦅', url: 'https://gonevadacounty.com/', directions: 'https://maps.google.com/?q=Deer+Creek+Tribute+Trail+Nevada+City+CA', lat: 39.2591, lng: -121.0138, photo: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // SCENIC / NATURE
+  { id: 43, name: 'Crystal Hermitage Garden', sub: "Anandas stunning tulip & rose gardens open to public", area: 'Nevada County', type: 'Outdoor', tags: ['Scenic','Spiritual','Romantic'], hours: 'Spring: daily dawn–dusk approx. March–May; call ahead', notes: 'Photographer-led wildflower walks in spring; surreal beauty; admission by donation', icon: '🌷', url: 'https://crystalhermitage.org/', directions: 'https://maps.google.com/?q=Crystal+Hermitage+Garden+Nevada+City+CA', lat: 39.3082, lng: -121.0972, photo: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=400&h=260&fit=crop', season: 'Spring' },
+  // SPIRITUAL / WELLNESS
+  { id: 29, name: 'Inner Path Nevada City', sub: 'Yoga, meditation, spiritual shop, workshops', area: 'Nevada City', type: 'Wellness', tags: ['Spiritual'], hours: 'Open 7 days 10 AM–6 PM; classes vary', notes: 'Donation yoga and frequent uplifting events; community wellness anchor', icon: '🧘', url: 'https://nevadacity.innerpath.org/inner-path-nevada-city-2/', directions: 'https://maps.google.com/?q=Inner+Path+Nevada+City+CA', lat: 39.2619, lng: -121.0159, photo: 'https://images.unsplash.com/photo-1600618528240-fb9fc964b853?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 30, name: 'Ananda Meditation Retreats', sub: 'Meditation / yoga retreats', area: 'Nevada County', type: 'Wellness', tags: ['Spiritual'], hours: 'Scheduled retreats; check calendar', notes: 'Good for destination retreat packaging; Crystal Hermitage on grounds', icon: '🌸', url: 'https://meditationretreat.org/', directions: 'https://maps.google.com/?q=Ananda+Village+Nevada+City+CA', lat: 39.3082, lng: -121.0972, photo: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 31, name: 'Mountain Stream Meditation', sub: 'Insight meditation community', area: 'Nevada County', type: 'Wellness', tags: ['Spiritual'], hours: 'Programs vary', notes: 'Meditation-centered programming; quiet retreat option', icon: '🌊', url: 'https://www.mtstream.org/', directions: 'https://maps.google.com/?q=Mountain+Stream+Meditation+Nevada+County+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 32, name: 'Rising Gaia', sub: 'Sound healing / Reiki / Yoga Nidra', area: 'Nevada County', type: 'Wellness', tags: ['Spiritual'], hours: 'Check events / booking', notes: 'Works for wellness-themed itineraries', icon: '✨', url: 'https://www.risinggaia.com/', directions: 'https://maps.google.com/?q=Rising+Gaia+Nevada+County+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // ROMANTIC / OPULENT LODGING
+  { id: 24, name: 'National Exchange Hotel', sub: 'Historic luxury hotel — 1856', area: 'Nevada City', type: 'Lodging', tags: ['Opulent','Historic','Romantic'], hours: 'Hotel / dining schedule varies', notes: 'Iconic 1856 property; recently renovated to boutique luxury; home of Lola Restaurant', icon: '🏨', url: 'https://www.thenationalexchangehotel.com/', directions: 'https://maps.google.com/?q=National+Exchange+Hotel+Nevada+City+CA', lat: 39.2621, lng: -121.018, photo: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 25, name: 'Holbrooke Hotel', sub: 'Historic downtown hotel — 1851', area: 'Grass Valley', type: 'Lodging', tags: ['Opulent','Historic','Romantic'], hours: 'Hotel / dining schedule varies', notes: 'Hosted Mark Twain & US Presidents; Golden Gate Saloon; rustic-refined landmark', icon: '🏩', url: 'https://holbrooke.com/', directions: 'https://maps.google.com/?q=Holbrooke+Hotel+Grass+Valley+CA', lat: 39.2201, lng: -121.0577, photo: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 27, name: 'The Parsonage 1865', sub: 'Historic inn / retreat venue', area: 'Nevada City', type: 'Lodging', tags: ['Opulent','Romantic','Spiritual'], hours: 'Booking based', notes: 'Can also host retreats and events; quiet & refined', icon: '🕍', url: 'https://www.theparsonage1865.com/', directions: 'https://maps.google.com/?q=The+Parsonage+1865+Nevada+City+CA', lat: 39.2625, lng: -121.0186, photo: 'https://images.unsplash.com/photo-1521783593447-5702b9bfd267?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 28, name: 'Sierra Mountain Inn', sub: 'Boutique inn steps from Center for the Arts', area: 'Grass Valley', type: 'Lodging', tags: ['Romantic'], hours: 'Booking based', notes: 'Blocks from theaters, restaurants, and shops; ask about CFA event discount', icon: '🏡', url: 'https://sierramountaininn.com/', directions: 'https://maps.google.com/?q=Sierra+Mountain+Inn+Grass+Valley+CA', lat: 39.2158, lng: -121.0591, photo: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // RUSTIC LODGING & CAMPING
+  { id: 22, name: 'Inn Town Campground', sub: 'Camping, RV, glamping', area: 'Nevada City', type: 'Lodging', tags: ['Rustic','Active','Family'], hours: 'Check-in / booking schedule varies', notes: '2 miles from downtown; tents, RV, glamping; hosts ghost/cemetery tours', icon: '⛺', url: 'https://inntowncampground.com/', directions: 'https://maps.google.com/?q=Inn+Town+Campground+Nevada+City+CA', lat: 39.2529, lng: -121.0033, photo: 'https://images.unsplash.com/photo-1537225228614-56cc3556d7ed?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 23, name: 'Inn Town Glamping', sub: 'Deluxe canvas glamping tents', area: 'Nevada City', type: 'Lodging', tags: ['Rustic','Romantic'], hours: 'Booking based', notes: 'Canvas tents with electricity and real beds; award-winning', icon: '🏕️', url: 'https://inntowncampground.com/brochure/glamping/', directions: 'https://maps.google.com/?q=Inn+Town+Campground+Nevada+City+CA', lat: 39.2529, lng: -121.0033, photo: 'https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 26, name: 'Outside Inn', sub: 'Themed motel close to downtown', area: 'Nevada City', type: 'Lodging', tags: ['Rustic'], hours: 'Office 10 AM–10 PM; check-in 3 PM', notes: 'Two blocks from downtown; quirky themed rooms; great value', icon: '🛏️', url: 'https://outsideinn.com/', directions: 'https://maps.google.com/?q=Outside+Inn+Nevada+City+CA', lat: 39.2597, lng: -121.0138, photo: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // GOLD RUSH
+  { id: 46, name: 'Gold Panning — Humbug Creek / Washington', sub: 'Try your hand at panning historic Gold Rush waterways', area: 'North San Juan area', type: 'Activity', tags: ['Gold Rush','Active','Family'], hours: 'Year-round; best late spring–fall', notes: 'Humbug Creek at Malakoff Diggins; Washington town has public panning areas', icon: '⚱️', url: 'https://gonevadacounty.com/gold-panning/', directions: 'https://maps.google.com/?q=Humbug+Creek+North+San+Juan+CA', lat: 39.3608, lng: -120.9029, photo: 'https://images.unsplash.com/photo-1611348586840-ea6f2cf82cf1?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // OFF THE BEATEN PATH / HIDDEN GEMS
+  { id: 53, name: 'Ghost & Cemetery Tours', sub: 'Haunted tours of Gold Rush-era Nevada City', area: 'Nevada City', type: 'Activity', tags: ['Historic','Rustic'], hours: 'Seasonal; Halloween most active; Inn Town Campground hosts', notes: "One of CAs most haunted towns; old mines, hotels & cemeteries featured", icon: '👻', url: 'https://inntowncampground.com/', directions: 'https://maps.google.com/?q=Nevada+City+CA+Cemetery', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // ── COLFAX: HANDS-ON CREATIVE ──────────────────────────────────────
+  { id: 58, name: "ASiF – Artists' Studio in the Foothills", sub: 'Community art center with 20+ resident artists & workshops', area: 'Grass Valley', type: 'Activity', tags: ['Hands-on','Artistic'], hours: 'Mon–Fri 10–5; Sat 11–4; check for events', notes: '4,000 sq ft studio; drawing, painting, ceramics, jewelry, metalsmithing, fiber arts, mixed media; all ages', icon: '🎨', url: 'https://www.asifstudios.com/', directions: 'https://maps.google.com/?q=940+Idaho+Maryland+Rd+Grass+Valley+CA', lat: 39.2201, lng: -121.0422, photo: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 59, name: 'Wolf Craft School & Collective', sub: 'Traditional craft workshops — ceramics, fiber, shoemaking & more', area: 'Nevada City', type: 'Activity', tags: ['Hands-on','Rustic'], hours: 'Check schedule at wolfcraftcollective.com', notes: 'Located at The Tinnery in downtown Nevada City; hand-built ceramics, stained glass, silversmithing, hat-making, natural dyeing; future Wolf Road campus with lodging planned', icon: '🧵', url: 'https://wolfcraftcollective.com/', directions: 'https://maps.google.com/?q=The+Tinnery+Nevada+City+CA', lat: 39.2618, lng: -121.0179, photo: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 60, name: 'Craftfolk Collective', sub: 'Community craft school in historic downtown Colfax', area: 'Colfax', type: 'Activity', tags: ['Hands-on','Social'], hours: 'Workshops vary; free Community Craft Club Thursdays 4–6 PM', notes: '38 N. Main St, Colfax; fiber arts, painting, mixed media, herbal, seasonal projects; beginners welcome; free weekly craft night', icon: '🧶', url: 'https://www.craftfolkcollective.com/', directions: 'https://maps.google.com/?q=38+N+Main+St+Colfax+CA', lat: 39.0965, lng: -120.953, photo: 'https://images.unsplash.com/photo-1605627079912-97c3b68e5c6d?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // ── COLFAX AREA ────────────────────────────────────────────────────
+  { id: 61, name: 'Downtown Colfax & Heritage Museum', sub: 'Railroad history, historic Main Street & gold rush architecture', area: 'Colfax', type: 'Historic site', tags: ['Historic','Gold Rush','Family'], hours: 'Museum: check hours; downtown always walkable', notes: 'Former western terminus of Central Pacific Railroad; Colfax Theatre (1939), 1867 general store, free Heritage Museum in restored train depot', icon: '🚂', url: 'https://historiccolfax.com/', directions: 'https://maps.google.com/?q=Historic+Downtown+Colfax+CA', lat: 39.0965, lng: -120.953, photo: 'https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 62, name: 'Stevens Trail', sub: 'Historic 3.5-mile hike to North Fork American River', area: 'Colfax', type: 'Outdoor', tags: ['Active','Scenic','Gold Rush'], hours: 'Always open; wildflowers peak spring', notes: 'Originally used during Gold Rush; breathtaking canyon views; descends to the North Fork American River; spring wildflower showcase', icon: '🌿', url: 'https://www.visitcalifornia.com/places-to-visit/colfax/', directions: 'https://maps.google.com/?q=Stevens+Trail+Colfax+CA', lat: 39.1028, lng: -120.9472, photo: 'https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?w=400&h=260&fit=crop', season: 'Spring,Summer,Fall' },
+  { id: 63, name: 'Rollins Lake', sub: 'Boating, swimming, fishing & camping near Colfax', area: 'Colfax', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Seasonal; check Rollins Lake Recreation Area', notes: '900-acre reservoir with 26 miles of shoreline; kayaking, paddleboarding, waterfront camping; multiple campgrounds', icon: '⛵', url: 'https://www.placer.ca.gov/rollins', directions: 'https://maps.google.com/?q=Rollins+Lake+Colfax+CA', lat: 39.1291, lng: -120.9675, photo: 'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 64, name: 'Snapdragon Provisions', sub: 'Plant-based café & local market in downtown Colfax', area: 'Colfax', type: 'Restaurant', tags: ['Foodie','Social'], hours: 'Check current hours', notes: 'Locally owned; plant-based and gluten-free offerings; neighboring Craftfolk Collective for a craft + café combo', icon: '🌱', url: 'https://historiccolfax.com/', directions: 'https://maps.google.com/?q=Snapdragon+Provisions+Colfax+CA', lat: 39.0965, lng: -120.953, photo: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // ── SMALL TOWN GEMS ────────────────────────────────────────────────
+  { id: 65, name: 'Washington Hotel & Gold Panning', sub: 'Tiny Gold Rush town on the South Yuba River', area: 'Washington', type: 'Historic site', tags: ['Historic','Gold Rush','Rustic','Active'], hours: 'Year-round; hotel bar open most evenings', notes: '137-person town; hotel bar frequented by Wyatt Earp & Grover Cleveland; public gold panning at Quartz Picnic Area', icon: '🏚️', url: 'https://gonevadacounty.com/small-town-gems/', directions: 'https://maps.google.com/?q=Washington+Hotel+Washington+CA', lat: 39.3588, lng: -120.8025, photo: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 66, name: 'Rough and Ready', sub: "Californias only town to briefly secede from the Union (1850)", area: 'Rough and Ready', type: 'Historic site', tags: ['Historic','Gold Rush','Rustic'], hours: 'Always open; drive-through town', notes: 'Founded 1849; near Bridgeport Covered Bridge; wildflowers, fall colors, living history days', icon: '⭐', url: 'https://gonevadacounty.com/small-town-gems/', directions: 'https://maps.google.com/?q=Rough+and+Ready+CA', lat: 39.2324, lng: -121.1397, photo: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 67, name: 'Gray Pine Winery — Penn Valley', sub: 'Bordeaux varietals in a scenic wine cave tasting room', area: 'Penn Valley', type: 'Tasting room', tags: ['Foodie','Romantic','Scenic'], hours: 'Weekends; check current hours', notes: 'Sierra Vintners Trail member; ~350 cases/year; wine cave tours; Cab Sauv, Merlot, Petit Verdot; Western Gateway Park nearby', icon: '🍷', url: 'https://www.graypinewinery.com/', directions: 'https://maps.google.com/?q=Gray+Pine+Winery+Penn+Valley+CA', lat: 39.1918, lng: -121.1673, photo: 'https://images.unsplash.com/photo-1519922639192-e73293ca430e?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── FILM & LIVE THEATER ────────────────────────────────────────────
+  { id: 68, name: 'Del Oro Theatre', sub: 'Retro single-screen cinema on Mill Street, Grass Valley', area: 'Grass Valley', type: 'Music venue', tags: ['Film','Historic','Artistic'], hours: 'Check showtimes; evenings & weekends', notes: 'Classic 1942 movie palace on Mill St; a Gold Country landmark; retro marquee and single screen charm', icon: '🎬', url: 'https://delorotheatre.com/', directions: 'https://maps.google.com/?q=Del+Oro+Theatre+165+Mill+St+Grass+Valley+CA', lat: 39.2199, lng: -121.0569, photo: 'https://images.unsplash.com/photo-1595769816263-9b910be24d5f?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 69, name: 'Sierra Cinemas Nevada City', sub: 'Movie theater in downtown Nevada City', area: 'Nevada City', type: 'Music venue', tags: ['Film','Social','Family'], hours: 'Daily; check showtimes', notes: 'Community cinema in Nevada City; Nutcracker screenings at Christmas; central movie destination for the county', icon: '🎥', url: 'https://www.sierracinemas.com/', directions: 'https://maps.google.com/?q=Sierra+Cinemas+Nevada+City+CA', lat: 39.2592, lng: -121.0143, photo: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  { id: 70, name: 'The Onyx Theatre', sub: '21+ indie cinema — twin 29-seat screening rooms with beer & wine', area: 'Nevada City', type: 'Music venue', tags: ['Film','Romantic','Social'], hours: 'Daily noon–9 PM; check showtimes at theonyxtheatre.com', notes: '107 Argall Way; indie, foreign & documentary focus; organic popcorn, local beer & wine; intimate date-night destination', icon: '🎬', url: 'https://www.theonyxtheatre.com/', directions: 'https://maps.google.com/?q=107+Argall+Way+Nevada+City+CA+95959', lat: 39.2619, lng: -121.0159, photo: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── NEVADA COUNTY FAIRGROUNDS ─────────────────────────────────────
+  { id: 71, name: 'Nevada County Fairgrounds', sub: 'Year-round events, RV camping & Lions Lake — Voted California Most Beautiful Fairgrounds', area: 'Grass Valley', type: 'Activity', tags: ['Family','Social','Rustic'], hours: 'Office Mon–Fri 8–5; events vary; RV park year-round', notes: '11228 McCourtney Rd; hosts County Fair (Aug), Draft Horse Classic (Sep), High Sierra Music Fest (Jul), KVMR Celtic Fest (May), Bluegrass Festival (Jun); onsite Lions Lake & RV park', icon: '🎪', url: 'https://www.nevadacountyfair.com/', directions: 'https://maps.google.com/?q=11228+McCourtney+Rd+Grass+Valley+CA+95949', lat: 39.2048, lng: -121.0389, photo: 'https://images.unsplash.com/photo-1471666875520-c75081f42081?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── STATE PARKS ───────────────────────────────────────────────────
+  { id: 72, name: 'Empire Mine Trails — Hiking, Biking & Horses', sub: '14 miles of multi-use trails through 856 acres of historic gold country forest', area: 'Grass Valley', type: 'Outdoor', tags: ['Active','Scenic','Historic','Gold Rush'], hours: 'Trails open year-round; no fee for trail-only use; visitor center $5', notes: 'Union Hill Trail Area: beginner to intermediate; bikes, horses & hikers; 1.5–10 miles; trail maps at visitor center; no bikes in historic zone', icon: '🚵', url: 'https://www.parks.ca.gov/EmpireMine/', directions: 'https://maps.google.com/?q=Empire+Mine+State+Historic+Park+Grass+Valley+CA', lat: 39.2095, lng: -121.0496, photo: 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── MOUNTAIN BIKING TRAILS ────────────────────────────────────────
+  { id: 73, name: 'Pioneer Trail System', sub: '65+ miles of multi-use singletrack parallel to Hwy 20 — bikes, horses & hikers', area: 'Near Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Sport'], hours: 'Year-round; may have snow in winter at upper elevations', notes: 'Lower Pioneer (beginner–intermediate): 10mi from Harmony Ridge Market; Upper Pioneer (advanced): 10mi from White Cloud Campground; also connects to Hoot Trail & Casci Ranch Loop; maintained by Gold Country Trails Council & BONC', icon: '🚵', url: 'https://www.nevadacitychamber.com/nevada-city-things-to-do/outdoor-recreation/mountain-biking/', directions: 'https://maps.google.com/?q=Harmony+Ridge+Market+Nevada+City+CA', lat: 39.2921, lng: -120.9943, photo: 'https://images.unsplash.com/photo-1544191696-102dbeb9c11a?w=400&h=260&fit=crop', season: 'Spring,Summer,Fall' },
+  { id: 74, name: 'Hoot Trail & Parliament Trails Network', sub: 'World-class flow trails accessible from downtown Nevada City', area: 'Nevada City', type: 'Outdoor', tags: ['Active','Sport'], hours: 'Year-round', notes: 'Hoot Trail: 1.3 miles of jumps, berms & flow built by BONC; Parliament Trails network includes Talon Show (directional MTB-only); Scotts Flat Lake Trail nearby; accessible from downtown via Pioneer Trail', icon: '🚵', url: 'https://www.trailforks.com/region/nevada-city/', directions: 'https://maps.google.com/?q=Pioneer+Trail+Nevada+City+CA', lat: 39.2820, lng: -121.0080, photo: 'https://images.unsplash.com/photo-1606901571272-a97b2e03e91e?w=400&h=260&fit=crop', season: 'Spring,Summer,Fall' },
+  { id: 75, name: 'South Yuba Trail — Mountain Biking', sub: '18-mile intermediate singletrack along the South Yuba River', area: 'Near Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Sport'], hours: 'Spring through fall; may be muddy in winter', notes: 'Trailhead at South Yuba Camp off North Bloomfield Rd; 18 miles out-and-back; river swimming access; beautiful canyon scenery; intermediate+', icon: '🚵', url: 'https://gonevadacounty.com/biking/', directions: 'https://maps.google.com/?q=South+Yuba+River+State+Park+North+Bloomfield+Rd+Nevada+City+CA', lat: 39.3200, lng: -121.0010, photo: 'https://images.unsplash.com/photo-1558610125-6df03e73a83e?w=400&h=260&fit=crop', season: 'Spring,Summer,Fall' },
+  { id: 76, name: 'Bear Yuba Land Trust Trails', sub: 'Conservation trails network throughout Nevada County — hiking & biking', area: 'Nevada County', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Dawn to dusk; year-round', notes: 'Wildflower Ridge Preserve, Rice Crossing, Hirschman Pond Trail, Independence Trail; maps at bylt.org; some trails wheelchair accessible; excellent for beginners and families', icon: '🌲', url: 'https://www.bylt.org/trails-list/', directions: 'https://maps.google.com/?q=Bear+Yuba+Land+Trust+Grass+Valley+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 77, name: 'Gateway Bike Park — Penn Valley', sub: 'Dedicated mountain bike skills park for all levels', area: 'Penn Valley', type: 'Outdoor', tags: ['Active','Family','Sport'], hours: 'Dawn to dusk; free', notes: 'Located at Western Gateway Park in Penn Valley; purpose-built pump tracks, skills area & flow trails; great for beginners; dogs welcome', icon: '🚵', url: 'https://gonevadacounty.com/biking/', directions: 'https://maps.google.com/?q=Western+Gateway+Park+Penn+Valley+CA', lat: 39.1988, lng: -121.1681, photo: 'https://images.unsplash.com/photo-1544191696-102dbeb9c11a?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── HORSEBACK RIDING ──────────────────────────────────────────────
+  { id: 78, name: 'Gold Country Trails Council — Equestrian Trails', sub: 'Horse-friendly multi-use trails across Nevada County', area: 'Nevada County', type: 'Outdoor', tags: ['Active','Scenic','Rustic','Sport'], hours: 'Year-round; Pioneer Trail has equestrian staging area off Hwy 20', notes: 'The Pioneer Trail system was developed & maintained by equestrians; staging areas at White Cloud, Skillman & equestrian overlook; Empire Mine trails also horse-friendly; yield to horses on all shared trails', icon: '🐴', url: 'https://goldcountrytrails.org/', directions: 'https://maps.google.com/?q=Pioneer+Trail+Equestrian+Staging+Nevada+City+CA', lat: 39.2921, lng: -120.9943, photo: 'https://images.unsplash.com/photo-1553284965-5dd5b8c4cc85?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── DISC GOLF ─────────────────────────────────────────────────────
+  { id: 79, name: 'Squirrel Creek Disc Golf — Condon Park', sub: '27-hole disc golf course rated one of the best in California', area: 'Grass Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to dusk; free; year-round', notes: '660 Minnie St — tight tree-lined fairways, dense manzanita rough, year-round creek, concrete tee pads, skip-friendly red clay; home course of Gold Country Disc Golf Association (GCDGA); weekly leagues', icon: '🥏', url: 'https://www.cityofgrassvalley.com/pod/squirrel-creek-disc-golf', directions: 'https://maps.google.com/?q=660+Minnie+St+Grass+Valley+CA+95945', lat: 39.2138, lng: -121.0578, photo: 'https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 80, name: 'Hanging Oaks Disc Golf — Western Gateway Park', sub: '18-hole disc golf course in scenic Penn Valley park', area: 'Penn Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to dusk; free; year-round', notes: 'Western Gateway Park, Penn Valley; rated 4/5 by players; also has tennis, pickleball, racquetball, baseball fields & amphitheater in same park; GCDGA hosts regular tournaments here', icon: '🥏', url: 'https://www.goldcountrydga.org/', directions: 'https://maps.google.com/?q=Western+Gateway+Park+Penn+Valley+CA', lat: 39.1988, lng: -121.1681, photo: 'https://images.unsplash.com/photo-1548690312-e3b507d8c110?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 81, name: 'Diamond Arrow Disc Golf — Nevada City', sub: '9-hole disc golf course in Nevada City', area: 'Nevada City', type: 'Outdoor', tags: ['Active','Social','Sport'], hours: 'Dawn to dusk; free', notes: 'Convenient Nevada City course for a quick round; disc golf gear available at Brighton Street Grocery (French & Brighton)', icon: '🥏', url: 'https://www.goldcountrydga.org/', directions: 'https://maps.google.com/?q=Diamond+Arrow+Disc+Golf+Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── BOCCE BALL ────────────────────────────────────────────────────
+  { id: 82, name: 'Bocce Ball & Outdoor Courts — Condon Park', sub: 'Bocce, basketball, horseshoes & lawn games in Grass Valley', area: 'Grass Valley', type: 'Outdoor', tags: ['Social','Family','Active','Sport'], hours: 'Dawn to dusk; free; year-round', notes: 'Condon Park, 115 Bank St — bocce courts, basketball, horseshoe pits, covered group picnic area, BBQ areas, dog park, arboretum; 80-acre park a short walk from downtown GV', icon: '🎳', url: 'https://gonevadacounty.com/condon-park/', directions: 'https://maps.google.com/?q=Condon+Park+660+Minnie+St+Grass+Valley+CA', lat: 39.2138, lng: -121.0578, photo: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── TENNIS ────────────────────────────────────────────────────────
+  { id: 83, name: 'Tennis Courts — Western Gateway Park', sub: 'Public tennis & racquetball courts in Penn Valley', area: 'Penn Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to dusk; free', notes: 'Western Gateway Park, Penn Valley — tennis & racquetball courts plus pickleball, disc golf, baseball, amphitheater & streamside play area all in one park', icon: '🎾', url: 'https://gonevadacounty.com/parks/', directions: 'https://maps.google.com/?q=Western+Gateway+Park+Penn+Valley+CA', lat: 39.1988, lng: -121.1681, photo: 'https://images.unsplash.com/photo-1562552052-d2ef67b1a47e?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── PICKLEBALL ────────────────────────────────────────────────────
+  { id: 84, name: 'South Yuba Club — Pickleball', sub: '11-court private pickleball facility with lessons & leagues', area: 'Grass Valley', type: 'Activity', tags: ['Active','Social','Sport'], hours: 'Check schedule at southyubaclub.com; open play, leagues & clinics', notes: 'Nevada County premier pickleball facility; Coach John with 30+ years experience; beginner clinics, open play, socials & leagues; membership required', icon: '🏓', url: 'https://southyubaclub.com/pickleball', directions: 'https://maps.google.com/?q=South+Yuba+Club+Grass+Valley+CA', lat: 39.2170, lng: -121.0610, photo: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 85, name: 'Grass Valley Pickleball Courts — Race Street', sub: 'Public outdoor pickleball courts with shaded areas', area: 'Grass Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to dusk; free', notes: 'Behind the aquatic complex on Race Street; multiple courts; well-maintained; bring your own paddles; great casual drop-in play', icon: '🏓', url: 'https://www.cityofgrassvalley.com/', directions: 'https://maps.google.com/?q=Race+St+Grass+Valley+CA+95945', lat: 39.2162, lng: -121.0545, photo: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 86, name: 'Western Gateway Park Pickleball — Penn Valley', sub: 'Pickleball, tennis & racquetball in one park', area: 'Penn Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to dusk; free', notes: 'Western Gateway Park; pickleball + tennis + racquetball + disc golf + baseball all together; ideal for group outings', icon: '🏓', url: 'https://gonevadacounty.com/parks/', directions: 'https://maps.google.com/?q=Western+Gateway+Park+Penn+Valley+CA', lat: 39.1988, lng: -121.1681, photo: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── MEMORIAL PARK ─────────────────────────────────────────────────
+  { id: 87, name: 'Memorial Park — Pickleball', sub: '6 dedicated lighted courts — free, open dawn to 10 PM daily', area: 'Grass Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to 10 PM daily; lights until 10 PM; free', notes: '350 Race St, Grass Valley — 6 permanent outdoor courts, concrete, wheelchair accessible, restrooms, water fountain; Grass Valley Pickleball Club reserved times Tue/Thu/Sat 9-11am, Wed 4-6pm, Sun 12-2pm; all skill levels welcome', icon: '🏓', url: 'https://www.grassvalleypickleballclub.org/', directions: 'https://maps.google.com/?q=350+Race+St+Grass+Valley+CA+95945', lat: 39.2162, lng: -121.0545, photo: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 88, name: 'Memorial Park — Tennis & Baseball', sub: 'Public tennis courts, baseball field, pool & playground in Grass Valley', area: 'Grass Valley', type: 'Outdoor', tags: ['Active','Family','Sport'], hours: 'Dawn to dusk (pool seasonal); free courts', notes: '415 Central Ave, Grass Valley — tennis courts, baseball field, basketball, swimming pool (summer), playground, picnic areas, large grassy space; Veterans memorial grounds; adjacent to Race St pickleball courts', icon: '🎾', url: 'https://www.cityofgrassvalley.com/department/parks-recreation', directions: 'https://maps.google.com/?q=415+Central+Ave+Grass+Valley+CA+95945', lat: 39.2165, lng: -121.0540, photo: 'https://images.unsplash.com/photo-1562552052-d2ef67b1a47e?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── SWIMMING & RIVER RECREATION ───────────────────────────────────
+  { id: 89, name: 'South Yuba River Swimming Holes', sub: 'Emerald pools, granite rocks & sandy shores along the South Yuba', area: 'Near Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Best late June–Sept; check river conditions at syrcl.org first', notes: 'Key access points: Bridgeport (families & small kids), 49 Crossing, Hoyt Crossing, Purdon Crossing, Edwards Crossing, Emerald Pools (high-clearance vehicle); NEVER enter when snowmelt is running high; parking fills fast — take Gold Country Stage bus #7 from Govt Center', icon: '🏊', url: 'https://gonevadacounty.com/yuba-river-swimming-holes-dos-donts/', directions: 'https://maps.google.com/?q=Bridgeport+Crossing+South+Yuba+River+Penn+Valley+CA', lat: 39.3018, lng: -121.0633, photo: 'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 90, name: 'H2O Adventures — Whitewater Rafting', sub: 'Guided rafting on the South Yuba & North Fork American Rivers', area: 'Near Nevada City', type: 'Outdoor', tags: ['Active','Social','Family'], hours: 'Spring through fall; check h2oadventures.com for schedule', notes: 'Expert guides; half-day, full-day & multi-day trips; best spring runoff season; family-friendly sections available; world-class expert kayak runs on North Fork', icon: '🚣', url: 'https://gonevadacounty.com/boating/', directions: 'https://maps.google.com/?q=South+Yuba+River+Nevada+City+CA', lat: 39.2957, lng: -121.0573, photo: 'https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=400&h=260&fit=crop', season: 'Spring,Summer' },
+  { id: 91, name: 'Englebright Lake — Boating & Fishing', sub: 'Boat-access-only lake with full marina, camping & fishing', area: 'Penn Valley', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Year-round; Skippers Cove marina has boat rentals & launch ramp', notes: 'Unique boat-access-only camping; rainbow & brown trout, bass, kokanee; kayak & pedal boat rentals at Skippers Cove; 815-acre lake in a steep canyon', icon: '⛵', url: 'https://gonevadacounty.com/fishing/', directions: 'https://maps.google.com/?q=Englebright+Lake+Smartsville+CA', lat: 39.2318, lng: -121.2678, photo: 'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 92, name: 'Fishing — South Yuba, Rollins & Scotts Flat', sub: 'Year-round angling for trout, bass & kokanee in rivers and lakes', area: 'Nevada County', type: 'Outdoor', tags: ['Active','Scenic','Family'], hours: 'Year-round; license required; Mountain Recreation in GV for gear & local tips', notes: 'Rollins Lake: bass, trout & trolling; Scotts Flat: kayak & SUP rentals Memorial Day–mid-Aug (Mountain Recreation kiosk); South Yuba: fly fishing; Englebright: boat-only; Fishing Derby at Fairgrounds annually', icon: '🎣', url: 'https://gonevadacounty.com/fishing/', directions: 'https://maps.google.com/?q=Rollins+Lake+Colfax+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1559827291-72ee739d0d9a?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 93, name: 'SYRCL Salmon Expedition', sub: 'Guided float trip to watch salmon spawning on the Yuba River', area: 'Near Nevada City', type: 'Activity', tags: ['Active','Scenic','Family'], hours: 'Annual — fall salmon run (Oct–Dec); check syrcl.org for dates', notes: 'South Yuba River Citizens League guided expeditions; learn the lifecycle & ecology of Yuba salmon; also land-based hiking expeditions; an unforgettable conservation experience', icon: '🐟', url: 'https://www.syrcl.org/', directions: 'https://maps.google.com/?q=South+Yuba+River+Nevada+City+CA', lat: 39.2957, lng: -121.0573, photo: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── ROCK CLIMBING ─────────────────────────────────────────────────
+  { id: 94, name: 'Gold Crush Climbing Gym', sub: 'Indoor rock climbing gym in Grass Valley', area: 'Grass Valley', type: 'Activity', tags: ['Active','Social','Family'], hours: 'Check goldcrushclimbing.com for current hours', notes: 'Top-rope, lead & bouldering; great rainy-day or river-full alternative; beginner classes available', icon: '🧗', url: 'https://gonevadacounty.com/parking-south-yuba-river/', directions: 'https://maps.google.com/?q=Gold+Crush+Climbing+Gym+Grass+Valley+CA', lat: 39.2197, lng: -121.0580, photo: 'https://images.unsplash.com/photo-1564769662533-4f00a87b4056?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── HIKES & SCENIC SPOTS ──────────────────────────────────────────
+  { id: 95, name: 'Sugarloaf Mountain Hike', sub: 'Sunset hike with panoramic views of Nevada City & the foothills', area: 'Nevada City', type: 'Outdoor', tags: ['Active','Scenic','Romantic'], hours: 'Dawn to dusk; free', notes: 'Short hike from downtown Nevada City; one of the best sunset spots in the county; city-owned open space; Bear Yuba Land Trust partnership; views of downtown and surrounding ridges', icon: '🌅', url: 'https://gonevadacounty.com/things-to-do-nevada-city/', directions: 'https://maps.google.com/?q=Sugarloaf+Mountain+Nevada+City+CA', lat: 39.2680, lng: -121.0050, photo: 'https://images.unsplash.com/photo-1476611338391-6f395a0ebc7b?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── MARKETS & SHOPPING ────────────────────────────────────────────
+  { id: 96, name: 'Grass Valley Farmers Market', sub: 'Four-decade tradition — fresh produce, live music & local vendors', area: 'Grass Valley', type: 'Activity', tags: ['Foodie','Social','Family'], hours: 'Saturdays 8–12:30 PM & Tuesdays 8:30 AM–1 PM; Apr–Nov', notes: 'Downtown Grass Valley; 40+ years running; free-range eggs, berries, seasonal produce, local honey & artisan goods; live music most Saturdays', icon: '🌽', url: 'https://gvfarmersmarket.org/', directions: 'https://maps.google.com/?q=Pine+Creek+Shopping+Center+Grass+Valley+CA', lat: 39.2199, lng: -121.0572, photo: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=400&h=260&fit=crop', season: 'Spring,Summer,Fall' },
+  { id: 141, name: 'Nevada City Farmers Market', sub: 'Saturday morning market on Union Street — produce, artisan food & community', area: 'Nevada City', type: 'Activity', tags: ['Foodie','Social','Family'], hours: 'Saturdays 8:30 AM–1 PM; Apr–Dec', notes: 'Union Street; 40+ local vendors; fresh produce, eggs, honey, flowers, artisan baked goods & local cheese; one of Nevada County\'s most beloved weekly gatherings; year\'s longest-running Saturday market', icon: '🌿', url: 'https://www.ncfarmersmarket.org/', directions: 'https://maps.google.com/?q=Union+St+Nevada+City+CA', lat: 39.2621, lng: -121.0183, photo: 'https://images.unsplash.com/photo-1470072768013-bf9532016c10?w=400&h=260&fit=crop', season: 'Spring,Summer,Fall' },
+  { id: 142, name: 'Thursday Night Market', sub: 'Summer evening street market with live music, farm vendors & local wine', area: 'Grass Valley', type: 'Activity', tags: ['Foodie','Social','Music','Family'], hours: 'Thursdays in June, 6–9 PM; check current schedule', notes: 'Mill Street closes to traffic for a festive evening market; live music, local wine & craft beer, farm-fresh produce, artisan food vendors & street performers; one of the county\'s best free summer evenings out', icon: '🎶', url: 'https://downtowngrassvalley.com/', directions: 'https://maps.google.com/?q=Mill+St+Grass+Valley+CA', lat: 39.2199, lng: -121.0572, photo: 'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 97, name: 'Nevada City Summer Nights', sub: 'Wednesday evening street festival in historic downtown', area: 'Nevada City', type: 'Activity', tags: ['Social','Artistic','Music','Family'], hours: 'Wednesdays in July, 5–9 PM; road closures downtown', notes: 'Historic section closes to cars; live music, food, drink, art vendors, bouncy house for kids; one of the best free summer evening events in the county', icon: '🎶', url: 'https://gonevadacounty.com/summer-vacation-california/', directions: 'https://maps.google.com/?q=Broad+St+Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 98, name: 'Downtown Shopping — Nevada City & Grass Valley', sub: 'Boutiques, galleries, bookstores & artisan shops in two historic downtowns', area: 'Nevada City', type: 'Activity', tags: ['Artistic','Social','Romantic'], hours: 'Most shops open daily; hours vary', notes: 'Nevada City: KitKitDizzi (231 Broad St — clothing, home & botanicals), Hardy Books; Grass Valley: Goodtimes (146 Mill St), local jewelers, craft studios; both downtowns walkable and charming', icon: '🛍️', url: 'https://gonevadacounty.com/shopping/', directions: 'https://maps.google.com/?q=Broad+St+Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── SEASONAL FESTIVALS ────────────────────────────────────────────
+  { id: 99, name: 'Sierra Storytelling Festival', sub: '"Queen of storytelling festivals" — world-class tellers in Nevada City', area: 'Nevada City', type: 'Art event', tags: ['Artistic','Social','Family'], hours: 'Annual — typically June; sierrastorytelling.org', notes: 'Founded by poet Steve Sanfield; 30+ years; world-class storytellers; a rare chance to unplug and experience the power of oral tradition; all ages; multiple venues', icon: '📖', url: 'https://sierrastorytelling.org/', directions: 'https://maps.google.com/?q=Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 100, name: 'Victorian Christmas — Nevada City', sub: 'Lamp-lit streets, roasted chestnuts & 19th-century magic in December', area: 'Nevada City', type: 'Art event', tags: ['Romantic','Historic','Social','Family'], hours: 'Two Wed evenings + three Sun afternoons in December; check nevadacitychamber.com', notes: 'Nevada City transforms into a Victorian wonderland; street vendors in period costume, chestnuts, carolers, holiday treasures; one of the most unique Christmas traditions in California', icon: '🎄', url: 'https://www.nevadacitychamber.com/', directions: 'https://maps.google.com/?q=Broad+St+Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=400&h=260&fit=crop', season: 'Holiday' },
+  { id: 101, name: 'Cornish Christmas — Grass Valley', sub: 'Ye olde Cornish holiday tradition on Mill & Main Streets', area: 'Grass Valley', type: 'Art event', tags: ['Rustic','Historic','Social','Family'], hours: 'Late Nov through 3rd Fri in December, every Friday evening; downtowngrassvalley.com', notes: 'Grass Valley celebrates its Cornish mining heritage; carolers, mistletoe, vendors in Cornish attire, street food; starts last Friday of November; beloved annual tradition', icon: '🎅', url: 'https://gonevadacounty.com/festivals-special-events/', directions: 'https://maps.google.com/?q=Mill+St+Grass+Valley+CA', lat: 39.2199, lng: -121.0572, photo: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=400&h=260&fit=crop', season: 'Holiday' },
+  { id: 102, name: 'Penn Valley Rodeo', sub: 'Family-friendly full-weekend rodeo in the Sierra foothills', area: 'Penn Valley', type: 'Activity', tags: ['Rustic','Family','Social'], hours: 'Annual — check pennvalleyrodeo.com for dates', notes: 'Full weekend of rodeo events; get your cowboy boots ready; one of the authentic small-town Western experiences in the foothills', icon: '🤠', url: 'https://gonevadacounty.com/small-town-gems/', directions: 'https://maps.google.com/?q=Penn+Valley+CA', lat: 39.1988, lng: -121.1681, photo: 'https://images.unsplash.com/photo-1504203700686-f21e703e5f1c?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 103, name: 'Bridgeport Gold Panning with Docents', sub: 'Hands-on gold panning lessons at the South Yuba River', area: 'Near Nevada City', type: 'Activity', tags: ['Gold Rush','Family','Active'], hours: 'Saturdays & Sundays 12–2 PM (seasonal); check syrcl.org', notes: 'Docents at Bridgeport provide step-by-step panning lessons and share Gold Rush history; combine with wildflower walks (spring) and Buttermilk Bend hike; 17660 Pleasant Valley Rd, Penn Valley', icon: '⚱️', url: 'https://gonevadacounty.com/gold-panning/', directions: 'https://maps.google.com/?q=17660+Pleasant+Valley+Rd+Penn+Valley+CA', lat: 39.3019, lng: -121.0633, photo: 'https://images.unsplash.com/photo-1534270804882-6b5048b1c1fc?w=400&h=260&fit=crop', season: 'Spring' },
+  { id: 104, name: 'Nevada City & Grass Valley Pools', sub: 'Public outdoor swimming pools — perfect when the river is high', area: 'Nevada City', type: 'Outdoor', tags: ['Active','Family'], hours: 'Summer season (Memorial Day–Labor Day); check city sites for hours', notes: 'Nevada City Pool at Pioneer Park (7 days/week all summer); Memorial Park Pool in Grass Valley (recently renovated, near downtown & Empire Mine); Inn Town Campground also has a pool', icon: '🏊', url: 'https://gonevadacounty.com/swimming/', directions: 'https://maps.google.com/?q=Pioneer+Park+Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1560089000-7433a4ebbd64?w=400&h=260&fit=crop', season: 'Summer' },
+
+  // ── FLOAT THERAPY & WELLNESS ──────────────────────────────────────
+  { id: 105, name: 'Revival Float & Wellness', sub: 'Float therapy, infrared sauna & massage in Grass Valley', area: 'Grass Valley', type: 'Wellness', tags: ['Spiritual','Romantic'], hours: 'Tue–Sun 10 AM–6 PM; book at revivalfloat.com', notes: '262 S Auburn St — 3 private float suites with 1,000 lbs Epsom salt each; infrared sauna; deep tissue, Swedish, Myofascial Release, Lymphatic Drainage, Reiki, hot stones & cupping; intro 3-float package for first-timers', icon: '🌊', url: 'https://revivalfloat.com/', directions: 'https://maps.google.com/?q=262+S+Auburn+St+Grass+Valley+CA+95945', lat: 39.2178, lng: -121.0576, photo: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── YOGA STUDIOS ──────────────────────────────────────────────────
+  { id: 106, name: 'Wild Mountain Yoga Center', sub: 'Premier yoga studio — 2 locations, 90+ weekly classes', area: 'Grass Valley', type: 'Wellness', tags: ['Spiritual','Active'], hours: 'Daily; check wildmtyoga.com for class schedule', notes: '121 S Church St, Grass Valley (above Yuba Blue) & Nevada City location; Hatha, Vinyasa, Yin, Restorative, meditation; international teacher trainings; community donations welcome; drop-in friendly', icon: '🧘', url: 'https://wildmtyoga.com/', directions: 'https://maps.google.com/?q=121+South+Church+Street+Grass+Valley+CA+95959', lat: 39.2188, lng: -121.0582, photo: 'https://images.unsplash.com/photo-1600618528240-fb9fc964b853?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 107, name: 'Warmth Studios', sub: 'Hot yoga & Pilates — Bikram, Vinyasa, Yin & Inferno Hot Pilates', area: 'Grass Valley', type: 'Wellness', tags: ['Spiritual','Active'], hours: 'Mon–Fri 7 AM–12:30 PM & 4–8:30 PM; Sat 7 AM–12:30 PM; Sun 8:30–11:30 AM & 3:30–9 PM', notes: '155 Spring Hill Dr Ste 206, Grass Valley — classes at 98–103 degrees; locker rooms, mat & towel rentals; Bikram 26+2, hot Vinyasa, Yin, Yoga Nidra, Inferno Hot Pilates; established 2003 as Bikram Yoga GV/NC', icon: '🔥', url: 'https://warmthstudios.com/', directions: 'https://maps.google.com/?q=155+Spring+Hill+Dr+Grass+Valley+CA+95945', lat: 39.2248, lng: -121.0523, photo: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 108, name: 'The Yoga Dive / Kinfolk Yoga', sub: 'Community yoga studio offering classes, workshops & art therapy', area: 'Grass Valley', type: 'Wellness', tags: ['Spiritual','Artistic'], hours: 'Check theyogadive.com for current schedule', notes: 'Neighborhood studio in downtown Grass Valley; Kinfolk Yoga offers ceramics + yoga workshops, art therapy & bodywork; 20+ years of combined teaching; beginner-friendly & drop-in classes', icon: '🧘', url: 'http://theyogadive.com/', directions: 'https://maps.google.com/?q=The+Yoga+Dive+Grass+Valley+CA', lat: 39.2197, lng: -121.0572, photo: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 109, name: 'Golden Mandala Yoga Studio', sub: 'Yoga, meditation & spiritual community in Nevada City', area: 'Nevada City', type: 'Wellness', tags: ['Spiritual'], hours: 'Check current class schedule', notes: 'Nevada City yoga and meditation community; Hatha, gentle yoga, and meditation classes; welcoming to all levels', icon: '🌸', url: 'https://www.yelp.com/biz/golden-mandala-yoga-studio-nevada-city', directions: 'https://maps.google.com/?q=Golden+Mandala+Yoga+Studio+Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 110, name: 'Ananda Expanding Light Retreat', sub: 'Northern California premier yoga & meditation retreat since 1968', area: 'Nevada County', type: 'Wellness', tags: ['Spiritual'], hours: 'Year-round programs; check expandinglight.org', notes: 'Daily guided yoga postures & meditations; year-round programs; teacher training & certification; Hatha, Bhakti, Kriya yoga; also Crystal Hermitage Garden on campus', icon: '✨', url: 'https://www.expandinglight.org/', directions: 'https://maps.google.com/?q=14618+Tyler+Foote+Crossing+Rd+Nevada+City+CA', lat: 39.3082, lng: -121.0972, photo: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── NEVADA COUNTY ARTS COUNCIL ────────────────────────────────────
+  { id: 111, name: 'Nevada County Arts Council', sub: 'Hub of the arts in Nevada County — events calendar, artist directory & cultural programs', area: 'Grass Valley', type: 'Activity', tags: ['Artistic','Social','Music'], hours: 'Office hours vary; arts calendar updated continuously at nevadacountyarts.org', notes: '100 N Church St, Grass Valley; State-Local Partner with California Arts Council; manages GVNC & Truckee Cultural Districts; publishes MUSE magazine; comprehensive Arts & Culture Calendar covering all county events; free resource for visitors', icon: '🎭', url: 'https://www.nevadacountyarts.org/', directions: 'https://maps.google.com/?q=Nevada+County+Arts+Council+Grass+Valley+CA', lat: 39.2188, lng: -121.0582, photo: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 112, name: 'Arts & Culture Calendar — NCAC', sub: 'Most comprehensive arts & culture events calendar in Nevada County', area: 'Nevada County', type: 'Activity', tags: ['Artistic','Music','Film','Social'], hours: 'Updated continuously; free to browse', notes: 'nevadacountyarts.org/calendar — concerts, theater, art exhibits, live performance, film screenings, poetry, dance & more across all of Nevada County; submit your own event free', icon: '📅', url: 'https://www.nevadacountyarts.org/calendar/', directions: 'https://maps.google.com/?q=Nevada+County+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 113, name: 'MUSE Magazine', sub: 'Free annual guide to art & culture in Nevada County', area: 'Nevada County', type: 'Activity', tags: ['Artistic','Social'], hours: 'Annual publication; pick up free at chambers, venues & visitor centers', notes: '10,000 print copies distributed across Grass Valley, Nevada City & Truckee; also along I-80 & Hwy 20 from Sacramento to Reno; yearly cultural map, events calendar, artist & business directories; digital edition at nevadacountyarts.org/muse', icon: '📖', url: 'https://www.nevadacountyarts.org/muse', directions: 'https://maps.google.com/?q=Nevada+City+Chamber+of+Commerce+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=260&fit=crop', season: 'Year-Round' },
+
+  // ── FESTIVALS & EVENTS (from NCAC) ───────────────────────────────
+  { id: 114, name: 'Sierra Poetry Festival', sub: 'Annual international poetry festival — 10th year in 2026', area: 'Grass Valley', type: 'Art event', tags: ['Artistic','Social'], hours: 'Annual — April 18, 2026 main stage at Center for the Arts; month-long fringe festival throughout April', notes: 'Project of Nevada County Arts Council; local, national & international poets; month-long pop-up poetry events at venues county-wide; free student tickets; preceded by open mics, book releases & readings at Miners Foundry, Holbrooke, ASiF & more', icon: '📝', url: 'https://www.sierrapoetryfestival.org/', directions: 'https://maps.google.com/?q=The+Center+for+the+Arts+314+W+Main+St+Grass+Valley+CA', lat: 39.2188, lng: -121.0597, photo: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400&h=260&fit=crop', season: 'Spring' },
+  { id: 115, name: 'Open Studios Nevada County', sub: 'Annual self-guided tour of working artist studios', area: 'Nevada County', type: 'Art event', tags: ['Artistic','Hands-on','Social'], hours: 'Annual — typically fall (October); check nevadacountyarts.org', notes: '30th anniversary event — studios open county-wide across Nevada City, Grass Valley & surrounding areas; meet artists in their working spaces; unique art purchases direct from creators', icon: '🎨', url: 'https://www.nevadacountyarts.org/', directions: 'https://maps.google.com/?q=Nevada+County+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=260&fit=crop', season: 'Fall' },
+  { id: 116, name: 'Mardi Gras Nevada City', sub: 'Colorful Fat Tuesday parade with floats, Burning Man art cars & community spirit', area: 'Nevada City', type: 'Art event', tags: ['Social','Artistic','Music','Family'], hours: 'Annual — Sunday before Fat Tuesday (February); downtown Nevada City', notes: 'Nevada City version of Mardi Gras; dozens of festive floats, marching groups, Burning Man art cars; fun & family-friendly; beads, costumes & community spirit', icon: '🎉', url: 'https://gonevadacounty.com/festivals-special-events/', directions: 'https://maps.google.com/?q=Broad+St+Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd81e?w=400&h=260&fit=crop', season: 'Holiday' },
+  { id: 117, name: 'Nevada City Chinese New Year Celebration', sub: 'Lunar New Year celebration honoring Gold Rush Chinese heritage', area: 'Nevada City', type: 'Art event', tags: ['Historic','Social','Family','Artistic'], hours: 'Annual — January/February (date varies with lunar calendar)', notes: 'Honors the rich Chinese heritage of the Gold Rush era in Nevada County; Firehouse No.1 houses the Hou Wang Temple altar from Grass Valley Chinatown; community celebration with food, music & cultural traditions', icon: '🧧', url: 'https://www.nevadacountyarts.org/', directions: 'https://maps.google.com/?q=Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&h=260&fit=crop', season: 'Holiday' },
+  { id: 118, name: 'Fathers Day Bluegrass Festival', sub: 'Multi-day bluegrass camping festival at the Nevada County Fairgrounds', area: 'Grass Valley', type: 'Music venue', tags: ['Music','Social','Family'], hours: 'Annual — Fathers Day weekend (June 18-21, 2026); fathersdayfestival.com', notes: 'Presented by California Bluegrass Association; multi-day camping festival; Nevada County Fairgrounds; nationally recognized bluegrass artists; family-friendly; tent & RV camping', icon: '🎸', url: 'https://fathersdayfestival.com/', directions: 'https://maps.google.com/?q=Nevada+County+Fairgrounds+11228+McCourtney+Rd+Grass+Valley+CA', lat: 39.2048, lng: -121.0389, photo: 'https://images.unsplash.com/photo-1495976797530-f33e6580e44b?w=400&h=260&fit=crop', season: 'Summer' },
+  { id: 119, name: 'Sugar Pine Music Festival', sub: '4-day family camping music festival in the Sierra foothills', area: 'Nevada County', type: 'Music venue', tags: ['Music','Social','Family'], hours: 'Annual — summer; sugarpinemusicfest.com', notes: 'Multi-day camping festival; diverse music lineup; kid zone; costume themes; arts and craft vendors; food and drink; family-friendly outdoor experience', icon: '🎵', url: 'https://sugarpinemusicfest.com/', directions: 'https://maps.google.com/?q=Nevada+County+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&h=260&fit=crop', season: 'Summer' },
+
+  // ── ARTS ORGANIZATIONS & VENUES ──────────────────────────────────
+  { id: 120, name: 'InConcert Sierra', sub: 'Classical and chamber music concert series in Nevada County', area: 'Grass Valley', type: 'Music venue', tags: ['Music','Artistic'], hours: 'Concert series runs fall through spring; check inconcertsierra.org', notes: 'Professional-quality classical & chamber music performances at intimate Nevada County venues; local talent alongside visiting artists; beloved community institution', icon: '🎻', url: 'https://inconcertsierra.org/', directions: 'https://maps.google.com/?q=The+Center+for+the+Arts+Grass+Valley+CA', lat: 39.2188, lng: -121.0597, photo: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 121, name: 'North Columbia Schoolhouse Cultural Center', sub: 'Hootenannies, concerts, poetry readings & art shows on the San Juan Ridge', area: 'North San Juan', type: 'Music venue', tags: ['Music','Artistic','Social','Rustic'], hours: 'Events vary; check northcolumbiaschoolhouse.org', notes: '17894 Tyler Foote Rd, Nevada City — unique 1800s schoolhouse hosting concerts, poetry, theater, square dances & community gatherings on the historic San Juan Ridge; intimate and authentic', icon: '🏫', url: 'https://northcolumbiaschoolhouse.org/', directions: 'https://maps.google.com/?q=17894+Tyler+Foote+Rd+Nevada+City+CA', lat: 39.3580, lng: -121.0270, photo: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 122, name: 'CATS — Community Asian Theatre of the Sierra', sub: 'Multicultural theater productions in Gold Rush country', area: 'Nevada City', type: 'Music venue', tags: ['Artistic','Social','Historic'], hours: 'Productions vary; check catsweb.org', notes: 'Promoting cultural diversity through multicultural theater, events & workshops in Western Nevada County; performs at Nevada Theatre; unique perspective on the regions diverse heritage', icon: '🎭', url: 'https://catsweb.org/', directions: 'https://maps.google.com/?q=Nevada+Theatre+Nevada+City+CA', lat: 39.2618, lng: -121.0180, photo: 'https://images.unsplash.com/photo-1507924538820-ede94a04019d?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 123, name: 'Sierra Stages', sub: 'Professional theater company performing at the Nevada Theatre', area: 'Nevada City', type: 'Music venue', tags: ['Artistic'], hours: 'Productions vary seasonally; sierrastages.org', notes: 'High-quality live theater at the historic Nevada Theatre (1865); produces a mix of classic and contemporary plays; a cornerstone of the local performing arts scene', icon: '🎭', url: 'https://sierrastages.org/', directions: 'https://maps.google.com/?q=Nevada+Theatre+401+Broad+St+Nevada+City+CA', lat: 39.2618, lng: -121.0180, photo: 'https://images.unsplash.com/photo-1507924538820-ede94a04019d?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 124, name: 'Trails & Vistas', sub: 'Art hikes fusing visual art, music & nature in the Sierra landscape', area: 'Nevada County', type: 'Outdoor', tags: ['Artistic','Scenic','Active'], hours: 'Annual — Earth Day weekend (April) and summer; trailsandvistas.org', notes: 'Unique outdoor arts experience — artists, performers & musicians integrated into nature hikes; celebrating 20+ years; artists from Lake Tahoe Basin to East Coast; tickets required; one of the most distinctive arts events in California', icon: '🖼️', url: 'https://trailsandvistas.org/', directions: 'https://maps.google.com/?q=Nevada+County+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 125, name: 'Creatives Meetup — NCAC', sub: 'Monthly arts community networking event in Grass Valley & Nevada City', area: 'Grass Valley', type: 'Activity', tags: ['Artistic','Social','Hands-on'], hours: 'Monthly — check nevadacountyarts.org for dates & locations', notes: 'Free monthly gathering for artists, makers & creatives; held alternately in Grass Valley and Nevada City; great way for visitors to connect with the local arts community; all welcome', icon: '🤝', url: 'https://www.nevadacountyarts.org/resources-for-creatives', directions: 'https://maps.google.com/?q=Grass+Valley+CA', lat: 39.2188, lng: -121.0582, photo: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 126, name: 'Nisenan Heritage Day', sub: 'Annual celebration of the indigenous Nisenan people of Nevada County', area: 'Nevada City', type: 'Art event', tags: ['Historic','Social','Family','Artistic'], hours: 'Annual — fall; check nevadacountyarts.org for dates', notes: 'Honors the Nisenan Tribe, the original inhabitants of the Nevada City area; cultural education, art, and community; Nevada City Rancheria Nisenan Tribe recently purchased ancestral land at Yulica; connects Gold Rush history with indigenous heritage', icon: '🪶', url: 'https://www.nevadacountyarts.org/', directions: 'https://maps.google.com/?q=Nevada+City+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1504450874802-0ba2bcd9b5ae?w=400&h=260&fit=crop', season: 'Fall' },
+
+];
+
+const ITINERARIES = [
+  { theme: 'Rustic Gold Country', duration: '1 Day', stops: [
+    { time: 'Morning', name: 'Empire Mine Mineyard Tour + Blacksmith Shop', area: 'Grass Valley' },
+    { time: 'Lunch', name: "Tofanellis Gold Country Bistro", area: 'Grass Valley' },
+    { time: 'Afternoon', name: 'The Curious Forge – Blacksmithing Workshop', area: 'Nevada City' },
+    { time: 'Evening', name: 'Dinner at The Willo Steakhouse', area: 'Nevada City' },
+    { time: 'Night', name: 'Inn Town Glamping or Holbrooke Hotel', area: 'Nevada City / Grass Valley' },
+  ]},
+  { theme: 'Art + Music Weekend', duration: '2 Days', stops: [
+    { time: 'Day 1 Arrive', name: 'Check into National Exchange Hotel or Outside Inn', area: 'Nevada City' },
+    { time: 'Day 1 Eve', name: 'First Friday Art Walk or Miners Foundry / Crazy Horse', area: 'Nevada City' },
+    { time: 'Day 2 AM', name: 'Nevada City Farmers Market + gallery stroll + winery tasting', area: 'Nevada City' },
+    { time: 'Day 2 Eve', name: 'Center for the Arts show + dinner', area: 'Grass Valley' },
+  ]},
+  { theme: 'Spiritual Reset', duration: '2 Days', stops: [
+    { time: 'Day 1', name: 'Inner Path yoga / meditation + Petra or DaKan meal', area: 'Nevada City' },
+    { time: 'Day 1 Night', name: 'Stay at The Parsonage 1865', area: 'Nevada City' },
+    { time: 'Day 2', name: 'Ananda retreat / Mountain Stream / Rising Gaia', area: 'Nevada County' },
+  ]},
+  { theme: 'Active River + Town', duration: '1–2 Days', stops: [
+    { time: 'Morning', name: 'South Yuba River State Park or local trail', area: 'Near Nevada City' },
+    { time: 'Afternoon', name: 'Post-hike meal at The River Downtown or BrewBilt', area: 'Nevada City' },
+    { time: 'Night', name: 'Inn Town Campground', area: 'Nevada City' },
+  ]},
+  { theme: 'Summer Festival Weekend', duration: '2 Days', stops: [
+    { time: 'Day 1 Eve', name: 'Thursday Night Market – Downtown Grass Valley', area: 'Grass Valley' },
+    { time: 'Day 2', name: 'KVMR Celtic Festival / High Sierra / Fairgrounds event', area: 'Grass Valley' },
+  ]},
+  { theme: 'Romantic Getaway', duration: '2 Days', stops: [
+    { time: 'Day 1', name: 'Check into National Exchange Hotel', area: 'Nevada City' },
+    { time: 'Day 1 Afternoon', name: 'Nevada City Winery tasting', area: 'Nevada City' },
+    { time: 'Day 1 Evening', name: 'Dinner at Restaurant DaKan', area: 'Nevada City' },
+    { time: 'Day 2', name: 'Holbrooke Hotel brunch + downtown stroll', area: 'Grass Valley' },
+    { time: 'Day 2 Afternoon', name: 'Art galleries + Miners Foundry evening show', area: 'Nevada City' },
+  ]},
+];
+
+// ── ITINERARY LIVE DATA + STORAGE ───────────────────────────────────
+const ITIN_STORAGE_KEY = 'ncexp:itineraries';
+let liveItineraries = JSON.parse(JSON.stringify(ITINERARIES)); // mutable copy
+
+function loadItineraries() {
+  try {
+    const raw = localStorage.getItem(ITIN_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        liveItineraries = parsed;
+        console.log(`Loaded ${liveItineraries.length} itineraries from localStorage.`);
+      }
+    }
+  } catch(e) {}
+}
+
+function saveItineraries() {
+  try {
+    localStorage.setItem(ITIN_STORAGE_KEY, JSON.stringify(liveItineraries));
+    flashSaved();
+  } catch(e) { console.warn('Could not save itineraries:', e); }
+}
+
+const EVENTS = [
+  { name: 'KVMR Celtic Festival', venue: 'Nevada County Fairgrounds', dates: 'May 1–3, 2026', times: 'Varies; Friday Ceilidh 8–11 PM', area: 'Grass Valley', tags: ['Music','Cultural','Family'], url: 'https://kvmrcelticfestival.org/' },
+  { name: 'Grass Valley Old West Show', venue: 'Nevada County Fairgrounds', dates: 'May 7–9, 2026', times: 'Thu early entry; Fri/Sat regular show', area: 'Grass Valley', tags: ['Rustic','Historic'], url: 'https://www.grassvalleyshow.com/' },
+  { name: 'Thursday Night Market', venue: 'Downtown Grass Valley', dates: 'June 11, 18, 25 & July 2, 9, 2026', times: '6:00–9:00 PM', area: 'Grass Valley', tags: ['Artistic','Music','Social'], url: 'https://downtowngrassvalley.com/gvda-events/2026-thursday-night-market/' },
+  { name: 'High Sierra Music Festival', venue: 'Nevada County Fairgrounds', dates: 'July 2–5, 2026', times: 'Festival schedule varies', area: 'Grass Valley', tags: ['Music','Social','Destination'], url: 'https://www.sfchronicle.com/entertainment/article/high-sierra-festival-lineup-21323157.php' },
+  { name: 'Nevada County Fair', venue: 'Nevada County Fairgrounds', dates: 'August 12–16, 2026', times: 'Daily schedules TBD', area: 'Grass Valley', tags: ['Family','Classic','Social'], url: 'https://www.nevadacountyfair.com/p/daily-schedules/page' },
+  { name: 'Draft Horse Classic & Harvest Fair', venue: 'Nevada County Fairgrounds', dates: 'September 17–20, 2026', times: 'Arena performances begin Sep 17 evening', area: 'Grass Valley', tags: ['Rustic','Family','Classic'], url: 'https://www.nevadacountyfair.com/p/draft-horse-classic' },
+  { name: 'First Friday Art Walk – Nevada City', venue: 'Downtown Nevada City', dates: 'First Friday of June, July, August 2026', times: '6:00–9:00 PM', area: 'Nevada City', tags: ['Artistic','Music','Social'], url: 'https://www.nevadacitychamber.com/nevada-city-events/first-friday-artwalks/' },
+  { name: 'Nevada City Farmers Market', venue: 'Union Street', dates: 'Every Saturday Apr 11–Dec 19, 2026', times: '8:30 AM–1:00 PM', area: 'Nevada City', tags: ['Foodie','Family','Social'], url: 'https://www.ncfarmersmarket.org/' },
+  { name: 'Grass Valley Farmers Market', venue: 'Pine Creek Shopping Center', dates: 'Saturdays Apr 18–Nov 21 & Tuesdays May 5–Sep 22, 2026', times: 'Sat 8–12:30 PM; Tue 8:30–1 PM', area: 'Grass Valley', tags: ['Foodie','Local'], url: 'https://gvfarmersmarket.org/locations/' },
+  { name: 'Wild & Scenic Film Festival', venue: 'Nevada Theatre + Miners Foundry + Center for the Arts', dates: 'February 19–23, 2026 (annual)', times: 'Thu–Sun; film sessions throughout', area: 'Nevada City / Grass Valley', tags: ['Film','Cultural','Active'], url: 'https://wildandscenicfilmfestival.org/' },
+  { name: 'Nevada City Film Festival', venue: 'Nevada Theatre & outdoor venues', dates: 'June–July 2026 (annual)', times: 'Lawn games from 7:30 PM; screening at sunset ~8:30 PM', area: 'Nevada City', tags: ['Film','Artistic','Social'], url: 'https://nevadacityfilmfestival.com/' },
+  { name: 'Music in the Mountains', venue: 'Center for the Arts & area venues', dates: 'June 2026 (annual)', times: 'Various; check musicinthemountains.org', area: 'Grass Valley', tags: ['Music','Artistic','Cultural'], url: 'https://musicinthemountains.org/' },
+  { name: 'Sierra Poetry Festival', venue: 'The Center for the Arts', dates: 'April 18, 2026', times: 'Mainstage event; check schedule', area: 'Grass Valley', tags: ['Artistic','Cultural','Social'], url: 'https://thecenterforthearts.org/' },
+  { name: 'Wednesday Night Concerts in Nevada City', venue: 'Downtown Nevada City', dates: 'Wednesdays in July 2026', times: '6:00–9:00 PM (street closures)', area: 'Nevada City', tags: ['Music','Social','Family'], url: 'https://www.nevadacitychamber.com/' },
+  { name: 'Foothills Celebration Wine & Food Walk', venue: 'Historic Downtown Grass Valley', dates: 'March 2026 (annual; March 14, 2026)', times: '1:00–4:00 PM', area: 'Grass Valley', tags: ['Foodie','Social','Romantic'], url: 'https://downtowngrassvalley.com/' },
+  { name: 'Buttermilk Bend Wildflower Docent Walks', venue: 'Buttermilk Bend Trailhead, South Yuba River', dates: "Saturdays & Sundays March–Mothers Day 2026", times: '10:00 AM', area: 'Near Nevada City', tags: ['Scenic','Nature','Family'], url: 'https://gonevadacounty.com/south-yuba-river-state-park/' },
+  { name: 'Nevada County Recreation Fair', venue: 'Nevada County Fairgrounds', dates: 'April 25, 2026', times: '11:00 AM–4:00 PM', area: 'Grass Valley', tags: ['Family','Active','Social'], url: 'https://nevadacityca.gov/recfair' },
+  { name: 'Cornish Christmas', venue: 'Downtown Grass Valley', dates: 'Select Fridays after Thanksgiving through Dec 18, 2026', times: 'Evening hours ~6–9 PM', area: 'Grass Valley', tags: ['Historic','Family','Seasonal'], url: 'https://downtowngrassvalley.com/gvda-events/58th-annual-cornish-christmas-2026/' },
+  { name: 'Victorian Christmas', venue: 'Downtown Nevada City', dates: 'December 2026', times: 'Sundays 1:30–6 PM & Wednesdays 5–9 PM', area: 'Nevada City', tags: ['Historic','Romantic','Seasonal'], url: 'https://gonevadacounty.com/victorian-christmas/' },
+];
+
+let selectedThemes = new Set();
+let myList = new Set();
+let manageMode = false;
+let manageDataTab = 'experiences'; // 'experiences' | 'itineraries'
+
+function getActiveThemeTags() {
+  if (selectedThemes.size === 0) return null;
+  let tags = new Set();
+  selectedThemes.forEach(tid => {
+    const t = THEMES.find(t => t.id === tid);
+    if (t) t.tags.forEach(tag => tags.add(tag.toLowerCase()));
+  });
+  return tags;
+}
+
+function renderThemes() {
+  const grid = document.getElementById('themesGrid');
+  grid.innerHTML = THEMES.map(t => `
+    <div class="theme-card ${selectedThemes.has(t.id) ? 'selected' : ''}" onclick="toggleTheme('${t.id}')">
+      <img src="${t.photo}" alt="${t.name}" loading="lazy">
+      <div class="theme-card-overlay"></div>
+      <div class="theme-check">✓</div>
+      <div class="theme-card-label">
+        <span class="theme-name">${t.name}</span>
+        <span class="theme-tagline">${t.tagline}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+
+function toggleTheme(id) {
+  if (selectedThemes.has(id)) {
+    selectedThemes.delete(id);
+  } else {
+    selectedThemes.add(id);   // multi-select: OR logic between vibes
+  }
+  renderThemes();
+  renderActiveFilters();
+  renderExperiences();
+}
+
+function addToVibes(id) { toggleTheme(id); }
+
+
+function renderExperiences() {
+  const filtered = filterExperiences();
+  const filteredIds = new Set(filtered.map(e => e.id));
+
+  // Items already in myList that are NOT in the current vibe filter — show pinned at top
+  const pinnedItems = [...myList]
+    .map(id => liveExperiences.find(e => e.id === id))
+    .filter(e => e && !filteredIds.has(e.id));
+
+  const grid = document.getElementById('expGrid');
+  const countEl = document.getElementById('resultsCount');
+
+  const totalShown = filtered.length + pinnedItems.length;
+  const vibeLabel = selectedThemes.size === 1 ? ' matching your vibe'
+    : selectedThemes.size > 1  ? ` matching ${selectedThemes.size} vibes` : '';
+  countEl.innerHTML = totalShown > 0
+    ? `Showing <strong>${filtered.length}</strong> experience${filtered.length !== 1 ? 's' : ''}${vibeLabel}${pinnedItems.length > 0 ? ` <span style="color:var(--slate);font-weight:400">+ ${pinnedItems.length} from your list</span>` : ''}`
+    : '';
+
+  if (filtered.length === 0 && pinnedItems.length === 0) {
+    grid.innerHTML = '<div class="no-results">No experiences match your current filters.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Try adjusting your themes or filters.</span></div>';
+    return;
+  }
+
+  const cardHtml = (e) => {
+    const added = myList.has(e.id);
+    return `
+    <div class="exp-card ${added ? 'added' : ''}" id="exp-card-${e.id}">
+      ${manageMode && added ? `<button class="item-remove" style="position:absolute;top:10px;right:10px;z-index:10" onclick="removeFromList(${e.id})">×</button>` : ''}
+      <div class="exp-photo">
+        <img src="${e.photo}" alt="${e.name}" loading="lazy" onerror="this.style.display='none'">
+        <div class="exp-photo-overlay"></div>
+        <div class="exp-added-badge">✓ Added</div>
+        <span class="exp-photo-area">${e.area}</span>
+        <div class="exp-photo-name">${e.name}</div>
+      </div>
+      <div class="exp-body">
+        <div class="exp-sub">${e.sub}</div>
+        <div class="exp-meta">
+          <span>🕐 ${e.hours}</span>
+        </div>
+        <div class="exp-tags">
+          ${e.tags.map(tag => `<span class="tag ${isHighlightTag(tag) ? 'highlight' : ''}">${tag}</span>`).join('')}
+        </div>
+        ${e.notes ? `<div style="font-size:11px;color:#718096;font-style:italic;margin-bottom:10px">${e.notes}</div>` : ''}
+        <div class="exp-actions">
+          <button class="btn-add ${added ? 'added-btn' : ''}" onclick="toggleList(${e.id})">
+            ${added ? '✓ Added' : '+ Add to My List'}
+          </button>
+          <a class="btn-visit" href="${e.url}" target="_blank">Website ↗</a>
+          <a class="btn-visit" href="${e.directions}" target="_blank">📍</a>
+        </div>
+      </div>
+    </div>`;
+  };
+
+  // Pinned items (from other vibes, already in list) shown first with a subtle separator
+  const pinnedHtml = pinnedItems.length > 0
+    ? `<div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);padding:4px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">Your picks from other vibes</div>
+       ${pinnedItems.map(cardHtml).join('')}
+       <div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--slate);padding:8px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">${selectedThemes.size > 0 ? [...selectedThemes].map(tid=>THEMES.find(t=>t.id===tid)?.name).filter(Boolean).join(' + ') : 'All experiences'}</div>`
+    : '';
+
+  grid.innerHTML = pinnedHtml + filtered.map(cardHtml).join('');
+}
+
+function isHighlightTag(tag) {
+  const themeTags = getActiveThemeTags();
+  return themeTags && themeTags.has(tag.toLowerCase());
+}
+
+function renderActiveFilters() {
+  const bar = document.getElementById('activeFilterBar');
+  const chips = [];
+
+  // One chip per active vibe
+  selectedThemes.forEach(tid => {
+    const t = THEMES.find(t => t.id === tid);
+    if (t) chips.push(
+      `<span class="filter-chip">${t.name}<span class="filter-chip-x" onclick="toggleTheme('${tid}')">✕</span></span>`
+    );
+  });
+
+  // Area chip
+  const areaEl = document.getElementById('filterArea');
+  if (areaEl.value) chips.push(
+    `<span class="filter-chip chip-meta">${areaEl.options[areaEl.selectedIndex].text}<span class="filter-chip-x" onclick="document.getElementById('filterArea').value='';renderExperiences();renderActiveFilters()">✕</span></span>`
+  );
+
+  // Category chip
+  const typeEl = document.getElementById('filterType');
+  if (typeEl.value) chips.push(
+    `<span class="filter-chip chip-meta">${typeEl.options[typeEl.selectedIndex].text}<span class="filter-chip-x" onclick="document.getElementById('filterType').value='';renderExperiences();renderActiveFilters()">✕</span></span>`
+  );
+
+  if (chips.length === 0) {
+    bar.style.display = 'none';
+    bar.innerHTML = '';
+    return;
+  }
+
+  chips.push(`<button class="filter-chip-clear" onclick="clearAllFilters()">Clear all</button>`);
+  bar.style.display = 'block';
+  bar.innerHTML = `<div class="filter-chip-bar">${chips.join('')}</div>`;
+}
+
+function clearAllFilters() {
+  selectedThemes.clear();
+  document.getElementById('filterArea').value = '';
+  document.getElementById('filterType').value = '';
+  renderThemes();
+  renderActiveFilters();
+  renderExperiences();
+}
+
+function toggleList(id) {
+  if (myList.has(id)) myList.delete(id);
+  else myList.add(id);
+  updateFab();
+  renderExperiences();
+}
+
+function removeFromList(id) {
+  myList.delete(id);
+  updateFab();
+  renderExperiences();
+  renderModal();
+}
+
+function updateFab() {
+  document.getElementById('fabCount').textContent = myList.size;
+}
+
+function renderItineraries() {
+  const themeTags = getActiveThemeTags();
+  let itins = liveItineraries;
+  if (themeTags) {
+    itins = liveItineraries.filter(i => {
+      const name = i.theme.toLowerCase();
+      return [...themeTags].some(t => name.includes(t) || 
+        (t === 'active' && name.includes('river')) ||
+        (t === 'romantic' && name.includes('romantic')) ||
+        (t === 'rustic' && name.includes('rustic')) ||
+        (t === 'music' && name.includes('festival')) ||
+        (t === 'spiritual' && name.includes('spiritual')));
+    });
+    if (itins.length === 0) itins = liveItineraries;
+  }
+  document.getElementById('itinGrid').innerHTML = itins.map(i => `
+    <div class="itin-card">
+      <div class="itin-theme">${i.duration}</div>
+      <div class="itin-title">${i.theme}</div>
+      <ul class="itin-stops">
+        ${i.stops.map(s => `
+          <li class="itin-stop">
+            <span class="stop-time">${s.time}</span>
+            <span>${s.name} <em style="color:#A0AEC0;font-size:10px">· ${s.area}</em></span>
+          </li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+function renderEvents() {
+  const themeTags = getActiveThemeTags();
+  let evts = EVENTS;
+  if (themeTags) {
+    evts = EVENTS.filter(e => e.tags.some(t => themeTags.has(t.toLowerCase())));
+    if (evts.length === 0) evts = EVENTS;
+  }
+  document.getElementById('eventsGrid').innerHTML = evts.map(e => `
+    <div class="event-card">
+      <div class="event-date">${e.dates}</div>
+      <div class="event-name">${e.name}</div>
+      <div class="event-venue">📍 ${e.venue} · ${e.area}</div>
+      <div class="event-tags">${e.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="exp-actions">
+        <a class="btn-visit" href="${e.url}" target="_blank" style="font-size:11px">More Info ↗</a>
+        <span style="font-size:11px;color:#718096;margin-left:4px">🕐 ${e.times}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'itineraries') renderItineraries();
+  if (tab === 'events') renderEvents();
+}
+
+function openModal() {
+  renderModal();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function renderModal() {
+  const body = document.getElementById('modalBody');
+  const subtitle = document.getElementById('modalSubtitle');
+  const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
+
+  if (items.length === 0) {
+    subtitle.textContent = 'Your list is empty';
+    body.innerHTML = `<div class="empty-state"><div class="big">🗺️</div><p>Browse experiences and add them to build your itinerary.</p></div>`;
+    return;
+  }
+
+  subtitle.textContent = `${items.length} experience${items.length !== 1 ? 's' : ''} selected`;
+  body.innerHTML = `
+    <div id="modalList">
+      ${items.map((e, i) => `
+        <div class="itinerary-item">
+          <div class="num">${i + 1}</div>
+          <div class="item-body">
+            <div class="item-name">${e.icon} ${e.name}</div>
+            <div class="item-sub">📍 ${e.area} · ${e.type} · 🕐 ${e.hours}</div>
+            <div class="item-links">
+              <a class="item-link" href="${e.url}" target="_blank">Book / Info ↗</a>
+              <a class="item-link" href="${e.directions}" target="_blank">Directions ↗</a>
+            </div>
+          </div>
+          <button class="item-remove" onclick="removeFromList(${e.id})">×</button>
+        </div>
+      `).join('')}
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="openMap()">🗺 View on Map</button>
+      <button class="btn-primary" onclick="printItinerary()" style="background:transparent;color:var(--brown);border-color:#d4c9b0">🖨 Print</button>
+      <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+      <button class="btn-secondary" onclick="closeModal();enterManage()">✏️ Manage</button>
+    </div>`;
+}
+
+// ── MAP ─────────────────────────────────────────────────────────────
+let leafletMap = null;
+
+function openMap() {
+  const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
+  if (items.length === 0) return;
+
+  document.getElementById('mapSubtitle').textContent =
+    `${items.length} location${items.length !== 1 ? 's' : ''} · click any marker for details`;
+  document.getElementById('mapOverlay').classList.add('open');
+
+  // Init map after overlay is visible so dimensions are known
+  setTimeout(() => {
+    if (leafletMap) {
+      leafletMap.remove();
+      leafletMap = null;
+    }
+
+    // Compute center from items
+    const avgLat = items.reduce((s, e) => s + e.lat, 0) / items.length;
+    const avgLng = items.reduce((s, e) => s + e.lng, 0) / items.length;
+
+    leafletMap = L.map('leafletMap').setView([avgLat, avgLng], 13);
+
+    // Warm, slightly muted tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+      maxZoom: 19
+    }).addTo(leafletMap);
+
+    const bounds = [];
+
+    items.forEach((e, i) => {
+      bounds.push([e.lat, e.lng]);
+
+      // Custom gold numbered marker
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="
+          width:34px;height:34px;
+          background:#C9A84C;
+          border:3px solid #1E1508;
+          border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);
+          box-shadow:0 3px 10px rgba(0,0,0,0.35);
+          display:flex;align-items:center;justify-content:center;
+        "><span style="
+          transform:rotate(45deg);
+          font-family:'Josefin Sans',sans-serif;
+          font-size:13px;font-weight:700;
+          color:#1E1508;line-height:1;
+        ">${i + 1}</span></div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+        popupAnchor: [0, -36]
+      });
+
+      const notesHtml = e.notes
+        ? `<div class="popup-notes">${e.notes}</div>`
+        : '';
+
+      const popup = L.popup({ maxWidth: 260, minWidth: 240 }).setContent(`
+        <div class="popup-inner">
+          <div class="popup-num">${i + 1}</div>
+          <div class="popup-name">${e.icon} ${e.name}</div>
+          <div class="popup-sub">${e.sub}</div>
+          <div class="popup-hours">🕐 ${e.hours}</div>
+          ${notesHtml}
+          <div class="popup-links">
+            <a class="popup-link" href="${e.url}" target="_blank">Book / Info ↗</a>
+            <a class="popup-link" href="${e.directions}" target="_blank">Directions ↗</a>
+          </div>
+        </div>`);
+
+      L.marker([e.lat, e.lng], { icon })
+        .addTo(leafletMap)
+        .bindPopup(popup);
+    });
+
+    // Fit map to all markers with padding
+    if (bounds.length > 1) {
+      leafletMap.fitBounds(bounds, { padding: [40, 40] });
+    }
+  }, 80);
+}
+
+function closeMap() {
+  document.getElementById('mapOverlay').classList.remove('open');
+}
+
+function handleMapOverlayClick(e) {
+  if (e.target === document.getElementById('mapOverlay')) closeMap();
+}
+
+function clearAll() {
+  if (confirm('Clear your entire itinerary list?')) {
+    myList.clear();
+    updateFab();
+    renderModal();
+    renderExperiences();
+  }
+}
+
+function enterManage() {
+  manageMode = true;
+  document.getElementById('manageBanner').classList.add('visible');
+  renderExperiences();
+  window.scrollTo({ top: document.querySelector('.tabs').offsetTop - 80, behavior: 'smooth' });
+}
+
+function exitManage() {
+  manageMode = false;
+  document.getElementById('manageBanner').classList.remove('visible');
+  renderExperiences();
+}
+
+function printItinerary() {
+  const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <html><head><title>My Nevada County Itinerary</title>
+    <style>
+      body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; color: #1E1508; }
+      h1 { font-size: 28px; color: #6B4A2A; border-bottom: 2px solid #C9A84C; padding-bottom: 12px; }
+      .item { margin: 20px 0; padding: 16px; border: 1px solid #e0d8c8; border-radius: 8px; }
+      .item h3 { font-size: 18px; margin-bottom: 4px; }
+      .item p { font-size: 13px; color: #4A5568; margin: 3px 0; }
+      .item a { color: #8B6914; font-size: 12px; }
+    </style></head><body>
+    <h1>🗺 My Nevada County Itinerary</h1>
+    <p style="color:#718096;font-size:13px">Generated ${new Date().toLocaleDateString()}</p>
+    ${items.map((e, i) => `
+      <div class="item">
+        <h3>${i + 1}. ${e.icon} ${e.name}</h3>
+        <p>${e.sub}</p>
+        <p>📍 ${e.area} · ${e.type}</p>
+        <p>🕐 ${e.hours}</p>
+        <p><a href="${e.url}">${e.url}</a></p>
+        <p><a href="${e.directions}">Get Directions →</a></p>
+      </div>`).join('')}
+    </body></html>`);
+  win.document.close();
+  win.print();
+}
+
+// Event listeners
+document.getElementById('filterArea').addEventListener('change', () => { renderExperiences(); renderActiveFilters(); });
+document.getElementById('filterType').addEventListener('change', () => { renderExperiences(); renderActiveFilters(); });
+
+// ── PERSISTENT STORAGE ──────────────────────────────────────────────
+// Storage priority: localStorage (works everywhere) → window.storage (Claude artifacts)
+// localStorage is synchronous and universally available in all browsers.
+
+const STORAGE_KEY = 'ncexp:experiences';
+let liveExperiences = [...EXPERIENCES]; // working copy, may be overridden from storage
+
+// Detect which storage backend is available
+function getStorageBackend() {
+  try {
+    localStorage.setItem('_ncexp_test', '1');
+    localStorage.removeItem('_ncexp_test');
+    return 'localStorage';
+  } catch(e) {}
+  if (window.storage && typeof window.storage.get === 'function') return 'windowStorage';
+  return null;
+}
+
+async function loadFromStorage() {
+  const backend = getStorageBackend();
+  try {
+    if (backend === 'localStorage') {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          liveExperiences = parsed;
+          console.log(`Loaded ${liveExperiences.length} experiences from localStorage.`);
+        }
+      }
+    } else if (backend === 'windowStorage') {
+      const result = await window.storage.get(STORAGE_KEY);
+      if (result && result.value) {
+        const parsed = JSON.parse(result.value);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          liveExperiences = parsed;
+          console.log(`Loaded ${liveExperiences.length} experiences from window.storage.`);
+        }
+      }
+    }
+  } catch (e) {
+    console.log('No saved data found, using defaults.', e);
+  }
+  loadItineraries();
+  renderThemes();
+  renderActiveFilters();
+  renderExperiences();
+}
+
+async function saveToStorage() {
+  const backend = getStorageBackend();
+  try {
+    const data = JSON.stringify(liveExperiences);
+    if (backend === 'localStorage') {
+      localStorage.setItem(STORAGE_KEY, data);
+      return true;
+    } else if (backend === 'windowStorage') {
+      await window.storage.set(STORAGE_KEY, data);
+      return true;
+    } else {
+      console.warn('No storage backend available — changes live in memory only this session.');
+      return false;
+    }
+  } catch (e) {
+    console.error('Storage save failed:', e);
+    // If localStorage quota exceeded, try clearing old data and retry
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(liveExperiences));
+        return true;
+      } catch(e2) { return false; }
+    }
+    return false;
+  }
+}
+
+// Patch all functions that read EXPERIENCES to use liveExperiences instead
+// We override the filter function to use liveExperiences
+function filterExperiences() {
+  const area = document.getElementById('filterArea').value.toLowerCase();
+  const type = document.getElementById('filterType').value.toLowerCase();
+  const themeTags = getActiveThemeTags();
+
+  // Check if type filter is actually a season filter
+  const seasonFilter = type.startsWith('season:') ? type.replace('season:', '') : null;
+  const typeFilter   = seasonFilter ? null : type;
+
+  return liveExperiences.filter(e => {
+    if (area && !e.area.toLowerCase().includes(area)) return false;
+    if (typeFilter && e.type.toLowerCase() !== typeFilter) return false;
+    if (seasonFilter) {
+      const expSeason = (e.season || 'Year-Round');
+      if (expSeason === 'Year-Round') return true;
+      if (!expSeason.toLowerCase().includes(seasonFilter)) return false;
+    }
+    if (themeTags) {
+      const match = e.tags.some(tag => themeTags.has(tag.toLowerCase()));
+      if (!match) return false;
+    }
+    return true;
+  });
+}
+
+// ── MANAGE DATA MODAL ────────────────────────────────────────────────
+function openManageData() {
+  renderManageData();
+  document.getElementById('manageDataOverlay').classList.add('open');
+}
+
+function closeManageData() {
+  document.getElementById('manageDataOverlay').classList.remove('open');
+}
+
+function handleManageDataOverlayClick(e) {
+  if (e.target === document.getElementById('manageDataOverlay')) closeManageData();
+}
+
+// ── MANAGE TABLE SORT STATE ─────────────────────────────────────────
+let manageSort = { field: null, dir: 1 }; // dir: 1=asc, -1=desc
+
+function sortManageBy(field) {
+  if (manageSort.field === field) {
+    manageSort.dir *= -1; // toggle direction
+  } else {
+    manageSort.field = field;
+    manageSort.dir = 1;
+  }
+  renderManageData();
+}
+
+function getSortedExperiences() {
+  if (!manageSort.field) return liveExperiences;
+  const f = manageSort.field;
+  const d = manageSort.dir;
+  return [...liveExperiences].sort((a, b) => {
+    let av = a[f], bv = b[f];
+    // Arrays (tags) -> join to string
+    if (Array.isArray(av)) av = av.join(',');
+    if (Array.isArray(bv)) bv = bv.join(',');
+    // Numbers
+    if (typeof av === 'number' && typeof bv === 'number') return d * (av - bv);
+    // Strings
+    return d * String(av || '').localeCompare(String(bv || ''), undefined, { sensitivity: 'base' });
+  });
+}
+
+function renderManageData() {
+  const body = document.getElementById('manageDataBody');
+  const subtitle = document.getElementById('manageDataSubtitle');
+
+  const tabBar = `
+    <div class="manage-tabs">
+      <button class="manage-tab-btn ${manageDataTab==='experiences'?'active':''}" onclick="switchManageTab('experiences')">Experiences</button>
+      <button class="manage-tab-btn ${manageDataTab==='itineraries'?'active':''}" onclick="switchManageTab('itineraries')">Itineraries</button>
+    </div>`;
+
+  if (manageDataTab === 'experiences') {
+    subtitle.textContent = `${liveExperiences.length} experiences · changes are saved to persistent storage`;
+
+    const sortedExps = getSortedExperiences();
+    const thSort = (field, label, minW = '') => {
+      const active = manageSort.field === field;
+      const cls = ['sortable', active ? (manageSort.dir === 1 ? 'sort-asc' : 'sort-desc') : ''].filter(Boolean).join(' ');
+      const style = minW ? ` style="min-width:${minW}"` : '';
+      return `<th class="${cls}"${style} onclick="sortManageBy('${field}')">${label}</th>`;
+    };
+
+    body.innerHTML = tabBar + `
+      <div class="manage-toolbar">
+        <span>Edit any field inline. Click <strong>Save All</strong> to persist changes.</span>
+        <span id="savedFlash" class="saved-flash">✓ Saved</span>
+        <button class="btn-add-row" onclick="openTagManager()" style="background:var(--forest);margin-right:4px">🏷 Edit Tags</button>
+        <button class="btn-add-row" onclick="addNewRow()">+ Add Experience</button>
+        <button class="btn-save-all" onclick="saveAllRows()">💾 Save All</button>
+      </div>
+      <div class="manage-table-wrap">
+        <table class="manage-table" id="manageTable">
+          <thead>
+            <tr>
+              ${thSort('id', '#')}
+              ${thSort('name', 'Name', '160px')}
+              ${thSort('sub', 'Description', '160px')}
+              ${thSort('area', 'Area')}
+              ${thSort('type', 'Type', '160px')}
+              ${thSort('hours', 'Hours', '140px')}
+              ${thSort('notes', 'Notes', '160px')}
+              ${thSort('tags', 'Tags', '120px')}
+              ${thSort('season', 'Season', '120px')}
+              <th style="min-width:200px">Website URL</th>
+              ${thSort('lat', 'Lat')}
+              ${thSort('lng', 'Lng')}
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="manageTableBody">
+            ${sortedExps.map((e, i) => manageRow(e, i)).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } else {
+    subtitle.textContent = `${liveItineraries.length} suggested itinerary${liveItineraries.length !== 1 ? 's' : ''} · auto-saves on every change`;
+    body.innerHTML = tabBar + renderManageItinerariesHtml();
+  }
+}
+
+// ── TAG MANAGER MODAL ────────────────────────────────────────────────
+// Custom tags stored in localStorage under a separate key
+const TAG_LIST_KEY = 'ncexp:customtags';
+
+function getCustomTags() {
+  try {
+    const raw = localStorage.getItem(TAG_LIST_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return [];
+}
+
+function saveCustomTags(tags) {
+  try { localStorage.setItem(TAG_LIST_KEY, JSON.stringify(tags)); } catch(e) {}
+}
+
+function getAllMasterTags() {
+  // Built-in tags + any custom tags saved by user
+  const base = ['Active','Art event','Artistic','Family','Film','Foodie','Gold Rush',
+    'Hands-on','Hidden Gem','Historic','Music','Opulent','Romantic','Rustic',
+    'Scenic','Social','Spiritual','Sport'];
+  const custom = getCustomTags();
+  return [...new Set([...base, ...custom])].sort();
+}
+
+function openTagManager() {
+  renderTagManager();
+  document.getElementById('tagManagerOverlay').classList.add('open');
+}
+
+function closeTagManager() {
+  document.getElementById('tagManagerOverlay').classList.remove('open');
+  // Refresh manage table so dropdowns show new tags
+  renderManageData();
+}
+
+function renderTagManager() {
+  const masterTags = getAllMasterTags();
+  // Count usage of each tag across all experiences
+  const usage = {};
+  masterTags.forEach(t => { usage[t] = 0; });
+  liveExperiences.forEach(e => (e.tags||[]).forEach(t => {
+    if (usage[t] !== undefined) usage[t]++;
+    else usage[t] = 1;
+  }));
+
+  const body = document.getElementById('tagManagerBody');
+  body.innerHTML = `
+    <div style="padding:16px 20px 8px">
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <input id="newTagInput" placeholder="Add new tag..." style="flex:1;padding:8px 10px;border:1px solid var(--gold);border-radius:6px;font-family:'Josefin Sans',sans-serif;font-size:12px;outline:none"
+          onkeydown="if(event.key==='Enter')addCustomTag()">
+        <button onclick="addCustomTag()" style="background:var(--gold);color:var(--dark);border:none;border-radius:6px;padding:8px 14px;font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;cursor:pointer">+ ADD</button>
+      </div>
+      <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--slate);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--fog)">
+        ${masterTags.length} tags — click × to remove unused tags
+      </div>
+      <div id="tagManagerList" style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:16px">
+        ${masterTags.map(tag => {
+          const count = usage[tag] || 0;
+          const isBuiltIn = ['Active','Artistic','Family','Film','Foodie','Gold Rush','Hands-on',
+            'Hidden Gem','Historic','Music','Opulent','Romantic','Rustic','Scenic',
+            'Social','Spiritual','Sport'].includes(tag);
+          return `<span style="display:inline-flex;align-items:center;gap:4px;background:${count > 0 ? 'var(--gold)' : 'var(--fog)'};color:var(--dark);padding:4px 8px 4px 10px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">
+            ${tag}
+            <span style="font-size:9px;opacity:0.65;font-weight:400">(${count})</span>
+            ${!isBuiltIn ? `<button onclick="removeCustomTag('${tag}')" title="Remove tag" style="background:none;border:none;cursor:pointer;color:var(--dark);font-size:12px;line-height:1;padding:0 0 0 2px;opacity:0.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">×</button>` : ''}
+          </span>`;
+        }).join('')}
+      </div>
+      <p style="font-size:10px;color:var(--slate);line-height:1.5">
+        <strong>Built-in tags</strong> (no × button) are used by vibes and cannot be removed.<br>
+        Custom tags with <strong>(0) uses</strong> can be safely removed.
+      </p>
+    </div>`;
+}
+
+function addCustomTag() {
+  const input = document.getElementById('newTagInput');
+  const val = (input.value || '').trim();
+  if (!val) return;
+  // Title-case
+  const tag = val.charAt(0).toUpperCase() + val.slice(1);
+  const custom = getCustomTags();
+  const all = getAllMasterTags();
+  if (all.includes(tag)) { input.value = ''; return; } // already exists
+  custom.push(tag);
+  saveCustomTags(custom);
+  input.value = '';
+  renderTagManager();
+}
+
+function removeCustomTag(tag) {
+  // Count usage first
+  const usageCount = liveExperiences.filter(e => (e.tags||[]).includes(tag)).length;
+  if (usageCount > 0) {
+    if (!confirm(`"${tag}" is used by ${usageCount} experience(s). Remove it anyway? It will stay on those experiences but disappear from the dropdown.`)) return;
+  }
+  const custom = getCustomTags().filter(t => t !== tag);
+  saveCustomTags(custom);
+  renderTagManager();
+}
+
+// ── TAG EDITOR ───────────────────────────────────────────────────────
+// All known tags — derived from THEMES plus extras
+const ALL_TAGS = [
+  'Active','Artistic','Family','Film','Foodie','Gold Rush','Hands-on',
+  'Hidden Gem','Historic','Music','Opulent','Romantic','Rustic','Scenic',
+  'Social','Spiritual','Sport',
+  // secondary tags that appear in experiences
+  'Active','Historic','Rustic','Family','Social','Foodie',
+].filter((v,i,a) => a.indexOf(v) === i).sort();
+
+let openTagDropdownId = null;
+
+function toggleTagDropdown(expId, evt) {
+  evt.stopPropagation();
+  // Close any open dropdown first
+  if (openTagDropdownId && openTagDropdownId !== expId) closeTagDropdown();
+  if (openTagDropdownId === expId) { closeTagDropdown(); return; }
+
+  const exp = liveExperiences.find(e => e.id === expId);
+  if (!exp) return;
+  const cell = document.getElementById(`tagcell-${expId}`);
+  if (!cell) return;
+
+  // Build current tags set (may have been edited already)
+  const currentTags = new Set(exp.tags || []);
+
+  // Collect ALL tags seen in the database + standard ones
+  const allSeenTags = new Set(getAllMasterTags());
+  liveExperiences.forEach(e => (e.tags||[]).forEach(t => allSeenTags.add(t)));
+  const sortedTags = [...allSeenTags].sort();
+
+  const dd = document.createElement('div');
+  dd.className = 'tag-dropdown';
+  dd.id = `tagdd-${expId}`;
+  dd.innerHTML = `<div class="tag-dropdown-header">Select tags</div>` +
+    sortedTags.map(tag => `
+      <label class="tag-dropdown-item ${currentTags.has(tag) ? 'checked' : ''}">
+        <input type="checkbox" ${currentTags.has(tag) ? 'checked' : ''}
+          onchange="updateExpTag(${expId}, '${tag.replace(/'/g,"\\'")}', this.checked)">
+        ${tag}
+      </label>`).join('');
+
+  dd.addEventListener('click', e => e.stopPropagation());
+
+  // Position using fixed coords so it's always visible and left-aligned to the cell
+  document.body.appendChild(dd);
+  const rect = cell.getBoundingClientRect();
+  dd.style.top  = Math.min(rect.bottom + 2, window.innerHeight - 290) + 'px';
+  dd.style.left = Math.max(rect.left, 8) + 'px';
+
+  openTagDropdownId = expId;
+
+  // Close on outside click
+  setTimeout(() => document.addEventListener('click', closeTagDropdown, { once: true }), 10);
+}
+
+function closeTagDropdown() {
+  if (!openTagDropdownId) return;
+  const dd = document.getElementById(`tagdd-${openTagDropdownId}`);
+  if (dd) dd.remove();
+  openTagDropdownId = null;
+}
+
+function updateExpTag(expId, tag, checked) {
+  const exp = liveExperiences.find(e => e.id === expId);
+  if (!exp) return;
+  const tags = new Set(exp.tags || []);
+  if (checked) tags.add(tag); else tags.delete(tag);
+  exp.tags = [...tags].sort();
+
+  // Mark dirty for save
+  if (!dirtyData[expId]) dirtyData[expId] = {};
+  dirtyData[expId].tags = exp.tags;
+
+  // Update the pill display
+  const cell = document.getElementById(`tagcell-${expId}`);
+  if (cell) {
+    const pillsDiv = cell.querySelector('.tag-pills');
+    if (pillsDiv) {
+      pillsDiv.innerHTML = exp.tags.length
+        ? exp.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')
+        : '<span class="tag-pill-empty">+ tags</span>';
+    }
+    // Update checked class on the dropdown item
+    const item = cell.querySelector(`input[type=checkbox]`);
+    // Refresh all checkboxes in dropdown
+    const dd = document.getElementById(`tagdd-${expId}`);
+    if (dd) {
+      dd.querySelectorAll('.tag-dropdown-item').forEach(label => {
+        const cb = label.querySelector('input[type=checkbox]');
+        if (cb) label.classList.toggle('checked', cb.checked);
+      });
+    }
+  }
+}
+
+function manageRow(e, i, isNew = false) {
+  const safeVal = v => (v || '').toString().replace(/"/g, '&quot;');
+  return `<tr id="row-${e.id}" class="${isNew ? 'new-row' : ''}">
+    <td style="color:var(--slate);font-size:11px;white-space:nowrap">${i + 1}</td>
+    <td><input value="${safeVal(e.name)}" data-field="name" data-id="${e.id}" onchange="markDirty(${e.id},'name',this.value)"></td>
+    <td><input value="${safeVal(e.sub)}" data-field="sub" data-id="${e.id}" onchange="markDirty(${e.id},'sub',this.value)"></td>
+    <td><input class="medium" value="${safeVal(e.area)}" data-field="area" data-id="${e.id}" onchange="markDirty(${e.id},'area',this.value)"></td>
+    <td><select data-field="type" data-id="${e.id}" onchange="markDirty(${e.id},'type',this.value)" style="font-family:'Josefin Sans',sans-serif;font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--dark);cursor:pointer;width:100%;min-width:150px">
+      ${['Activity','Art event','Brewery','Gallery','Historic site','Lodging','Museum','Music venue','Outdoor','Restaurant','Tasting room','Wellness'].map(t =>
+        `<option value="${t}" ${e.type === t ? 'selected' : ''}>${t}</option>`
+      ).join('')}
+    </select></td>
+    <td><input value="${safeVal(e.hours)}" data-field="hours" data-id="${e.id}" onchange="markDirty(${e.id},'hours',this.value)"></td>
+    <td><input value="${safeVal(e.notes)}" data-field="notes" data-id="${e.id}" onchange="markDirty(${e.id},'notes',this.value)"></td>
+    <td class="tag-cell" id="tagcell-${e.id}">
+      <div class="tag-pills" onclick="toggleTagDropdown(${e.id}, event)">
+        ${(e.tags||[]).length ? (e.tags||[]).map(t => `<span class="tag-pill">${t}</span>`).join('') : '<span class="tag-pill-empty">+ tags</span>'}
+      </div>
+    </td>
+    <td><select data-field="season" data-id="${e.id}" onchange="markDirty(${e.id},'season',this.value)" style="font-family:'Josefin Sans',sans-serif;font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--dark);cursor:pointer;width:100%;min-width:110px">
+      ${['Year-Round','Spring','Summer','Fall','Winter','Spring,Summer','Summer,Fall','Fall,Winter','Holiday'].map(s =>
+        `<option value="${s}" ${(e.season||'Year-Round') === s ? 'selected' : ''}>${s}</option>`
+      ).join('')}
+    </select></td>
+    <td><input value="${safeVal(e.url)}" data-field="url" data-id="${e.id}" onchange="markDirty(${e.id},'url',this.value)"></td>
+    <td><input class="short" value="${safeVal(e.lat)}" data-field="lat" data-id="${e.id}" onchange="markDirty(${e.id},'lat',this.value)"></td>
+    <td><input class="short" value="${safeVal(e.lng)}" data-field="lng" data-id="${e.id}" onchange="markDirty(${e.id},'lng',this.value)"></td>
+    <td><button class="btn-del-row" onclick="deleteRow(${e.id})" title="Delete">×</button></td>
+  </tr>`;
+}
+
+const dirtyData = {}; // id -> {field: value}
+
+function markDirty(id, field, value) {
+  if (!dirtyData[id]) dirtyData[id] = {};
+  if (field === 'tags') {
+    dirtyData[id][field] = value.split(',').map(t => t.trim()).filter(Boolean);
+  } else if (field === 'lat' || field === 'lng') {
+    dirtyData[id][field] = parseFloat(value) || 0;
+  } else {
+    dirtyData[id][field] = value;
+  }
+}
+
+function deleteRow(id) {
+  if (!confirm('Remove this experience from the database?')) return;
+  liveExperiences = liveExperiences.filter(e => e.id !== id);
+  delete dirtyData[id];
+  saveToStorage().then(() => {
+    renderManageData();
+    renderExperiences();
+    flashSaved();
+  });
+}
+
+// ── PHOTO LOOKUP BY TYPE/TAGS ────────────────────────────────────────
+const TYPE_PHOTOS = {
+  'Outdoor':      'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=260&fit=crop',
+  'Historic site':'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop',
+  'Museum':       'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=400&h=260&fit=crop',
+  'Music venue':  'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=260&fit=crop',
+  'Art event':    'https://images.unsplash.com/photo-1578926288207-a90a5366f1ff?w=400&h=260&fit=crop',
+  'Gallery':      'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400&h=260&fit=crop',
+  'Restaurant':   'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=260&fit=crop',
+  'Brewery':      'https://images.unsplash.com/photo-1559818896-946d8a20dcc3?w=400&h=260&fit=crop',
+  'Tasting room': 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=260&fit=crop',
+  'Wellness':     'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=260&fit=crop',
+  'Lodging':      'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=260&fit=crop',
+  'Activity':     'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400&h=260&fit=crop',
+};
+const TAG_PHOTOS = {
+  'Hands-on': 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400&h=260&fit=crop',
+  'Scenic':   'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=260&fit=crop',
+  'Film':     'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&h=260&fit=crop',
+  'Gold Rush':'https://images.unsplash.com/photo-1611348586840-ea6f2cf82cf1?w=400&h=260&fit=crop',
+  'Spiritual':'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=260&fit=crop',
+  'Romantic': 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&h=260&fit=crop',
+  'Active':   'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=400&h=260&fit=crop',
+  'Foodie':   'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=260&fit=crop',
+  'Music':    'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&h=260&fit=crop',
+  'Social':   'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&h=260&fit=crop',
+  'Rustic':   'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=260&fit=crop',
+  'Historic': 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop',
+  'Artistic': 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=400&h=260&fit=crop',
+  'Family':   'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?w=400&h=260&fit=crop',
+  'Opulent':  'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=260&fit=crop',
+};
+
+function photoForExp(exp) {
+  // First check tags
+  for (const tag of (exp.tags || [])) {
+    if (TAG_PHOTOS[tag]) return TAG_PHOTOS[tag];
+  }
+  // Then type
+  return TYPE_PHOTOS[exp.type] || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=260&fit=crop';
+}
+
+async function geocodeExp(exp) {
+  // Build a search query from name + area
+  const query = encodeURIComponent(`${exp.name}, ${exp.area}, California`);
+  const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=us`;
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': 'NevadaCountyExperienceFinder/1.0' } });
+    const data = await res.json();
+    if (data && data[0]) {
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    }
+  } catch (e) { /* network blocked, use default */ }
+  return null;
+}
+
+function addNewRow() {
+  const newId = Math.max(...liveExperiences.map(e => e.id), 0) + 1;
+  const newExp = {
+    id: newId,
+    name: 'New Experience',
+    sub: '',
+    area: 'Nevada City',
+    type: 'Activity',
+    tags: [],
+    hours: '',
+    notes: '',
+    season: 'Year-Round',
+    icon: '📍',
+    url: '',
+    directions: '',
+    lat: 39.2617,
+    lng: -121.0178,
+    photo: TYPE_PHOTOS['Activity']
+  };
+  liveExperiences.push(newExp);
+  renderManageData();
+  setTimeout(() => {
+    const wrap = document.querySelector('.manage-table-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    const nameInput = document.querySelector(`#row-${newId} input[data-field="name"]`);
+    if (nameInput) { nameInput.select(); }
+  }, 50);
+}
+
+async function saveAllRows() {
+  // Apply all dirty changes to liveExperiences
+  Object.entries(dirtyData).forEach(([rawId, changes]) => {
+    const id = parseInt(rawId);
+    const exp = liveExperiences.find(e => e.id === id);
+    if (exp) Object.assign(exp, changes);
+  });
+  Object.keys(dirtyData).forEach(k => delete dirtyData[k]);
+
+  // Read all inputs + selects from table (skip tags — managed directly by tag editor)
+  document.querySelectorAll('#manageTableBody input[data-field], #manageTableBody select[data-field]').forEach(input => {
+    const id = parseInt(input.dataset.id);
+    const field = input.dataset.field;
+    if (!field || field === 'tags') return; // tags handled by tag editor
+    const exp = liveExperiences.find(e => e.id === id);
+    if (!exp) return;
+    if (field === 'tags') {
+      exp[field] = input.value.split(',').map(t => t.trim()).filter(Boolean);
+    } else if (field === 'lat' || field === 'lng') {
+      exp[field] = parseFloat(input.value) || exp[field];
+    } else {
+      exp[field] = input.value;
+    }
+    if (field === 'lat' || field === 'lng' || field === 'name' || field === 'area') {
+      exp.directions = `https://maps.google.com/?q=${encodeURIComponent(exp.name + ' ' + exp.area + ' CA')}`;
+    }
+  });
+
+  // ── Auto-enrich: photo + geocoords for entries missing them ──────────
+  const DEFAULT_PHOTO = 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=260&fit=crop';
+  const DEFAULT_LAT = 39.2617, DEFAULT_LNG = -121.0178;
+  const needsEnrich = liveExperiences.filter(e =>
+    (e.name && e.name !== 'New Experience') &&
+    (e.photo === DEFAULT_PHOTO || !e.photo ||
+     e.lat === DEFAULT_LAT || e.lng === DEFAULT_LNG)
+  );
+
+  if (needsEnrich.length > 0) {
+    document.getElementById('manageDataSubtitle').textContent =
+      `Enriching ${needsEnrich.length} new entries (photo + location)…`;
+
+    for (const exp of needsEnrich) {
+      // Auto photo from type/tags
+      if (!exp.photo || exp.photo === DEFAULT_PHOTO) {
+        exp.photo = photoForExp(exp);
+      }
+      // Auto geocode
+      if (exp.lat === DEFAULT_LAT || exp.lng === DEFAULT_LNG) {
+        const coords = await geocodeExp(exp);
+        if (coords) {
+          exp.lat = coords.lat;
+          exp.lng = coords.lng;
+          exp.directions = `https://maps.google.com/?q=${encodeURIComponent(exp.name + ' ' + exp.area + ' CA')}`;
+        }
+      }
+    }
+    // Re-render table to show updated lat/lng
+    renderManageData();
+  }
+
+  const ok = await saveToStorage();
+  if (ok) {
+    flashSaved();
+    renderExperiences();
+    document.getElementById('manageDataSubtitle').textContent =
+      `${liveExperiences.length} experiences · saved ${new Date().toLocaleTimeString()}`;
+  } else {
+    alert('Save failed — storage unavailable in this context.\n\nYour changes are active for this session but will not persist after closing.\n\nTip: Open this file from a web server (not file://) for reliable localStorage support.');
+  }
+}
+
+function flashSaved() {
+  const el = document.getElementById('savedFlash');
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ── MANAGE TABS ──────────────────────────────────────────────────────
+function switchManageTab(tab) {
+  manageDataTab = tab;
+  renderManageData();
+}
+
+// ── ITINERARY EDITOR ─────────────────────────────────────────────────
+function escVal(v) {
+  return (v || '').toString()
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderManageItinerariesHtml() {
+  const cardsHtml = liveItineraries.length === 0
+    ? `<div class="itin-empty-state">No itineraries yet. Click <strong>+ New Itinerary</strong> to get started.</div>`
+    : liveItineraries.map((it, idx) => itinEditorCard(it, idx)).join('');
+  return `
+    <div class="manage-toolbar">
+      <span>Changes save automatically as you type.</span>
+      <span id="savedFlash" class="saved-flash">✓ Saved</span>
+      <button class="btn-add-row" onclick="addNewItinerary()">+ New Itinerary</button>
+    </div>
+    <div class="itin-editor-list" id="itinEditorList">${cardsHtml}</div>`;
+}
+
+function itinEditorCard(it, idx) {
+  return `
+    <div class="itin-editor-card" id="itincard-${idx}">
+      <div class="itin-editor-header">
+        <div style="display:flex;gap:8px;flex:1;min-width:0">
+          <input class="itin-field itin-field-name" placeholder="Itinerary name…"
+            value="${escVal(it.theme)}"
+            onchange="updateItinerary(${idx},'theme',this.value)"
+            title="Itinerary name (e.g. Romantic Getaway)">
+          <input class="itin-field itin-field-duration" placeholder="Duration…"
+            value="${escVal(it.duration)}"
+            onchange="updateItinerary(${idx},'duration',this.value)"
+            title="Duration (e.g. 1 Day, 2 Days, Half Day)">
+        </div>
+        <button class="btn-del-row" onclick="deleteItinerary(${idx})" title="Delete this itinerary" style="margin-left:8px;flex-shrink:0">×</button>
+      </div>
+      <div class="itin-stops-editor" id="stops-${idx}">
+        ${it.stops.map((s, si) => stopEditorRow(idx, si, s)).join('')}
+      </div>
+      <button class="btn-add-stop" onclick="addStop(${idx})">+ Add Stop</button>
+    </div>`;
+}
+
+function stopEditorRow(itIdx, stopIdx, s) {
+  return `
+    <div class="stop-editor-row" id="stop-${itIdx}-${stopIdx}">
+      <span class="stop-editor-num">${stopIdx + 1}</span>
+      <input class="itin-field itin-field-time" placeholder="Time…"
+        value="${escVal(s.time)}"
+        onchange="updateStop(${itIdx},${stopIdx},'time',this.value)"
+        title="Time label (e.g. Morning, Day 1 Eve, Afternoon)">
+      <input class="itin-field itin-field-stopname" placeholder="Experience or venue name…"
+        value="${escVal(s.name)}"
+        onchange="updateStop(${itIdx},${stopIdx},'name',this.value)"
+        title="What to do at this stop">
+      <input class="itin-field itin-field-area" placeholder="Area…"
+        value="${escVal(s.area)}"
+        onchange="updateStop(${itIdx},${stopIdx},'area',this.value)"
+        title="Area (e.g. Nevada City, Grass Valley)">
+      <button class="btn-del-stop" onclick="deleteStop(${itIdx},${stopIdx})" title="Remove stop">×</button>
+    </div>`;
+}
+
+function addNewItinerary() {
+  liveItineraries.push({
+    theme: 'New Itinerary',
+    duration: '1 Day',
+    stops: [{ time: 'Morning', name: '', area: 'Nevada City' }]
+  });
+  saveItineraries();
+  renderItineraries();
+  renderManageData();
+  setTimeout(() => {
+    const list = document.getElementById('itinEditorList');
+    if (list) list.scrollTop = list.scrollHeight;
+    const newCard = document.getElementById(`itincard-${liveItineraries.length - 1}`);
+    if (newCard) newCard.querySelector('.itin-field-name')?.select();
+  }, 60);
+}
+
+function deleteItinerary(idx) {
+  const name = liveItineraries[idx]?.theme || 'this itinerary';
+  if (!confirm(`Remove "${name}"?`)) return;
+  liveItineraries.splice(idx, 1);
+  saveItineraries();
+  renderItineraries();
+  renderManageData();
+}
+
+function updateItinerary(idx, field, value) {
+  if (!liveItineraries[idx]) return;
+  liveItineraries[idx][field] = value;
+  saveItineraries();
+  renderItineraries(); // keep main Itineraries tab live
+}
+
+function addStop(itIdx) {
+  if (!liveItineraries[itIdx]) return;
+  liveItineraries[itIdx].stops.push({ time: '', name: '', area: '' });
+  saveItineraries();
+  renderItineraries();
+  // Only re-render the stops container, not the whole panel (preserves focus elsewhere)
+  const stopsEl = document.getElementById(`stops-${itIdx}`);
+  if (stopsEl) {
+    stopsEl.innerHTML = liveItineraries[itIdx].stops
+      .map((s, si) => stopEditorRow(itIdx, si, s)).join('');
+    const rows = stopsEl.querySelectorAll('.stop-editor-row');
+    const lastRow = rows[rows.length - 1];
+    if (lastRow) lastRow.querySelector('.itin-field-time')?.focus();
+  }
+}
+
+function deleteStop(itIdx, stopIdx) {
+  if (!liveItineraries[itIdx]) return;
+  liveItineraries[itIdx].stops.splice(stopIdx, 1);
+  saveItineraries();
+  renderItineraries();
+  const stopsEl = document.getElementById(`stops-${itIdx}`);
+  if (stopsEl) {
+    stopsEl.innerHTML = liveItineraries[itIdx].stops
+      .map((s, si) => stopEditorRow(itIdx, si, s)).join('');
+  }
+}
+
+function updateStop(itIdx, stopIdx, field, value) {
+  if (!liveItineraries[itIdx]?.stops[stopIdx]) return;
+  liveItineraries[itIdx].stops[stopIdx][field] = value;
+  saveItineraries();
+  renderItineraries(); // keep main tab live without disturbing the editor
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────────
+// Load from storage first, fall back to defaults
+loadFromStorage();
+</script>
+</body>
+</html>
