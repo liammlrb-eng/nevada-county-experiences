@@ -38,10 +38,10 @@
     "field": "url",
     "issue": "dead_link",
     "old_value": "https://www.threeforksbakery.com/",
-    "new_value": null,
+    "new_value": "https://www.threeforksnc.com/",
     "http_status": "HTTPSConnectionPool(host='www.threeforksbakery.com', port=44",
     "checked": "2026-04-24",
-    "status": "pending"
+    "status": "fixed"
   },
   {
     "id": 48,
