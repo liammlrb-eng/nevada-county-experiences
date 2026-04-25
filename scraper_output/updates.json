@@ -6,8 +6,8 @@
     "issue": "dead_link",
     "old_value": "https://artworksgrassvalley.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='artworksgrassvalley.com', port=443",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -18,7 +18,7 @@
     "old_value": "https://hardybooks.com/",
     "new_value": null,
     "http_status": "406",
-    "checked": "2026-04-24",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -28,8 +28,8 @@
     "issue": "dead_link",
     "old_value": "https://northstarminingmuseum.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='northstarminingmuseum.com', port=4",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -39,8 +39,8 @@
     "issue": "dead_link",
     "old_value": "https://www.threeforksbakery.com/",
     "new_value": "https://www.threeforksnc.com/",
-    "http_status": "HTTPSConnectionPool(host='www.threeforksbakery.com', port=44",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "fixed"
   },
   {
@@ -50,8 +50,8 @@
     "issue": "dead_link",
     "old_value": "https://www.communalcafenv.com/",
     "new_value": "https://www.communalcafenc.com/",
-    "http_status": "HTTPSConnectionPool(host='www.communalcafenv.com', port=443)",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "fixed"
   },
   {
@@ -62,7 +62,7 @@
     "old_value": "https://www.thenationalexchangehotel.com/lola-restaurant/",
     "new_value": "https://www.thenationalexchangehotel.com/dining/lola/",
     "http_status": "404",
-    "checked": "2026-04-24",
+    "checked": "2026-04-25",
     "status": "fixed"
   },
   {
@@ -72,8 +72,8 @@
     "issue": "dead_link",
     "old_value": "https://www.smithvineyard.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='www.smithvineyard.com', port=443):",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -84,8 +84,8 @@
     "old_value": "https://bentmetalwinery.com/",
     "new_value": null,
     "http_status": "403",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "checked": "2026-04-25",
+    "status": "dismissed"
   },
   {
     "id": 132,
@@ -94,8 +94,8 @@
     "issue": "dead_link",
     "old_value": "https://carringtonswine.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='carringtonswine.com', port=443): M",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -105,8 +105,8 @@
     "issue": "dead_link",
     "old_value": "https://naggiar.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='naggiar.com', port=443): Max retri",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -117,8 +117,8 @@
     "old_value": "https://bentmetalwinery.com/",
     "new_value": null,
     "http_status": "403",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "checked": "2026-04-25",
+    "status": "dismissed"
   },
   {
     "id": 137,
@@ -127,8 +127,8 @@
     "issue": "dead_link",
     "old_value": "https://solunewine.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='solunewine.com', port=443): Max re",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -139,7 +139,7 @@
     "old_value": "https://coufoscellars.com/",
     "new_value": null,
     "http_status": "404",
-    "checked": "2026-04-24",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -149,19 +149,19 @@
     "issue": "dead_link",
     "old_value": "https://graypinevineyard.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='graypinevineyard.com', port=443): ",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
     "id": 50,
-    "name": "Ol",
+    "name": "Ol Republic Brewery",
     "field": "url",
     "issue": "dead_link",
     "old_value": "https://olrepublicbrewery.com/",
     "new_value": null,
     "http_status": "521",
-    "checked": "2026-04-24",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -170,10 +170,10 @@
     "field": "url",
     "issue": "dead_link",
     "old_value": "https://www.nidwater.com/recreation/scotts-flat/",
-    "new_value": null,
+    "new_value": "",
     "http_status": "404",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "checked": "2026-04-25",
+    "status": "dismissed"
   },
   {
     "id": 61,
@@ -182,8 +182,8 @@
     "issue": "dead_link",
     "old_value": "https://historiccolfax.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='historiccolfax.com', port=443): Re",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -192,10 +192,10 @@
     "field": "url",
     "issue": "dead_link",
     "old_value": "https://www.placer.ca.gov/rollins",
-    "new_value": null,
+    "new_value": "",
     "http_status": "404",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "checked": "2026-04-25",
+    "status": "dismissed"
   },
   {
     "id": 64,
@@ -204,9 +204,9 @@
     "issue": "dead_link",
     "old_value": "https://historiccolfax.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='historiccolfax.com', port=443): Re",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "http_status": "200",
+    "checked": "2026-04-25",
+    "status": "dismissed"
   },
   {
     "id": 67,
@@ -215,8 +215,8 @@
     "issue": "dead_link",
     "old_value": "https://www.graypinewinery.com/",
     "new_value": null,
-    "http_status": "('Connection aborted.', ConnectionResetError(10054, 'An exis",
-    "checked": "2026-04-24",
+    "http_status": "connection_reset",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -226,8 +226,8 @@
     "issue": "dead_link",
     "old_value": "https://delorotheatre.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='delorotheatre.com', port=443): Max",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -237,8 +237,8 @@
     "issue": "dead_link",
     "old_value": "https://www.sierracinemas.com/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='www.sierracinemas.com', port=443):",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -249,8 +249,8 @@
     "old_value": "https://www.trailforks.com/region/nevada-city/",
     "new_value": null,
     "http_status": "403",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "checked": "2026-04-25",
+    "status": "dismissed"
   },
   {
     "id": 78,
@@ -259,8 +259,8 @@
     "issue": "dead_link",
     "old_value": "https://goldcountrytrails.org/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='goldcountrytrails.org', port=443):",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -270,8 +270,8 @@
     "issue": "dead_link",
     "old_value": "https://southyubaclub.com/pickleball",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='southyubaclub.com', port=443): Max",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -280,10 +280,10 @@
     "field": "url",
     "issue": "dead_link",
     "old_value": "https://www.cityofgrassvalley.com/department/parks-recreation",
-    "new_value": null,
+    "new_value": "",
     "http_status": "404",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "checked": "2026-04-25",
+    "status": "dismissed"
   },
   {
     "id": 99,
@@ -292,8 +292,8 @@
     "issue": "dead_link",
     "old_value": "https://sierrastorytelling.org/",
     "new_value": null,
-    "http_status": "HTTPSConnectionPool(host='sierrastorytelling.org', port=443)",
-    "checked": "2026-04-24",
+    "http_status": "timeout",
+    "checked": "2026-04-25",
     "status": "pending"
   },
   {
@@ -304,7 +304,7 @@
     "old_value": "https://www.yelp.com/biz/golden-mandala-yoga-studio-nevada-city",
     "new_value": null,
     "http_status": "403",
-    "checked": "2026-04-24",
-    "status": "pending"
+    "checked": "2026-04-25",
+    "status": "dismissed"
   }
 ]
