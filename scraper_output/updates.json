@@ -49,10 +49,10 @@
     "field": "url",
     "issue": "dead_link",
     "old_value": "https://www.communalcafenv.com/",
-    "new_value": null,
+    "new_value": "https://www.communalcafenc.com/",
     "http_status": "HTTPSConnectionPool(host='www.communalcafenv.com', port=443)",
     "checked": "2026-04-24",
-    "status": "pending"
+    "status": "fixed"
   },
   {
     "id": 49,
