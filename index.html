@@ -1770,7 +1770,7 @@ function renderItineraries() {
       .sort((a, b) => a.order - b.order);
     const stopsHtml = stops.length
       ? stops.map(s => {
-          const exp = liveExperiences.find(e => e.id === s.expId);
+          const exp = liveExperiences.find(e => String(e.id) === String(s.expId));
           if (!exp) return '';
           return `<li class="itin-stop">
             <span class="stop-time">${s.timeLabel || '—'}</span>
@@ -2695,7 +2695,7 @@ function renderStopsPanel() {
     </div>`;
   const stops = liveStops.filter(s => s.itinId === itin.id).sort((a,b) => a.order - b.order);
   const stopsHtml = stops.length ? stops.map((s, idx) => {
-    const exp = liveExperiences.find(e => e.id === s.expId);
+    const exp = liveExperiences.find(e => String(e.id) === String(s.expId));
     if (!exp) return '';
     const isFirst = idx === 0, isLast = idx === stops.length - 1;
     return `<div class="stop-row">
@@ -2780,7 +2780,7 @@ function refreshStopsPanel() {
   if (!panel || !selectedItinId) return;
   const stops = liveStops.filter(s => s.itinId === selectedItinId).sort((a,b) => a.order - b.order);
   panel.innerHTML = stops.map((s, idx) => {
-    const exp = liveExperiences.find(e => e.id === s.expId);
+    const exp = liveExperiences.find(e => String(e.id) === String(s.expId));
     if (!exp) return '';
     const isFirst = idx === 0, isLast = idx === stops.length - 1;
     return `<div class="stop-row">
