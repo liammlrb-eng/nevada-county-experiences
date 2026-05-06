@@ -2170,6 +2170,8 @@ function renderManageData() {
     <div class="manage-tabs">
       <button class="manage-tab-btn ${manageDataTab==='experiences'?'active':''}" onclick="switchManageTab('experiences')">Experiences</button>
       <button class="manage-tab-btn ${manageDataTab==='itineraries'?'active':''}" onclick="switchManageTab('itineraries')">Itineraries</button>
+      <button class="manage-tab-btn ${manageDataTab==='events'?'active':''}" onclick="switchManageTab('events')">📅 Events Queue</button>
+      <button class="manage-tab-btn ${manageDataTab==='sources'?'active':''}" onclick="switchManageTab('sources')">🔗 Scraper Sources</button>
     </div>`;
 
   if (manageDataTab === 'experiences') {
@@ -2215,10 +2217,227 @@ function renderManageData() {
           </tbody>
         </table>
       </div>`;
+  } else if (manageDataTab === 'events') {
+    subtitle.textContent = 'Review scraped events — approve to publish, dismiss to hide permanently';
+    body.innerHTML = tabBar + `<div id="eventsQueuePanel" style="padding:0"><div style="padding:24px;color:#888;font-size:13px">Loading events…</div></div>`;
+    renderEventsQueue();
+  } else if (manageDataTab === 'sources') {
+    subtitle.textContent = 'Manage scraper source URLs and schedules';
+    body.innerHTML = tabBar + `<div id="sourcesPanel" style="padding:0"><div style="padding:24px;color:#888;font-size:13px">Loading sources…</div></div>`;
+    renderScraperSources();
   } else {
     subtitle.textContent = `${liveItineraries.length} suggested itinerary${liveItineraries.length !== 1 ? 's' : ''} · auto-saves on every change`;
     body.innerHTML = tabBar + renderManageItinerariesHtml();
   }
+}
+
+// ── EVENTS QUEUE TAB ──────────────────────────────────────────────────────────
+const API_BASE = window.location.protocol === 'file:' ? null : '';  // null = file:// mode, no API
+
+async function renderEventsQueue() {
+  const panel = document.getElementById('eventsQueuePanel');
+  if (!panel) return;
+
+  // Scrape status bar
+  let statusHtml = '';
+  let scrapeStatus = null;
+  if (API_BASE !== null) {
+    try {
+      const r = await fetch(`${API_BASE}/api/scrape/status`);
+      scrapeStatus = await r.json();
+    } catch(e) { /* server not running */ }
+  }
+
+  const statusBar = `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        ${scrapeStatus ? `
+          <span style="font-size:11px;color:var(--slate)">Last run: <strong>${scrapeStatus.last_run||'Never'}</strong></span>
+          ${scrapeStatus.running ? '<span style="margin-left:12px;color:var(--gold);font-size:11px">⟳ Scraping in progress…</span>' : ''}
+          ${scrapeStatus.last_error ? `<span style="margin-left:12px;color:#c0392b;font-size:11px">⚠ ${scrapeStatus.last_error.slice(0,60)}</span>` : ''}
+        ` : '<span style="font-size:11px;color:#999">Server not running — open a terminal and run: <code>python server.py</code></span>'}
+      </div>
+      <button onclick="triggerScrape()" style="background:var(--forest);color:#fff;border:none;padding:8px 18px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:0.08em;font-weight:600" ${scrapeStatus&&scrapeStatus.running?'disabled':''}>
+        🔄 Update Now
+      </button>
+    </div>`;
+
+  // Load events
+  let events = [];
+  if (API_BASE !== null) {
+    try {
+      const r = await fetch(`${API_BASE}/api/events`);
+      events = await r.json();
+    } catch(e) { /* server not running */ }
+  }
+
+  const pending   = events.filter(e => e.status === 'pending');
+  const approved  = events.filter(e => e.status === 'approved');
+  const dismissed = events.filter(e => e.status === 'dismissed');
+
+  const filterBtns = (selected) => ['pending','approved','dismissed'].map(s =>
+    `<button onclick="eventsFilter='${s}';renderEventsQueue()" style="background:${selected===s?'var(--brown)':'#e8e0d0'};color:${selected===s?'#fff':'var(--slate)'};border:none;padding:5px 12px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">${s[0].toUpperCase()+s.slice(1)} (${s==='pending'?pending.length:s==='approved'?approved.length:dismissed.length})</button>`
+  ).join(' ');
+
+  const filter = typeof eventsFilter !== 'undefined' ? eventsFilter : 'pending';
+  const shown  = events.filter(e => e.status === filter);
+
+  const rows = shown.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:24px;color:#999">${filter === 'pending' ? 'No pending events — click Update Now to scrape fresh events.' : 'No '+filter+' events.'}</td></tr>`
+    : shown.map((ev, i) => {
+        const scraperId = ev.scraper_id || encodeURIComponent(`${ev.source}|${ev.title}|${ev.date}`);
+        return `<tr>
+          <td style="white-space:nowrap;color:var(--slate);font-size:10px">${ev.source||''}</td>
+          <td style="font-weight:600;max-width:260px">${ev.title||''}</td>
+          <td style="white-space:nowrap">${ev.date||''}</td>
+          <td style="white-space:nowrap">${ev.time||''}</td>
+          <td style="max-width:180px;color:var(--slate)">${ev.location||ev.area||''}</td>
+          <td style="max-width:200px;color:var(--slate);font-size:11px">${(ev.description||'').slice(0,80)}${ev.description&&ev.description.length>80?'…':''}</td>
+          <td style="white-space:nowrap">
+            ${filter === 'pending' ? `
+              <button onclick="approveEvent('${scraperId}')" style="background:var(--forest);color:#fff;border:none;padding:4px 9px;border-radius:3px;cursor:pointer;font-size:10px;margin-right:4px">✓ Approve</button>
+              <button onclick="dismissEvent('${scraperId}')" style="background:#8b4a2a;color:#fff;border:none;padding:4px 9px;border-radius:3px;cursor:pointer;font-size:10px">✗ Dismiss</button>
+            ` : filter === 'approved' ? '<span style="color:var(--forest);font-size:11px">✓ Approved</span>' : '<span style="color:#999;font-size:11px">Dismissed</span>'}
+          </td>
+        </tr>`;
+      }).join('');
+
+  panel.innerHTML = statusBar + `
+    <div style="padding:10px 16px 8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #e0d8c8">
+      ${filterBtns(filter)}
+      <span style="margin-left:auto;font-size:11px;color:#999">${shown.length} event${shown.length!==1?'s':''}</span>
+    </div>
+    <div class="manage-table-wrap" style="min-width:900px">
+      <table class="manage-table">
+        <thead><tr>
+          <th>Source</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Description</th><th>Actions</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+let eventsFilter = 'pending';
+
+async function triggerScrape() {
+  if (API_BASE === null) { alert('Start the server first:\n\npython server.py'); return; }
+  try {
+    const r = await fetch(`${API_BASE}/api/scrape`, { method: 'POST' });
+    const d = await r.json();
+    if (d.ok) {
+      // Poll for completion every 3 seconds
+      const interval = setInterval(async () => {
+        const sr = await fetch(`${API_BASE}/api/scrape/status`);
+        const s = await sr.json();
+        if (!s.running) {
+          clearInterval(interval);
+          renderEventsQueue();
+        }
+      }, 3000);
+      renderEventsQueue();  // show "running" state immediately
+    }
+  } catch(e) { alert('Could not reach server. Make sure server.py is running.'); }
+}
+
+async function approveEvent(id) {
+  if (API_BASE === null) return;
+  await fetch(`${API_BASE}/api/events/${encodeURIComponent(id)}/approve`, { method: 'POST' });
+  renderEventsQueue();
+}
+
+async function dismissEvent(id) {
+  if (API_BASE === null) return;
+  await fetch(`${API_BASE}/api/events/${encodeURIComponent(id)}/dismiss`, { method: 'POST' });
+  renderEventsQueue();
+}
+
+// ── SCRAPER SOURCES TAB ───────────────────────────────────────────────────────
+async function renderScraperSources() {
+  const panel = document.getElementById('sourcesPanel');
+  if (!panel) return;
+
+  let sources = [];
+  if (API_BASE !== null) {
+    try {
+      const r = await fetch(`${API_BASE}/api/sources`);
+      sources = await r.json();
+    } catch(e) { /* server not running */ }
+  }
+
+  const rows = sources.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;padding:24px;color:#999">No sources found — start server.py first.</td></tr>`
+    : sources.map((src, i) => `<tr>
+        <td><input type="text" value="${src.name||''}" style="width:160px" onchange="editSource(${i},'name',this.value)"></td>
+        <td><input type="url" value="${src.url||''}" style="width:300px" onchange="editSource(${i},'url',this.value)"></td>
+        <td>
+          <select style="width:120px" onchange="editSource(${i},'interval_hours',+this.value)">
+            ${[1,6,12,24,48,168].map(h => `<option value="${h}" ${src.interval_hours==h?'selected':''}>${h===1?'Hourly':h===168?'Weekly':h+'h'}</option>`).join('')}
+          </select>
+        </td>
+        <td style="text-align:center">
+          <input type="checkbox" ${src.enabled?'checked':''} onchange="editSource(${i},'enabled',this.checked)">
+        </td>
+        <td style="color:var(--slate);font-size:11px;max-width:200px">${src.notes||''}</td>
+        <td>
+          <button onclick="deleteSource(${i})" style="background:#c0392b;color:#fff;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;font-size:10px">✗</button>
+        </td>
+      </tr>`).join('');
+
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8">
+      <span style="font-size:12px;font-family:'Josefin Sans';letter-spacing:0.06em;color:var(--brown);font-weight:600">SCRAPER SOURCES</span>
+      <span style="margin-left:auto;font-size:11px;color:#999">${sources.length} source${sources.length!==1?'s':''}</span>
+      <button onclick="addSource()" style="background:var(--forest);color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">+ Add Source</button>
+      <button onclick="saveSources()" style="background:var(--brown);color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">💾 Save</button>
+    </div>
+    <div class="manage-table-wrap" style="min-width:900px">
+      <table class="manage-table">
+        <thead><tr>
+          <th style="min-width:160px">Source Name</th>
+          <th style="min-width:300px">URL</th>
+          <th>Interval</th>
+          <th>Enabled</th>
+          <th style="min-width:200px">Notes</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="sourcesTableBody">${rows}</tbody>
+      </table>
+    </div>
+    <div style="padding:12px 16px;font-size:11px;color:#999;border-top:1px solid #e0d8c8">
+      ℹ️  Changes saved to <code>scraper/sources.json</code> — the scraper reads this file on each run.
+      On a production server, set up a cron job: <code>*/6 * * * * python /path/to/event_scraper.py</code>
+    </div>`;
+
+  window._sourcesData = JSON.parse(JSON.stringify(sources));  // deep copy for editing
+}
+
+function editSource(idx, field, val) {
+  if (!window._sourcesData) return;
+  window._sourcesData[idx][field] = val;
+}
+
+function addSource() {
+  if (!window._sourcesData) window._sourcesData = [];
+  window._sourcesData.push({ id: 'new_'+Date.now(), name: 'New Source', url: 'https://', enabled: true, interval_hours: 24, notes: '' });
+  renderScraperSources();
+}
+
+function deleteSource(idx) {
+  if (!window._sourcesData) return;
+  if (!confirm('Remove this source?')) return;
+  window._sourcesData.splice(idx, 1);
+  renderScraperSources();
+}
+
+async function saveSources() {
+  if (API_BASE === null) { alert('Start server.py first to save sources.'); return; }
+  const r = await fetch(`${API_BASE}/api/sources`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(window._sourcesData)
+  });
+  const d = await r.json();
+  if (d.ok) { alert(`✓ Saved ${d.count} sources`); }
 }
 
 // ── TAG MANAGER MODAL ────────────────────────────────────────────────

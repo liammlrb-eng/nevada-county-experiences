@@ -1,0 +1,34 @@
+[
+  {
+    "id": "nevada_city_chamber",
+    "name": "Nevada City Chamber",
+    "url": "https://www.nevadacitychamber.com/nevada-city-events/",
+    "enabled": true,
+    "interval_hours": 24,
+    "notes": "Static HTML. Essential Grid plugin events. No Selenium needed."
+  },
+  {
+    "id": "eventbrite_nevada",
+    "name": "Eventbrite Nevada",
+    "url": "https://www.eventbrite.com/d/ca--nevada-city/events/",
+    "enabled": true,
+    "interval_hours": 6,
+    "notes": "React-rendered. Filtered to Nevada County locations only."
+  },
+  {
+    "id": "the_union",
+    "name": "The Union",
+    "url": "https://www.theunion.com/local-events/",
+    "enabled": true,
+    "interval_hours": 12,
+    "notes": "RSS-first, Selenium fallback. Events behind paywall — RSS often fails."
+  },
+  {
+    "id": "go_nevada",
+    "name": "Go Nevada County",
+    "url": "https://gonevadacounty.com/community-calendar/",
+    "enabled": false,
+    "interval_hours": 12,
+    "notes": "DISABLED — site returns 403 to headless Chrome (Cloudflare protection)."
+  }
+]

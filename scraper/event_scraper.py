@@ -66,6 +66,13 @@ def load_existing() -> list:
 def event_key(e: dict) -> str:
     return f"{e.get('source','').lower()}|{e.get('title','').lower().strip()}|{e.get('date','')}"
 
+def assign_id(event: dict) -> dict:
+    """Add a stable scraper_id (URL-safe hash of the event key)."""
+    import hashlib
+    key = event_key(event)
+    event["scraper_id"] = hashlib.md5(key.encode()).hexdigest()[:12]
+    return event
+
 def merge(existing: list, fresh: list) -> tuple:
     by_key    = {event_key(e): e for e in existing}
     dismissed = {event_key(e) for e in existing if e.get("status") == "dismissed"}
@@ -75,6 +82,7 @@ def merge(existing: list, fresh: list) -> tuple:
         k = event_key(ev)
         if k in dismissed or k in by_key:
             continue
+        assign_id(ev)
         merged.append(ev)
         by_key[k] = ev
         added += 1
