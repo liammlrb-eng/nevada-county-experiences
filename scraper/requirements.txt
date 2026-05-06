@@ -1,0 +1,14 @@
+# Nevada County Experience — Scraper dependencies
+# Install with: pip install -r requirements.txt
+
+# HTTP / HTML
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=5.0           # fast XML parser (used for RSS feeds)
+
+# Headless browser (Selenium + auto ChromeDriver download)
+selenium>=4.18
+webdriver-manager>=4.0
+
+# Date parsing
+python-dateutil>=2.9
