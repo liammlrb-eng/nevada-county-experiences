@@ -129,6 +129,31 @@ class TheUnionScraper(EventScraper):
             cat_el = item.find("category")
             category = cat_el.get_text(strip=True) if cat_el else "Event"
 
+            # Image — try media:content, media:thumbnail, enclosure, then
+            # fall back to first <img> in the description HTML
+            image = ""
+            mc = item.find("media:content") or item.find("content", attrs={"url": True})
+            if mc and mc.get("url", "").lower().split("?")[0].endswith(
+                    ('.jpg', '.jpeg', '.png', '.webp', '.gif')):
+                image = mc["url"]
+            if not image:
+                mt = item.find("media:thumbnail") or item.find("thumbnail")
+                if mt:
+                    image = mt.get("url", "") or mt.get_text(strip=True)
+            if not image:
+                enc = item.find("enclosure")
+                if enc and "image" in enc.get("type", ""):
+                    image = enc.get("url", "")
+            if not image and description:
+                # Try to pull image from description HTML
+                desc_soup = BeautifulSoup(
+                    (item.find("description") or item.find("summary") or item.find("content") or item).get_text(strip=True),
+                    "html.parser"
+                )
+                img_el = desc_soup.find("img")
+                if img_el:
+                    image = img_el.get("src", "")
+
             events.append(self.make_event(
                 title=title,
                 date=date_str,
@@ -137,6 +162,7 @@ class TheUnionScraper(EventScraper):
                 url=url,
                 category=category,
                 area="Nevada County",
+                image=image,
             ))
 
         return events
@@ -191,10 +217,18 @@ class TheUnionScraper(EventScraper):
             cat_el = card.select_one(".tnt-section-nav, .section, .category, .tag")
             category = cat_el.get_text(strip=True) if cat_el else "Event"
 
+            # Image — look for img in the card
+            image = ""
+            img_el = card.select_one("img[src]")
+            if img_el:
+                image = img_el.get("src", "") or img_el.get("data-src", "")
+                if image and image.startswith("/"):
+                    image = "https://www.theunion.com" + image
+
             events.append(self.make_event(
                 title=title, date=date_str, time=time_str,
                 location=location, description=description,
-                category=category, url=url,
+                category=category, url=url, image=image,
             ))
 
         return events

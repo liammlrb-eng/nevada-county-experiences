@@ -28,6 +28,9 @@ from site_scrapers.the_union         import TheUnionScraper
 from site_scrapers.go_nevada         import GoNevadaScraper
 from site_scrapers.eventbrite_nevada import EventbriteNevadaScraper
 from site_scrapers.nevada_city_chamber import NevadaCityChamberScraper
+from site_scrapers.kvmr              import KVMRScraper
+from site_scrapers.gv_chamber        import GVChamberScraper
+from auto_tagger                     import tag_events
 # Future scrapers — uncomment as they're built:
 # from site_scrapers.miners_foundry  import MinersFoundryScraper
 # from site_scrapers.nevada_theatre  import NevadaTheatreScraper
@@ -40,8 +43,10 @@ from site_scrapers.nevada_city_chamber import NevadaCityChamberScraper
 #
 ALL_SCRAPERS = [
     NevadaCityChamberScraper(),     # static HTML — no Selenium needed
+    GVChamberScraper(),             # static HTML — Elementor page
+    KVMRScraper(),                  # RSS — Tribe Events feed
     TheUnionScraper(),              # RSS first, Selenium fallback
-    GoNevadaScraper(),              # Selenium — Smart Post Show JS
+    GoNevadaScraper(),              # Selenium — Smart Post Show JS (Cloudflare blocked)
     EventbriteNevadaScraper(),      # Selenium — React-rendered cards
     # MinersFoundryScraper(),
     # NevadaTheatreScraper(),
@@ -72,6 +77,51 @@ def assign_id(event: dict) -> dict:
     key = event_key(event)
     event["scraper_id"] = hashlib.md5(key.encode()).hexdigest()[:12]
     return event
+
+def prune_expired(events: list) -> tuple:
+    """
+    Remove events that are past their useful life:
+
+    • pending / approved   — pruned the day after their event date
+    • dismissed            — pruned 60 days after their event date
+                             (60 days is enough to prevent same-cycle re-import;
+                              annual recurring events have different dates each year
+                              so the blocklist wouldn't help them anyway)
+    • no / non-ISO date    — kept (can't judge)
+
+    Returns (kept_events, pruned_count).
+    """
+    from datetime import timedelta
+    today      = datetime.now().date()
+    cutoff_dis = today - timedelta(days=60)   # dismissed older than 60 days → gone
+
+    kept, pruned = [], 0
+    for ev in events:
+        date   = ev.get('date', '')
+        status = ev.get('status', 'pending')
+
+        if not date or len(date) < 10:         # no parseable date → keep
+            kept.append(ev)
+            continue
+
+        try:
+            ev_date = datetime.strptime(date, '%Y-%m-%d').date()
+        except ValueError:
+            kept.append(ev)                    # unparseable → keep
+            continue
+
+        if status == 'dismissed':
+            if ev_date >= cutoff_dis:          # dismissed but recent enough → keep
+                kept.append(ev)
+            else:
+                pruned += 1                    # dismissed + old → drop
+        elif ev_date >= today:                 # future / today → keep
+            kept.append(ev)
+        else:
+            pruned += 1                        # pending/approved + past → drop
+
+    return kept, pruned
+
 
 def merge(existing: list, fresh: list) -> tuple:
     by_key    = {event_key(e): e for e in existing}
@@ -137,8 +187,12 @@ def run(scrapers, discover=False):
         if driver:
             driver.quit()
 
-    existing      = load_existing()
-    merged, added = merge(existing, all_fresh)
+    # Auto-tag all freshly scraped events before merging
+    tag_events(all_fresh)
+
+    existing             = load_existing()
+    existing, pruned_cnt = prune_expired(existing)   # drop past events first
+    merged, added        = merge(existing, all_fresh)
 
     with open(EVENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(merged, f, indent=2, ensure_ascii=False)
@@ -146,6 +200,7 @@ def run(scrapers, discover=False):
     print(f"\n{'=' * 56}")
     print(f"  Scraped this run   : {len(all_fresh)}")
     print(f"  New (added)        : {added}")
+    print(f"  Expired (pruned)   : {pruned_cnt}")
     print(f"  Total in queue     : {len(merged)}")
     print(f"  Saved -> scraper_output/events.json")
     if discover:

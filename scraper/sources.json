@@ -1,34 +1,50 @@
 [
   {
+    "enabled": true,
     "id": "nevada_city_chamber",
+    "interval_hours": 168,
     "name": "Nevada City Chamber",
-    "url": "https://www.nevadacitychamber.com/nevada-city-events/",
-    "enabled": true,
-    "interval_hours": 24,
-    "notes": "Static HTML. Essential Grid plugin events. No Selenium needed."
+    "notes": "Static HTML. Essential Grid plugin events. No Selenium needed.",
+    "url": "https://www.nevadacitychamber.com/nevada-city-events/"
   },
   {
+    "enabled": true,
+    "id": "gv_chamber",
+    "interval_hours": 168,
+    "name": "GV Chamber",
+    "notes": "Static HTML. Elementor page — manually coded events, ~5-10 per month. Chamber meetings, mixers, workshops.",
+    "url": "https://www.grassvalleychamber.com/about/chamber-events/"
+  },
+  {
+    "enabled": true,
+    "id": "kvmr",
+    "interval_hours": 168,
+    "name": "KVMR",
+    "notes": "RSS feed (Tribe Events). Covers KVMR-hosted and community events across Nevada County.",
+    "url": "https://www.kvmr.org/events/"
+  },
+  {
+    "enabled": true,
     "id": "eventbrite_nevada",
+    "interval_hours": 168,
     "name": "Eventbrite Nevada",
-    "url": "https://www.eventbrite.com/d/ca--nevada-city/events/",
-    "enabled": true,
-    "interval_hours": 6,
-    "notes": "React-rendered. Filtered to Nevada County locations only."
+    "notes": "React-rendered. Filtered to Nevada County locations only.",
+    "url": "https://www.eventbrite.com/d/ca--nevada-city/events/"
   },
   {
+    "enabled": true,
     "id": "the_union",
+    "interval_hours": 168,
     "name": "The Union",
-    "url": "https://www.theunion.com/local-events/",
-    "enabled": true,
-    "interval_hours": 12,
-    "notes": "RSS-first, Selenium fallback. Events behind paywall — RSS often fails."
+    "notes": "RSS-first, Selenium fallback. Events behind paywall — RSS often fails.",
+    "url": "https://www.theunion.com/local-events/"
   },
   {
-    "id": "go_nevada",
-    "name": "Go Nevada County",
-    "url": "https://gonevadacounty.com/community-calendar/",
     "enabled": false,
-    "interval_hours": 12,
-    "notes": "DISABLED — site returns 403 to headless Chrome (Cloudflare protection)."
+    "id": "go_nevada",
+    "interval_hours": 168,
+    "name": "Go Nevada County",
+    "notes": "DISABLED — site returns 403 to headless Chrome (Cloudflare protection).",
+    "url": "https://gonevadacounty.com/community-calendar/"
   }
 ]

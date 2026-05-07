@@ -14,6 +14,8 @@ Confirmed selectors (from HTML snapshot 2026-05-06):
   Image    : .esg-media-poster background-image OR img src
 """
 
+from datetime import datetime
+
 from .base import EventScraper
 from bs4 import BeautifulSoup
 from dateutil import parser as dateparser
@@ -74,6 +76,7 @@ class NevadaCityChamberScraper(EventScraper):
     # ── Parse Essential Grid event items ─────────────────────────────────────
     def parse(self, soup: BeautifulSoup) -> list[dict]:
         events = []
+        cutoff = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
         # Essential Grid plugin: each event is a <li class="eg-events-wrapper ...">
         cards = soup.select("li.eg-events-wrapper")
@@ -150,6 +153,14 @@ class NevadaCityChamberScraper(EventScraper):
             # Skip the "Local Calendar of Events" hub link
             if "calendar of events" in title.lower():
                 continue
+
+            # Skip stale events (before today)
+            if date_str:
+                try:
+                    if datetime.strptime(date_str, '%Y-%m-%d') < cutoff:
+                        continue
+                except Exception:
+                    pass   # non-parseable raw date strings pass through
 
             # ── Image ─────────────────────────────────────────────────────
             image = ""

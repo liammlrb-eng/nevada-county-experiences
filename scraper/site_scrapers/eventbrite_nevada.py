@@ -245,6 +245,17 @@ class EventbriteNevadaScraper(EventScraper):
                 if not v.startswith("From ") and not v.startswith("Check "):
                     venue = v
 
+            # Image — Eventbrite places the image in the card's parent wrapper,
+            # as a sibling div/article containing an <img> outside the <section>
+            image = ""
+            parent = card.parent
+            if parent:
+                img_el = parent.find("img")
+                if img_el:
+                    image = (img_el.get("src")
+                             or img_el.get("data-src")
+                             or img_el.get("data-lazy-src", ""))
+
             events.append(self.make_event(
                 title=title,
                 date=date_str,
@@ -252,6 +263,7 @@ class EventbriteNevadaScraper(EventScraper):
                 location=venue,
                 url=url,
                 area="Nevada County",
+                image=image,
             ))
 
         return events
