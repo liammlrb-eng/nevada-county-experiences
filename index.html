@@ -2316,14 +2316,35 @@ let _eventsCache = null;
 let _eventsCacheTime = 0;
 
 // ── Shared event cache loader (used by both Experiences strip and Events tab) ─
+// Tries the live API first (when the Flask server is running); falls back to
+// a static snapshot at scraper_output/events.json so GitHub Pages and any
+// static-only host still show the full event list.
 async function _loadEventsCache() {
-  if (API_BASE === null) return;
   if (_eventsCache && Date.now() - _eventsCacheTime < 300000) return; // still fresh
+
+  let raw = null;
+  // 1. Try the live API (only when the server is running)
+  if (API_BASE !== null) {
+    try {
+      const r = await fetch(`${API_BASE}/api/events?status=approved`);
+      if (r.ok) raw = await r.json();
+    } catch(e) { /* fall through to static snapshot */ }
+  }
+  // 2. Fall back to the static snapshot (GitHub Pages or local file://)
+  if (!raw) {
+    try {
+      const r = await fetch('./scraper_output/events.json');
+      if (r.ok) {
+        const all = await r.json();
+        // Mimic the API's status=approved filter
+        raw = Array.isArray(all) ? all.filter(e => e.status === 'approved') : [];
+      }
+    } catch(e) { /* no snapshot available — fall back to hardcoded EVENTS */ }
+  }
+  if (!raw) return;
+
   try {
-    const r = await fetch(`${API_BASE}/api/events?status=approved`);
-    if (!r.ok) return;
     const today = new Date().toISOString().slice(0, 10);
-    const raw   = await r.json();
     _eventsCache = raw
       // Drop past dates AND anything Claude flagged low-quality
       .filter(ev => (!ev.date || ev.date >= today) && ev.ai_quality !== 'low')

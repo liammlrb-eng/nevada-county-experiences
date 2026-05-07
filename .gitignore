@@ -10,8 +10,9 @@ __pycache__/
 *.pyo
 .env
 
-# Scraper runtime outputs — don't commit local data
-scraper_output/events.json
+# Scraper runtime outputs
+# events.json IS committed so the GitHub Pages demo has live data.
+# After each scrape, run: git add scraper_output/events.json && git commit && git push
 scraper_output/candidates.json
 scraper_output/snapshots/
 
