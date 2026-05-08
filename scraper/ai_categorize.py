@@ -69,7 +69,7 @@ ALLOWED_TAGS = [
     "Active", "Scenic", "Sport", "Nature", "Outdoor", "Environment",
     "Hiking", "Biking", "Running", "Swimming", "Boating", "Fishing",
     # Wellness & Spiritual
-    "Spiritual", "Wellness",
+    "Spiritual", "Wellness", "Restorative",
     # Family / Community
     "Family", "Community", "Holiday", "Social",
     # Historic
