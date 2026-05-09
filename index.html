@@ -3332,12 +3332,24 @@ const VIBE_PILLS = {
     { id: 'racquet',     label: '🎾 Racquet & Disc',   match: e => /pickleball|tennis|disc golf|bocce/i.test(e.name + ' ' + (e.sub||'')) },
   ],
   handson: [
-    { id: 'metal',       label: '🛠 Smithing & Jewelry', match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
-    { id: 'ceramic',     label: '🏺 Ceramics',         match: e => /ceramic|pottery|clay|wheel-thrown|stoneware/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'glass',       label: '🪟 Glass',            match: e => /\bglass\b|stained glass|glass blow/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'fiber',       label: '🧵 Fiber & Textile',  match: e => /fiber|weav|knit|textile|hat.?making|natural dye|sew/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'paint',       label: '🎨 Painting',         match: e => /painting|drawing|mixed media|watercolor/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'goldpan',     label: '⚱ Gold Panning',      match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'crafts',   label: '🎨 Crafts',                match: e => {
+        const t = ((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name + ' ' + (e.description||'')).toLowerCase();
+        // Word-bounded / phrase-specific to avoid name false-positives (Weaver, Clay Camero)
+        return /\bceramics?\b|pottery|wheel.thrown|stoneware|glass.blow|stained.glass|\bforge\b|forging|blacksmith|metalsmith|silversmith|metalwork|jewelry.making|jewelry.class|jewelry.workshop|fiber.arts|weaving|knitting|sewing.class|quilting|painting.class|painting.workshop|drawing.class|watercolor.class|mixed.media|woodworking|wood.carving|natural.dye|hat.making|craft.fair|craft.workshop|craft.school|makerspace/.test(t);
+    } },
+    { id: 'movement', label: '💃 Movement & Dance',      match: e => {
+        const t = ((e.name||'') + ' ' + (e.description||'')).toLowerCase();
+        return /\bdance\b|salsa|bachata|swing.out|contra dance|line dance|ecstatic|tai chi|qi gong|mindful movement|movement class|tango|flamenco|ballet|ballroom/.test(t);
+    } },
+    { id: 'nature',   label: '🌿 Nature & Garden',       match: e => {
+        const t = ((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name + ' ' + (e.description||'')).toLowerCase();
+        return /gold pan|herbal medicine|plant sale|master gardener|garden workshop|garden tour|wildflower walk|botanical|foraging|native plant|mushroom hunt|bird walk|naturalist|permaculture|remedy garden|calscape/.test(t);
+    } },
+    { id: 'learn',    label: '📚 Workshops & Talks',     match: e => {
+        const tags = e.tags || [];
+        if (tags.includes('Workshop') || tags.includes('Lecture')) return true;
+        return /workshop|class|seminar|lecture|tutorial|training\b|course\b/i.test((e.name||'') + ' ' + (e.sub||''));
+    } },
   ],
   arts: [
     { id: 'theater',     label: '🎭 Theater',          match: e => { const t = (e.name + ' ' + (e.sub||'')).toLowerCase(); return /theat(re|er)|stages|cats\b|community asian/.test(t) && !/cinema/.test(t); } },
@@ -3464,13 +3476,23 @@ const SUB_PILLS = {
     { id: 'spa',        label: '💆 Spa & Float',  match: e => /float|spa|sauna|massage|sound healing|reiki/i.test(e.name + ' ' + (e.sub||'')) },
   ],
   'Hands-on': [
-    { id: 'metal',    label: '🛠 Smithing & Jewelry',     match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
-    { id: 'ceramic',  label: '🏺 Ceramics & Pottery',     match: e => /ceramic|pottery|clay|wheel-thrown|stoneware/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'glass',    label: '🪟 Glass',                  match: e => /\bglass\b|stained glass|glass blow/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'fiber',    label: '🧵 Fiber & Textile',         match: e => /fiber|weav|knit|textile|hat.?making|natural dye|spinning|sew/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'paint',    label: '🎨 Painting & Mixed Media', match: e => /painting|drawing|mixed media|watercolor|oil paint/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'wood',     label: '🪚 Woodworking',             match: e => /woodwork|carving|joinery/i.test((e.notes||'') + ' ' + (e.sub||'')) },
-    { id: 'community', label: '🎯 Drop-in / Community',   match: e => /drop.?in|free|community|all.ages|beginner/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'crafts',   label: '🎨 Crafts',                match: e => {
+        const t = ((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name + ' ' + (e.description||'')).toLowerCase();
+        return /\bceramics?\b|pottery|wheel.thrown|stoneware|glass.blow|stained.glass|\bforge\b|forging|blacksmith|metalsmith|silversmith|metalwork|jewelry.making|jewelry.class|jewelry.workshop|fiber.arts|weaving|knitting|sewing.class|quilting|painting.class|painting.workshop|drawing.class|watercolor.class|mixed.media|woodworking|wood.carving|natural.dye|hat.making|craft.fair|craft.workshop|craft.school|makerspace/.test(t);
+    } },
+    { id: 'movement', label: '💃 Movement & Dance',      match: e => {
+        const t = ((e.name||'') + ' ' + (e.description||'')).toLowerCase();
+        return /\bdance\b|salsa|bachata|swing.out|contra dance|line dance|ecstatic|tai chi|qi gong|mindful movement|movement class|tango|flamenco|ballet|ballroom/.test(t);
+    } },
+    { id: 'nature',   label: '🌿 Nature & Garden',       match: e => {
+        const t = ((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name + ' ' + (e.description||'')).toLowerCase();
+        return /gold pan|herbal medicine|plant sale|master gardener|garden workshop|garden tour|wildflower walk|botanical|foraging|native plant|mushroom hunt|bird walk|naturalist|permaculture|remedy garden|calscape/.test(t);
+    } },
+    { id: 'learn',    label: '📚 Workshops & Talks',     match: e => {
+        const tags = e.tags || [];
+        if (tags.includes('Workshop') || tags.includes('Lecture')) return true;
+        return /workshop|class|seminar|lecture|tutorial|training\b|course\b/i.test((e.name||'') + ' ' + (e.sub||''));
+    } },
   ],
   'Activity': [
     { id: 'workshops', label: '🛠️ Workshops & Classes', match: e => /workshop|class|forge|school|craft|asif|wolf craft|craftfolk/i.test(e.name + ' ' + (e.sub||'')) },
