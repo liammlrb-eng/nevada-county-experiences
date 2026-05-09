@@ -2241,7 +2241,11 @@ function renderExperiences() {
     <div class="exp-card ${evtAdded ? 'added' : ''}" style="border-color:#c8a84b;position:relative">
       <div style="position:absolute;top:10px;left:10px;z-index:10;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.1em;padding:3px 8px;border-radius:10px;text-transform:uppercase">📅 Event</div>
       ${evtAdded ? `<button class="item-remove" title="Remove from my itinerary" style="position:absolute;top:10px;right:10px;z-index:10" onclick="removeFromList('evt_${e.scraperId}')">×</button>` : ''}
-      ${e.image ? `<div class="exp-photo"><img src="${e.image}" alt="${e.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'"><div class="exp-photo-overlay"></div></div>` : ''}
+      <div class="exp-photo" style="position:relative">
+        ${_eventPlaceholder(e, 180)}
+        ${e.image ? `<img src="${e.image}" alt="${e.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : ''}
+        <div class="exp-photo-overlay"></div>
+      </div>
       <div class="exp-body">
         <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:3px">${e.dates || 'Upcoming'}${e.times ? '  ·  🕐 ' + e.times : ''}</div>
         <div style="font-size:15px;font-weight:700;color:var(--slate);line-height:1.3;margin-bottom:6px">${e.name}</div>
@@ -2457,6 +2461,64 @@ function renderItineraries() {
   }).join('');
 }
 
+// ── Event type → representational emoji + accent gradient ────────────
+// Used to render a placeholder image when an event has no photo.
+const _EVENT_TYPE_VISUAL = {
+  // tag → [emoji, gradient-from, gradient-to]
+  'Music':       ['🎵', '#7E57C2', '#9C7CD2'],
+  'Theater':     ['🎭', '#C0392B', '#D87060'],
+  'Film':        ['🎬', '#34495E', '#5D6D7E'],
+  'Festival':    ['🎉', '#E67E22', '#F0A05A'],
+  'Dance':       ['💃', '#C2185B', '#D9568D'],
+  'Art':         ['🎨', '#8E44AD', '#A569BD'],
+  'Artistic':    ['🎨', '#8E44AD', '#A569BD'],
+  'Workshop':    ['🛠️', '#7E5A33', '#A07B4F'],
+  'Hands-on':    ['🔨', '#7E5A33', '#A07B4F'],
+  'Craft':       ['🪡', '#7E5A33', '#A07B4F'],
+  'Lecture':     ['📚', '#34495E', '#5D6D7E'],
+  'Foodie':      ['🍽', '#D35400', '#E58E4A'],
+  'Food & Drink':['🍽', '#D35400', '#E58E4A'],
+  'Market':      ['🛒', '#27AE60', '#52BE80'],
+  'Garden':      ['🌷', '#16A085', '#48C9B0'],
+  'Wellness':    ['🧘', '#1ABC9C', '#76D7C4'],
+  'Spiritual':   ['🕉️', '#5B7B8A', '#8AA9B6'],
+  'Restorative': ['💆', '#1ABC9C', '#76D7C4'],
+  'Active':      ['🏃', '#27AE60', '#58D68D'],
+  'Sport':       ['⚽', '#27AE60', '#58D68D'],
+  'Hiking':      ['🥾', '#16A085', '#48C9B0'],
+  'Biking':      ['🚲', '#16A085', '#48C9B0'],
+  'Swimming':    ['🏊', '#2980B9', '#5DADE2'],
+  'Fishing':     ['🎣', '#2980B9', '#5DADE2'],
+  'Boating':     ['🛶', '#2980B9', '#5DADE2'],
+  'Running':     ['🏃', '#27AE60', '#58D68D'],
+  'Nature':      ['🌲', '#1E8449', '#52BE80'],
+  'Outdoor':     ['🌲', '#1E8449', '#52BE80'],
+  'Environment': ['🌍', '#27AE60', '#52BE80'],
+  'Scenic':      ['🏞️', '#16A085', '#48C9B0'],
+  'Family':      ['👨‍👩‍👧', '#E91E63', '#EC7CA0'],
+  'Community':   ['🤝', '#E91E63', '#EC7CA0'],
+  'Holiday':     ['🎄', '#C0392B', '#E74C3C'],
+  'Social':      ['🥂', '#9B59B6', '#BB8FCE'],
+  'Historic':    ['🏛️', '#8B6F4E', '#A88E6E'],
+  'Gold Rush':   ['⚱️', '#B8860B', '#DAA520'],
+  'Fundraiser':  ['💝', '#E74C3C', '#EC7063'],
+  'Romantic':    ['🍷', '#922B21', '#A93226'],
+};
+
+function _eventVisual(ev) {
+  const tags = ev.tags || [];
+  for (const t of tags) {
+    if (_EVENT_TYPE_VISUAL[t]) return _EVENT_TYPE_VISUAL[t];
+  }
+  return ['📅', '#C9A84C', '#E8C96A']; // default — gold
+}
+
+// Produce the placeholder block HTML when an event has no image
+function _eventPlaceholder(ev, height = 100) {
+  const [emoji, c1, c2] = _eventVisual(ev);
+  return `<div style="background:linear-gradient(135deg, ${c1} 0%, ${c2} 100%);height:${height}px;display:flex;align-items:center;justify-content:center"><span style="font-size:${Math.round(height*0.45)}px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))">${emoji}</span></div>`;
+}
+
 function _fmtApiDate(dateStr) {
   if (!dateStr) return '';
   try {
@@ -2599,7 +2661,10 @@ async function renderEvents() {
     return `
     <div class="event-card ${evtAdded ? 'added' : ''}" style="position:relative">
       ${evtAdded ? `<button class="item-remove" title="Remove from my itinerary" style="position:absolute;top:8px;right:8px;z-index:10" onclick="removeFromList('evt_${e.scraperId}');renderEvents();">×</button>` : ''}
-      ${e.image ? `<img class="event-card-img" src="${e.image}" alt="${e.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+      <div class="event-card-img" style="position:relative;padding:0">
+        ${_eventPlaceholder(e, 160)}
+        ${e.image ? `<img src="${e.image}" alt="${e.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : ''}
+      </div>
       <div class="event-card-body">
         <div class="event-date">${e.dates}</div>
         <div class="event-name">${e.name}</div>
@@ -2776,7 +2841,10 @@ function renderModal() {
       return `
         <div style="background:#fff;border:1.5px solid #c8a84b;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;position:relative">
           <div style="position:absolute;top:8px;left:8px;z-index:2;background:var(--gold);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.1em;padding:2px 7px;border-radius:8px;text-transform:uppercase">📅 Event</div>
-          ${ev.image ? `<img src="${ev.image}" alt="${ev.name}" loading="lazy" style="width:100%;height:90px;object-fit:cover" onerror="this.style.display='none'">` : ''}
+          <div style="position:relative">
+            ${_eventPlaceholder(ev, 90)}
+            ${ev.image ? `<img src="${ev.image}" alt="${ev.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : ''}
+          </div>
           <div style="padding:9px 11px;flex:1;display:flex;flex-direction:column">
             <div style="font-size:10px;color:var(--gold);font-weight:700;margin-bottom:2px">${ev.dates || 'Upcoming'}</div>
             <div style="font-size:13px;font-weight:600;color:var(--brown);line-height:1.3;margin-bottom:3px">${ev.name}</div>
@@ -3264,7 +3332,7 @@ const VIBE_PILLS = {
     { id: 'racquet',     label: '🎾 Racquet & Disc',   match: e => /pickleball|tennis|disc golf|bocce/i.test(e.name + ' ' + (e.sub||'')) },
   ],
   handson: [
-    { id: 'metal',       label: '🔨 Metal & Forge',    match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
+    { id: 'metal',       label: '🛠 Smithing & Jewelry', match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
     { id: 'ceramic',     label: '🏺 Ceramics',         match: e => /ceramic|pottery|clay|wheel-thrown|stoneware/i.test((e.notes||'') + ' ' + (e.sub||'')) },
     { id: 'glass',       label: '🪟 Glass',            match: e => /\bglass\b|stained glass|glass blow/i.test((e.notes||'') + ' ' + (e.sub||'')) },
     { id: 'fiber',       label: '🧵 Fiber & Textile',  match: e => /fiber|weav|knit|textile|hat.?making|natural dye|sew/i.test((e.notes||'') + ' ' + (e.sub||'')) },
@@ -3396,7 +3464,7 @@ const SUB_PILLS = {
     { id: 'spa',        label: '💆 Spa & Float',  match: e => /float|spa|sauna|massage|sound healing|reiki/i.test(e.name + ' ' + (e.sub||'')) },
   ],
   'Hands-on': [
-    { id: 'metal',    label: '🔨 Metal & Forge',          match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
+    { id: 'metal',    label: '🛠 Smithing & Jewelry',     match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
     { id: 'ceramic',  label: '🏺 Ceramics & Pottery',     match: e => /ceramic|pottery|clay|wheel-thrown|stoneware/i.test((e.notes||'') + ' ' + (e.sub||'')) },
     { id: 'glass',    label: '🪟 Glass',                  match: e => /\bglass\b|stained glass|glass blow/i.test((e.notes||'') + ' ' + (e.sub||'')) },
     { id: 'fiber',    label: '🧵 Fiber & Textile',         match: e => /fiber|weav|knit|textile|hat.?making|natural dye|spinning|sew/i.test((e.notes||'') + ' ' + (e.sub||'')) },
