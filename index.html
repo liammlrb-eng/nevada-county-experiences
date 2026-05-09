@@ -1788,7 +1788,9 @@ function _hasSaveConsent() {
 
 function _saveMyList() {
   const arr = [...myList];
-  // URL hash format: #list=2:1,8:1,33:2  (id:day pairs)
+  // URL hash format: #list=2:1,8:1,evt_abc123:2,33:2  (id:day pairs)
+  //   - integer ids = experiences (e.g. 2, 8, 33)
+  //   - 'evt_<scraperId>' strings = events
   // Backward compat: old format #list=2,8,33 still loads (defaults all to Day 1).
   const newHash = arr.length
     ? '#list=' + arr.map(id => `${id}:${dayMap[id] || 1}`).join(',')
@@ -1809,17 +1811,27 @@ function _saveMyList() {
 }
 
 function _loadMyList() {
-  // 1. URL hash — supports both old (#list=2,8) and new (#list=2:1,8:2) formats
+  // 1. URL hash — supports legacy (#list=2,8), id:day (#list=2:1,8:2),
+  //    and now event IDs (#list=evt_abc123:2,8:1).
   const hash = window.location.hash;
-  const m = hash.match(/[#&]list=([\d,:]+)/);
+  // Allow underscores + alphanumerics for event IDs
+  const m = hash.match(/[#&]list=([\w,:]+)/);
   if (m) {
     m[1].split(',').forEach(item => {
-      const parts = item.split(':');
-      const id  = parseInt(parts[0], 10);
-      const day = parts[1] ? parseInt(parts[1], 10) : 1;
-      if (!isNaN(id) && id > 0) {
-        myList.add(id);
-        dayMap[id] = (!isNaN(day) && day > 0) ? day : 1;
+      const idx = item.lastIndexOf(':');
+      const idRaw = idx >= 0 ? item.slice(0, idx) : item;
+      const dayStr = idx >= 0 ? item.slice(idx + 1) : '1';
+      const day = parseInt(dayStr, 10) || 1;
+      if (idRaw.startsWith('evt_') && idRaw.length > 4) {
+        // Event ID — store as string
+        myList.add(idRaw);
+        dayMap[idRaw] = day;
+      } else {
+        const id = parseInt(idRaw, 10);
+        if (!isNaN(id) && id > 0) {
+          myList.add(id);
+          dayMap[id] = day;
+        }
       }
     });
     tripDays = Math.max(1, ...Object.values(dayMap).map(Number).filter(Boolean));
@@ -2199,8 +2211,10 @@ function renderExperiences() {
   };
 
   // ── Event card template (for events shown inline in the exp grid) ─────────
-  const eventCardHtml = (e) => `
-    <div class="exp-card" style="border-color:#c8a84b;position:relative">
+  const eventCardHtml = (e) => {
+    const evtAdded = e.scraperId && myList.has('evt_' + e.scraperId);
+    return `
+    <div class="exp-card ${evtAdded ? 'added' : ''}" style="border-color:#c8a84b;position:relative">
       <div style="position:absolute;top:10px;left:10px;z-index:10;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.1em;padding:3px 8px;border-radius:10px;text-transform:uppercase">📅 Event</div>
       ${e.image ? `<div class="exp-photo"><img src="${e.image}" alt="${e.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'"><div class="exp-photo-overlay"></div></div>` : ''}
       <div class="exp-body">
@@ -2209,10 +2223,12 @@ function renderExperiences() {
         <div style="font-size:12px;color:#718096;margin-bottom:8px">📍 ${e.venue}</div>
         <div class="exp-tags">${e.tags.map(t => `<span class="tag ${isHighlightTag(t) ? 'highlight' : ''}">${t}</span>`).join('')}${e.source ? `<span class="tag" style="opacity:0.45;font-size:9px">${e.source}</span>` : ''}</div>
         <div class="exp-actions" style="margin-top:auto;padding-top:8px">
+          ${e.scraperId ? `<button class="btn-add ${evtAdded ? 'added-btn' : ''}" onclick="toggleEventInList('${e.scraperId}')">${evtAdded ? '✓ Added' : '+ Add to My List'}</button>` : ''}
           ${e.url ? `<a class="btn-visit" href="${e.url}" target="_blank">More Info ↗</a>` : ''}
         </div>
       </div>
     </div>`;
+  };
 
   // ── Pinned items separator ────────────────────────────────────────────────
   const pinnedHtml = pinnedItems.length > 0
@@ -2295,6 +2311,7 @@ function clearAllFilters() {
 }
 
 function toggleList(id) {
+  id = _normalizeId(id);
   if (myList.has(id)) {
     myList.delete(id);
     delete dayMap[id];
@@ -2309,6 +2326,7 @@ function toggleList(id) {
 }
 
 function removeFromList(id) {
+  id = _normalizeId(id);
   myList.delete(id);
   delete dayMap[id];
   updateFab();
@@ -2317,8 +2335,44 @@ function removeFromList(id) {
   renderModal();
 }
 
+// Normalize an id passed in from an HTML attribute back to its real type.
+// Numeric strings ('2') become numbers; event-id strings ('evt_abc') stay strings.
+function _normalizeId(id) {
+  if (typeof id === 'string' && /^\d+$/.test(id)) return parseInt(id, 10);
+  return id;
+}
+
+// ── Unified item lookup ──────────────────────────────────────────────
+// myList holds a mix of integer experience IDs and 'evt_<scraperId>' strings.
+// This resolves either kind to a unified item object with `_kind` set.
+function _lookupItem(id) {
+  if (typeof id === 'string' && id.startsWith('evt_')) {
+    const sid = id.slice(4);
+    const ev = (_eventsCache || []).find(e => e.scraperId === sid);
+    if (!ev) return null;
+    return { ...ev, _kind: 'event', _id: id };
+  }
+  const exp = liveExperiences.find(e => e.id === id);
+  if (!exp) return null;
+  return { ...exp, _kind: 'exp', _id: id };
+}
+
+// Convenience for event "Add to List" buttons
+function toggleEventInList(scraperId) {
+  if (!scraperId) return;
+  toggleList('evt_' + scraperId);
+}
+
+function _eventInListButton(scraperId) {
+  if (!scraperId) return '';
+  const id = 'evt_' + scraperId;
+  const added = myList.has(id);
+  return `<button onclick="toggleEventInList('${scraperId}');if(typeof renderModal==='function')renderModal();renderExperiences();" style="background:${added?'var(--gold)':'transparent'};color:${added?'#fff':'var(--brown)'};border:1.5px solid var(--gold);padding:5px 10px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600">${added ? '✓ Added' : '+ Add'}</button>`;
+}
+
 // ── Day-by-day controls ──────────────────────────────────────────────
 function assignToDay(id, day) {
+  id = _normalizeId(id);
   const d = parseInt(day, 10);
   if (isNaN(d) || d < 1) return;
   dayMap[id] = d;
@@ -2423,13 +2477,13 @@ async function _loadEventsCache() {
       // Drop past dates AND anything Claude flagged low-quality
       .filter(ev => (!ev.date || ev.date >= today) && ev.ai_quality !== 'low')
       .map(ev => {
-        // Prefer AI-enriched fields when available; fall back to scraper data
         const aiTags = Array.isArray(ev.ai_tags) ? ev.ai_tags : null;
         const tags   = (aiTags && aiTags.length) ? aiTags
                      : (Array.isArray(ev.tags) ? ev.tags : []);
         const venue  = ev.ai_venue || ev.location || ev.area || 'Nevada County';
         const area   = ev.ai_area  || ev.area || 'Nevada County';
         return {
+          scraperId: ev.scraper_id || '',   // stable ID for itinerary persistence
           name:      ev.title || '',
           dates:     _fmtApiDate(ev.date),
           dateStart: ev.date || '',
@@ -2513,21 +2567,24 @@ async function renderEvents() {
     return;
   }
 
-  document.getElementById('eventsGrid').innerHTML = evts.map(e => `
-    <div class="event-card">
+  document.getElementById('eventsGrid').innerHTML = evts.map(e => {
+    const evtAdded = e.scraperId && myList.has('evt_' + e.scraperId);
+    return `
+    <div class="event-card ${evtAdded ? 'added' : ''}">
       ${e.image ? `<img class="event-card-img" src="${e.image}" alt="${e.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
       <div class="event-card-body">
         <div class="event-date">${e.dates}</div>
         <div class="event-name">${e.name}</div>
         <div class="event-venue">📍 ${e.venue || e.area} · ${e.area}</div>
         <div class="event-tags">${e.tags.map(t => `<span class="tag">${t}</span>`).join('')}${e.source ? `<span class="tag" style="opacity:0.55;font-size:9px">${e.source}</span>` : ''}</div>
-        <div class="exp-actions" style="margin-top:auto;padding-top:8px">
+        <div class="exp-actions" style="margin-top:auto;padding-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${e.scraperId ? `<button class="btn-add ${evtAdded ? 'added-btn' : ''}" onclick="toggleEventInList('${e.scraperId}');renderEvents();" style="font-size:11px">${evtAdded ? '✓ Added' : '+ Add to My List'}</button>` : ''}
           ${e.url ? `<a class="btn-visit" href="${e.url}" target="_blank" style="font-size:11px">More Info ↗</a>` : ''}
-          ${e.times ? `<span style="font-size:11px;color:#718096;margin-left:4px">🕐 ${e.times}</span>` : ''}
+          ${e.times ? `<span style="font-size:11px;color:#718096">🕐 ${e.times}</span>` : ''}
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function switchTab(tab, btn) {
@@ -2621,7 +2678,8 @@ function getSuggestedExperiences(maxN = 6) {
 
 function getSuggestedEvents(maxN = 4) {
   if (!_eventsCache || !_eventsCache.length) return [];
-  const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
+  // Use unified lookup so itinerary tags include events too
+  const items = [...myList].map(_lookupItem).filter(Boolean);
   if (!items.length) return [];
   const itinTags = new Set();
   items.forEach(it => (it.tags || []).forEach(t => itinTags.add(t.toLowerCase())));
@@ -2632,6 +2690,8 @@ function getSuggestedEvents(maxN = 4) {
 
   return _eventsCache
     .filter(ev => {
+      // Skip events already in the visitor's list
+      if (ev.scraperId && myList.has('evt_' + ev.scraperId)) return false;
       // Future-dated only
       if (ev.dateStart && ev.dateStart < today) return false;
       // Honor date filter if set
@@ -2651,7 +2711,8 @@ function getSuggestedEvents(maxN = 4) {
 function renderModal() {
   const body = document.getElementById('modalBody');
   const subtitle = document.getElementById('modalSubtitle');
-  const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
+  // Unified lookup — resolves both experiences (numeric IDs) and events (evt_* strings)
+  const items = [...myList].map(_lookupItem).filter(Boolean);
 
   if (items.length === 0) {
     subtitle.textContent = 'Your list is empty';
@@ -2682,7 +2743,9 @@ function renderModal() {
         </div>`;
     }).join('');
 
-    const evtCardsHtml = suggEvt.map(ev => `
+    const evtCardsHtml = suggEvt.map(ev => {
+      const evtAdded = ev.scraperId && myList.has('evt_' + ev.scraperId);
+      return `
         <div style="background:#fff;border:1.5px solid #c8a84b;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;position:relative">
           <div style="position:absolute;top:8px;left:8px;z-index:2;background:var(--gold);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.1em;padding:2px 7px;border-radius:8px;text-transform:uppercase">📅 Event</div>
           ${ev.image ? `<img src="${ev.image}" alt="${ev.name}" loading="lazy" style="width:100%;height:90px;object-fit:cover" onerror="this.style.display='none'">` : ''}
@@ -2690,9 +2753,11 @@ function renderModal() {
             <div style="font-size:10px;color:var(--gold);font-weight:700;margin-bottom:2px">${ev.dates || 'Upcoming'}</div>
             <div style="font-size:13px;font-weight:600;color:var(--brown);line-height:1.3;margin-bottom:3px">${ev.name}</div>
             <div style="font-size:10px;color:#718096;margin-bottom:8px">📍 ${ev.venue || ev.area}</div>
-            ${ev.url ? `<a href="${ev.url}" target="_blank" style="margin-top:auto;display:inline-block;font-size:11px;color:var(--brown);text-decoration:none;font-weight:600;border:1.5px solid #d4c9b0;border-radius:4px;padding:5px 10px;text-align:center">More Info ↗</a>` : ''}
+            ${ev.scraperId ? `<button onclick="toggleEventInList('${ev.scraperId}');renderModal();" style="margin-top:auto;background:${evtAdded?'var(--gold)':'transparent'};color:${evtAdded?'#fff':'var(--brown)'};border:1.5px solid var(--gold);padding:5px 10px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600">${evtAdded ? '✓ Added' : '+ Add to List'}</button>` : ''}
+            ${ev.url ? `<a href="${ev.url}" target="_blank" style="margin-top:6px;display:inline-block;font-size:10px;color:#888;text-decoration:underline;text-align:center">More Info ↗</a>` : ''}
           </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 
     suggHtml = `
       <div style="margin-top:28px;border-top:2px solid #e8dfc8;padding-top:18px">
@@ -2710,14 +2775,16 @@ function renderModal() {
   // ── Group items by day ──────────────────────────────────────────────
   // Auto-grow tripDays if any item has a day > current count
   for (const it of items) {
-    const d = dayMap[it.id] || 1;
+    const d = dayMap[it._id] || 1;
     if (d > tripDays) tripDays = d;
   }
   const byDay = {};
   for (let d = 1; d <= tripDays; d++) byDay[d] = { lodging: [], stops: [] };
   for (const it of items) {
-    const d = dayMap[it.id] || 1;
-    (it.type === 'Lodging' ? byDay[d].lodging : byDay[d].stops).push(it);
+    const d = dayMap[it._id] || 1;
+    // Events are always stops (never lodging); experiences split by type.
+    const isLodging = it._kind === 'exp' && it.type === 'Lodging';
+    (isLodging ? byDay[d].lodging : byDay[d].stops).push(it);
   }
 
   // Day section template
@@ -2726,7 +2793,13 @@ function renderModal() {
     const dayOptions = Array.from({length: tripDays}, (_, i) => i + 1)
       .map(n => `<option value="${n}">Day ${n}</option>`).join('');
 
-    // Lodging slot
+    // Day controls (per item) — works for both kinds via quoted _id
+    const moveSelect = (item) => tripDays > 1 ? `<select onchange="assignToDay('${item._id}', this.value)" title="Move to another day" style="font-size:10px;border:1px solid #d4c9b0;border-radius:3px;padding:2px 4px;margin-right:4px;background:#fbf7ee">
+      ${dayOptions.replace(`value="${d}"`, `value="${d}" selected`)}
+    </select>` : '';
+    const removeBtn = (item) => `<button class="item-remove" onclick="removeFromList('${item._id}')">×</button>`;
+
+    // Lodging slot (experiences only)
     const lodgingHtml = day.lodging.length
       ? day.lodging.map(l => `
           <div class="itinerary-item" style="background:linear-gradient(0deg,rgba(201,168,76,0.06),rgba(201,168,76,0.06)),#fff;border-left:3px solid var(--gold)">
@@ -2740,34 +2813,47 @@ function renderModal() {
                 <a class="item-link" href="${l.directions}" target="_blank">Directions ↗</a>
               </div>
             </div>
-            ${tripDays > 1 ? `<select onchange="assignToDay(${l.id}, this.value)" title="Move to another day" style="font-size:10px;border:1px solid #d4c9b0;border-radius:3px;padding:2px 4px;margin-right:4px;background:#fbf7ee">
-              ${dayOptions.replace(`value="${d}"`, `value="${d}" selected`)}
-            </select>` : ''}
-            <button class="item-remove" onclick="removeFromList(${l.id})">×</button>
+            ${moveSelect(l)}${removeBtn(l)}
           </div>`).join('')
       : `<div style="border:1.5px dashed #d4c9b0;border-radius:8px;padding:12px 16px;text-align:center;background:rgba(245,239,226,0.4);margin-bottom:8px">
           <div style="font-size:11px;color:#888;margin-bottom:6px">💤 No lodging picked for tonight</div>
           <div style="font-size:10px;color:#aaa">Browse the <strong>Lodging</strong> category and add your stay — it'll land on the day you pick.</div>
         </div>`;
 
-    // Stop list
+    // Stop list — different rendering for events vs experiences
     const stopsHtml = day.stops.length
-      ? day.stops.map((s, i) => `
-          <div class="itinerary-item">
-            <div class="num">${i + 1}</div>
-            <div class="item-body">
-              <div class="item-name">${s.icon||''} ${s.name}</div>
-              <div class="item-sub">📍 ${s.area} · ${s.type} · 🕐 ${s.hours||''}</div>
-              <div class="item-links">
-                <a class="item-link" href="${s.url}" target="_blank">Book / Info ↗</a>
-                <a class="item-link" href="${s.directions}" target="_blank">Directions ↗</a>
+      ? day.stops.map((s, i) => {
+          if (s._kind === 'event') {
+            // Event stop — gold accent, dates prominent, More Info link
+            return `
+              <div class="itinerary-item" style="border-left:3px solid #c8a84b;background:linear-gradient(0deg,rgba(201,168,76,0.04),rgba(201,168,76,0.04)),#fff">
+                <div style="font-size:14px;width:32px;text-align:center;flex-shrink:0">📅</div>
+                <div class="item-body">
+                  <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:2px">${s.dates || 'Upcoming Event'}${s.times ? ' · ' + s.times : ''}</div>
+                  <div class="item-name">${s.name}</div>
+                  <div class="item-sub">📍 ${s.venue || s.area}${s.source ? ' · ' + s.source : ''}</div>
+                  <div class="item-links">
+                    ${s.url ? `<a class="item-link" href="${s.url}" target="_blank">More Info ↗</a>` : ''}
+                  </div>
+                </div>
+                ${moveSelect(s)}${removeBtn(s)}
+              </div>`;
+          }
+          // Experience stop
+          return `
+            <div class="itinerary-item">
+              <div class="num">${i + 1}</div>
+              <div class="item-body">
+                <div class="item-name">${s.icon||''} ${s.name}</div>
+                <div class="item-sub">📍 ${s.area} · ${s.type} · 🕐 ${s.hours||''}</div>
+                <div class="item-links">
+                  <a class="item-link" href="${s.url}" target="_blank">Book / Info ↗</a>
+                  <a class="item-link" href="${s.directions}" target="_blank">Directions ↗</a>
+                </div>
               </div>
-            </div>
-            ${tripDays > 1 ? `<select onchange="assignToDay(${s.id}, this.value)" title="Move to another day" style="font-size:10px;border:1px solid #d4c9b0;border-radius:3px;padding:2px 4px;margin-right:4px;background:#fbf7ee">
-              ${dayOptions.replace(`value="${d}"`, `value="${d}" selected`)}
-            </select>` : ''}
-            <button class="item-remove" onclick="removeFromList(${s.id})">×</button>
-          </div>`).join('')
+              ${moveSelect(s)}${removeBtn(s)}
+            </div>`;
+        }).join('')
       : `<div style="font-size:11px;color:#aaa;font-style:italic;padding:8px 0;text-align:center">No stops planned for this day yet.</div>`;
 
     return `
@@ -2818,8 +2904,14 @@ function renderModal() {
 let leafletMap = null;
 
 function openMap() {
-  const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
-  if (items.length === 0) return;
+  // Map only shows items with lat/lng — events typically don't have coordinates
+  const items = [...myList]
+    .map(_lookupItem)
+    .filter(it => it && typeof it.lat === 'number' && typeof it.lng === 'number');
+  if (items.length === 0) {
+    alert('No mappable stops in your itinerary yet — add some experiences with locations.');
+    return;
+  }
 
   document.getElementById('mapSubtitle').textContent =
     `${items.length} location${items.length !== 1 ? 's' : ''} · click any marker for details`;
@@ -2934,25 +3026,37 @@ function exitManage() {
 }
 
 function printItinerary() {
-  const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
-  // Group by day, splitting lodging from stops
+  // Use unified lookup so events come along too
+  const items = [...myList].map(_lookupItem).filter(Boolean);
   const byDay = {};
   for (let d = 1; d <= tripDays; d++) byDay[d] = { lodging: [], stops: [] };
   for (const it of items) {
-    const d = dayMap[it.id] || 1;
+    const d = dayMap[it._id] || 1;
     if (!byDay[d]) byDay[d] = { lodging: [], stops: [] };
-    (it.type === 'Lodging' ? byDay[d].lodging : byDay[d].stops).push(it);
+    const isLodging = it._kind === 'exp' && it.type === 'Lodging';
+    (isLodging ? byDay[d].lodging : byDay[d].stops).push(it);
   }
   const totalNights = Math.max(0, tripDays - 1);
-  const renderItem = (e, prefix) => `
-    <div class="item">
-      <h3>${prefix} ${e.icon || ''} ${e.name}</h3>
-      <p>${e.sub || ''}</p>
-      <p>📍 ${e.area} · ${e.type}</p>
-      ${e.hours ? `<p>🕐 ${e.hours}</p>` : ''}
-      ${e.url ? `<p><a href="${e.url}">${e.url}</a></p>` : ''}
-      ${e.directions ? `<p><a href="${e.directions}">Get Directions →</a></p>` : ''}
-    </div>`;
+  const renderItem = (e, prefix) => {
+    if (e._kind === 'event') {
+      return `
+        <div class="item event">
+          <h3>${prefix} 📅 ${e.name}</h3>
+          <p><strong>${e.dates || 'Upcoming'}</strong>${e.times ? ' · ' + e.times : ''}</p>
+          <p>📍 ${e.venue || e.area}${e.source ? ' · ' + e.source : ''}</p>
+          ${e.url ? `<p><a href="${e.url}">More Info: ${e.url}</a></p>` : ''}
+        </div>`;
+    }
+    return `
+      <div class="item">
+        <h3>${prefix} ${e.icon || ''} ${e.name}</h3>
+        <p>${e.sub || ''}</p>
+        <p>📍 ${e.area} · ${e.type}</p>
+        ${e.hours ? `<p>🕐 ${e.hours}</p>` : ''}
+        ${e.url ? `<p><a href="${e.url}">${e.url}</a></p>` : ''}
+        ${e.directions ? `<p><a href="${e.directions}">Get Directions →</a></p>` : ''}
+      </div>`;
+  };
   const dayHtml = (d) => {
     const day = byDay[d] || { lodging: [], stops: [] };
     if (!day.lodging.length && !day.stops.length) return '';
@@ -2977,6 +3081,7 @@ function printItinerary() {
       .day { margin-bottom: 28px; }
       .lodging-row, .stops-row { font-size: 11px; letter-spacing: 0.1em; color: #6B4A2A; text-transform: uppercase; margin: 12px 0 4px; }
       .item { margin: 8px 0; padding: 14px 16px; border: 1px solid #e0d8c8; border-radius: 8px; }
+      .item.event { border-left: 3px solid #C9A84C; background: #FBF7EE; }
       .item h3 { font-size: 16px; margin: 0 0 4px; }
       .item p { font-size: 12.5px; color: #4A5568; margin: 3px 0; }
       .item a { color: #8B6914; font-size: 11.5px; }
