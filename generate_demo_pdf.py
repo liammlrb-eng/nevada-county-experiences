@@ -1204,5 +1204,16 @@ crontab -e
     return out
 
 
+def _mirror_to_pitch_resources(path):
+    """Keep pitch_resources/ snapshot in sync."""
+    import shutil
+    mirror_dir = Path(__file__).resolve().parent / 'pitch_resources'
+    if mirror_dir.is_dir() and Path(path).is_file():
+        mirror = mirror_dir / Path(path).name
+        shutil.copy2(path, mirror)
+        print(f'Mirrored: {mirror}')
+
+
 if __name__ == '__main__':
-    build()
+    out = build()
+    _mirror_to_pitch_resources(out)

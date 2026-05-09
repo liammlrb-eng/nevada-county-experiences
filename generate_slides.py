@@ -774,8 +774,17 @@ add_text(s,
     size=11, color=SLATE, font='Consolas')
 
 # ─── Save ───────────────────────────────────────────────────────────────
-out = Path(__file__).resolve().parent / 'demo_pitch.pptx'
+import shutil
+project_root = Path(__file__).resolve().parent
+out = project_root / 'demo_pitch.pptx'
 prs.save(str(out))
 print(f'Wrote: {out}')
 print(f'Slides: {TOTAL}')
 print(f'Size: {out.stat().st_size:,} bytes ({out.stat().st_size/1024:.1f} KB)')
+
+# Mirror to pitch_resources/ so the chat-upload bundle stays in sync
+mirror_dir = project_root / 'pitch_resources'
+if mirror_dir.is_dir():
+    mirror = mirror_dir / 'demo_pitch.pptx'
+    shutil.copy2(out, mirror)
+    print(f'Mirrored: {mirror}')
