@@ -2170,7 +2170,7 @@ function renderExperiences() {
     const added = myList.has(e.id);
     return `
     <div class="exp-card ${added ? 'added' : ''}" id="exp-card-${e.id}">
-      ${manageMode && added ? `<button class="item-remove" style="position:absolute;top:10px;right:10px;z-index:10" onclick="removeFromList(${e.id})">×</button>` : ''}
+      ${added ? `<button class="item-remove" title="Remove from my itinerary" style="position:absolute;top:10px;right:10px;z-index:10" onclick="removeFromList(${e.id})">×</button>` : ''}
       <div class="exp-photo">
         <img src="${e.photo}" alt="${e.name}" loading="lazy" onerror="this.style.display='none'">
         <div class="exp-photo-overlay"></div>
@@ -2216,6 +2216,7 @@ function renderExperiences() {
     return `
     <div class="exp-card ${evtAdded ? 'added' : ''}" style="border-color:#c8a84b;position:relative">
       <div style="position:absolute;top:10px;left:10px;z-index:10;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.1em;padding:3px 8px;border-radius:10px;text-transform:uppercase">📅 Event</div>
+      ${evtAdded ? `<button class="item-remove" title="Remove from my itinerary" style="position:absolute;top:10px;right:10px;z-index:10" onclick="removeFromList('evt_${e.scraperId}')">×</button>` : ''}
       ${e.image ? `<div class="exp-photo"><img src="${e.image}" alt="${e.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'"><div class="exp-photo-overlay"></div></div>` : ''}
       <div class="exp-body">
         <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:3px">${e.dates || 'Upcoming'}${e.times ? '  ·  🕐 ' + e.times : ''}</div>
@@ -2570,7 +2571,8 @@ async function renderEvents() {
   document.getElementById('eventsGrid').innerHTML = evts.map(e => {
     const evtAdded = e.scraperId && myList.has('evt_' + e.scraperId);
     return `
-    <div class="event-card ${evtAdded ? 'added' : ''}">
+    <div class="event-card ${evtAdded ? 'added' : ''}" style="position:relative">
+      ${evtAdded ? `<button class="item-remove" title="Remove from my itinerary" style="position:absolute;top:8px;right:8px;z-index:10" onclick="removeFromList('evt_${e.scraperId}');renderEvents();">×</button>` : ''}
       ${e.image ? `<img class="event-card-img" src="${e.image}" alt="${e.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
       <div class="event-card-body">
         <div class="event-date">${e.dates}</div>
@@ -2889,7 +2891,6 @@ function renderModal() {
       <button class="btn-primary" onclick="shareItinerary()">📤 Share / Save</button>
       <button class="btn-primary" onclick="printItinerary()" style="background:transparent;color:var(--brown);border-color:#d4c9b0">🖨 Print</button>
       <button class="btn-secondary" onclick="clearAll()">Clear All</button>
-      <button class="btn-secondary" onclick="closeModal();enterManage()">✏️ Manage</button>
     </div>
     <div style="font-size:10.5px;color:#888;text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid #f0e8d8">
       ${_hasSaveConsent()
