@@ -4,6 +4,14 @@
 slate (#4A5568), fog (#F5EFE2). All "↳ scenario" lines render as italic
 sub-lines beneath the bullet they explain.
 
+## Narrative arc — 5 acts
+
+1. **Why we're here** — Title + Strategic insight (lodging revenue framing leads everything)
+2. **What I built to test the idea** — Numbers, Discovery, Itinerary, Live demo
+3. **Why this approach works** — Personas, UX decisions, Privacy
+4. **How it runs** — Admin, AI, Cost (second big moment: $6/mo vs $5K–$30K)
+5. **What's next** — Where the group can take this · Migration (appendix-feel) · Close
+
 ---
 
 ## Slide 1 — Title
@@ -15,37 +23,43 @@ Visitor planning platform — county pitch deck.
 
 ---
 
-## Slide 2 — What this is
+## Slide 2 — The strategic insight  *(formerly slide 13 — now leads)*
+*What sets this apart from a generic tourism site.*
+
+> Most tourism sites optimize for visits to the site. The right metric is
+> lodging bookings driven by the site. Those are different optimization targets.
+
+- Day-by-day itinerary view structurally surfaces the "where do I sleep?" question
+  ↳ *Visitor sees Day 2 has no hotel and books one before leaving the page.*
+- "Find Lodging" CTA at the top of every itinerary — booking always one click away
+  ↳ *No hunting for a button — booking decision is visible on every itinerary view.*
+- Empty lodging slots create a visual gap that drives the booking decision
+  ↳ *That blank Day 2 stay tile is psychologically jarring; the visitor fills it.*
+- New items default to the latest day — no day-1 pile-up; trip naturally fills out
+  ↳ *Adding stops naturally extends the trip rather than cramming Day 1.*
+- Print view goes long-form per day — visitors who print, follow it
+  ↳ *Couple prints the itinerary; the same Day 1 / Day 2 structure follows on paper.*
+- Smart suggestions are tag + geography aware — clusters keep visitors close to lodging
+  ↳ *After Holbrooke Hotel goes in, suggestions cluster around Mill Street.*
+
+> *"Convince a visitor to add one more night and you double or triple local revenue."*
+
+---
+
+## Slide 3 — What this is  *(formerly slide 2)*
 *A tourism platform for Western Nevada County — Gold Country foothills.*
 
 Body intro: Centered on Nevada City and Grass Valley, with full coverage of
 Penn Valley, North San Juan, Rough & Ready, Washington, Chicago Park,
 Smartsville, and adjacent Colfax. Combines curated places with live-scraped
-events, so visitors discover what to do AND when it's actually happening.
+events.
 
 | Stat card | Stat card | Stat card | Stat card |
 |---|---|---|---|
 | **161** Curated experiences across 11 communities | **460+** Live events from 6 sources | **9** Themed vibes for discovery | **$5–$20** Typical monthly cost |
 
-Geographic scope footer: Western Nevada County + adjacent Colfax. Truckee
-and Sierra-side are out of scope.
-
----
-
-## Slide 3 — Who this serves
-*Nine visitor personas — each searches differently and converts on different content.*
-
-1. **Romantic Weekender** — Couples 35-65, Bay Area / Sac, B&Bs + dining + wineries
-2. **Festival Pilgrim** — Anchored to a specific event (Cornish Christmas, Wild & Scenic, Bluegrass)
-3. **Trail & Lake Seeker** — Hiking / biking / swimming / paddling — needs distance & difficulty
-4. **Multi-Gen Family** — Parents with kids 5–15 — "will my 8-year-old be bored?"
-5. **Arts & Heritage Traveler** — Substance over photos; reads notes; values authenticity
-6. **Wine Country Foodie** — Napa-alternative — provenance, chef bios, tasting flights
-7. **Wellness Refugee** — Float, massage, yoga, gardens — filtering for what's NOT there
-8. **Local "What's Up"** — Residents — pure events feed, "what's on this weekend"
-9. **Maker Traveler** 🎯 — Travels for the workshop — Curious Forge anchors a destination identity
-
-**Recommended marketing focus (over-serve four):** Maker Traveler · Festival Pilgrim · Romantic Weekender · Foodie
+**Geographic scope:** Western Nevada County + adjacent Colfax. Truckee and
+Sierra-side are out of scope.
 
 ---
 
@@ -85,17 +99,52 @@ and Sierra-side are out of scope.
   ↳ *Visitor texts the URL to spouse: "this is what I'm thinking."*
 
 Right-hand visual mock: 2-day itinerary with "DAY 1 of 2 · Sat, Jun 14",
-Tonight's Stay = Holbrooke Hotel (Grass Valley), and Day 2 with empty
-lodging slot showing "[Find Lodging]" affordance.
+Tonight's Stay = Holbrooke Hotel, and Day 2 with empty lodging slot.
 
 ---
 
-## Slide 6 — Why it's easy to use
+## Slide 6 — Let me show you  *(retitled from "The 8-minute demo flow")*
+*A live demo: visitor planning a romantic November weekend in Western Nevada County.*
+
+This slide cues the live demo — the emotional peak of the presentation.
+
+| Act | Time | What happens |
+|---|---|---|
+| Act 1 | 2 min | Set the scene — couple from Sacramento, click "This Weekend" + Festivals vibe |
+| Act 2 | 90 sec | Layer in Relaxed vibe + Lodging category + B&B sub-pill — Victorian B&Bs surface |
+| Act 3 | 2 min | Build the weekend — Cornish Christmas + Holbrooke Hotel + Empire Mine + Lola. Open My Itinerary — Smart Suggestions appear with "0.4 mi away" labels. |
+| Act 4 | 90 sec | Behind the scenes — admin Events Queue, Approve All, AI Categorize, Scraper Sources |
+| Act 5 | 60 sec | Close the value props — time saved, local visibility, privacy, no vendor lock-in |
+
+---
+
+## Slide 7 — Who this serves  *(formerly slide 3)*
+*Nine visitor personas — each searches differently and converts on different content.*
+
+After the demo, personas land as "these are real people I just saw using the tool."
+
+1. **Romantic Weekender** — Couples 35-65, Bay Area / Sac, B&Bs + dining + wineries
+2. **Festival Pilgrim** — Anchored to a specific event (Cornish Christmas, Wild & Scenic, Bluegrass)
+3. **Trail & Lake Seeker** — Hiking / biking / swimming / paddling — needs distance & difficulty
+4. **Multi-Gen Family** — Parents with kids 5–15 — "will my 8-year-old be bored?"
+5. **Arts & Heritage Traveler** — Substance over photos; reads notes; values authenticity
+6. **Wine Country Foodie** — Napa-alternative — provenance, chef bios, tasting flights
+7. **Wellness Refugee** — Float, massage, yoga, gardens — filtering for what's NOT there
+8. **Local "What's Up"** — Residents — pure events feed, "what's on this weekend"
+9. **Maker Traveler** 🎯 — Travels for the workshop — Curious Forge anchors a destination identity
+
+**Recommended marketing focus (over-serve four):** Maker Traveler · Festival Pilgrim · Romantic Weekender · Foodie
+
+> ⚠️ Watch the room when the Maker Traveler / Curious Forge callout lands — if anyone doesn't know the Forge, be ready with a one-sentence explanation.
+
+---
+
+## Slide 8 — Why it's easy to use  *(formerly slide 6)*
 *Friction points where most tourism sites lose visitors — and what we did instead.*
 
 | Decision | Why it matters |
 |---|---|
-| **Day-by-day with lodging anchor** | A flat list of stops hides the night question; structured days surface it<br>↳ *Visitor sees Day 2 has no stay tile, books before leaving the page.* |
+| **Day-by-day with lodging anchor** | A flat list hides the night question; structured days surface it<br>↳ *Visitor sees Day 2 has no stay tile, books before leaving the page.* |
 | **"Find Lodging" CTA + auto-clear vibes** | One-click jump to lodging that doesn't fight against active vibes<br>↳ *Foodie-vibe visitor taps Find Lodging; vibes clear so all stays show.* |
 | **Add Day returns to browse** | No leaving visitor staring at empty days; flow continues naturally<br>↳ *Day 2 isn't an empty container — visitor lands somewhere productive.* |
 | **Events → itinerary first** | No hijack to KVMR — visitor compares before clicking through<br>↳ *Three concerts compared side-by-side before committing to one.* |
@@ -106,68 +155,50 @@ lodging slot showing "[Find Lodging]" affordance.
 
 ---
 
-## Slide 7 — Privacy posture
+## Slide 9 — Privacy posture
 *No tracking. No cookies. Visitors stay anonymous; the chamber gets credit for it.*
 
 - No analytics, no cookies, no third-party trackers by default
   ↳ *Site loads instantly — no cookie modal between visitor and content.*
 - Itinerary save is opt-in only — explicit consent banner on first add
-  ↳ *Banner appears only after first card added; visitor knows what they're consenting to.*
 - "Forget on this device" link revokes consent and wipes saved data anytime
-  ↳ *Trip ends — visitor wipes the itinerary in two taps, takes nothing back home.*
 - Share-link URL works without any consent — purely a URL fragment
-  ↳ *Two friends compare itineraries via shared URLs, neither registered for anything.*
 - No account / sign-up / email required to plan a full trip
-  ↳ *30 seconds from landing → planning, no email-collection wall.*
 - Chamber sees zero personal information about visitors
-  ↳ *Aggregate scraper queue tells the chamber what's hot; visitor identity stays local.*
 - No GDPR / CCPA banners required (because nothing is collected)
-  ↳ *EU visitor on holiday gets the site without a banner ambush.*
 - No privacy review, no consent-platform fees, no compliance overhead
-  ↳ *Annual compliance budget for the platform: $0 — nothing to review.*
 
 > *"Visitors stay anonymous; the chamber gets credit for respecting them."*
 
+> ⚠️ **Pushback prep:** If the TOT official asks "how do we measure whether this is working?", offer Plausible Analytics as a middle ground (privacy-respecting, no cookies, GDPR-compliant, open source).
+
 ---
 
-## Slide 8 — Behind the scenes
+## Slide 10 — Behind the scenes  *(formerly slide 8)*
 *Chamber-staff operations: live data with minimal effort.*
 
 - 🔄 One-click scraper updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union
   ↳ *Chamber staffer clicks "Run Scrapers" Monday morning; ~50 new events appear.*
 - ✅ Approve / dismiss events in a queue; bulk-approve is one click
-  ↳ *Bulk-approve all KVMR events; dismiss the suspect ones individually.*
 - 🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)
-  ↳ *One click after a scrape; 460 events get area + venue + tags fixed for ~20¢.*
 - ✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it
-  ↳ *New cidery opens — staff types one row, hits save, it's live on the public site.*
 - 🏷 Tag taxonomy editor — add/rename/delete tags without code
-  ↳ *"Music" splits into "Live Music" and "Open Mic" without a developer.*
 - 🔗 Source URL management — add a new scraper feed by pasting a URL
-  ↳ *New venue website? Paste the URL, pick a parser pattern, done.*
 - 📅 Auto-prune past events; auto-dismiss internal admin meetings
-  ↳ *Saturday's farmers market vanishes from the queue Sunday morning.*
 - 🌐 Public RSS feed at /feed.rss — partners republish without integration work
-  ↳ *Local newspaper's "this weekend" widget pulls straight from /feed.rss.*
 
 ---
 
-## Slide 9 — AI-powered tag refinement
+## Slide 11 — AI-powered tag refinement
 *Claude Haiku adds intelligence where keyword rules stop short — at trivial cost.*
 
 **What it fixes**
 - 444 of 460 KVMR events tagged "Nevada County" → infers actual community
-  ↳ *"KVMR Storytelling Night" gets "Nevada City" instead of vague "Nevada County".*
 - Empty location field on most KVMR events → extracts venue name
-  ↳ *"Center for the Arts" surfaces as the venue from a description-only event.*
 - "Center for the Arts" → Grass Valley; "Miners Foundry" → Nevada City
-  ↳ *Visitor filtering by Grass Valley gets concerts without manual tagging.*
 - Cluttered descriptions → clean one-line summaries
-  ↳ *Long press-release blob shrinks to a clean teaser the visitor will actually read.*
 - Truckee / Sierra-side events flagged "low quality" → auto-hidden
-  ↳ *Tahoe events tagged "low quality" auto-hide on the public site, no manual cleanup.*
 - Future scrapes auto-categorize new events with the same logic
-  ↳ *Tuesday's new event gets correct area + venue + tags without human touch.*
 
 **Cost**
 | Run pattern | Monthly |
@@ -181,8 +212,10 @@ lodging slot showing "[Find Lodging]" affordance.
 
 ---
 
-## Slide 10 — What it costs
+## Slide 12 — What it costs  *(formerly slide 10)*
 *Three operating scenarios for the first year of operation.*
+
+This is the second big moment of the deck — let the $6/mo vs $5K–$30K comparison land.
 
 | Scenario | Monthly | Description |
 |---|---|---|
@@ -191,92 +224,52 @@ lodging slot showing "[Find Lodging]" affordance.
 | **Premium** | $300–$500 | Managed + daily AI |
 | **Commercial alt** | $5K–$30K | CrowdRiff / Simpleview |
 
-**What's NOT a cost:**
-- Per-listing fees — every chamber member free
-- Per-event fees — scrapers cost zero
-- Per-visitor fees — traffic 10× has no impact
-- Vendor termination fees — owned outright
-- Privacy compliance overhead — nothing collected to comply about
-- License fees — fully open-source stack
+**What's NOT a cost:** per-listing fees · per-event fees · per-visitor fees · vendor termination fees · privacy compliance · license fees.
 
 ---
 
-## Slide 11 — Migration to a county server
+## Slide 13 — Where the group can take this  *(retitled from "What the chamber needs to do next")*
+*Findings from the build — collaborative work that would unlock the next version.*
+
+### DATA PARTNERSHIPS
+- Ask NCAC for read access to their Trumba master — its 540-event, 16-month window is the most comprehensive feed in the county
+- Reach out to GoNevadaCounty (gonevadacounty.com) for a public events feed
+- Coordinate with The Union for a public events feed
+- Confirm whether the County itself runs a Trumba master calendar
+
+### MEMBER OUTREACH
+- Encourage venues to publish events on a platform with a public feed (Trumba, Tribe Events, Eventbrite)
+- Push schema.org/Event JSON-LD adoption
+- Solicit "missing venue" submissions
+- Identify the 5–10 venues responsible for the bulk of visitor traffic
+
+### OPERATIONS
+- Designate a queue curator (5 minutes, 1–2× per week)
+- Run AI Categorize after each scrape
+- Validate "no event" alerts (NCAC was a false negative for months)
+- Quarterly review of disabled scrapers
+
+> Concrete win from this work: NCAC's calendar went from "0 events" to 540 events — by hitting Trumba's JSON feed directly.
+
+---
+
+## Slide 14 — Migration to a county server  *(formerly slide 11 — consider as appendix)*
 *One focused half-day for someone comfortable with Linux; two days for a learner.*
+
+> 💡 Per chat-Claude feedback: "9-phase migration plan for a prototype conversation feels premature." Consider skipping this slide unless IT is in the room and asking, or pulling it up only when someone asks "how would we actually host this?"
 
 | Phase | What happens |
 |---|---|
 | 0 | Decisions: hosting, domain, OS, server account ownership |
-| 1 | Pre-flight: domain registered, DNS access, SSH keys, Anthropic API key |
+| 1 | Pre-flight: domain, DNS, SSH keys, Anthropic API key |
 | 2 | Provision: $6/mo Ubuntu droplet, lockdown SSH, install Python + nginx + chromium |
-| 3 | Deploy: git clone, Python venv, install deps, drop API keys in scraper/config.py |
-| 4 | systemd service for auto-restart on crash, auto-start on reboot |
-| 5 | nginx reverse proxy + Let's Encrypt HTTPS (auto-renew via certbot) |
-| 6 | Cron job: nightly scrape at 3 AM + AI categorize at 3:30 AM |
-| 7 | Backups: provider snapshots ($1/mo) + daily JSON tar to off-site |
-| 8 | Test checklist: site loads, vibes work, events populate, AI button works, scraper runs |
-| 9 | Hand-off to chamber: admin URL, billing alerts, cheat sheet, emergency contact |
-
----
-
-## Slide 12 — What the chamber needs to do next
-*Findings from building the scraper layer — items that need a person, not more code.*
-
-### DATA PARTNERSHIPS
-- Ask NCAC for read access to their Trumba master — its 540-event, 16-month window is the most comprehensive feed in the county
-- Reach out to GoNevadaCounty (gonevadacounty.com) for a public events feed — Cloudflare blocks scrapers
-- Coordinate with The Union for a public events feed — articles are paywalled and the RSS often returns nothing
-- Confirm whether the County itself runs a Trumba master calendar — federate from it instead of NCAC alone
-
-### MEMBER OUTREACH
-- Encourage venues to publish events on a platform with a public feed — Trumba, Tribe Events (WordPress), Eventbrite — not just static HTML pages
-- Push schema.org/Event JSON-LD adoption — one snippet on each event page makes scraping reliable without custom code
-- Solicit "missing venue" submissions — a simple web form for member venues to flag events that didn't get auto-discovered
-- Identify the 5–10 venues responsible for the bulk of visitor traffic and prioritize their data reliability
-
-### OPERATIONS
-- Designate a queue curator — someone clears the pending-events queue 1–2x per week (~5 minutes per session)
-- Run AI Categorize after each scrape — fixes venue, area, tags on long-tail events ($0.50/mo)
-- Validate "no event" alerts — when a scraper returns 0 events, the source has either gone down or restructured (NCAC was a false negative for months before we caught it)
-- Quarterly review of disabled scrapers — vendors change platforms (e.g. NCAC moved to Trumba) and previously-blocked sources become reachable
-
-> Concrete win from this work: NCAC's calendar went from "0 events" (blocked by an iframe) to 540 events — by hitting Trumba's JSON feed directly.
-
----
-
-## Slide 13 — The strategic insight
-*What sets this apart from a generic tourism site.*
-
-> Most tourism sites optimize for visits to the site. The right metric is
-> lodging bookings driven by the site. Those are different optimization targets.
-
-- Day-by-day itinerary view structurally surfaces the "where do I sleep?" question
-  ↳ *Visitor sees Day 2 has no hotel and books one before leaving the page.*
-- "Find Lodging" CTA at the top of every itinerary — booking always one click away
-  ↳ *No hunting for a button — booking decision is visible on every itinerary view.*
-- Empty lodging slots create a visual gap that drives the booking decision
-  ↳ *That blank Day 2 stay tile is psychologically jarring; the visitor fills it.*
-- New items default to the latest day — no day-1 pile-up; trip naturally fills out
-  ↳ *Adding stops naturally extends the trip rather than cramming Day 1.*
-- Print view goes long-form per day — visitors who print, follow it
-  ↳ *Couple prints the itinerary; the same Day 1 / Day 2 structure follows on paper.*
-- Smart suggestions are tag + geography aware — clusters keep visitors close to lodging
-  ↳ *After Holbrooke Hotel goes in, suggestions cluster around Mill Street.*
-
-> *"Convince a visitor to add one more night and you double or triple local revenue."*
-
----
-
-## Slide 14 — The 8-minute demo flow
-*A visitor planning a romantic November weekend in Western Nevada County.*
-
-| Act | Time | What happens |
-|---|---|---|
-| Act 1 | 2 min | Set the scene — couple from Sacramento, click "This Weekend" + Festivals vibe |
-| Act 2 | 90 sec | Layer in Relaxed vibe + Lodging category + B&B sub-pill — Victorian B&Bs surface |
-| Act 3 | 2 min | Build the weekend — Cornish Christmas + Holbrooke Hotel + Empire Mine + Lola Restaurant. Open My Itinerary — Smart Suggestions appear with "0.4 mi away" labels. Map view + Print + Share link. |
-| Act 4 | 90 sec | Behind the scenes — admin Events Queue, Approve All, AI Categorize button, Scraper Sources tab |
-| Act 5 | 60 sec | Close the value props — time saved, local visibility, privacy, no vendor lock-in, AI integration, low maintenance |
+| 3 | Deploy: git clone, Python venv, install deps, drop API keys |
+| 4 | systemd service for auto-restart |
+| 5 | nginx reverse proxy + Let's Encrypt HTTPS |
+| 6 | Cron job: nightly scrape + AI categorize |
+| 7 | Backups: provider snapshots + daily JSON tar to off-site |
+| 8 | Test checklist |
+| 9 | Hand-off to chamber: admin URL, billing alerts, cheat sheet |
 
 ---
 
