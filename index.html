@@ -2992,7 +2992,30 @@ function renderModal() {
   const totalNights = Math.max(0, tripDays - 1);
   subtitle.textContent = `${items.length} stop${items.length !== 1 ? 's' : ''} · ${tripDays} day${tripDays !== 1 ? 's' : ''}${totalNights > 0 ? ` / ${totalNights} night${totalNights !== 1 ? 's' : ''}` : ''}`;
 
+  // Lodging banner — count nights with vs. without a lodging picked
+  const lodgingCount = items.filter(it => it._kind === 'exp' && it.type === 'Lodging').length;
+  const nightsNeedingStay = Math.max(0, tripDays - 1) - lodgingCount; // tripDays-1 nights between days
+  const lodgingBanner = (() => {
+    // Always show banner — it's an invitation, not a nag
+    const cta = nightsNeedingStay > 0
+      ? `Need a place to stay tonight?`
+      : (lodgingCount > 0 ? `Want to add another stay?` : `Browse places to stay nearby`);
+    const sub = nightsNeedingStay > 0
+      ? `${nightsNeedingStay} night${nightsNeedingStay !== 1 ? 's' : ''} still need lodging — hotels, B&Bs, glamping, campgrounds & RV.`
+      : `Hotels, B&Bs, glamping, campgrounds & RV parks throughout Western Nevada County.`;
+    return `
+      <div style="background:linear-gradient(135deg, #C9A84C 0%, #E8C96A 100%);padding:14px 16px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(201,168,76,0.25)">
+        <div style="font-size:28px;line-height:1">🏨</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;color:#fff;font-size:14px;letter-spacing:0.02em">${cta}</div>
+          <div style="font-size:11px;color:#fff;opacity:0.9;margin-top:2px">${sub}</div>
+        </div>
+        <button onclick="findLodging()" style="background:#fff;color:var(--brown);border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:inherit;font-weight:700;font-size:11px;letter-spacing:0.06em;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.1)">Find Lodging →</button>
+      </div>`;
+  })();
+
   body.innerHTML = `
+    ${lodgingBanner}
     <div id="modalList">
       ${Array.from({length: tripDays}, (_, i) => i + 1).map(dayHtml).join('')}
     </div>
@@ -3122,6 +3145,30 @@ function clearAll() {
     renderModal();
     renderExperiences();
   }
+}
+
+// Shortcut from My Itinerary → browse Lodging category in the grid
+function findLodging() {
+  closeModal();
+  // Make sure we're on the Experiences tab (not Itineraries / Events)
+  const expTab = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
+  if (expTab && !expTab.classList.contains('active')) {
+    switchTab('experiences', expTab);
+  }
+  // Set the Category filter to Lodging
+  const sel = document.getElementById('filterType');
+  if (sel) {
+    sel.value = 'Lodging';
+    activeSubPill = null;
+    if (typeof renderSubPills === 'function') renderSubPills();
+    renderExperiences();
+    renderActiveFilters();
+  }
+  // Smooth-scroll to the experiences grid so the visitor lands right at the results
+  setTimeout(() => {
+    const grid = document.getElementById('expGrid');
+    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
 }
 
 function enterManage() {
