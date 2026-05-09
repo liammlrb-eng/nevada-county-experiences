@@ -1775,6 +1775,12 @@ const MYLIST_KEY    = 'ncexp:mylist';
 const CONSENT_KEY   = 'ncexp:save_consent';  // 'yes' | absent
 let   _sessionDeclinedSave = false;          // session-only "no" — re-ask next visit
 
+// Day-by-day itinerary structure:
+//   dayMap[expId] = day number (1, 2, 3...). Default 1 if missing.
+//   tripDays = total day count (auto-grows when items get assigned higher days).
+let dayMap   = {};
+let tripDays = 1;
+
 function _hasSaveConsent() {
   try { return localStorage.getItem(CONSENT_KEY) === 'yes'; }
   catch(e) { return false; }
@@ -1782,40 +1788,66 @@ function _hasSaveConsent() {
 
 function _saveMyList() {
   const arr = [...myList];
-  // Always update URL hash — it's just a URL fragment, no consent needed
-  const newHash = arr.length ? '#list=' + arr.join(',') : '';
+  // URL hash format: #list=2:1,8:1,33:2  (id:day pairs)
+  // Backward compat: old format #list=2,8,33 still loads (defaults all to Day 1).
+  const newHash = arr.length
+    ? '#list=' + arr.map(id => `${id}:${dayMap[id] || 1}`).join(',')
+    : '';
   if (newHash !== window.location.hash) {
     history.replaceState(null, '', window.location.pathname + window.location.search + newHash);
   }
   // Persist to localStorage ONLY if visitor opted in
   if (_hasSaveConsent()) {
-    try { localStorage.setItem(MYLIST_KEY, JSON.stringify(arr)); } catch(e) {}
+    try {
+      localStorage.setItem(MYLIST_KEY, JSON.stringify({
+        list: arr, days: dayMap, tripDays: tripDays,
+      }));
+    } catch(e) {}
   } else if (arr.length > 0 && !_sessionDeclinedSave) {
-    // First time they add anything — ask if they want it saved
     _showSaveConsentBanner();
   }
 }
 
 function _loadMyList() {
-  // 1. URL hash always loads (sharing is consent-free — it's just a URL)
+  // 1. URL hash — supports both old (#list=2,8) and new (#list=2:1,8:2) formats
   const hash = window.location.hash;
-  const m = hash.match(/[#&]list=([\d,]+)/);
+  const m = hash.match(/[#&]list=([\d,:]+)/);
   if (m) {
-    m[1].split(',').forEach(id => {
-      const n = parseInt(id, 10);
-      if (!isNaN(n)) myList.add(n);
+    m[1].split(',').forEach(item => {
+      const parts = item.split(':');
+      const id  = parseInt(parts[0], 10);
+      const day = parts[1] ? parseInt(parts[1], 10) : 1;
+      if (!isNaN(id) && id > 0) {
+        myList.add(id);
+        dayMap[id] = (!isNaN(day) && day > 0) ? day : 1;
+      }
     });
+    tripDays = Math.max(1, ...Object.values(dayMap).map(Number).filter(Boolean));
   }
-  // 2. localStorage only loads if visitor previously consented
+  // 2. localStorage — supports both old (array of ids) and new ({list,days,tripDays}) formats
   if (_hasSaveConsent()) {
     try {
       const raw = localStorage.getItem(MYLIST_KEY);
       if (raw) {
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) arr.forEach(id => myList.add(id));
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          // Legacy: just an array of IDs → all on Day 1
+          parsed.forEach(id => {
+            myList.add(id);
+            if (!dayMap[id]) dayMap[id] = 1;
+          });
+        } else if (parsed && typeof parsed === 'object') {
+          (parsed.list || []).forEach(id => myList.add(id));
+          for (const [id, d] of Object.entries(parsed.days || {})) {
+            if (!dayMap[id]) dayMap[id] = parseInt(d, 10) || 1;
+          }
+          if (parsed.tripDays) tripDays = Math.max(tripDays, parseInt(parsed.tripDays, 10) || 1);
+        }
       }
     } catch(e) { /* ignore */ }
   }
+  // Recompute tripDays from final state
+  tripDays = Math.max(tripDays, 1, ...Object.values(dayMap).map(Number).filter(n => !isNaN(n)));
 }
 
 // ── Consent banner ─────────────────────────────────────────────────────
@@ -2263,8 +2295,14 @@ function clearAllFilters() {
 }
 
 function toggleList(id) {
-  if (myList.has(id)) myList.delete(id);
-  else myList.add(id);
+  if (myList.has(id)) {
+    myList.delete(id);
+    delete dayMap[id];
+  } else {
+    myList.add(id);
+    // New items default to the last day of the current trip
+    if (!dayMap[id]) dayMap[id] = tripDays;
+  }
   updateFab();
   _saveMyList();
   renderExperiences();
@@ -2272,9 +2310,38 @@ function toggleList(id) {
 
 function removeFromList(id) {
   myList.delete(id);
+  delete dayMap[id];
   updateFab();
   _saveMyList();
   renderExperiences();
+  renderModal();
+}
+
+// ── Day-by-day controls ──────────────────────────────────────────────
+function assignToDay(id, day) {
+  const d = parseInt(day, 10);
+  if (isNaN(d) || d < 1) return;
+  dayMap[id] = d;
+  if (d > tripDays) tripDays = d;
+  _saveMyList();
+  renderModal();
+}
+
+function addDay() {
+  tripDays += 1;
+  _saveMyList();
+  renderModal();
+}
+
+function removeDay() {
+  if (tripDays <= 1) return;
+  // Move any items on the deleted day down to (tripDays-1)
+  const removed = tripDays;
+  for (const id of Object.keys(dayMap)) {
+    if (dayMap[id] >= removed) dayMap[id] = removed - 1;
+  }
+  tripDays = Math.max(1, tripDays - 1);
+  _saveMyList();
   renderModal();
 }
 
@@ -2640,23 +2707,97 @@ function renderModal() {
       </div>`;
   }
 
+  // ── Group items by day ──────────────────────────────────────────────
+  // Auto-grow tripDays if any item has a day > current count
+  for (const it of items) {
+    const d = dayMap[it.id] || 1;
+    if (d > tripDays) tripDays = d;
+  }
+  const byDay = {};
+  for (let d = 1; d <= tripDays; d++) byDay[d] = { lodging: [], stops: [] };
+  for (const it of items) {
+    const d = dayMap[it.id] || 1;
+    (it.type === 'Lodging' ? byDay[d].lodging : byDay[d].stops).push(it);
+  }
+
+  // Day section template
+  const dayHtml = (d) => {
+    const day = byDay[d];
+    const dayOptions = Array.from({length: tripDays}, (_, i) => i + 1)
+      .map(n => `<option value="${n}">Day ${n}</option>`).join('');
+
+    // Lodging slot
+    const lodgingHtml = day.lodging.length
+      ? day.lodging.map(l => `
+          <div class="itinerary-item" style="background:linear-gradient(0deg,rgba(201,168,76,0.06),rgba(201,168,76,0.06)),#fff;border-left:3px solid var(--gold)">
+            <div style="font-size:18px;width:32px;text-align:center;flex-shrink:0">💤</div>
+            <div class="item-body">
+              <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:2px">Tonight's Stay</div>
+              <div class="item-name">${l.icon||''} ${l.name}</div>
+              <div class="item-sub">📍 ${l.area} · 🕐 ${l.hours||'Check-in time varies'}</div>
+              <div class="item-links">
+                <a class="item-link" href="${l.url}" target="_blank">Book / Info ↗</a>
+                <a class="item-link" href="${l.directions}" target="_blank">Directions ↗</a>
+              </div>
+            </div>
+            ${tripDays > 1 ? `<select onchange="assignToDay(${l.id}, this.value)" title="Move to another day" style="font-size:10px;border:1px solid #d4c9b0;border-radius:3px;padding:2px 4px;margin-right:4px;background:#fbf7ee">
+              ${dayOptions.replace(`value="${d}"`, `value="${d}" selected`)}
+            </select>` : ''}
+            <button class="item-remove" onclick="removeFromList(${l.id})">×</button>
+          </div>`).join('')
+      : `<div style="border:1.5px dashed #d4c9b0;border-radius:8px;padding:12px 16px;text-align:center;background:rgba(245,239,226,0.4);margin-bottom:8px">
+          <div style="font-size:11px;color:#888;margin-bottom:6px">💤 No lodging picked for tonight</div>
+          <div style="font-size:10px;color:#aaa">Browse the <strong>Lodging</strong> category and add your stay — it'll land on the day you pick.</div>
+        </div>`;
+
+    // Stop list
+    const stopsHtml = day.stops.length
+      ? day.stops.map((s, i) => `
+          <div class="itinerary-item">
+            <div class="num">${i + 1}</div>
+            <div class="item-body">
+              <div class="item-name">${s.icon||''} ${s.name}</div>
+              <div class="item-sub">📍 ${s.area} · ${s.type} · 🕐 ${s.hours||''}</div>
+              <div class="item-links">
+                <a class="item-link" href="${s.url}" target="_blank">Book / Info ↗</a>
+                <a class="item-link" href="${s.directions}" target="_blank">Directions ↗</a>
+              </div>
+            </div>
+            ${tripDays > 1 ? `<select onchange="assignToDay(${s.id}, this.value)" title="Move to another day" style="font-size:10px;border:1px solid #d4c9b0;border-radius:3px;padding:2px 4px;margin-right:4px;background:#fbf7ee">
+              ${dayOptions.replace(`value="${d}"`, `value="${d}" selected`)}
+            </select>` : ''}
+            <button class="item-remove" onclick="removeFromList(${s.id})">×</button>
+          </div>`).join('')
+      : `<div style="font-size:11px;color:#aaa;font-style:italic;padding:8px 0;text-align:center">No stops planned for this day yet.</div>`;
+
+    return `
+      <div style="margin-bottom:18px;border-radius:8px;background:#fbf7ee;padding:14px;border:1px solid #e8dfc8">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="font-size:14px;font-weight:700;color:var(--brown);letter-spacing:0.06em">DAY ${d}${tripDays > 1 ? ` <span style="color:#999;font-weight:400">of ${tripDays}</span>` : ''}</div>
+          <div style="flex:1;height:1px;background:#e0d8c8"></div>
+          <div style="font-size:10px;color:#888">${day.lodging.length + day.stops.length} item${day.lodging.length + day.stops.length !== 1 ? 's' : ''}</div>
+        </div>
+        ${lodgingHtml}
+        ${stopsHtml}
+      </div>`;
+  };
+
+  // Day controls (Add / Remove a day)
+  const dayControls = `
+    <div style="display:flex;gap:8px;justify-content:center;margin:8px 0 18px;flex-wrap:wrap">
+      <button onclick="addDay()" style="background:var(--gold);color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.05em">+ Add another day</button>
+      ${tripDays > 1 ? `<button onclick="if(confirm('Remove Day ${tripDays}? Items will move to Day ${tripDays - 1}.')) removeDay()" style="background:transparent;color:var(--slate);border:1.5px solid #d4c9b0;padding:5px 13px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px">− Remove Day ${tripDays}</button>` : ''}
+    </div>`;
+
+  // Update subtitle to show day count
+  const totalNights = Math.max(0, tripDays - 1);
+  subtitle.textContent = `${items.length} stop${items.length !== 1 ? 's' : ''} · ${tripDays} day${tripDays !== 1 ? 's' : ''}${totalNights > 0 ? ` / ${totalNights} night${totalNights !== 1 ? 's' : ''}` : ''}`;
+
   body.innerHTML = `
     <div id="modalList">
-      ${items.map((e, i) => `
-        <div class="itinerary-item">
-          <div class="num">${i + 1}</div>
-          <div class="item-body">
-            <div class="item-name">${e.icon} ${e.name}</div>
-            <div class="item-sub">📍 ${e.area} · ${e.type} · 🕐 ${e.hours}</div>
-            <div class="item-links">
-              <a class="item-link" href="${e.url}" target="_blank">Book / Info ↗</a>
-              <a class="item-link" href="${e.directions}" target="_blank">Directions ↗</a>
-            </div>
-          </div>
-          <button class="item-remove" onclick="removeFromList(${e.id})">×</button>
-        </div>
-      `).join('')}
+      ${Array.from({length: tripDays}, (_, i) => i + 1).map(dayHtml).join('')}
     </div>
+    ${dayControls}
     <div class="modal-actions">
       <button class="btn-primary" onclick="openMap()">🗺 View on Map</button>
       <button class="btn-primary" onclick="shareItinerary()">📤 Share / Save</button>
@@ -2770,6 +2911,8 @@ function handleMapOverlayClick(e) {
 function clearAll() {
   if (confirm('Clear your entire itinerary list?')) {
     myList.clear();
+    dayMap = {};
+    tripDays = 1;
     updateFab();
     _saveMyList();
     renderModal();
@@ -2792,28 +2935,57 @@ function exitManage() {
 
 function printItinerary() {
   const items = [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean);
+  // Group by day, splitting lodging from stops
+  const byDay = {};
+  for (let d = 1; d <= tripDays; d++) byDay[d] = { lodging: [], stops: [] };
+  for (const it of items) {
+    const d = dayMap[it.id] || 1;
+    if (!byDay[d]) byDay[d] = { lodging: [], stops: [] };
+    (it.type === 'Lodging' ? byDay[d].lodging : byDay[d].stops).push(it);
+  }
+  const totalNights = Math.max(0, tripDays - 1);
+  const renderItem = (e, prefix) => `
+    <div class="item">
+      <h3>${prefix} ${e.icon || ''} ${e.name}</h3>
+      <p>${e.sub || ''}</p>
+      <p>📍 ${e.area} · ${e.type}</p>
+      ${e.hours ? `<p>🕐 ${e.hours}</p>` : ''}
+      ${e.url ? `<p><a href="${e.url}">${e.url}</a></p>` : ''}
+      ${e.directions ? `<p><a href="${e.directions}">Get Directions →</a></p>` : ''}
+    </div>`;
+  const dayHtml = (d) => {
+    const day = byDay[d] || { lodging: [], stops: [] };
+    if (!day.lodging.length && !day.stops.length) return '';
+    return `
+      <div class="day">
+        <h2>Day ${d}${tripDays > 1 ? ` of ${tripDays}` : ''}</h2>
+        ${day.lodging.length
+          ? `<div class="lodging-row"><strong>💤 Tonight's stay:</strong></div>${day.lodging.map(l => renderItem(l, '')).join('')}`
+          : ''}
+        ${day.stops.length
+          ? `<div class="stops-row"><strong>📍 Stops:</strong></div>${day.stops.map((s, i) => renderItem(s, `${i+1}.`)).join('')}`
+          : ''}
+      </div>`;
+  };
   const win = window.open('', '_blank');
   win.document.write(`
-    <html><head><title>My Nevada County Itinerary</title>
+    <html><head><title>My Western Nevada County Itinerary</title>
     <style>
-      body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; color: #1E1508; }
+      body { font-family: Georgia, serif; max-width: 720px; margin: 40px auto; color: #1E1508; }
       h1 { font-size: 28px; color: #6B4A2A; border-bottom: 2px solid #C9A84C; padding-bottom: 12px; }
-      .item { margin: 20px 0; padding: 16px; border: 1px solid #e0d8c8; border-radius: 8px; }
-      .item h3 { font-size: 18px; margin-bottom: 4px; }
-      .item p { font-size: 13px; color: #4A5568; margin: 3px 0; }
-      .item a { color: #8B6914; font-size: 12px; }
+      h2 { font-size: 18px; color: #C9A84C; letter-spacing: 0.1em; margin-top: 28px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #e0d8c8; }
+      .day { margin-bottom: 28px; }
+      .lodging-row, .stops-row { font-size: 11px; letter-spacing: 0.1em; color: #6B4A2A; text-transform: uppercase; margin: 12px 0 4px; }
+      .item { margin: 8px 0; padding: 14px 16px; border: 1px solid #e0d8c8; border-radius: 8px; }
+      .item h3 { font-size: 16px; margin: 0 0 4px; }
+      .item p { font-size: 12.5px; color: #4A5568; margin: 3px 0; }
+      .item a { color: #8B6914; font-size: 11.5px; }
+      .summary { color: #718096; font-size: 12px; margin-top: -8px; }
+      @media print { .day { page-break-inside: avoid; } }
     </style></head><body>
-    <h1>🗺 My Nevada County Itinerary</h1>
-    <p style="color:#718096;font-size:13px">Generated ${new Date().toLocaleDateString()}</p>
-    ${items.map((e, i) => `
-      <div class="item">
-        <h3>${i + 1}. ${e.icon} ${e.name}</h3>
-        <p>${e.sub}</p>
-        <p>📍 ${e.area} · ${e.type}</p>
-        <p>🕐 ${e.hours}</p>
-        <p><a href="${e.url}">${e.url}</a></p>
-        <p><a href="${e.directions}">Get Directions →</a></p>
-      </div>`).join('')}
+    <h1>🗺 My Western Nevada County Itinerary</h1>
+    <p class="summary">${items.length} stop${items.length !== 1 ? 's' : ''} · ${tripDays} day${tripDays !== 1 ? 's' : ''}${totalNights > 0 ? ` / ${totalNights} night${totalNights !== 1 ? 's' : ''}` : ''} · Generated ${new Date().toLocaleDateString()}</p>
+    ${Array.from({length: tripDays}, (_, i) => i + 1).map(dayHtml).join('')}
     </body></html>`);
   win.document.close();
   win.print();
