@@ -19,7 +19,7 @@ sub-lines beneath the bullet they explain.
 Visitor planning platform — county pitch deck.
 
 > A purpose-built tourism platform combining 161 curated experiences with
-> 460+ live-scraped events. Privacy-first, opt-in, no tracking.
+> 460+ live local events. Privacy-first, opt-in, no tracking.
 
 ---
 
@@ -51,7 +51,7 @@ Visitor planning platform — county pitch deck.
 
 Body intro: Centered on Nevada City and Grass Valley, with full coverage of
 Penn Valley, North San Juan, Rough & Ready, Washington, Chicago Park,
-Smartsville, and adjacent Colfax. Combines curated places with live-scraped
+Smartsville, and adjacent Colfax. Combines curated places with live local
 events.
 
 | Stat card | Stat card | Stat card | Stat card |
@@ -113,7 +113,7 @@ This slide cues the live demo — the emotional peak of the presentation.
 | Act 1 | 2 min | Set the scene — couple from Sacramento, click "This Weekend" + Festivals vibe |
 | Act 2 | 90 sec | Layer in Relaxed vibe + Lodging category + B&B sub-pill — Victorian B&Bs surface |
 | Act 3 | 2 min | Build the weekend — Cornish Christmas + Holbrooke Hotel + Empire Mine + Lola. Open My Itinerary — Smart Suggestions appear with "0.4 mi away" labels. |
-| Act 4 | 90 sec | Behind the scenes — admin Events Queue, Approve All, AI Categorize, Scraper Sources |
+| Act 4 | 90 sec | Behind the scenes — admin Events Queue, Approve All, AI Categorize, Event Sources |
 | Act 5 | 60 sec | Close the value props — time saved, local visibility, privacy, no vendor lock-in |
 
 ---
@@ -177,13 +177,13 @@ After the demo, personas land as "these are real people I just saw using the too
 ## Slide 10 — Behind the scenes  *(formerly slide 8)*
 *Chamber-staff operations: live data with minimal effort.*
 
-- 🔄 One-click scraper updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union
-  ↳ *Chamber staffer clicks "Run Scrapers" Monday morning; ~50 new events appear.*
+- 🔄 One-click event-source updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union
+  ↳ *Chamber staffer clicks "Refresh Sources" Monday morning; ~50 new events appear.*
 - ✅ Approve / dismiss events in a queue; bulk-approve is one click
 - 🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)
 - ✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it
 - 🏷 Tag taxonomy editor — add/rename/delete tags without code
-- 🔗 Source URL management — add a new scraper feed by pasting a URL
+- 🔗 Event-source URL management — add a new source by pasting a URL
 - 📅 Auto-prune past events; auto-dismiss internal admin meetings
 - 🌐 Public RSS feed at /feed.rss — partners republish without integration work
 
@@ -198,14 +198,14 @@ After the demo, personas land as "these are real people I just saw using the too
 - "Center for the Arts" → Grass Valley; "Miners Foundry" → Nevada City
 - Cluttered descriptions → clean one-line summaries
 - Truckee / Sierra-side events flagged "low quality" → auto-hidden
-- Future scrapes auto-categorize new events with the same logic
+- Future source refreshes auto-categorize new events with the same logic
 
 **Cost**
 | Run pattern | Monthly |
 |---|---|
 | First-time bulk (460 events) | ~$0.30 once |
-| Daily scrape + categorize | $0.30 – $0.60 |
-| Weekly scrape + categorize | $0.16 – $0.52 |
+| Daily refresh + categorize | $0.30 – $0.60 |
+| Weekly refresh + categorize | $0.16 – $0.52 |
 | Realistic chamber operation | ~$0.50 – $1.00 |
 
 > Hard $5/month spending cap settable in Anthropic console — cannot be exceeded.
@@ -245,9 +245,9 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 
 ### OPERATIONS
 - Designate a queue curator (5 minutes, 1–2× per week)
-- Run AI Categorize after each scrape
+- Run AI Categorize after each refresh
 - Validate "no event" alerts (NCAC was a false negative for months)
-- Quarterly review of disabled scrapers
+- Quarterly review of disabled sources
 
 > Concrete win from this work: NCAC's calendar went from "0 events" to 540 events — by hitting Trumba's JSON feed directly.
 
@@ -266,7 +266,7 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 | 3 | Deploy: git clone, Python venv, install deps, drop API keys |
 | 4 | systemd service for auto-restart |
 | 5 | nginx reverse proxy + Let's Encrypt HTTPS |
-| 6 | Cron job: nightly scrape + AI categorize |
+| 6 | Cron job: nightly source refresh + AI categorize |
 | 7 | Backups: provider snapshots + daily JSON tar to off-site |
 | 8 | Test checklist |
 | 9 | Hand-off to chamber: admin URL, billing alerts, cheat sheet |

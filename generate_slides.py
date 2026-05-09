@@ -261,7 +261,7 @@ def slide_title(s):
     add_gold_rule(s, Inches(4.9), Inches(3.6), Inches(7.5))
     add_text(s,
         'A purpose-built tourism platform combining 161 curated experiences '
-        'with 460+ live-scraped events. Privacy-first, opt-in, no tracking.',
+        'with 460+ live local events. Privacy-first, opt-in, no tracking.',
         Inches(4.9), Inches(3.85), Inches(7.8), Inches(2.5),
         size=14, color=SLATE)
 
@@ -311,7 +311,7 @@ def slide_what_this_is(s):
         'A purpose-built tourism platform for Western Nevada County — '
         'centered on Nevada City and Grass Valley, with full coverage of Penn Valley, '
         'North San Juan, Rough & Ready, Washington, Chicago Park, Smartsville, and '
-        'adjacent Colfax. The platform combines curated places with live-scraped '
+        'adjacent Colfax. The platform combines curated places with live local '
         'events, so visitors discover what to do AND when it\'s actually happening.',
         Inches(0.6), Inches(1.95), Inches(12.1), Inches(1.4),
         size=13, color=DARK)
@@ -425,7 +425,7 @@ def slide_demo_flow(s):
         ('Act 1 · 2 min',  'Set the scene — couple from Sacramento, click "This Weekend" + Festivals vibe'),
         ('Act 2 · 90 sec', 'Layer in Relaxed vibe + Lodging category + B&B sub-pill — real Victorian B&Bs surface'),
         ('Act 3 · 2 min',  'Build the weekend — Cornish Christmas + Holbrooke Hotel + Empire Mine + Lola Restaurant. Open My Itinerary — Smart Suggestions appear with "0.4 mi away" labels. Map view + Print + Share link.'),
-        ('Act 4 · 90 sec', 'Behind the scenes — admin Events Queue, Approve All, AI Categorize button, Scraper Sources tab'),
+        ('Act 4 · 90 sec', 'Behind the scenes — admin Events Queue, Approve All, AI Categorize button, Event Sources tab'),
         ('Act 5 · 60 sec', 'Close the value props — time saved, local visibility, privacy, no vendor lock-in, AI integration, low maintenance'),
     ]
     two_col_table(s, ['Act', 'What happens'], acts,
@@ -512,7 +512,7 @@ def slide_privacy(s):
         ('No account / sign-up / email required to plan a full trip',
          '30 seconds from landing → planning, no email-collection wall.'),
         ('Chamber sees zero personal information about visitors',
-         'Aggregate scraper queue tells the chamber what\'s hot; visitor identity stays local.'),
+         'Aggregate event queue tells the chamber what\'s hot; visitor identity stays local.'),
         ('No GDPR / CCPA banners required (because nothing is collected)',
          'EU visitor on holiday gets the site without a banner ambush.'),
         ('No privacy review, no consent-platform fees, no compliance overhead',
@@ -534,17 +534,17 @@ def slide_admin(s):
         'Chamber-staff operations: live data with minimal effort.')
 
     add_bullets(s, [
-        ('🔄 One-click scraper updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
-         'Chamber staffer clicks "Run Scrapers" Monday morning; ~50 new events appear.'),
+        ('🔄 One-click event-source updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
+         'Chamber staffer clicks "Refresh Sources" Monday morning; ~50 new events appear.'),
         ('✅ Approve / dismiss events in a queue; bulk-approve is one click',
          'Bulk-approve all KVMR events; dismiss the suspect ones individually.'),
         ('🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
-         'One click after a scrape; 460 events get area + venue + tags fixed for ~20¢.'),
+         'One click after a refresh; 460 events get area + venue + tags fixed for ~20¢.'),
         ('✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it',
          'New cidery opens — staff types one row, hits save, it\'s live on the public site.'),
         ('🏷 Tag taxonomy editor — add/rename/delete tags without code',
          '"Music" splits into "Live Music" and "Open Mic" without a developer.'),
-        ('🔗 Source URL management — add a new scraper feed by pasting a URL',
+        ('🔗 Event-source URL management — add a new source by pasting a URL',
          'New venue website? Paste the URL, pick a parser pattern, done.'),
         ('📅 Auto-prune past events; auto-dismiss internal admin meetings',
          'Saturday\'s farmers market vanishes from the queue Sunday morning.'),
@@ -572,7 +572,7 @@ def slide_ai(s):
          'Long press-release blob shrinks to a clean teaser the visitor will actually read.'),
         ('Truckee / Sierra-side events flagged "low quality" → auto-hidden',
          'Tahoe events tagged "low quality" auto-hide on the public site, no manual cleanup.'),
-        ('Future scrapes auto-categorize new events with the same logic',
+        ('Future source refreshes auto-categorize new events with the same logic',
          'Tuesday\'s new event gets correct area + venue + tags without human touch.'),
     ], Inches(0.6), Inches(2.3), Inches(6), Inches(4.2),
        size=10, line_spacing=1.15, scenario_size=8)
@@ -582,8 +582,8 @@ def slide_ai(s):
              size=14, bold=True, color=GOLD)
     two_col_table(s, ['Run pattern', 'Monthly'], [
         ('First-time bulk (460 events)',    '~$0.30 once'),
-        ('Daily scrape + categorize',       '$0.30 – $0.60'),
-        ('Weekly scrape + categorize',      '$0.16 – $0.52'),
+        ('Daily refresh + categorize',      '$0.30 – $0.60'),
+        ('Weekly refresh + categorize',     '$0.16 – $0.52'),
         ('Realistic chamber operation',     '~$0.50 – $1.00'),
     ], Inches(2.3), left_w=3.0, right_w=2.4, body_size=10, row_height=0.45)
 
@@ -616,7 +616,7 @@ def slide_cost(s):
              size=14, bold=True, color=GOLD)
     add_bullets(s, [
         'Per-listing fees — every chamber member free',
-        'Per-event fees — scrapers cost zero',
+        'Per-event fees — event sources cost zero',
         'Per-visitor fees — traffic 10× has no impact',
         'Vendor termination fees — owned outright',
         'Privacy compliance overhead — nothing collected to comply about',
@@ -646,10 +646,10 @@ def slide_next_steps(s):
         'the most comprehensive feed in the county',
         'Reach out to GoNevadaCounty (gonevadacounty.com) '
         'for a public events feed — Cloudflare blocks '
-        'scrapers and we lose the 13 anchor festivals',
+        'automated access and we lose the 13 anchor festivals',
         'Coordinate with The Union for a public events '
         'feed — articles are paywalled and the RSS often '
-        'returns nothing scrape-able',
+        'returns nothing usable',
         'Confirm whether the County itself runs a Trumba '
         'master calendar — if so, federate from it instead '
         'of NCAC alone',
@@ -666,7 +666,7 @@ def slide_next_steps(s):
         'Events (WordPress), Eventbrite — not just '
         'static HTML pages',
         'Push schema.org/Event JSON-LD adoption — one '
-        'snippet on each event page makes scraping '
+        'snippet on each event page makes auto-importing '
         'reliable without custom code per site',
         'Solicit "missing venue" submissions — a simple '
         'web form for member venues to flag events that '
@@ -685,13 +685,13 @@ def slide_next_steps(s):
         'Designate a queue curator — someone clears the '
         'pending-events queue 1-2x per week (Approve / '
         'Dismiss takes ~5 minutes per session)',
-        'Run AI Categorize after each scrape — fixes '
+        'Run AI Categorize after each refresh — fixes '
         'venue, area, tags on long-tail events ($0.50/mo)',
-        'Validate "no event" alerts — when a scraper '
-        'returns 0 events, the source has either gone '
-        'down or restructured (NCAC was a false negative '
-        'for months before we caught it)',
-        'Quarterly review of disabled scrapers — vendors '
+        'Validate "no event" alerts — when a source '
+        'returns 0 events, it has either gone down or '
+        'restructured (NCAC was a false negative for '
+        'months before we caught it)',
+        'Quarterly review of disabled sources — vendors '
         'change platforms (e.g. NCAC moved to Trumba) and '
         'previously-blocked sources become reachable',
     ], Inches(8.8), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
@@ -720,12 +720,12 @@ def slide_migration(s):
         ('Phase 0',  'Decisions: hosting (DigitalOcean $6/mo recommended), domain, OS, server account ownership'),
         ('Phase 1',  'Pre-flight: domain registered, DNS access, SSH keys ready, Anthropic API key generated'),
         ('Phase 2',  'Provision: $6/mo Ubuntu droplet, lockdown SSH, install Python + nginx + chromium'),
-        ('Phase 3',  'Deploy: git clone, Python venv, install deps, drop API keys in scraper/config.py'),
+        ('Phase 3',  'Deploy: git clone, Python venv, install deps, drop API keys in the config file'),
         ('Phase 4',  'systemd service for auto-restart on crash, auto-start on reboot'),
         ('Phase 5',  'nginx reverse proxy + Let\'s Encrypt HTTPS (auto-renew via certbot)'),
-        ('Phase 6',  'Cron job: nightly scrape at 3 AM + AI categorize at 3:30 AM'),
+        ('Phase 6',  'Cron job: nightly source refresh at 3 AM + AI categorize at 3:30 AM'),
         ('Phase 7',  'Backups: provider snapshots ($1/mo) + daily JSON tar to off-site'),
-        ('Phase 8',  'Test checklist: site loads, vibes work, events populate, AI button works, scraper runs'),
+        ('Phase 8',  'Test checklist: site loads, vibes work, events populate, AI button works, source updates run'),
         ('Phase 9',  'Hand-off to chamber: admin URL, billing alerts, cheat sheet, emergency contact'),
     ]
     two_col_table(s, ['Phase', 'What happens'], steps,
