@@ -3172,16 +3172,27 @@ function findLodging() {
   if (expTab && !expTab.classList.contains('active')) {
     switchTab('experiences', expTab);
   }
+  // Vibes don't apply to lodging searches — Foodie/Active/etc. tag-sets
+  // exclude all lodging since none are tagged with food/sport/etc tags.
+  // Clear vibes (and sub-pills, vibe-pills) so the visitor sees ALL stays.
+  const hadVibes = selectedThemes.size > 0;
+  selectedThemes.clear();
+  activeSubPill = null;
+  activeVibePill = null;
   // Set the Category filter to Lodging
   const sel = document.getElementById('filterType');
-  if (sel) {
-    sel.value = 'Lodging';
-    activeSubPill = null;
-    if (typeof renderSubPills === 'function') renderSubPills();
-    renderExperiences();
-    renderActiveFilters();
+  if (sel) sel.value = 'Lodging';
+  // Re-render everything that depends on this state
+  if (typeof renderThemes === 'function') renderThemes();
+  if (typeof renderSubPills === 'function') renderSubPills();
+  if (typeof renderVibePills === 'function') renderVibePills();
+  renderExperiences();
+  renderActiveFilters();
+  // Subtle notification so the visitor knows what changed
+  if (hadVibes && typeof _showShareToast === 'function') {
+    _showShareToast('Showing all lodging — vibes cleared so nothing\'s hidden');
   }
-  // Smooth-scroll to the experiences grid so the visitor lands right at the results
+  // Smooth-scroll to the experiences grid
   setTimeout(() => {
     const grid = document.getElementById('expGrid');
     if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
