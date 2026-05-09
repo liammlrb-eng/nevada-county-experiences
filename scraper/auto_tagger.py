@@ -34,7 +34,22 @@ _TAG_RULES: list[tuple[str, list[str]]] = [
                          "recital", "choir", "choral", "opera", "acoustic",
                          "singer-songwriter", "singer songwriter", "open mic",
                          "music festival", "caroling", "karaoke",
-                         "drum circle", "jam session"]),
+                         "drum circle", "jam session",
+                         # Performance signals
+                         "performs at", "performing at", "live at",
+                         "tribute to", "tribute show", "album release",
+                         "record release", "album live",
+                         # Group format hints (X Trio at Y, X Duo in Y, X Quartet)
+                         "trio at", "trio in", "duo at", "duo in",
+                         "quartet", "quintet", "ensemble at",
+                         # Devotional / world music
+                         "kirtan", "mariachi", "tribute album",
+                         # Major Western NC music venues (artist@venue is music)
+                         "at the center for the arts", "at the miners foundry",
+                         "at the nevada theatre", "at bunce", "at barmhaus",
+                         "at alibi", "at 5 mile house", "at the stone house",
+                         # Music industry signals
+                         "rhythm kings", "song contest", "records presents"]),
 
     ("Theater",         ["theater", "theatre", "play", "musical", "improv",
                          "comedy show", "stand-up", "standup", "cabaret",
@@ -66,16 +81,31 @@ _TAG_RULES: list[tuple[str, list[str]]] = [
 
     ("Social",          ["mixer", "networking", "social hour", "happy hour",
                          "meetup", "meet-up", "gathering", "potluck",
-                         "block party", "street fair", "reunion"]),
+                         "block party", "street fair", "reunion",
+                         "trivia", "chess night", "chess club",
+                         "death cafe", "tea party", "tea social",
+                         "community-centered", "community picnic",
+                         "first friday", "art walk", "sidewalk sale"]),
 
     ("Market",          ["farmers market", "flea market", "swap meet",
                          "pop-up market", "holiday market", "craft market",
-                         "night market", "market day"]),
+                         "night market", "market day", "plant and market",
+                         "marketplace"]),
+
+    # ── Garden & Plants ──────────────────────────────────────────────────────
+    ("Garden",          ["plant sale", "garden tour", "garden workshop",
+                         "garden club", "master gardener", "herbal medicine",
+                         "remedy garden", "butterfly garden", "wildflower walk",
+                         "wildflower", "botanical", "garden of remembrance",
+                         "calscape", "horticulture"]),
 
     # ── Family & Kids ─────────────────────────────────────────────────────────
     ("Family",          ["family", "kids", "children", "child-friendly",
                          "all ages", "family friendly", "youth", "toddler",
-                         "parent", "school age", "storytime", "story time"]),
+                         "parent", "school age", "storytime", "story time",
+                         "halloween", "fourth of july", "july 4",
+                         "adoption day", "pet adoption", "kitty adoption",
+                         "doggy adoption"]),
 
     # ── Education & Workshops ─────────────────────────────────────────────────
     ("Workshop",        ["workshop", "class", "seminar", "webinar", "tutorial",
@@ -108,14 +138,17 @@ _TAG_RULES: list[tuple[str, list[str]]] = [
     ("Wellness",        ["yoga", "meditation", "mindfulness", "wellness",
                          "fitness class", "pilates", "tai chi", "qi gong",
                          "sound bath", "breathwork", "retreat",
-                         "mental health", "self-care"]),
+                         "mental health", "self-care",
+                         "mindful movement", "music-assisted",
+                         "compassionate care"]),
 
     # ── Spiritual & Contemplative ─────────────────────────────────────────────
     ("Spiritual",       ["spiritual", "prayer", "church",
                          "interfaith", "sacred", "blessing",
                          "dharma", "buddhist", "zen", "quaker",
                          "celebration of life", "vigil", "sanctuary",
-                         "congregation", "worship", "sermon"]),
+                         "congregation", "worship", "sermon",
+                         "ananda", "expanding light"]),
 
     # ── History & Heritage ────────────────────────────────────────────────────
     ("Historic",        ["historic", "history", "heritage", "gold rush",

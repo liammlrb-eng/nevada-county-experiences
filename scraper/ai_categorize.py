@@ -64,7 +64,7 @@ ALLOWED_TAGS = [
     # Hands-on
     "Hands-on", "Workshop", "Craft", "Lecture",
     # Foodie
-    "Foodie", "Food & Drink", "Market",
+    "Foodie", "Food & Drink", "Market", "Garden",
     # Active & Outdoors
     "Active", "Scenic", "Sport", "Nature", "Outdoor", "Environment",
     "Hiking", "Biking", "Running", "Swimming", "Boating", "Fishing",
