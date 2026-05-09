@@ -430,6 +430,71 @@ def build():
 
     flow.append(PageBreak())
 
+    # ──────────── UX DESIGN DECISIONS ─────────────────────────────────────
+    flow.append(Paragraph('Visitor-Centered Design Decisions', H_TITLE))
+    flow.append(Paragraph(
+        'Why the platform is easy to use — deliberate UX choices, not accidents.',
+        H_SUB))
+    flow.append(section_rule())
+
+    flow.append(Paragraph(
+        'Most tourism sites lose visitors at predictable friction points: cluttered '
+        'filtering, confusing day-by-day planning, lost itineraries, forced sign-ups, '
+        'and clicking-out moments that never bring people back. This platform was '
+        'built around explicit decisions to remove those friction points.',
+        BODY))
+
+    flow.append(Spacer(1, 8))
+    flow.append(Paragraph('How key decisions improve the visitor flow', H1))
+
+    ux_rows = [
+        ['<b>Day-by-day itinerary view</b>',
+         'A flat list of stops hides the question "where do I sleep tonight?" Visitors think in stops, not nights — and so they day-trip. Restructuring as Day 1 / Day 2 / Day 3 with a per-day lodging slot makes nights structurally visible and quietly drives overnight stays.'],
+        ['<b>"Find Lodging" CTA at top of itinerary</b>',
+         'When the visitor has empty nights, a gold banner appears at the top of My Itinerary with a one-click "Find Lodging →" button. Removes the friction of: close modal → find Category dropdown → pick Lodging → scroll. Booking is one click away from the planning view.'],
+        ['<b>Find Lodging clears active vibes</b>',
+         'Vibes (Foodie, Active, Wellness) describe a discovery mood — not lodging properties. When a visitor explicitly asks for lodging, that intent supersedes the vibe filter, otherwise zero stays show (lodgings aren\'t tagged "Foodie"). The system makes the right call and tells the visitor what changed via a brief toast.'],
+        ['<b>Add Day returns to browse mode</b>',
+         '"Add another day" doesn\'t leave the visitor staring at an empty day inside the modal — it closes the modal, switches to the Experiences tab, scrolls to the grid, and shows a toast: "Day 2 added — pick stops below." New items default to the latest day, so adds land correctly without the visitor thinking about it.'],
+        ['<b>Events go into the itinerary, not direct to KVMR</b>',
+         'Clicking "More Info" sent visitors off-site to KVMR/Eventbrite — many never came back. New flow lets visitors collect interesting events in their itinerary, see them side-by-side with experiences, then click through to source pages WHEN they\'re ready to commit. Itinerary becomes a comparison tool, not a redirect graveyard.'],
+        ['<b>Calendar dates on day headers</b>',
+         'When visitor sets a trip-start date, abstract "Day 1 / Day 2" become concrete: "DAY 1 · Sat, May 17". Specific dates change planning psychology — abstract days feel hypothetical; calendar dates feel committed.'],
+        ['<b>Vibe-level pills for finer granularity</b>',
+         'Picking the Foodie vibe alone is broad. Sub-pills under the vibe (🍽 Restaurants · 🍷 Wineries · 🛒 Markets · 🎉 Food Events) let the visitor narrow within their chosen mood without leaving the discovery flow. Same pattern across all 9 vibes.'],
+        ['<b>Direct × remove on cards</b>',
+         'No "Manage Mode" toggle. The × button is always visible on cards once added. Visitor stays in browse-flow throughout — no mode-switching cognitive overhead.'],
+        ['<b>Opt-in itinerary save</b>',
+         'On first add, visitor is asked: "Save your itinerary on this device?" Yes → survives tab close + browser restart. No → session-only. Privacy by design, not by tracking. Revocable from the modal anytime.'],
+        ['<b>Type-representative event placeholders</b>',
+         'Every event without a real photo gets a colored gradient with its type emoji — music events look different from wellness events at a glance. The 126 KVMR events without posters are no longer indistinguishable text blocks.'],
+        ['<b>"All Future" date filter as default</b>',
+         'Replaces the implicit "no buttons active = no filter" state with an explicit default. Visitors immediately see they\'re viewing all upcoming items, and can switch to a narrower window with one click.'],
+        ['<b>Auto-clearing seasonal experiences</b>',
+         'Visiting in May? Summer-only experiences hide automatically. The system knows seasons and respects the visitor\'s travel window without making them think about it.'],
+    ]
+    flow.append(build_table(
+        [['Design decision', 'Why it matters']] + ux_rows,
+        col_widths=[1.9*inch, 4.6*inch], body_size=8.5))
+
+    flow.append(Spacer(1, 12))
+    flow.append(Paragraph('What ties these together', H2))
+    flow.append(Paragraph(
+        '<i>Every choice listed above came from asking: "where does the visitor get '
+        'stuck or leak out?" — then removing the friction. Vibes don\'t fight category '
+        'filters. The itinerary doesn\'t require accounts. Events don\'t hijack the '
+        'visitor to KVMR. Days aren\'t abstract numbers. Manage mode doesn\'t exist '
+        'because it doesn\'t need to."</i>',
+        QUOTE))
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph(
+        'The result: a planning workspace where visitors complete trips, not just '
+        'browse them. The pixel-level decisions add up to the strategic outcome — '
+        'overnight stays.',
+        BODY))
+
+    flow.append(PageBreak())
+
     # ──────────── DEMO SCRIPT — INTRO + ACT 1 + ACT 2 ─────────────────────
     flow.append(Paragraph('Demonstration Script', H_TITLE))
     flow.append(Paragraph(
