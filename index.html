@@ -3138,7 +3138,7 @@ function renderModal() {
       <button class="btn-primary" onclick="openMap()">🗺 View on Map</button>
       <button class="btn-primary" onclick="shareItinerary()">📤 Share / Save</button>
       <button class="btn-primary" onclick="printItinerary()" style="background:transparent;color:var(--brown);border-color:#d4c9b0">🖨 Print</button>
-      ${(typeof API_BASE !== 'undefined' && API_BASE !== null) ? `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Itineraries section.">✨ Publish as Suggested</button>` : ''}
+      ${(typeof IS_ADMIN_HOST !== 'undefined' && IS_ADMIN_HOST) ? `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Itineraries section.">✨ Publish as Suggested</button>` : ''}
       <button class="btn-secondary" onclick="clearAll()">Clear All</button>
     </div>
     <div style="font-size:10.5px;color:#888;text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid #f0e8d8">
@@ -3278,8 +3278,9 @@ function clearAll() {
 //     reference experiences (numeric IDs); events have separate semantics
 //
 function publishAsItinerary() {
-  if (typeof API_BASE === 'undefined' || API_BASE === null) {
-    alert('Publishing requires the local admin server (python server.py).');
+  // Defense in depth — UI gate already hides the button on non-admin hosts.
+  if (typeof IS_ADMIN_HOST === 'undefined' || !IS_ADMIN_HOST) {
+    alert('Publishing is only available on the chamber\'s admin machine.');
     return;
   }
   const items = [...myList].map(_lookupItem).filter(Boolean);
@@ -3980,6 +3981,22 @@ function renderManageData() {
 
 // ── EVENTS QUEUE TAB ──────────────────────────────────────────────────────────
 const API_BASE = window.location.protocol === 'file:' ? null : '';  // null = file:// mode, no API
+
+// ─── Admin-host detection ─────────────────────────────────────────────────
+// Some affordances (e.g. the "✨ Publish as Suggested Itinerary" button)
+// belong only on the chamber's admin machine — never on the public site.
+//
+// Rule: admin context iff one of —
+//   - hostname is 127.0.0.1 or localhost  (chamber's own laptop running server.py)
+//   - URL contains ?admin=1                (chamber bookmarks this on a hosted instance)
+//
+// Public visitors hitting liammlrb-eng.github.io / *.pages.dev / a real
+// production domain without ?admin=1 will see no admin affordances.
+const IS_ADMIN_HOST = (() => {
+  const h = (window.location.hostname || '').toLowerCase();
+  if (h === '127.0.0.1' || h === 'localhost' || h === '0.0.0.0') return true;
+  return new URLSearchParams(window.location.search).has('admin');
+})();
 
 async function renderEventsQueue() {
   const panel = document.getElementById('eventsQueuePanel');
