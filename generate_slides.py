@@ -99,31 +99,66 @@ def page_footer(slide, page_num, total):
 
 
 def add_bullets(slide, items, left, top, width, height, *,
-                size=14, color=DARK, line_spacing=1.4, bullet_color=GOLD):
-    """Each item is a string. Renders one paragraph per item with a gold • marker."""
+                size=14, color=DARK, line_spacing=1.4, bullet_color=GOLD,
+                scenario_size=None, scenario_color=None):
+    """
+    Each item is either a string OR a (text, scenario) tuple.
+    Strings render as a single bulleted line.
+    Tuples render the item, then an italic gold sub-line "↳ scenario"
+    showing how the feature is used in practice.
+
+    scenario_size  defaults to size - 2
+    scenario_color defaults to BROWN (the brand brown)
+    """
+    if scenario_size is None:
+        scenario_size = max(size - 2, 8)
+    if scenario_color is None:
+        scenario_color = BROWN
     box = slide.shapes.add_textbox(left, top, width, height)
     tf = box.text_frame
     tf.word_wrap = True
     tf.margin_left = tf.margin_right = Inches(0.05)
-    for i, item in enumerate(items):
-        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+
+    para_idx = 0
+    for item in items:
+        # Allow either plain string or (text, scenario) tuple
+        if isinstance(item, tuple):
+            text, scenario = item
+        else:
+            text, scenario = item, None
+
+        # Bullet line
+        p = tf.paragraphs[0] if para_idx == 0 else tf.add_paragraph()
         p.alignment = PP_ALIGN.LEFT
-        # Gold bullet
         b = p.add_run()
         b.text = '• '
         b.font.size = Pt(size + 2)
         b.font.bold = True
         b.font.color.rgb = bullet_color
         b.font.name = 'Calibri'
-        # Item text
         r = p.add_run()
-        r.text = item
+        r.text = text
         r.font.size = Pt(size)
         r.font.color.rgb = color
         r.font.name = 'Calibri'
         p.line_spacing = line_spacing
-        if i > 0:
-            p.space_before = Pt(6)
+        if para_idx > 0:
+            p.space_before = Pt(6 if scenario is None else 4)
+        para_idx += 1
+
+        # Optional scenario sub-line: italic, indented, smaller
+        if scenario:
+            p2 = tf.add_paragraph()
+            p2.alignment = PP_ALIGN.LEFT
+            sr = p2.add_run()
+            sr.text = '       ↳  ' + scenario
+            sr.font.size = Pt(scenario_size)
+            sr.font.italic = True
+            sr.font.color.rgb = scenario_color
+            sr.font.name = 'Calibri'
+            p2.line_spacing = 1.1
+            p2.space_before = Pt(0)
+            para_idx += 1
     return box
 
 
@@ -139,8 +174,15 @@ def add_stat_card(slide, left, top, width, height, big_text, label):
 
 
 def two_col_table(slide, headers, rows, top, *, left_w=4.5, right_w=8.0,
-                  header_size=11, body_size=10, row_height=0.5):
-    """Simple 2-column table without using actual table shape (more layout control)."""
+                  header_size=11, body_size=10, row_height=0.5,
+                  scenario_size=None):
+    """
+    Simple 2-column table without using actual table shape (more layout control).
+    Each row is either a 2-tuple (left, right) or a 3-tuple (left, right, scenario).
+    A scenario renders as a second italic line in the right column.
+    """
+    if scenario_size is None:
+        scenario_size = max(body_size - 2, 8)
     left  = Inches(0.6)
     col2  = left + Inches(left_w)
     # Header row
@@ -153,16 +195,37 @@ def two_col_table(slide, headers, rows, top, *, left_w=4.5, right_w=8.0,
              size=header_size, bold=True, color=BROWN)
     add_gold_rule(slide, left, top + Inches(0.42), Inches(left_w + right_w))
     y = top + Inches(0.46)
-    for i, (a, b) in enumerate(rows):
+    for i, row in enumerate(rows):
+        if len(row) == 3:
+            a, b, scenario = row
+        else:
+            a, b = row
+            scenario = None
+
         if i % 2 == 0:
             add_rect(slide, left, y, Inches(left_w + right_w),
                      Inches(row_height), RGBColor(0xFB, 0xF7, 0xEE))
+
+        # Left column — vertically centered when row is tall
         add_text(slide, a, left + Inches(0.1), y + Inches(0.05),
                  Inches(left_w - 0.15), Inches(row_height - 0.05),
-                 size=body_size, color=DARK)
-        add_text(slide, b, col2 + Inches(0.1), y + Inches(0.05),
-                 Inches(right_w - 0.15), Inches(row_height - 0.05),
-                 size=body_size, color=DARK)
+                 size=body_size, color=DARK,
+                 anchor=MSO_ANCHOR.MIDDLE if scenario else MSO_ANCHOR.TOP)
+
+        if scenario:
+            # Right column — explanation on top, scenario in italic below
+            half = (row_height - 0.05) / 2
+            add_text(slide, b, col2 + Inches(0.1), y + Inches(0.04),
+                     Inches(right_w - 0.15), Inches(half),
+                     size=body_size, color=DARK)
+            add_text(slide, '↳  ' + scenario,
+                     col2 + Inches(0.1), y + Inches(half + 0.04),
+                     Inches(right_w - 0.15), Inches(half),
+                     size=scenario_size, color=BROWN, italic=True)
+        else:
+            add_text(slide, b, col2 + Inches(0.1), y + Inches(0.05),
+                     Inches(right_w - 0.15), Inches(row_height - 0.05),
+                     size=body_size, color=DARK)
         y += Inches(row_height)
 
 
@@ -257,14 +320,29 @@ slide_header(s, 'How visitors discover',
     'Multiple paths to "I found it" — works for browse-mode and date-mode visitors.')
 
 two_col_table(s, ['Discovery path', 'What it does'], [
-    ('Themed vibes (9 cards)',          'Historic · Arts · Hands-On · Foodie · Active · Relaxed · Wellness · Family · Festivals'),
-    ('Vibe-level pills',                'Pick Foodie → narrow to Restaurants / Wineries / Markets / Bakeries / Food Events'),
-    ('Category dropdown + sub-pills',   'Lodging → Hotels / B&Bs / Glamping / Campgrounds / RV  (and more)'),
-    ('Activity tags',                   'Hiking · Biking · Swimming · Fishing · Boating · Running on every relevant card'),
-    ('Date filter',                     'All Future (default) · Today · Weekend · Week — auto-clears summer-only items in winter'),
-    ('Area filter',                     'County-wide events show for any local area; city events filter normally'),
-    ('Tag-aware Smart Suggestions',     '"More to Explore" panel in the itinerary — geographic + tag scoring'),
-], Inches(1.85), left_w=3.4, right_w=8.7, body_size=10, row_height=0.55)
+    ('Themed vibes (9 cards)',
+     'Historic · Arts · Hands-On · Foodie · Active · Relaxed · Wellness · Family · Festivals',
+     'No-plan visitor taps "Foodie" — relevant cards instantly filter in.'),
+    ('Vibe-level pills',
+     'Pick Foodie → narrow to Restaurants / Wineries / Markets / Bakeries / Food Events',
+     'Foodie visitor switches to "Wineries only" without leaving the vibe.'),
+    ('Category dropdown + sub-pills',
+     'Lodging → Hotels / B&Bs / Glamping / Campgrounds / RV  (and more)',
+     'Family of four picks Lodging → B&Bs to find character stays over chains.'),
+    ('Activity tags',
+     'Hiking · Biking · Swimming · Fishing · Boating · Running on every relevant card',
+     'Mountain biker scrolls and immediately spots cards tagged "Biking".'),
+    ('Date filter',
+     'All Future (default) · Today · Weekend · Week — auto-clears summer-only items in winter',
+     'One-tap "Weekend" — only Sat/Sun events remain across every vibe.'),
+    ('Area filter',
+     'County-wide events show for any local area; city events filter normally',
+     'Penn Valley resident filters out Nevada City clutter for a local night out.'),
+    ('Tag-aware Smart Suggestions',
+     '"More to Explore" panel in the itinerary — geographic + tag scoring',
+     'After Empire Mine goes in, the panel surfaces Holbrooke Hotel 0.4 mi away.'),
+], Inches(1.75), left_w=3.4, right_w=8.7, body_size=10, row_height=0.65,
+   scenario_size=8)
 
 page_footer(s, 4, TOTAL)
 
@@ -275,16 +353,24 @@ slide_header(s, 'Day-by-day itinerary builder',
 
 # Left: feature list
 add_bullets(s, [
-    'Each day has its own card with a numbered header and calendar date',
-    'Per-day "Tonight\'s Stay" lodging slot — empty slots prompt for booking',
-    'Drag-free move-between-days dropdown on every item',
-    'Add Day → returns visitor to browse mode for the new day',
-    'Find Lodging button at top of itinerary jumps directly to lodging filter',
-    'Events go INTO the itinerary first; the visitor decides what to commit to',
-    '15-min add → opt-in save → survives tab close + browser restart',
-    'Share link via native phone share sheet, email, text, or copy URL',
-], Inches(0.6), Inches(1.85), Inches(7.0), Inches(5.0),
-   size=12, line_spacing=1.45)
+    ('Each day has its own card with a numbered header and calendar date',
+     'Visitor sees "Day 1: Sat May 17" instead of an undifferentiated stop list.'),
+    ('Per-day "Tonight\'s Stay" lodging slot — empty slots prompt for booking',
+     'Empty Day 2 stay tile reminds the visitor they haven\'t booked Sunday yet.'),
+    ('Drag-free move-between-days dropdown on every item',
+     'Spouse on phone moves Friday\'s hike to Saturday in two taps.'),
+    ('Add Day → returns visitor to browse mode for the new day',
+     'Tap "Add Day," land on cards to pick Day 3 activities — flow continues.'),
+    ('Find Lodging button at top of itinerary jumps directly to lodging filter',
+     'Six stops in but no hotel — one tap surfaces every nearby B&B.'),
+    ('Events go INTO the itinerary first; the visitor decides what to commit to',
+     'Bluegrass concert tile lands in My Itinerary, not on KVMR\'s site.'),
+    ('15-min add → opt-in save → survives tab close + browser restart',
+     'Browser closes, phone reboots — itinerary still there next morning.'),
+    ('Share link via native phone share sheet, email, text, or copy URL',
+     'Visitor texts the URL to spouse: "this is what I\'m thinking."'),
+], Inches(0.6), Inches(1.75), Inches(7.0), Inches(5.3),
+   size=11, line_spacing=1.2, scenario_size=9)
 
 # Right: visual mock representation
 mock_x = Inches(7.9); mock_y = Inches(1.85); mock_w = Inches(4.8); mock_h = Inches(5.0)
@@ -325,19 +411,34 @@ slide_header(s, 'Why it\'s easy to use',
     'Friction points where most tourism sites lose visitors — and what we did instead.')
 
 ux_pairs = [
-    ('Day-by-day with lodging anchor',  'A flat list of stops hides the night question; structured days surface it'),
-    ('"Find Lodging" CTA + auto-clear vibes',  'One-click jump to lodging that doesn\'t fight against active vibes'),
-    ('Add Day returns to browse',       'No leaving visitor staring at empty days; flow continues naturally'),
-    ('Events → itinerary first',        'No hijack to KVMR — visitor compares before clicking through'),
-    ('Direct × on cards',               'No "Manage Mode" toggle; remove buttons always visible'),
-    ('Vibe sub-pills',                  'Foodie → Restaurants/Markets/Wineries — granular without leaving the vibe'),
-    ('Calendar dates on day headers',   '"DAY 1 · Sat, May 17" instead of abstract numbers'),
-    ('Opt-in itinerary save',           'Survives tab close + restart — no account, no email, explicit consent'),
-    ('Auto-season filtering',           'November visit hides summer-only experiences automatically'),
-    ('Type-emoji event placeholders',   '126 events without posters now visually distinct by type'),
+    ('Day-by-day with lodging anchor',
+     'A flat list of stops hides the night question; structured days surface it',
+     'Visitor sees Day 2 has no stay tile, books before leaving the page.'),
+    ('"Find Lodging" CTA + auto-clear vibes',
+     'One-click jump to lodging that doesn\'t fight against active vibes',
+     'Foodie-vibe visitor taps Find Lodging; vibes clear so all stays show.'),
+    ('Add Day returns to browse',
+     'No leaving visitor staring at empty days; flow continues naturally',
+     'Day 2 isn\'t an empty container — visitor lands somewhere productive.'),
+    ('Events → itinerary first',
+     'No hijack to KVMR — visitor compares before clicking through',
+     'Three concerts compared side-by-side before committing to one.'),
+    ('Vibe sub-pills',
+     'Foodie → Restaurants/Markets/Wineries — granular without leaving the vibe',
+     'Foodie → Wineries narrows without switching mental contexts.'),
+    ('Calendar dates on day headers',
+     '"DAY 1 · Sat, May 17" instead of abstract numbers',
+     '"Sat, May 17" grounds the trip in real-world weekend planning.'),
+    ('Opt-in itinerary save',
+     'Survives tab close + restart — no account, no email, explicit consent',
+     'Banner appears only after first add — visitor consents knowingly.'),
+    ('Auto-season filtering',
+     'November visit hides summer-only experiences automatically',
+     'December visitor never sees "summer concert series" as a dead lead.'),
 ]
 two_col_table(s, ['Decision', 'Why it matters'], ux_pairs,
-              Inches(1.85), left_w=4.0, right_w=8.1, body_size=10, row_height=0.42)
+              Inches(1.65), left_w=4.0, right_w=8.1, body_size=9,
+              row_height=0.6, scenario_size=8)
 
 page_footer(s, 6, TOTAL)
 
@@ -347,16 +448,24 @@ slide_header(s, 'Privacy posture',
     'No tracking. No cookies. Visitors stay anonymous; the chamber gets credit for it.')
 
 add_bullets(s, [
-    'No analytics, no cookies, no third-party trackers by default',
-    'Itinerary save is opt-in only — explicit consent banner on first add',
-    '"Forget on this device" link revokes consent and wipes saved data anytime',
-    'Share-link URL works without any consent — purely a URL fragment',
-    'No account / sign-up / email required to plan a full trip',
-    'Chamber sees zero personal information about visitors',
-    'No GDPR / CCPA banners required (because nothing is collected)',
-    'No privacy review, no consent-platform fees, no compliance overhead',
-], Inches(0.6), Inches(1.85), Inches(12.1), Inches(4.5),
-   size=13, line_spacing=1.5)
+    ('No analytics, no cookies, no third-party trackers by default',
+     'Site loads instantly — no cookie modal between visitor and content.'),
+    ('Itinerary save is opt-in only — explicit consent banner on first add',
+     'Banner appears only after first card added; visitor knows what they\'re consenting to.'),
+    ('"Forget on this device" link revokes consent and wipes saved data anytime',
+     'Trip ends — visitor wipes the itinerary in two taps, takes nothing back home.'),
+    ('Share-link URL works without any consent — purely a URL fragment',
+     'Two friends compare itineraries via shared URLs, neither registered for anything.'),
+    ('No account / sign-up / email required to plan a full trip',
+     '30 seconds from landing → planning, no email-collection wall.'),
+    ('Chamber sees zero personal information about visitors',
+     'Aggregate scraper queue tells the chamber what\'s hot; visitor identity stays local.'),
+    ('No GDPR / CCPA banners required (because nothing is collected)',
+     'EU visitor on holiday gets the site without a banner ambush.'),
+    ('No privacy review, no consent-platform fees, no compliance overhead',
+     'Annual compliance budget for the platform: $0 — nothing to review.'),
+], Inches(0.6), Inches(1.7), Inches(12.1), Inches(4.5),
+   size=11, line_spacing=1.2, scenario_size=9)
 
 # Closing quote
 add_rect(s, Inches(0.6), Inches(6.0), Inches(12.1), Inches(0.85),
@@ -374,16 +483,24 @@ slide_header(s, 'Behind the scenes',
     'Chamber-staff operations: live data with minimal effort.')
 
 add_bullets(s, [
-    '🔄 One-click scraper updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
-    '✅ Approve / dismiss events in a queue; bulk-approve is one click',
-    '🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
-    '✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it',
-    '🏷 Tag taxonomy editor — add/rename/delete tags without code',
-    '🔗 Source URL management — add a new scraper feed by pasting a URL',
-    '📅 Auto-prune past events; auto-dismiss internal admin meetings',
-    '🌐 Public RSS feed at /feed.rss — partners republish without integration work',
-], Inches(0.6), Inches(1.85), Inches(12.1), Inches(5.0),
-   size=13, line_spacing=1.5)
+    ('🔄 One-click scraper updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
+     'Chamber staffer clicks "Run Scrapers" Monday morning; ~50 new events appear.'),
+    ('✅ Approve / dismiss events in a queue; bulk-approve is one click',
+     'Bulk-approve all KVMR events; dismiss the suspect ones individually.'),
+    ('🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
+     'One click after a scrape; 460 events get area + venue + tags fixed for ~20¢.'),
+    ('✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it',
+     'New cidery opens — staff types one row, hits save, it\'s live on the public site.'),
+    ('🏷 Tag taxonomy editor — add/rename/delete tags without code',
+     '"Music" splits into "Live Music" and "Open Mic" without a developer.'),
+    ('🔗 Source URL management — add a new scraper feed by pasting a URL',
+     'New venue website? Paste the URL, pick a parser pattern, done.'),
+    ('📅 Auto-prune past events; auto-dismiss internal admin meetings',
+     'Saturday\'s farmers market vanishes from the queue Sunday morning.'),
+    ('🌐 Public RSS feed at /feed.rss — partners republish without integration work',
+     'Local newspaper\'s "this weekend" widget pulls straight from /feed.rss.'),
+], Inches(0.6), Inches(1.7), Inches(12.1), Inches(5.2),
+   size=11, line_spacing=1.2, scenario_size=9)
 
 page_footer(s, 8, TOTAL)
 
@@ -396,14 +513,20 @@ slide_header(s, 'AI-powered tag refinement',
 add_text(s, 'What it fixes', Inches(0.6), Inches(1.85), Inches(6), Inches(0.45),
          size=14, bold=True, color=GOLD)
 add_bullets(s, [
-    '444 of 460 KVMR events tagged "Nevada County" → infers actual community',
-    'Empty location field on most KVMR events → extracts venue name',
-    '"Center for the Arts" → Grass Valley; "Miners Foundry" → Nevada City',
-    'Cluttered descriptions → clean one-line summaries',
-    'Truckee / Sierra-side events flagged "low quality" → auto-hidden',
-    'Future scrapes auto-categorize new events with the same logic',
-], Inches(0.6), Inches(2.3), Inches(6), Inches(4.5),
-   size=11, line_spacing=1.4)
+    ('444 of 460 KVMR events tagged "Nevada County" → infers actual community',
+     '"KVMR Storytelling Night" gets "Nevada City" instead of vague "Nevada County".'),
+    ('Empty location field on most KVMR events → extracts venue name',
+     '"Center for the Arts" surfaces as the venue from a description-only event.'),
+    ('"Center for the Arts" → Grass Valley; "Miners Foundry" → Nevada City',
+     'Visitor filtering by Grass Valley gets concerts without manual tagging.'),
+    ('Cluttered descriptions → clean one-line summaries',
+     'Long press-release blob shrinks to a clean teaser the visitor will actually read.'),
+    ('Truckee / Sierra-side events flagged "low quality" → auto-hidden',
+     'Tahoe events tagged "low quality" auto-hide on the public site, no manual cleanup.'),
+    ('Future scrapes auto-categorize new events with the same logic',
+     'Tuesday\'s new event gets correct area + venue + tags without human touch.'),
+], Inches(0.6), Inches(2.3), Inches(6), Inches(4.2),
+   size=10, line_spacing=1.15, scenario_size=8)
 
 # Right: cost table
 add_text(s, 'Cost', Inches(7.2), Inches(1.85), Inches(5.5), Inches(0.45),
@@ -574,14 +697,20 @@ add_text(s,
     size=15, color=DARK)
 
 add_bullets(s, [
-    'Day-by-day itinerary view structurally surfaces the "where do I sleep?" question',
-    '"Find Lodging" CTA at the top of every itinerary — booking always one click away',
-    'Empty lodging slots create a visual gap that drives the booking decision',
-    'New items default to the latest day — no day-1 pile-up; trip naturally fills out',
-    'Print view goes long-form per day — visitors who print, follow it',
-    'Smart suggestions are tag + geography aware — clusters keep visitors close to lodging',
-], Inches(0.6), Inches(2.95), Inches(12.1), Inches(3.5),
-   size=12, line_spacing=1.4)
+    ('Day-by-day itinerary view structurally surfaces the "where do I sleep?" question',
+     'Visitor sees Day 2 has no hotel and books one before leaving the page.'),
+    ('"Find Lodging" CTA at the top of every itinerary — booking always one click away',
+     'No hunting for a button — booking decision is visible on every itinerary view.'),
+    ('Empty lodging slots create a visual gap that drives the booking decision',
+     'That blank Day 2 stay tile is psychologically jarring; the visitor fills it.'),
+    ('New items default to the latest day — no day-1 pile-up; trip naturally fills out',
+     'Adding stops naturally extends the trip rather than cramming Day 1.'),
+    ('Print view goes long-form per day — visitors who print, follow it',
+     'Couple prints the itinerary; the same Day 1 / Day 2 structure follows on paper.'),
+    ('Smart suggestions are tag + geography aware — clusters keep visitors close to lodging',
+     'After Holbrooke Hotel goes in, suggestions cluster around Mill Street.'),
+], Inches(0.6), Inches(2.85), Inches(12.1), Inches(3.5),
+   size=11, line_spacing=1.2, scenario_size=9)
 
 # Closing quote
 add_rect(s, Inches(0.6), Inches(6.2), Inches(12.1), Inches(0.7),
