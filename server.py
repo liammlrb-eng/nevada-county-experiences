@@ -20,6 +20,9 @@ API endpoints:
   POST /api/events/<id>/dismiss  → mark event dismissed
   POST /api/scrape               → run scraper in background
   GET  /api/scrape/status        → current scrape status
+  GET  /api/suggestions          → visitor-submitted venue/event ideas
+  POST /api/suggestions          → record a new suggestion (from public form)
+  POST /api/suggestions/<id>/approve|dismiss|reopen → mark status
 """
 
 import os, sys, json, threading, subprocess, argparse
@@ -30,10 +33,11 @@ from flask import Flask, jsonify, request, send_from_directory, abort, Response
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
 SCRAPER_DIR = os.path.join(BASE_DIR, "scraper")
 OUT_DIR     = os.path.join(BASE_DIR, "scraper_output")
-EVENTS_FILE = os.path.join(OUT_DIR, "events.json")
-SOURCES_FILE= os.path.join(SCRAPER_DIR, "sources.json")
-SCRAPER_PY  = os.path.join(SCRAPER_DIR, "event_scraper.py")
-AI_PY       = os.path.join(SCRAPER_DIR, "ai_categorize.py")
+EVENTS_FILE      = os.path.join(OUT_DIR, "events.json")
+SOURCES_FILE     = os.path.join(SCRAPER_DIR, "sources.json")
+SUGGESTIONS_FILE = os.path.join(OUT_DIR, "suggestions.json")
+SCRAPER_PY       = os.path.join(SCRAPER_DIR, "event_scraper.py")
+AI_PY            = os.path.join(SCRAPER_DIR, "ai_categorize.py")
 
 app = Flask(__name__, static_folder=BASE_DIR, static_url_path="")
 
@@ -180,6 +184,108 @@ def dismiss_event(event_id):
         return jsonify({"error": "event not found"}), 404
     _save_events(events)
     return jsonify({"ok": True})
+
+
+# ── Suggestions API ──────────────────────────────────────────────────────────
+# Visitors submit venue / event / experience suggestions via the public form
+# (footer link "Suggest a venue or event"). Submissions land here and surface
+# in the admin "Suggestions" tab where chamber staff can approve / dismiss.
+
+_VALID_KINDS = {"venue", "event", "experience", "other"}
+
+def _load_suggestions():
+    try:
+        with open(SUGGESTIONS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def _save_suggestions(items):
+    os.makedirs(OUT_DIR, exist_ok=True)
+    with open(SUGGESTIONS_FILE, "w", encoding="utf-8") as f:
+        json.dump(items, f, indent=2, ensure_ascii=False)
+
+
+@app.route("/api/suggestions")
+def get_suggestions():
+    """Return all suggestions (or filter by ?status=pending|approved|dismissed)."""
+    items = _load_suggestions()
+    status_filter = request.args.get("status")
+    if status_filter:
+        items = [s for s in items if s.get("status") == status_filter]
+    return jsonify(items)
+
+
+@app.route("/api/suggestions", methods=["POST"])
+def post_suggestion():
+    """
+    Record a new visitor-submitted suggestion.
+
+    Expected JSON body:
+      { "kind": "venue|event|experience|other",
+        "name": "...",
+        "url": "...",
+        "description": "...",
+        "submitter_email": "..." }
+
+    Light spam protection: name max 120 chars, description max 600 chars,
+    other fields capped, single-shot per request (no batch). For
+    production, layer a rate-limit reverse proxy or CAPTCHA in front.
+    """
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()[:120]
+    if not name:
+        return jsonify({"error": "name is required"}), 400
+
+    kind = (data.get("kind") or "other").strip().lower()
+    if kind not in _VALID_KINDS:
+        kind = "other"
+
+    suggestion = {
+        "id":              f"sug_{int(datetime.now().timestamp() * 1000)}",
+        "kind":            kind,
+        "name":            name,
+        "url":             (data.get("url") or "").strip()[:300],
+        "description":     (data.get("description") or "").strip()[:600],
+        "submitter_email": (data.get("submitter_email") or "").strip()[:120],
+        "submitted_at":    datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "status":          "pending",
+        "reviewed_at":     None,
+        # Best-effort sender info for spam-debugging (no PII stored beyond IP)
+        "submitter_ip":    request.headers.get("X-Forwarded-For", request.remote_addr or "")[:64],
+    }
+
+    items = _load_suggestions()
+    items.append(suggestion)
+    _save_suggestions(items)
+    return jsonify({"ok": True, "id": suggestion["id"]}), 201
+
+
+def _set_suggestion_status(suggestion_id, new_status):
+    items = _load_suggestions()
+    now   = datetime.now().strftime("%Y-%m-%d %H:%M")
+    for s in items:
+        if s.get("id") == suggestion_id:
+            s["status"]      = new_status
+            s["reviewed_at"] = now if new_status != "pending" else None
+            _save_suggestions(items)
+            return jsonify({"ok": True})
+    return jsonify({"error": "suggestion not found"}), 404
+
+
+@app.route("/api/suggestions/<sid>/approve", methods=["POST"])
+def approve_suggestion(sid):
+    return _set_suggestion_status(sid, "approved")
+
+
+@app.route("/api/suggestions/<sid>/dismiss", methods=["POST"])
+def dismiss_suggestion(sid):
+    return _set_suggestion_status(sid, "dismissed")
+
+
+@app.route("/api/suggestions/<sid>/reopen", methods=["POST"])
+def reopen_suggestion(sid):
+    return _set_suggestion_status(sid, "pending")
 
 
 # ── RSS Feed ─────────────────────────────────────────────────────────────────

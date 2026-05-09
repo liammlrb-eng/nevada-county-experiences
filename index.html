@@ -1455,9 +1455,106 @@
   </div>
 </div>
 
-<footer>Nevada County, California · Gold Country · Data sourced from public venue & tourism listings</footer>
+<footer>
+  Nevada County, California · Gold Country · Data sourced from public venue &amp; tourism listings
+  &nbsp;·&nbsp;
+  <a href="#" onclick="openSuggestModal();return false" style="color:inherit;text-decoration:underline">Suggest a venue or event</a>
+</footer>
+
+<!-- ─── SUGGEST A VENUE / EVENT MODAL ─────────────────────────────────────── -->
+<div class="modal-overlay" id="suggestOverlay" onclick="if(event.target===this)closeSuggestModal()" style="z-index:1100">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeSuggestModal()">✕</button>
+      <h2>Suggest a venue or event</h2>
+      <p>Spot something missing? Tell us — the chamber will review and add it.</p>
+    </div>
+    <div class="modal-body" id="suggestBody">
+      <form id="suggestForm" onsubmit="submitSuggestion(event)">
+        <div style="display:flex;flex-direction:column;gap:14px">
+
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+            WHAT IS IT?
+            <select name="kind" required style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px;background:#fff">
+              <option value="">— choose one —</option>
+              <option value="venue">A venue or place</option>
+              <option value="event">A specific event with a date</option>
+              <option value="experience">An experience or activity</option>
+              <option value="other">Something else</option>
+            </select>
+          </label>
+
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+            NAME *
+            <input type="text" name="name" required maxlength="120" placeholder="e.g. Pine Tree Cafe"
+              style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px">
+          </label>
+
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+            WEBSITE OR LINK <span style="font-weight:400;color:var(--slate);text-transform:none;letter-spacing:0">(optional)</span>
+            <input type="url" name="url" maxlength="300" placeholder="https://"
+              style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px">
+          </label>
+
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+            BRIEF DESCRIPTION
+            <textarea name="description" maxlength="600" rows="3" placeholder="What makes it worth listing? Address, hours, vibe, dates if it's an event…"
+              style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px;resize:vertical"></textarea>
+          </label>
+
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+            YOUR EMAIL <span style="font-weight:400;color:var(--slate);text-transform:none;letter-spacing:0">(optional — only if you want a reply)</span>
+            <input type="email" name="submitter_email" maxlength="120" placeholder="you@example.com"
+              style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px">
+          </label>
+
+          <div id="suggestStatus" style="font-size:12px;color:var(--slate);min-height:18px"></div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+            <button type="button" onclick="closeSuggestModal()" style="background:transparent;color:var(--slate);border:1px solid #d4c9b0;padding:9px 18px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:0.06em">Cancel</button>
+            <button type="submit" id="suggestSubmitBtn" style="background:var(--gold);color:#fff;border:none;padding:9px 22px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:0.06em;font-weight:600">Submit suggestion</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
+// ─── ANALYTICS CONFIG (opt-in, off by default) ────────────────────────────
+// The site collects no analytics, no cookies, and no third-party trackers
+// by default — that's part of the privacy posture pitched to the chamber.
+//
+// To enable aggregate, privacy-respecting measurement (page views, popular
+// cards, share events — never per-visitor identity), set the two constants
+// below. Plausible is GDPR-compliant out of the box (no cookies), open
+// source, ~$9/mo hosted, free to self-host on the same VPS.
+//
+//   PLAUSIBLE_DOMAIN  — the registered site domain in your Plausible account
+//   PLAUSIBLE_SCRIPT  — script URL: 'https://plausible.io/js/script.js' for
+//                       hosted, or your own self-hosted URL
+//
+// Once enabled, the helper `track('Event Name', {prop:'value'})` becomes a
+// no-op-safe wrapper around window.plausible() — call it from anywhere in
+// the app to log a custom event.
+const PLAUSIBLE_DOMAIN = '';   // empty string = analytics disabled (default)
+const PLAUSIBLE_SCRIPT = 'https://plausible.io/js/script.js';
+
+if (PLAUSIBLE_DOMAIN) {
+  const _ps = document.createElement('script');
+  _ps.defer = true;
+  _ps.dataset.domain = PLAUSIBLE_DOMAIN;
+  _ps.src = PLAUSIBLE_SCRIPT;
+  document.head.appendChild(_ps);
+  // Plausible's queueing stub — supports calls before the script finishes loading
+  window.plausible = window.plausible || function(){(window.plausible.q=window.plausible.q||[]).push(arguments)};
+}
+
+/** Safe, no-op-when-disabled custom-event tracker. */
+function track(name, props) {
+  try { if (window.plausible) window.plausible(name, props ? {props} : undefined); } catch(e) {}
+}
+
 const THEMES = [
   { id: 'historic',  name: 'Historic & Gold Rush',    tagline: 'Stories carved in stone, gold & time',      tags: ['Historic','Gold Rush'],                                    photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=320&h=200&fit=crop' },
   { id: 'arts',      name: 'Arts, Culture & Music',   tagline: 'Studios, stages & storytelling',            tags: ['Artistic','Music','Film','Theater','Festival','Dance','Art','Lecture'], photo: 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=320&h=200&fit=crop' },
@@ -3727,6 +3824,7 @@ function renderManageData() {
       <button class="manage-tab-btn ${manageDataTab==='experiences'?'active':''}" onclick="switchManageTab('experiences')">Experiences</button>
       <button class="manage-tab-btn ${manageDataTab==='itineraries'?'active':''}" onclick="switchManageTab('itineraries')">Itineraries</button>
       <button class="manage-tab-btn ${manageDataTab==='events'?'active':''}" onclick="switchManageTab('events')">📅 Events Queue</button>
+      <button class="manage-tab-btn ${manageDataTab==='suggestions'?'active':''}" onclick="switchManageTab('suggestions')">💡 Suggestions</button>
       <button class="manage-tab-btn ${manageDataTab==='sources'?'active':''}" onclick="switchManageTab('sources')">🔗 Event Sources</button>
     </div>`;
 
@@ -3777,6 +3875,10 @@ function renderManageData() {
     subtitle.textContent = 'Review imported events — approve to publish, dismiss to hide permanently';
     body.innerHTML = tabBar + `<div id="eventsQueuePanel" style="padding:0;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden"><div style="padding:24px;color:#888;font-size:13px">Loading events…</div></div>`;
     renderEventsQueue();
+  } else if (manageDataTab === 'suggestions') {
+    subtitle.textContent = 'Visitor-submitted venues, events, and experiences — review and follow up';
+    body.innerHTML = tabBar + `<div id="suggestionsPanel" style="padding:0;flex:1;min-height:0;overflow-y:auto"><div style="padding:24px;color:#888;font-size:13px">Loading suggestions…</div></div>`;
+    renderSuggestionsTab();
   } else if (manageDataTab === 'sources') {
     subtitle.textContent = 'Manage event source URLs and schedules';
     body.innerHTML = tabBar + `<div id="sourcesPanel" style="padding:0;flex:1;min-height:0;overflow-y:auto"><div style="padding:24px;color:#888;font-size:13px">Loading sources…</div></div>`;
@@ -4153,7 +4255,108 @@ async function approveAllEvents(count) {
   renderEventsQueue();
 }
 
-// ── SCRAPER SOURCES TAB ───────────────────────────────────────────────────────
+// ── SUGGESTIONS TAB ───────────────────────────────────────────────────────────
+async function renderSuggestionsTab() {
+  const panel = document.getElementById('suggestionsPanel');
+  if (!panel) return;
+
+  if (API_BASE === null) {
+    panel.innerHTML = `<div style="padding:24px;color:#888;font-size:13px">
+      Server not running — start <code>python server.py</code> to view submitted suggestions.
+    </div>`;
+    return;
+  }
+
+  let suggestions = [];
+  try {
+    const r = await fetch(`${API_BASE}/api/suggestions`);
+    suggestions = await r.json();
+  } catch(e) {
+    panel.innerHTML = `<div style="padding:24px;color:#c0392b;font-size:13px">Failed to load suggestions: ${e.message}</div>`;
+    return;
+  }
+
+  // Most recent first; pending before reviewed
+  suggestions.sort((a, b) => {
+    const ap = (a.status === 'pending') ? 0 : 1;
+    const bp = (b.status === 'pending') ? 0 : 1;
+    if (ap !== bp) return ap - bp;
+    return (b.submitted_at || '').localeCompare(a.submitted_at || '');
+  });
+
+  const pendingCount = suggestions.filter(s => s.status === 'pending').length;
+
+  const escapeHtml = (s) => String(s||'').replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  if (suggestions.length === 0) {
+    panel.innerHTML = `
+      <div style="padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8;font-size:12px;color:var(--brown);font-family:'Josefin Sans';letter-spacing:0.06em;font-weight:600">
+        SUGGESTIONS &nbsp;<span style="color:#999;font-weight:400">— 0 received</span>
+      </div>
+      <div style="padding:24px;color:#888;font-size:13px">
+        No suggestions yet. The "Suggest a venue or event" link in the public footer
+        opens a form that lands here.
+      </div>`;
+    return;
+  }
+
+  const cards = suggestions.map(s => {
+    const isPending = s.status === 'pending';
+    const kind = s.kind || 'other';
+    const kindLabel = {venue:'Venue', event:'Event', experience:'Experience', other:'Other'}[kind] || kind;
+    const statusBadge = isPending
+      ? `<span style="background:var(--gold);color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:0.06em">PENDING</span>`
+      : (s.status === 'approved'
+          ? `<span style="background:var(--forest);color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:0.06em">APPROVED</span>`
+          : `<span style="background:#999;color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:0.06em">DISMISSED</span>`);
+
+    return `
+      <div style="background:#fff;border:1px solid #e0d8c8;border-radius:6px;padding:14px 16px;margin:10px 16px">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+              ${statusBadge}
+              <span style="font-size:11px;color:var(--slate);text-transform:uppercase;letter-spacing:0.06em">${escapeHtml(kindLabel)}</span>
+              <span style="font-size:11px;color:#999">${escapeHtml(s.submitted_at || '')}</span>
+            </div>
+            <div style="font-size:14px;font-weight:600;color:var(--brown);margin-bottom:2px">${escapeHtml(s.name)}</div>
+            ${s.url ? `<div style="font-size:11px;margin-bottom:4px"><a href="${escapeHtml(s.url)}" target="_blank" rel="noopener" style="color:var(--gold)">${escapeHtml(s.url)}</a></div>` : ''}
+            ${s.description ? `<div style="font-size:12px;color:var(--slate);line-height:1.5;margin-top:6px">${escapeHtml(s.description)}</div>` : ''}
+            ${s.submitter_email ? `<div style="font-size:11px;color:#888;margin-top:6px">From: <a href="mailto:${escapeHtml(s.submitter_email)}" style="color:#888">${escapeHtml(s.submitter_email)}</a></div>` : '<div style="font-size:11px;color:#bbb;margin-top:6px">From: anonymous</div>'}
+          </div>
+          ${isPending ? `
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            <button onclick="reviewSuggestion('${s.id}','approved')" style="background:var(--forest);color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">✓ Approve</button>
+            <button onclick="reviewSuggestion('${s.id}','dismissed')" style="background:#c0392b;color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">✗ Dismiss</button>
+          </div>` : `
+          <button onclick="reviewSuggestion('${s.id}','pending')" style="background:transparent;color:var(--slate);border:1px solid #d4c9b0;padding:4px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-family:inherit">Re-open</button>`}
+        </div>
+      </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div style="padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8;display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;font-family:'Josefin Sans';letter-spacing:0.06em;color:var(--brown);font-weight:600">SUGGESTIONS</span>
+      <span style="font-size:11px;color:#999">${suggestions.length} total · ${pendingCount} pending</span>
+      <span style="margin-left:auto;font-size:11px;color:#999">Approval here just marks status — copy details to the Experiences or Events tabs to publish.</span>
+    </div>
+    <div style="padding:6px 0">${cards}</div>`;
+}
+
+async function reviewSuggestion(id, newStatus) {
+  if (API_BASE === null) return;
+  try {
+    await fetch(`${API_BASE}/api/suggestions/${encodeURIComponent(id)}/${newStatus === 'pending' ? 'reopen' : newStatus === 'approved' ? 'approve' : 'dismiss'}`, {
+      method: 'POST',
+    });
+    renderSuggestionsTab();
+  } catch(e) {
+    alert('Could not reach server.');
+  }
+}
+
+// ── EVENT SOURCES TAB ─────────────────────────────────────────────────────────
 async function renderScraperSources() {
   const panel = document.getElementById('sourcesPanel');
   if (!panel) return;
@@ -4265,6 +4468,85 @@ function getAllMasterTags() {
     'Scenic','Social','Spiritual','Sport'];
   const custom = getCustomTags();
   return [...new Set([...base, ...custom])].sort();
+}
+
+// ─── SUGGEST A VENUE / EVENT MODAL ────────────────────────────────────────
+function openSuggestModal() {
+  const overlay = document.getElementById('suggestOverlay');
+  if (!overlay) return;
+  // Reset form state every open
+  const form = document.getElementById('suggestForm');
+  if (form) form.reset();
+  const status = document.getElementById('suggestStatus');
+  if (status) { status.textContent = ''; status.style.color = 'var(--slate)'; }
+  const btn = document.getElementById('suggestSubmitBtn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Submit suggestion'; }
+  overlay.classList.add('open');
+  track('Suggestion Modal Opened');
+}
+
+function closeSuggestModal() {
+  const overlay = document.getElementById('suggestOverlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+async function submitSuggestion(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const status = document.getElementById('suggestStatus');
+  const btn = document.getElementById('suggestSubmitBtn');
+
+  // Pull the field values
+  const data = {
+    kind:            form.kind.value || 'other',
+    name:            (form.name.value || '').trim(),
+    url:             (form.url.value || '').trim(),
+    description:     (form.description.value || '').trim(),
+    submitter_email: (form.submitter_email.value || '').trim(),
+  };
+  if (!data.name) {
+    status.textContent = 'A name is required.';
+    status.style.color = '#c0392b';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  status.textContent = '';
+
+  // No server? Fall back to opening a mailto link the visitor can send.
+  if (API_BASE === null) {
+    const subj = encodeURIComponent(`Suggestion: ${data.name}`);
+    const body = encodeURIComponent(
+      `Type: ${data.kind}\nName: ${data.name}\nURL: ${data.url}\n\n${data.description}\n\n— ${data.submitter_email || 'anonymous'}`
+    );
+    // Replace this address when going live with the chamber
+    window.location.href = `mailto:hello@example.com?subject=${subj}&body=${body}`;
+    status.textContent = 'Opened your email client — please send the message to finish.';
+    btn.disabled = false;
+    btn.textContent = 'Submit suggestion';
+    return;
+  }
+
+  try {
+    const r = await fetch(`${API_BASE}/api/suggestions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    status.textContent = '✓ Thanks — submission received. The chamber will review it.';
+    status.style.color = 'var(--forest)';
+    btn.textContent = 'Sent';
+    track('Suggestion Submitted', {kind: data.kind});
+    // Auto-close after 1.5s
+    setTimeout(closeSuggestModal, 1800);
+  } catch(e) {
+    status.textContent = `Could not reach the server. Try again later, or email the chamber directly.`;
+    status.style.color = '#c0392b';
+    btn.disabled = false;
+    btn.textContent = 'Submit suggestion';
+  }
 }
 
 function openTagManager() {

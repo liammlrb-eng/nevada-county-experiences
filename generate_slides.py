@@ -517,8 +517,10 @@ def slide_privacy(s):
          'EU visitor on holiday gets the site without a banner ambush.'),
         ('No privacy review, no consent-platform fees, no compliance overhead',
          'Annual compliance budget for the platform: $0 — nothing to review.'),
-    ], Inches(0.6), Inches(1.7), Inches(12.1), Inches(4.5),
-       size=11, line_spacing=1.2, scenario_size=9)
+        ('Opt-in measurement available if needed (Plausible — no cookies, no PII)',
+         'If the chamber wants aggregate metrics later, flip a config flag — no rebuild.'),
+    ], Inches(0.6), Inches(1.7), Inches(12.1), Inches(4.7),
+       size=11, line_spacing=1.18, scenario_size=9)
 
     # Closing quote
     add_rect(s, Inches(0.6), Inches(6.0), Inches(12.1), Inches(0.85),

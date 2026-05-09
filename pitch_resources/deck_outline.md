@@ -167,10 +167,12 @@ After the demo, personas land as "these are real people I just saw using the too
 - Chamber sees zero personal information about visitors
 - No GDPR / CCPA banners required (because nothing is collected)
 - No privacy review, no consent-platform fees, no compliance overhead
+- Opt-in measurement available if needed (Plausible — no cookies, no PII)
+  ↳ *If the chamber wants aggregate metrics later, flip a config flag — no rebuild.*
 
 > *"Visitors stay anonymous; the chamber gets credit for respecting them."*
 
-> ⚠️ **Pushback prep:** If the TOT official asks "how do we measure whether this is working?", offer Plausible Analytics as a middle ground (privacy-respecting, no cookies, GDPR-compliant, open source).
+> ✅ **Pushback prep handled:** The Plausible Analytics fallback is now wired in (off by default). If the TOT official asks "how do we measure whether this is working?", you can show the config block in `index.html` — set `PLAUSIBLE_DOMAIN` and reload.
 
 ---
 
