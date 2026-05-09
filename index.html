@@ -3727,7 +3727,7 @@ function renderManageData() {
       <button class="manage-tab-btn ${manageDataTab==='experiences'?'active':''}" onclick="switchManageTab('experiences')">Experiences</button>
       <button class="manage-tab-btn ${manageDataTab==='itineraries'?'active':''}" onclick="switchManageTab('itineraries')">Itineraries</button>
       <button class="manage-tab-btn ${manageDataTab==='events'?'active':''}" onclick="switchManageTab('events')">📅 Events Queue</button>
-      <button class="manage-tab-btn ${manageDataTab==='sources'?'active':''}" onclick="switchManageTab('sources')">🔗 Scraper Sources</button>
+      <button class="manage-tab-btn ${manageDataTab==='sources'?'active':''}" onclick="switchManageTab('sources')">🔗 Event Sources</button>
     </div>`;
 
   if (manageDataTab === 'experiences') {
@@ -3774,11 +3774,11 @@ function renderManageData() {
         </table>
       </div>`;
   } else if (manageDataTab === 'events') {
-    subtitle.textContent = 'Review scraped events — approve to publish, dismiss to hide permanently';
+    subtitle.textContent = 'Review imported events — approve to publish, dismiss to hide permanently';
     body.innerHTML = tabBar + `<div id="eventsQueuePanel" style="padding:0;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden"><div style="padding:24px;color:#888;font-size:13px">Loading events…</div></div>`;
     renderEventsQueue();
   } else if (manageDataTab === 'sources') {
-    subtitle.textContent = 'Manage scraper source URLs and schedules';
+    subtitle.textContent = 'Manage event source URLs and schedules';
     body.innerHTML = tabBar + `<div id="sourcesPanel" style="padding:0;flex:1;min-height:0;overflow-y:auto"><div style="padding:24px;color:#888;font-size:13px">Loading sources…</div></div>`;
     renderScraperSources();
   } else {
@@ -3813,8 +3813,8 @@ async function renderEventsQueue() {
     <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
         ${scrapeStatus ? `
-          <span style="font-size:11px;color:var(--slate)">Last scrape: <strong>${scrapeStatus.last_run||'Never'}</strong></span>
-          ${scrapeStatus.running ? '<span style="margin-left:12px;color:var(--gold);font-size:11px">⟳ Scraping…</span>' : ''}
+          <span style="font-size:11px;color:var(--slate)">Last refresh: <strong>${scrapeStatus.last_run||'Never'}</strong></span>
+          ${scrapeStatus.running ? '<span style="margin-left:12px;color:var(--gold);font-size:11px">⟳ Refreshing…</span>' : ''}
           ${scrapeStatus.last_error ? `<span style="margin-left:12px;color:#c0392b;font-size:11px">⚠ ${scrapeStatus.last_error.slice(0,60)}</span>` : ''}
           ${aiStatus && aiStatus.last_run ? `<span style="margin-left:12px;font-size:11px;color:var(--slate)">AI: <strong>${aiStatus.last_run.split(' ')[1]||aiStatus.last_run}</strong>${aiStatus.last_processed ? ` (${aiStatus.last_processed})` : ''}</span>` : ''}
           ${aiBusy ? '<span style="margin-left:12px;color:var(--gold);font-size:11px">🤖 Categorizing…</span>' : ''}
@@ -4187,7 +4187,7 @@ async function renderScraperSources() {
 
   panel.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8">
-      <span style="font-size:12px;font-family:'Josefin Sans';letter-spacing:0.06em;color:var(--brown);font-weight:600">SCRAPER SOURCES</span>
+      <span style="font-size:12px;font-family:'Josefin Sans';letter-spacing:0.06em;color:var(--brown);font-weight:600">EVENT SOURCES</span>
       <span style="margin-left:auto;font-size:11px;color:#999">${sources.length} source${sources.length!==1?'s':''}</span>
       <button onclick="addSource()" style="background:var(--forest);color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">+ Add Source</button>
       <button onclick="saveSources()" style="background:var(--brown);color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">💾 Save</button>
