@@ -1367,6 +1367,7 @@
   <p class="section-desc">Pick one or more vibes — they combine with the filters above to narrow your results.</p>
 
   <div class="themes-grid" id="themesGrid"></div>
+  <div id="vibePillsRow" style="display:none;margin-top:14px;padding:10px 0 0;border-top:1px dashed #e0d8c8;flex-wrap:wrap;gap:6px;align-items:center"></div>
 
   <div class="section-label" style="margin-top:16px">Step 3</div>
   <div class="section-title" style="margin-bottom:8px">Browse & Build Your List</div>
@@ -2063,8 +2064,11 @@ function toggleTheme(id) {
   } else {
     selectedThemes.add(id);   // multi-select: OR logic between vibes
   }
+  // Reset vibe-pill when vibe selection changes (it's tied to the active vibe)
+  activeVibePill = null;
   renderThemes();
   renderActiveFilters();
+  if (typeof renderVibePills === 'function') renderVibePills();
   renderExperiences();
   // If the Events tab is currently active, re-filter it too
   const evtTab = document.getElementById('tab-events');
@@ -2153,6 +2157,13 @@ function renderExperiences() {
         if (dateTo   && d > dateTo)   return false;
         return true;
       });
+    }
+
+    // Vibe-pill filter (Foodie → Markets, Active → Hiking, etc.)
+    if (selectedThemes.size === 1 && activeVibePill) {
+      const vibeId = [...selectedThemes][0];
+      const vibeDef = (VIBE_PILLS[vibeId] || []).find(p => p.id === activeVibePill);
+      if (vibeDef) candidates = candidates.filter(vibeDef.match);
     }
 
     eventsInGrid = candidates;
@@ -3229,6 +3240,114 @@ async function saveToStorage() {
 
 // Patch all functions that read EXPERIENCES to use liveExperiences instead
 // We override the filter function to use liveExperiences
+// ── VIBE-LEVEL SUB-PILLS ─────────────────────────────────────────────
+// When a single vibe is selected, show a row of pills to narrow within
+// that vibe — e.g. Foodie → Restaurants / Markets / Wineries / Bakeries.
+let activeVibePill = null;
+
+const VIBE_PILLS = {
+  foodie: [
+    { id: 'restaurants', label: '🍽 Restaurants',     match: e => e.type === 'Restaurant' },
+    { id: 'wineries',    label: '🍷 Wineries',         match: e => e.type === 'Winery' || e.type === 'Tasting room' },
+    { id: 'breweries',   label: '🍺 Breweries',        match: e => e.type === 'Brewery' || /tap house|brewing|taproom/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'bakeries',    label: '🥖 Bakeries',         match: e => e.type === 'Bakery' || /bakery|sourdough|pastries|donut|pasties/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'markets',     label: '🛒 Markets & Farms',  match: e => /farmers market|night market|plant sale|marketplace|community garden/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Market') || (e.tags||[]).includes('Garden') },
+    { id: 'foodevents',  label: '🎉 Food Events',      match: e => /food festival|wine festival|harvest|food walk|food tour|wine.?walk/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Food & Drink') },
+  ],
+  active: [
+    { id: 'hiking',      label: '🥾 Hiking',           match: e => (e.tags||[]).includes('Hiking') },
+    { id: 'biking',      label: '🚲 Biking',           match: e => (e.tags||[]).includes('Biking') },
+    { id: 'swimming',    label: '🏊 Swimming',         match: e => (e.tags||[]).includes('Swimming') },
+    { id: 'fishing',     label: '🎣 Fishing',          match: e => (e.tags||[]).includes('Fishing') },
+    { id: 'boating',     label: '🛶 Boating',          match: e => (e.tags||[]).includes('Boating') },
+    { id: 'running',     label: '🏃 Running',          match: e => (e.tags||[]).includes('Running') },
+    { id: 'racquet',     label: '🎾 Racquet & Disc',   match: e => /pickleball|tennis|disc golf|bocce/i.test(e.name + ' ' + (e.sub||'')) },
+  ],
+  handson: [
+    { id: 'metal',       label: '🔨 Metal & Forge',    match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
+    { id: 'ceramic',     label: '🏺 Ceramics',         match: e => /ceramic|pottery|clay|wheel-thrown|stoneware/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'glass',       label: '🪟 Glass',            match: e => /\bglass\b|stained glass|glass blow/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'fiber',       label: '🧵 Fiber & Textile',  match: e => /fiber|weav|knit|textile|hat.?making|natural dye|sew/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'paint',       label: '🎨 Painting',         match: e => /painting|drawing|mixed media|watercolor/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'goldpan',     label: '⚱ Gold Panning',      match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
+  ],
+  arts: [
+    { id: 'theater',     label: '🎭 Theater',          match: e => { const t = (e.name + ' ' + (e.sub||'')).toLowerCase(); return /theat(re|er)|stages|cats\b|community asian/.test(t) && !/cinema/.test(t); } },
+    { id: 'cinema',      label: '🎬 Cinema',           match: e => /cinema|del oro|onyx|sierra cinemas/i.test(e.name) },
+    { id: 'concerts',    label: '🎵 Concert Halls',    match: e => /center for the arts|miners foundry|inconcert|schoolhouse cultural|nevada theatre/i.test(e.name) },
+    { id: 'galleries',   label: '🖼 Galleries',        match: e => e.type === 'Gallery' || /gallery|art walk/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'films',       label: '🎬 Film Events',      match: e => (e.tags||[]).includes('Film') || /film festival/i.test(e.name) },
+  ],
+  historic: [
+    { id: 'museums',     label: '🏛 Museums',          match: e => e.type === 'Museum' },
+    { id: 'mines',       label: '⛏ Mines',             match: e => /mine|mining|empire|north star|pelton/i.test(e.name) && !/yard/i.test(e.name) },
+    { id: 'goldpan',     label: '⚱ Gold Panning',      match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'sites',       label: '🏘 Historic Sites',   match: e => e.type === 'Historic site' || /historic|heritage|gold rush/i.test(e.name + ' ' + (e.sub||'')) },
+  ],
+  wellness: [
+    { id: 'yoga',        label: '🧘 Yoga',             match: e => /yoga|pilates|warmth|wild mountain|kinfolk|golden mandala/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'meditation',  label: '🕉 Meditation',       match: e => /meditation|insight|mindful|ananda|expanding light/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'spa',         label: '💆 Spa & Float',      match: e => /float|spa|sauna|massage|sound healing|reiki|day spa/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'gardens',     label: '🌷 Gardens',          match: e => (e.tags||[]).includes('Garden') || /garden|hermitage|tulip|botanical/i.test(e.name + ' ' + (e.sub||'')) },
+  ],
+  relaxed: [
+    { id: 'bnbs',        label: '🏡 B&Bs / Inns',      match: e => e.type === 'Lodging' && /\binn\b|b&b|bed.?and.?breakfast|cottages|parsonage|harmony ridge|speakeasy|sierra mountain/i.test(e.name) && !/campground/i.test(e.name) },
+    { id: 'hotels',      label: '🏨 Hotels',           match: e => e.type === 'Lodging' && /\bhotel\b/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'spa',         label: '💆 Spa & Float',      match: e => /float|spa|sauna|massage/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'gardens',     label: '🌷 Gardens',          match: e => (e.tags||[]).includes('Garden') },
+    { id: 'finedining',  label: '🍷 Fine Dining',      match: e => e.type === 'Restaurant' && (/farm.?to.?table|steakhouse|fine dining|chef/i.test((e.notes||'') + ' ' + (e.sub||''))) },
+  ],
+  family: [
+    { id: 'goldpan',     label: '⚱ Gold Panning',      match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'pools',       label: '🏊 Pools',            match: e => /\bpool/i.test(e.name + ' ' + (e.sub||'')) && !/spa|float/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'markets',     label: '🛒 Markets & Fairs',  match: e => /market|fair|rodeo|fairgrounds/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Market') },
+    { id: 'museums',     label: '🏛 Museums',          match: e => e.type === 'Museum' && (e.tags||[]).includes('Family') },
+    { id: 'parks',       label: '🌲 Parks',            match: e => /park|trail|state park/i.test(e.name + ' ' + (e.sub||'')) && !/parking/i.test(e.name) },
+  ],
+  festival: [
+    { id: 'holiday',     label: '🎄 Holiday',          match: e => (e.tags||[]).includes('Holiday') || /christmas|new year|mardi gras|halloween/i.test(e.name) },
+    { id: 'film',        label: '🎬 Film Festivals',   match: e => /film festival/i.test(e.name) },
+    { id: 'music',       label: '🎵 Music Festivals',  match: e => /music festival|bluegrass festival|sugar pine music|music in the mountains/i.test(e.name) },
+    { id: 'cultural',    label: '🎨 Cultural',         match: e => /poetry|heritage|open studios|storytelling/i.test(e.name) },
+  ],
+};
+
+function renderVibePills() {
+  const row = document.getElementById('vibePillsRow');
+  if (!row) return;
+  // Only show pills when exactly ONE vibe is selected — avoids confusion
+  if (selectedThemes.size !== 1) {
+    row.style.display = 'none';
+    row.innerHTML = '';
+    activeVibePill = null;
+    return;
+  }
+  const vibeId = [...selectedThemes][0];
+  const pills = VIBE_PILLS[vibeId];
+  if (!pills) {
+    row.style.display = 'none';
+    row.innerHTML = '';
+    activeVibePill = null;
+    return;
+  }
+  const vibeName = (THEMES.find(t => t.id === vibeId) || {}).name || vibeId;
+  row.style.display = 'flex';
+  row.innerHTML =
+    `<span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--slate);font-weight:600;margin-right:6px">Narrow ${vibeName}:</span>` +
+    pills.map(p => {
+      const on = activeVibePill === p.id;
+      return `<button onclick="toggleVibePill('${p.id}')" style="font-size:11px;padding:5px 12px;border-radius:14px;border:1.5px solid ${on?'var(--gold)':'#d4c9b0'};background:${on?'var(--gold)':'transparent'};color:${on?'#fff':'var(--slate)'};cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:0.04em;transition:all 0.15s">${p.label}</button>`;
+    }).join('') +
+    (activeVibePill ? `<button onclick="toggleVibePill(null)" style="font-size:11px;padding:5px 10px;border:none;background:transparent;color:#999;cursor:pointer;font-family:inherit">Clear ✕</button>` : '');
+}
+
+function toggleVibePill(id) {
+  activeVibePill = (activeVibePill === id) ? null : id;
+  renderVibePills();
+  renderExperiences();
+  renderActiveFilters();
+}
+
 // ── CATEGORY SUB-PILLS ───────────────────────────────────────────────
 // When a Category is selected that has multiple sub-types worth distinguishing,
 // show a row of pills to narrow further.
@@ -3275,6 +3394,15 @@ const SUB_PILLS = {
     { id: 'yoga',       label: '🧘 Yoga',         match: e => /yoga|pilates|warmth|wild mountain|kinfolk|golden mandala/i.test(e.name + ' ' + (e.sub||'')) },
     { id: 'meditation', label: '🕉️ Meditation',   match: e => /meditation|insight|mindful|ananda|expanding light/i.test(e.name + ' ' + (e.sub||'')) },
     { id: 'spa',        label: '💆 Spa & Float',  match: e => /float|spa|sauna|massage|sound healing|reiki/i.test(e.name + ' ' + (e.sub||'')) },
+  ],
+  'Hands-on': [
+    { id: 'metal',    label: '🔨 Metal & Forge',          match: e => /forge|blacksmith|metalwork|metalsmith|silversmith|jewelry|cnc/i.test((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name) },
+    { id: 'ceramic',  label: '🏺 Ceramics & Pottery',     match: e => /ceramic|pottery|clay|wheel-thrown|stoneware/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'glass',    label: '🪟 Glass',                  match: e => /\bglass\b|stained glass|glass blow/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'fiber',    label: '🧵 Fiber & Textile',         match: e => /fiber|weav|knit|textile|hat.?making|natural dye|spinning|sew/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'paint',    label: '🎨 Painting & Mixed Media', match: e => /painting|drawing|mixed media|watercolor|oil paint/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'wood',     label: '🪚 Woodworking',             match: e => /woodwork|carving|joinery/i.test((e.notes||'') + ' ' + (e.sub||'')) },
+    { id: 'community', label: '🎯 Drop-in / Community',   match: e => /drop.?in|free|community|all.ages|beginner/i.test((e.notes||'') + ' ' + (e.sub||'')) },
   ],
   'Activity': [
     { id: 'workshops', label: '🛠️ Workshops & Classes', match: e => /workshop|class|forge|school|craft|asif|wolf craft|craftfolk/i.test(e.name + ' ' + (e.sub||'')) },
@@ -3347,10 +3475,18 @@ function filterExperiences() {
   const typeRaw = document.getElementById('filterType').value;
   const subPillDef = (SUB_PILLS[typeRaw] || []).find(p => p.id === activeSubPill);
 
+  // Vibe-pill matcher (e.g. Foodie > Markets) — only when 1 vibe selected
+  let vibePillDef = null;
+  if (selectedThemes.size === 1 && activeVibePill) {
+    const vibeId = [...selectedThemes][0];
+    vibePillDef = (VIBE_PILLS[vibeId] || []).find(p => p.id === activeVibePill);
+  }
+
   return liveExperiences.filter(e => {
     if (area && !e.area.toLowerCase().includes(area)) return false;
     if (typeFilter && e.type.toLowerCase() !== typeFilter) return false;
     if (subPillDef && !subPillDef.match(e)) return false;
+    if (vibePillDef && !vibePillDef.match(e)) return false;
 
     const expSeason = (e.season || 'Year-Round');
 
