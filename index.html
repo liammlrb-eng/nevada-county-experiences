@@ -2413,7 +2413,24 @@ function assignToDay(id, day) {
 function addDay() {
   tripDays += 1;
   _saveMyList();
-  renderModal();
+  // Close the modal and take the visitor back to the main page so they
+  // can browse experiences/events to fill the new day. New items default
+  // to the last day (= the day we just added), so adds land correctly.
+  closeModal();
+  // Make sure we're on the Experiences tab (not Itineraries / Events)
+  const expTab = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
+  if (expTab && !expTab.classList.contains('active')) {
+    switchTab('experiences', expTab);
+  }
+  // Brief confirmation toast
+  if (typeof _showShareToast === 'function') {
+    _showShareToast(`✓ Day ${tripDays} added — pick stops below for your new day`);
+  }
+  // Scroll the experiences grid into view
+  setTimeout(() => {
+    const grid = document.getElementById('expGrid');
+    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
 }
 
 function removeDay() {
