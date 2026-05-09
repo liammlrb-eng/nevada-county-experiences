@@ -552,8 +552,10 @@ def slide_admin(s):
          'Saturday\'s farmers market vanishes from the queue Sunday morning.'),
         ('🌐 Public RSS feed at /feed.rss — partners republish without integration work',
          'Local newspaper\'s "this weekend" widget pulls straight from /feed.rss.'),
-    ], Inches(0.6), Inches(1.7), Inches(12.1), Inches(5.2),
-       size=11, line_spacing=1.2, scenario_size=9)
+        ('💡 Public "Suggest a venue or event" form — submissions queue for chamber review',
+         'Chamber emails members the URL; venue owner fills the form; entry lands in admin Suggestions tab.'),
+    ], Inches(0.6), Inches(1.65), Inches(12.1), Inches(5.4),
+       size=10, line_spacing=1.18, scenario_size=8)
 
 
 def slide_ai(s):
@@ -670,9 +672,9 @@ def slide_next_steps(s):
         'Push schema.org/Event JSON-LD adoption — one '
         'snippet on each event page makes auto-importing '
         'reliable without custom code per site',
-        'Solicit "missing venue" submissions — a simple '
-        'web form for member venues to flag events that '
-        'didn\'t get auto-discovered',
+        'Promote the public "Suggest a venue or event" '
+        'form to members — already wired (footer + admin '
+        'queue); the lift is socialization, not engineering',
         'Identify the 5-10 venues responsible for the bulk '
         'of visitor traffic and prioritize their data '
         'reliability over long-tail coverage',

@@ -188,6 +188,8 @@ After the demo, personas land as "these are real people I just saw using the too
 - 🔗 Event-source URL management — add a new source by pasting a URL
 - 📅 Auto-prune past events; auto-dismiss internal admin meetings
 - 🌐 Public RSS feed at /feed.rss — partners republish without integration work
+- 💡 Public "Suggest a venue or event" form — submissions queue for chamber review
+  ↳ *Chamber emails members the URL; venue owner fills the form; entry lands in admin Suggestions tab.*
 
 ---
 
@@ -242,7 +244,7 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 ### MEMBER OUTREACH
 - Encourage venues to publish events on a platform with a public feed (Trumba, Tribe Events, Eventbrite)
 - Push schema.org/Event JSON-LD adoption
-- Solicit "missing venue" submissions
+- Promote the public "Suggest a venue or event" form to members — already wired (footer + admin queue); the lift is socialization, not engineering
 - Identify the 5–10 venues responsible for the bulk of visitor traffic
 
 ### OPERATIONS
