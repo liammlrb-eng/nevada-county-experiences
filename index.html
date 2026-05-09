@@ -2549,7 +2549,7 @@ function updateFab() {
 function renderItineraries() {
   const grid = document.getElementById('itinGrid');
   if (!liveItineraries.length) {
-    grid.innerHTML = '<div class="no-results">No itineraries yet.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Open ⚙ Manage Database → Itineraries to create one.</span></div>';
+    grid.innerHTML = '<div class="no-results">No itineraries yet.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Build a day-by-day plan in <strong>My Itinerary</strong>, then click <strong>✨ Publish as Suggested</strong> — it will appear here for all visitors.</span></div>';
     return;
   }
   grid.innerHTML = liveItineraries.map(itin => {
@@ -3138,6 +3138,7 @@ function renderModal() {
       <button class="btn-primary" onclick="openMap()">🗺 View on Map</button>
       <button class="btn-primary" onclick="shareItinerary()">📤 Share / Save</button>
       <button class="btn-primary" onclick="printItinerary()" style="background:transparent;color:var(--brown);border-color:#d4c9b0">🖨 Print</button>
+      ${(typeof API_BASE !== 'undefined' && API_BASE !== null) ? `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Itineraries section.">✨ Publish as Suggested</button>` : ''}
       <button class="btn-secondary" onclick="clearAll()">Clear All</button>
     </div>
     <div style="font-size:10.5px;color:#888;text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid #f0e8d8">
@@ -3259,6 +3260,94 @@ function clearAll() {
     renderModal();
     renderExperiences();
   }
+}
+
+// ─── PUBLISH AS SUGGESTED ITINERARY ───────────────────────────────────────
+// Lets chamber staff use the public day-by-day planner to create itineraries
+// that show up in the public "Suggested Itineraries" section. The button is
+// only rendered when API_BASE !== null (i.e. python server.py is running),
+// so it's effectively a chamber-machine-only affordance — public visitors
+// on a static deployment never see it.
+//
+// Conversion rules:
+//   - Each experience in myList becomes a stop in liveStops
+//   - The day number from dayMap gets baked into timeLabel ("Day 1", etc.)
+//   - Lodging slots get prefixed: "Day 1 · Tonight's Stay"
+//   - Order: lodging first per day, then other stops; days in order
+//   - Events (evt_<scraperId>) are skipped — published itineraries can only
+//     reference experiences (numeric IDs); events have separate semantics
+//
+function publishAsItinerary() {
+  if (typeof API_BASE === 'undefined' || API_BASE === null) {
+    alert('Publishing requires the local admin server (python server.py).');
+    return;
+  }
+  const items = [...myList].map(_lookupItem).filter(Boolean);
+  if (items.length === 0) {
+    alert('Add at least one stop before publishing.');
+    return;
+  }
+  // Skip events — they can't be saved as itinerary stops in the current schema
+  const expItems = items.filter(it => it._kind === 'exp');
+  if (expItems.length === 0) {
+    alert('Your list only contains events. Published itineraries need at least one experience (a place / venue / activity).');
+    return;
+  }
+
+  const defaultName = 'Untitled Itinerary';
+  const name = (prompt('Itinerary name (visitors will see this):', defaultName) || '').trim();
+  if (!name) return;  // user cancelled or left blank
+
+  const totalNights = Math.max(0, tripDays - 1);
+  const defaultDuration = totalNights > 0
+    ? `${tripDays} days / ${totalNights} night${totalNights !== 1 ? 's' : ''}`
+    : `${tripDays} day${tripDays !== 1 ? 's' : ''}`;
+  const duration = (prompt('Duration label (e.g. "Weekend", "3 days / 2 nights"):', defaultDuration) || defaultDuration).trim();
+
+  const newItinId = genId();
+  const newItin = { id: newItinId, name, duration };
+
+  // Build stops in display order: day-by-day, lodging first per day
+  const stops = [];
+  let order = 0;
+  for (let day = 1; day <= tripDays; day++) {
+    const itemsThisDay = expItems.filter(it => (dayMap[it._id] || 1) === day);
+    const lodging = itemsThisDay.filter(it => it.type === 'Lodging');
+    const others  = itemsThisDay.filter(it => it.type !== 'Lodging');
+    for (const it of [...lodging, ...others]) {
+      const isLodging = it.type === 'Lodging';
+      const dayLabel = isLodging
+        ? `Day ${day} · Tonight's Stay`
+        : (tripDays > 1 ? `Day ${day}` : '');
+      stops.push({
+        id: genId(),
+        itinId: newItinId,
+        expId: it.id,
+        timeLabel: dayLabel,
+        order: order++,
+      });
+    }
+  }
+
+  // Append + persist
+  liveItineraries.push(newItin);
+  liveStops.push(...stops);
+  saveAll();
+
+  // Refresh the public Suggested Itineraries grid if it's mounted
+  if (typeof renderItineraries === 'function') {
+    try { renderItineraries(); } catch(e) { /* not yet rendered */ }
+  }
+
+  // Toast confirmation
+  const skippedEvents = items.length - expItems.length;
+  const note = skippedEvents > 0
+    ? ` (${skippedEvents} event${skippedEvents !== 1 ? 's' : ''} skipped — events can't be saved as itinerary stops)`
+    : '';
+  _showShareToast(`✨ Published "${name}" — ${stops.length} stop${stops.length !== 1 ? 's' : ''}${note}`);
+
+  // Optional Plausible event
+  if (typeof track === 'function') track('Itinerary Published', {stops: String(stops.length), days: String(tripDays)});
 }
 
 // Shortcut from My Itinerary → browse Lodging category in the grid
@@ -4957,7 +5046,7 @@ function escVal(v) {
 function renderManageItinerariesHtml() {
   return `
     <div class="manage-toolbar">
-      <span>Select an itinerary, then click <strong>+</strong> on any experience to add it as a stop.</span>
+      <span><strong>Easier:</strong> close this and use <strong>My Itinerary → ✨ Publish as Suggested</strong> to build day-by-day with the visitor planner. This panel is for editing what's already published.</span>
       <span id="savedFlash" class="saved-flash">✓ Saved</span>
     </div>
     <div class="itin-3panel">
