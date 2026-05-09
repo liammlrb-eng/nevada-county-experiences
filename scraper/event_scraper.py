@@ -53,9 +53,9 @@ ALL_SCRAPERS = [
     GoNevadaScraper(),              # Selenium — Smart Post Show JS (Cloudflare blocked)
     EventbriteNevadaScraper(),      # Selenium — React-rendered cards
     MinersFoundryScraper(),         # Selenium — site 403s direct requests
-    # ── Disabled (calendar pages exist but are unpopulated/unreachable) ──
+    NCACCalendarScraper(),          # Trumba JSON feed (~180 western county events)
+    # ── Disabled (calendar pages exist but are unreachable) ──
     # GoNevadaFestivalsScraper(),   # Cloudflare 403s even via Selenium
-    # NCACCalendarScraper(),        # Squarespace demo template — Lorem Ipsum only
     # NevadaTheatreScraper(),
     # SyrclScraper(),
 ]

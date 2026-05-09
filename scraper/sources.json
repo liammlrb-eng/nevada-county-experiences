@@ -64,11 +64,11 @@
     "url": "https://minersfoundry.org/events/"
   },
   {
-    "enabled": false,
+    "enabled": true,
     "id": "ncac_calendar",
     "interval_hours": 168,
     "name": "NCAC Calendar",
-    "notes": "DISABLED — calendar page is a Squarespace demo template populated with Lorem Ipsum filler events. Despite NCAC's marketing copy, the calendar has never been populated. Re-enable if they ever go live.",
+    "notes": "Trumba JSON feed (https://www.trumba.com/calendars/nevada-county-arts-council.json). The Squarespace page embeds a Trumba widget — we hit Trumba directly. ~180 western Nevada County events; Truckee/Tahoe filtered out.",
     "url": "https://www.nevadacountyarts.org/calendar/"
   },
   {

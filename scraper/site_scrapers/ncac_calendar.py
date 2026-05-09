@@ -1,149 +1,233 @@
 """
 Nevada County Arts Council — Arts & Culture Calendar
-URL: https://www.nevadacountyarts.org/calendar/
+URL (public page): https://www.nevadacountyarts.org/calendar/
 
 NCAC describes their calendar as "the most comprehensive, accurate, and
 up-to-date calendar of arts & culture events in Nevada County" — they
 sync with community calendars (gonevadacounty.com, chambers).
 
-The calendar page is JS-rendered, so Selenium is required. The base.py
-EventScraper.scrape() handles this automatically.
+DATA SOURCE
+===========
+The public page embeds a Trumba calendar widget (a SaaS calendar product).
+The page's HTML contains:
+    $Trumba.addSpud({ webName: "nevada-county-arts-council", ... })
 
-Selectors are best-effort — run with `--discover --site "NCAC Calendar"`
-to save HTML for refinement.
+Trumba publishes machine-readable feeds for every public calendar at
+predictable URLs. We use the JSON feed (richest structured data):
+
+    https://www.trumba.com/calendars/nevada-county-arts-council.json
+
+Feed contains ~200 events with full metadata: title, description,
+startDateTime/endDateTime, location, eventImage, customFields
+(Type of event, City/Area, Price, Age range, Venue), permaLinkUrl, etc.
+
+We filter to western Nevada County (Nevada City, Grass Valley, North San
+Juan, Penn Valley, Rough & Ready, Cedar Ridge); Truckee/Tahoe events are
+dropped because they are far outside our target area.
 """
 
 from __future__ import annotations
-import re
+import re, html, requests
 from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
-from dateutil import parser as dateparser
 
-from .base import EventScraper
+from .base import EventScraper, _REQUESTS_HEADERS
 
+_FEED_URL = "https://www.trumba.com/calendars/nevada-county-arts-council.json"
 _MAX_FUTURE_DAYS = 365
+
+# Western Nevada County only (drop Truckee / Palisades Tahoe / etc.)
+_KEEP_CITIES = {
+    "nevada city", "grass valley", "north san juan",
+    "penn valley", "rough and ready", "rough & ready",
+    "cedar ridge", "washington", "graniteville",
+    "alta sierra", "lake of the pines", "smartsville",
+}
+
+# Map Trumba "Type of event" values onto our internal categories
+_TRUMBA_CATEGORY_MAP = {
+    "art & gallery":       "Art event",
+    "visual arts":         "Art event",
+    "music":               "Music event",
+    "music / concert":     "Music event",
+    "theatre":             "Theatre",
+    "theater":             "Theatre",
+    "dance":               "Dance",
+    "film":                "Film",
+    "literary arts":       "Literary",
+    "outdoors / recreation": "Outdoor",
+    "children / family":   "Family",
+    "workshop":            "Workshop",
+    "conference / lecture / workshop": "Workshop",
+    "beer / wine / food":  "Food event",
+    "history / heritage":  "Heritage",
+    "fundraiser":          "Fundraiser",
+    "health / wellbeing":  "Wellness",
+    "community":           "Community",
+}
+
+
+def _strip_html(s: str) -> str:
+    """Trumba returns HTML in description/location fields. Flatten it."""
+    if not s:
+        return ""
+    text = BeautifulSoup(s, "html.parser").get_text(" ", strip=True)
+    return html.unescape(text)
+
+
+def _pick_category(type_value: str) -> str:
+    """Map a Trumba 'Type of event' value to our category vocabulary."""
+    v = (type_value or "").lower()
+    for key, cat in _TRUMBA_CATEGORY_MAP.items():
+        if key in v:
+            return cat
+    return "Art event"
+
+
+def _pick_area(city_value: str) -> str:
+    """Normalize Trumba City/Area values to our area labels."""
+    c = (city_value or "").strip().lower()
+    if "nevada city" in c:    return "Nevada City"
+    if "grass valley" in c:   return "Grass Valley"
+    if "north san juan" in c: return "North San Juan"
+    if "penn valley" in c:    return "Penn Valley"
+    if "rough" in c:          return "Rough & Ready"
+    return "Nevada County"
 
 
 class NCACCalendarScraper(EventScraper):
-    name      = "NCAC Calendar"
-    url       = "https://www.nevadacountyarts.org/calendar/"
-    wait_css  = "body"
-    extra_wait = 4.0   # Calendar may load events lazily
+    name           = "NCAC Calendar"
+    url            = "https://www.nevadacountyarts.org/calendar/"
+    skip_rss       = True   # we hit Trumba JSON directly in scrape()
+    skip_selenium  = True   # never need a browser
 
-    def parse(self, soup: BeautifulSoup) -> list[dict]:
+    # ── Override scrape() entirely — we don't need HTML parsing ──────────────
+    def scrape(self, driver=None, discover: bool = False) -> list[dict]:
+        print(f"  [{self.name}] -> {_FEED_URL}  (Trumba JSON feed)")
+        try:
+            resp = requests.get(_FEED_URL, headers=_REQUESTS_HEADERS, timeout=20)
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception as e:
+            print(f"  [{self.name}] Feed fetch failed: {e}")
+            return []
+
+        if discover:
+            import os, json
+            from .base import SNAPSHOT_DIR
+            os.makedirs(SNAPSHOT_DIR, exist_ok=True)
+            path = os.path.join(SNAPSHOT_DIR, "ncac_calendar.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            print(f"  [{self.name}] Snapshot saved -> snapshots/ncac_calendar.json")
+
         events = []
-        seen_urls = set()
         cutoff = datetime.now() + timedelta(days=_MAX_FUTURE_DAYS)
+        today  = datetime.now().date()
+        seen   = set()
 
-        # Try multiple selector strategies
-        candidates = []
-        for selector in [
-            "article.event",
-            ".event-card",
-            ".event-listing",
-            ".tribe-events-calendar-list__event",
-            "article[class*='event']",
-            ".calendar-event",
-        ]:
-            found = soup.select(selector)
-            if found:
-                candidates = found
-                break
-
-        # Fallback: any /event/ link gets walked up
-        if not candidates:
-            seen_link = set()
-            for link in soup.select("a[href*='/event']"):
-                href = link.get("href", "")
-                if not href or href in seen_link:
-                    continue
-                seen_link.add(href)
-                container = link
-                for _ in range(4):
-                    if container.parent: container = container.parent
-                candidates.append(container)
-
-        for card in candidates:
-            link_el = (card.select_one("a[href*='/event']")
-                       or card.find("a", href=True))
-            if not link_el:
-                continue
-            url = link_el.get("href", "").split("?")[0]
-            if not url.startswith("http"):
-                url = "https://www.nevadacountyarts.org" + (url if url.startswith("/") else "/" + url)
-            if url in seen_urls:
-                continue
-            seen_urls.add(url)
-
-            title_el = card.select_one("h1, h2, h3, h4")
-            title = (title_el.get_text(strip=True) if title_el
-                     else link_el.get_text(strip=True))
-            if not title or len(title) < 3:
+        for ev in data:
+            # Trumba returns HTML-encoded entities in titles (&#8220; &amp; etc.) —
+            # unescape so users see proper quotes/dashes/ampersands.
+            title = html.unescape((ev.get("title") or "").strip())
+            if not title:
                 continue
 
+            # ── Custom fields ────────────────────────────────────────────────
+            cf = {}
+            for f in ev.get("customFields", []) or []:
+                lbl = (f.get("label") or "").strip().lower()
+                val = _strip_html(f.get("value") or "")
+                if lbl and val:
+                    cf[lbl] = val
+
+            # ── Geographic filter (western Nevada County only) ──────────────
+            city_raw = cf.get("city/area") or cf.get("city / area") or cf.get("city") or ""
+            city_lc  = city_raw.lower()
+            if city_lc and not any(ok in city_lc for ok in _KEEP_CITIES):
+                # Outside our area (Truckee, Tahoe, etc.) — drop
+                continue
+            # If no city set, allow it through (NCAC's own events have none)
+
+            # ── Date / time ──────────────────────────────────────────────────
+            start = ev.get("startDateTime") or ""
             date_str, time_str = "", ""
-            time_el = card.select_one("time[datetime]")
-            if time_el:
+            if start:
                 try:
-                    dt = dateparser.parse(time_el.get("datetime", ""))
-                    if dt:
-                        date_str = dt.strftime("%Y-%m-%d")
+                    dt = datetime.strptime(start[:19], "%Y-%m-%dT%H:%M:%S")
+                    if dt.date() < today:
+                        continue   # past event
+                    if dt > cutoff:
+                        continue   # too far in future
+                    date_str = dt.strftime("%Y-%m-%d")
+                    if not ev.get("allDay") and (dt.hour or dt.minute):
                         time_str = dt.strftime("%I:%M %p").lstrip("0")
                 except Exception:
-                    pass
-            if not date_str:
-                txt = card.get_text(" ", strip=True)
-                m = re.search(
-                    r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})',
-                    txt, re.I,
-                )
-                if m:
-                    try:
-                        year = datetime.now().year
-                        dt = dateparser.parse(f"{m.group(1)} {m.group(2)} {year}", fuzzy=True)
-                        if dt and dt < datetime.now() - timedelta(days=30):
-                            dt = dateparser.parse(f"{m.group(1)} {m.group(2)} {year + 1}", fuzzy=True)
-                        if dt:
-                            date_str = dt.strftime("%Y-%m-%d")
-                    except Exception:
-                        pass
-                t = re.search(r'(\d{1,2}:\d{2}\s*[ap]m)', txt, re.I)
-                if t: time_str = t.group(1).upper()
+                    continue
 
-            if date_str:
+            # ── End time ─────────────────────────────────────────────────────
+            end_time = ""
+            end_raw = ev.get("endDateTime") or ""
+            if end_raw and time_str:
                 try:
-                    if datetime.strptime(date_str, "%Y-%m-%d") > cutoff:
-                        continue
+                    dt_e = datetime.strptime(end_raw[:19], "%Y-%m-%dT%H:%M:%S")
+                    # Only show end-time when same day (otherwise it's a date range)
+                    if dt_e.date().isoformat() == date_str:
+                        end_time = dt_e.strftime("%I:%M %p").lstrip("0")
                 except Exception:
                     pass
 
-            img_el = card.find("img")
+            # ── Description ─────────────────────────────────────────────────
+            desc = (cf.get("event description")
+                    or cf.get("event details")
+                    or _strip_html(ev.get("description") or ""))
+            if desc and len(desc) > 400:
+                desc = desc[:397] + "..."
+
+            # ── Location ────────────────────────────────────────────────────
+            venue    = cf.get("venue") or cf.get("event location") or ""
+            location = venue or _strip_html(ev.get("location") or "")
+            location = html.unescape(location)
+            if location and len(location) > 120:
+                # When raw HTML address is too long, keep just the first line
+                location = location.split(",")[0][:120]
+
+            # ── Category / Area ─────────────────────────────────────────────
+            category = _pick_category(cf.get("type of event") or cf.get("type") or "")
+            area     = _pick_area(city_raw)
+
+            # ── Image ───────────────────────────────────────────────────────
             image = ""
-            if img_el:
-                image = (img_el.get("src", "") or img_el.get("data-src", ""))
+            img_obj = ev.get("eventImage") or ev.get("detailImage") or {}
+            if isinstance(img_obj, dict):
+                image = img_obj.get("url", "") or ""
 
-            desc = ""
-            desc_el = card.select_one(".description, p")
-            if desc_el:
-                desc = desc_el.get_text(" ", strip=True)[:400]
+            # ── URL: prefer NCAC permalink so user lands back on the calendar
+            url_str = ev.get("permaLinkUrl") or self.url
 
-            # NCAC mentions venue / location in many event cards
-            location = ""
-            loc_el = card.select_one(".location, .venue, [class*='location']")
-            if loc_el:
-                location = loc_el.get_text(strip=True)
+            # ── Dedup on title+date ─────────────────────────────────────────
+            key = f"{title.lower()}|{date_str}"
+            if key in seen:
+                continue
+            seen.add(key)
 
             events.append(self.make_event(
                 title=title,
                 date=date_str,
                 time=time_str,
-                location=location or "Nevada County",
+                end_time=end_time,
+                location=location,
                 description=desc,
-                area="Nevada County",
-                category="Art event",
-                url=url,
+                area=area,
+                category=category,
+                url=url_str,
                 image=image,
             ))
 
+        print(f"  [{self.name}] {len(events)} event(s) from Trumba feed")
         return events
+
+    # parse() never called (we override scrape) but keep stub for safety
+    def parse(self, soup: BeautifulSoup) -> list[dict]:
+        return []
