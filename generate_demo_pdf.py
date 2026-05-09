@@ -187,9 +187,155 @@ def build():
     flow.append(Spacer(1, 14))
     flow.append(Paragraph('How to use this document', H2))
     flow.append(Paragraph(
-        'Pages 2–3 list every feature, organized by audience. Pages 4–5 walk through an '
-        'eight-minute demo, click by click, that you can perform live. Page 6 is talking '
-        'points to handle questions and last-minute prep notes.', BODY))
+        'Pages 2–4 define <i>who</i> the platform serves — nine distinct visitor '
+        'personas. Pages 5–6 list every feature, organized by audience. Pages 7–8 '
+        'walk through an eight-minute demo, click by click. The remaining pages '
+        'cover talking points, costs, and server migration.', BODY))
+
+    flow.append(PageBreak())
+
+    # ──────────── PERSONAS — WHO THIS SERVES ──────────────────────────────
+    flow.append(Paragraph('Who This Serves', H_TITLE))
+    flow.append(Paragraph(
+        'Nine distinct visitor personas — each searches differently, '
+        'measures success differently, and converts on different content.',
+        H_SUB))
+    flow.append(section_rule())
+
+    flow.append(Paragraph(
+        'A tourism platform either serves everyone weakly or serves a focused set '
+        'of personas exceptionally well. Understanding who you\'re building for '
+        'shapes navigation, content priorities, and where the chamber spends '
+        'marketing budget. The nine personas below split into two macro-modes:',
+        BODY))
+
+    flow.append(Spacer(1, 6))
+    macro_rows = [
+        ['<b>Browse-first</b> (vibe-shopping)',
+         'Visitor is shopping a feeling — "romantic weekend," "active trip," "decompression." They want vibes, photos, and curation.'],
+        ['<b>Date-first</b> (calendar-shopping)',
+         'Visitor is shopping a calendar window — "what\'s happening that weekend." They want fresh events, dates, and availability.'],
+    ]
+    flow.append(build_table(
+        [['Macro-mode', 'How they use the site']] + macro_rows,
+        col_widths=[2.0*inch, 4.5*inch], header=True))
+
+    flow.append(Spacer(1, 14))
+    flow.append(Paragraph('The nine personas', H1))
+
+    persona_rows = [
+        ['<b>1. Romantic Weekender</b>',
+         'Couples 35-65, Bay Area / Sac, 1-3 nights, splurge OK',
+         '<i>"Where can we have the perfect date weekend?"</i> Shopping a feeling — they reject anything mentioning kids, RVs, sports. B&amp;Bs + fine dining + wineries.'],
+        ['<b>2. Festival Pilgrim</b>',
+         'Any age, anchored to a specific event date',
+         '<i>"I\'m here for X. What else should I do?"</i> Date-locked — searches the event name and wants a package around it. Cornish Christmas, Wild &amp; Scenic, Bluegrass.'],
+        ['<b>3. Trail &amp; Lake Seeker</b>',
+         '25-65, sporty, often gear-heavy, day-trip or 1-2 nights',
+         '<i>"What can I hike / bike / swim / paddle this weekend?"</i> Needs physical specs — distance, difficulty, water level, parking. Generic outdoor content is useless.'],
+        ['<b>4. Multi-Gen Family</b>',
+         'Parents 30-55 with kids 5-15, sometimes grandparents',
+         '<i>"Will my kids actually enjoy this?"</i> Every venue gets the "will my 8-year-old be bored" lens. Needs age-range and kid-friendly cues structured.'],
+        ['<b>5. Arts &amp; Heritage Traveler</b>',
+         '40-70, college-educated, often retired',
+         '<i>"What\'s the depth here?"</i> Wants substance over photogenic stops. Reads notes carefully. Distrusts marketing-speak. Authenticity matters.'],
+        ['<b>6. Wine Country Foodie</b>',
+         '30-60, food/wine enthusiasts, often Napa-alternative trippers',
+         '<i>"Where do locals actually eat?"</i> Meal-anchored trip planning. Needs provenance — chef bio, sourcing, pairings, hours that match a tasting flight.'],
+        ['<b>7. Wellness Refugee</b>',
+         '30-55, urban professional, burnt out, often solo',
+         '<i>"Will I actually be able to slow down here?"</i> Filtering for what\'s NOT there — no crowds, no kids, no schedule pressure. Float, massage, yoga, gardens.'],
+        ['<b>8. Local "What\'s Up"</b>',
+         'Nevada County residents themselves, recurring use',
+         '<i>"What\'s going on tonight?"</i> Already knows the venues. Wants pure events feed. Different mode entirely from tourists.'],
+        ['<b>9. Maker Traveler</b> 🎯',
+         '25-65, professional or semi-retired, often solo or paired, urban-based',
+         '<i>"I want to forge a knife / blow glass / throw a pot."</i> Shopping a SKILL, not a place. Will travel to the right workshop. Needs schedule, level required, take-home, instructor credentials.'],
+    ]
+    flow.append(build_table(
+        [['Persona', 'Who &amp; trip', 'How they search differently']] + persona_rows,
+        col_widths=[1.5*inch, 1.7*inch, 3.3*inch], body_size=8.5))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph(
+        '<b>🎯 Maker Traveler highlight:</b> Western Nevada County is unusually '
+        'well-positioned here — The Curious Forge, Wolf Craft School, ASiF, and '
+        'Craftfolk Collective form a maker ecosystem few foothills counties can '
+        'match. This persona has the highest revenue-per-visit (2-3 nights, '
+        'workshop fee, 4-6 meals out, lodging usually unbooked from comparison '
+        'sites), and the marketing story writes itself.',
+        BODY))
+
+    flow.append(PageBreak())
+
+    # ──────────── COVERAGE & STRATEGY ─────────────────────────────────────
+    flow.append(Paragraph('How well the current site serves each persona', H1))
+
+    coverage_rows = [
+        ['Romantic Weekender',          '✅ Strong',     'Relaxed vibe, B&amp;B sub-pill, real B&amp;B photos already in place'],
+        ['Festival Pilgrim',            '⚠️ Partial',    'Manual filtering required. Seasonal/event-anchored itineraries (planned) directly fixes this.'],
+        ['Trail &amp; Lake Seeker',     '✅ Strong',     'Hiking/Biking/Swimming/Boating/Fishing/Running tags + sub-pills shipped recently. Difficulty/distance fields would polish.'],
+        ['Multi-Gen Family',            '⚠️ Partial',    'Family vibe exists. Age-range guidance per entry isn\'t structured yet.'],
+        ['Arts &amp; Heritage Traveler', '✅ Strong',    'Historic and Arts vibes both rich. Long-form storytelling is the next polish.'],
+        ['Wine Country Foodie',         '✅ Strong',     'Foodie vibe + Restaurant sub-pills + 9 wineries + 9 tasting rooms in db.'],
+        ['Wellness Refugee',            '✅ Strong',     'Recently broadened (Restorative tag, 5 new massage venues, float/spa/yoga properly captured).'],
+        ['Local "What\'s Up"',          '⚠️ Weak',       'Same filtering as visitors today. A "this week" landing page + email digest would build resident audience.'],
+        ['<b>Maker Traveler</b>',       '⚠️ Partial',    '<b>Hands-On vibe + Workshops sub-pill in place</b>, but workshop calendars (Curious Forge, ASiF, Wolf Craft) aren\'t scraped — so dates/details require leaving the site. Highest-leverage gap to close.'],
+    ]
+    flow.append(build_table(
+        [['Persona', 'Today', 'Gap / next step']] + coverage_rows,
+        col_widths=[1.7*inch, 0.9*inch, 3.9*inch], body_size=8.5))
+
+    flow.append(Spacer(1, 14))
+    flow.append(Paragraph('Strategic recommendation', H1))
+    flow.append(Paragraph(
+        'Of the nine personas, the chamber should <b>over-serve four</b> in '
+        'site content, marketing, and budget. The remaining five should be '
+        'served gracefully by the platform but not be primary marketing targets.',
+        BODY))
+
+    flow.append(Spacer(1, 6))
+    rec_rows = [
+        ['<b>Over-serve (focused marketing)</b>',                           '<b>Why</b>'],
+        ['🎯 Maker Traveler',                'Highest revenue per visit; defensible market position; The Curious Forge alone is a destination-caliber asset.'],
+        ['Festival Pilgrim',                  'Drives concentrated peak-season tourism (Cornish Christmas, Wild &amp; Scenic, Bluegrass). High economic impact per weekend.'],
+        ['Romantic Weekender',                'Bay Area weekend market is enormous and well-suited to the foothills product. Highest per-capita spend on lodging/dining.'],
+        ['Wine Country Foodie',               'Napa-alternative positioning is achievable. Sierra foothills wine region needs visibility this site can provide.'],
+    ]
+    flow.append(build_table(rec_rows,
+        col_widths=[2.2*inch, 4.3*inch], header=False, body_size=9))
+
+    flow.append(Spacer(1, 8))
+    flow.append(Paragraph(
+        'The other five personas (Trail &amp; Lake, Family, Arts &amp; Heritage, '
+        'Wellness, Local) are well-served by what\'s built and don\'t require '
+        'concentrated marketing — they self-discover or are served by adjacent '
+        'channels (REI events, parent groups, local newspapers).',
+        BODY))
+
+    flow.append(Spacer(1, 12))
+    flow.append(Paragraph('What the platform does for each persona', H2))
+    flow.append(Paragraph(
+        'A single visit to the home page should let any of the nine personas '
+        'find their answer in under 30 seconds. The discovery paths are:',
+        BODY))
+    paths = [
+        '<b>Vibe cards</b> (9 themed) — direct match for Romantic, Active, Foodie, Wellness, Hands-On (Maker), Family, Festivals, Arts, Historic',
+        '<b>Category dropdown + sub-pills</b> — matches specific shopping intent (Lodging → B&amp;Bs, Outdoor → Swimming, etc.)',
+        '<b>Date filter</b> — Festival Pilgrim and Local "What\'s Up" go straight here',
+        '<b>Smart Suggestions</b> in the itinerary modal — works for any persona once they\'ve added 2+ items',
+        '<b>Sub-pills</b> like 🛠 Workshops &amp; Classes (Activity) or 💆 Spa &amp; Float (Wellness) — fine-grained intent',
+    ]
+    for p in paths:
+        flow.append(Paragraph(f'• {p}', BULLET))
+
+    flow.append(Spacer(1, 12))
+    flow.append(Paragraph(
+        '<i>"You don\'t need to serve everyone equally. You need to serve the '
+        'four right personas exceptionally — and not actively annoy the other '
+        'five. The platform already does the second; the marketing investment '
+        'is what closes the first."</i>',
+        QUOTE))
 
     flow.append(PageBreak())
 
