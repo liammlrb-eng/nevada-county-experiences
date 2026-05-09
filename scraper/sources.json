@@ -64,19 +64,19 @@
     "url": "https://minersfoundry.org/events/"
   },
   {
-    "enabled": true,
+    "enabled": false,
     "id": "ncac_calendar",
     "interval_hours": 168,
     "name": "NCAC Calendar",
-    "notes": "Nevada County Arts Council — comprehensive arts & culture calendar. Selenium required.",
+    "notes": "DISABLED — calendar page is a Squarespace demo template populated with Lorem Ipsum filler events. Despite NCAC's marketing copy, the calendar has never been populated. Re-enable if they ever go live.",
     "url": "https://www.nevadacountyarts.org/calendar/"
   },
   {
-    "enabled": true,
+    "enabled": false,
     "id": "go_nevada_festivals",
     "interval_hours": 336,
     "name": "Go Nevada County Festivals",
-    "notes": "Manually-curated festivals page. Static HTML, no Selenium. Annual / recurring festivals.",
+    "notes": "DISABLED — site returns 403 to both requests AND headless Chrome (Cloudflare protection). The 13 festivals listed are already in our hardcoded EVENTS array (Cornish Christmas, Wild & Scenic, etc.).",
     "url": "https://gonevadacounty.com/festivals-special-events/"
   }
 ]

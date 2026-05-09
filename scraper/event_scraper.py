@@ -47,14 +47,15 @@ from auto_tagger                     import tag_events
 ALL_SCRAPERS = [
     NevadaCityChamberScraper(),     # static HTML — no Selenium
     GVChamberScraper(),             # static HTML — Elementor page
-    GoNevadaFestivalsScraper(),     # static HTML — gonevadacounty festival page
     KVMRScraper(),                  # RSS — Tribe Events feed
     TheUnionScraper(),              # RSS first, Selenium fallback
-    CenterForTheArtsScraper(),      # requests first, Selenium fallback
+    CenterForTheArtsScraper(),      # requests first, Selenium fallback (~20 concerts)
     GoNevadaScraper(),              # Selenium — Smart Post Show JS (Cloudflare blocked)
     EventbriteNevadaScraper(),      # Selenium — React-rendered cards
     MinersFoundryScraper(),         # Selenium — site 403s direct requests
-    NCACCalendarScraper(),          # Selenium — JS-rendered calendar
+    # ── Disabled (calendar pages exist but are unpopulated/unreachable) ──
+    # GoNevadaFestivalsScraper(),   # Cloudflare 403s even via Selenium
+    # NCACCalendarScraper(),        # Squarespace demo template — Lorem Ipsum only
     # NevadaTheatreScraper(),
     # SyrclScraper(),
 ]

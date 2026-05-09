@@ -35,39 +35,33 @@ class MinersFoundryScraper(EventScraper):
     def parse(self, soup: BeautifulSoup) -> list[dict]:
         events = []
         seen_urls = set()
+        seen_titles = set()
         cutoff = datetime.now() + timedelta(days=_MAX_FUTURE_DAYS)
 
-        # Try multiple card selector strategies
+        # Miners Foundry uses <h4> for event titles (verified via --discover snapshot).
+        # Each h4 lives inside an event card with date / link / image siblings.
         candidates = []
-        for selector in [
-            "article.event",
-            ".event-listing",
-            ".event-card",
-            ".tribe-events-list-event",
-            "article[class*='event']",
-        ]:
-            found = soup.select(selector)
-            if found:
-                candidates = found
-                break
+        for h in soup.find_all("h4"):
+            title = h.get_text(strip=True)
+            if not title or len(title) < 4 or len(title) > 110:
+                continue
+            # Filter out obvious nav/footer h4s
+            if title.lower() in {'contact us','find yourself at the foundry','our socials','links','newsletter','subscribe'}:
+                continue
+            if title.lower() in seen_titles:
+                continue
+            seen_titles.add(title.lower())
+            # Walk up to a container that holds a link too
+            container = h
+            for _ in range(6):
+                if container.parent:
+                    container = container.parent
+                if container.find("a", href=True):
+                    break
+            candidates.append((title, container))
 
-        # Fallback: any /event/ link gets walked up to a container
-        if not candidates:
-            seen_link = set()
-            for link in soup.select("a[href*='/event/'], a[href*='/events/']"):
-                href = link.get("href", "")
-                if not href or href in seen_link:
-                    continue
-                seen_link.add(href)
-                container = link
-                for _ in range(4):
-                    if container.parent: container = container.parent
-                candidates.append(container)
-
-        for card in candidates:
-            link_el = (card.select_one("a[href*='/event/']")
-                       or card.select_one("a[href*='/events/']")
-                       or card.find("a", href=True))
+        for title, card in candidates:
+            link_el = card.find("a", href=True)
             if not link_el:
                 continue
             url = link_el.get("href", "").split("?")[0]
@@ -76,12 +70,6 @@ class MinersFoundryScraper(EventScraper):
             if url in seen_urls:
                 continue
             seen_urls.add(url)
-
-            title_el = card.select_one("h1, h2, h3, h4")
-            title = (title_el.get_text(strip=True) if title_el
-                     else link_el.get_text(strip=True))
-            if not title or len(title) < 3:
-                continue
 
             # Date/time
             date_str, time_str = "", ""

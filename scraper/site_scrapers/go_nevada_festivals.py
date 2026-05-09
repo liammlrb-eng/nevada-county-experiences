@@ -2,24 +2,23 @@
 GoNevadaCounty — Festivals & Special Events page
 URL: https://gonevadacounty.com/festivals-special-events/
 
-This is a manually-curated static page listing the major annual / recurring
-festivals in Western Nevada County: Cornish Christmas, Wild & Scenic, Mardi Gras,
+This is a manually-curated page listing the major annual / recurring festivals
+in Western Nevada County: Cornish Christmas, Wild & Scenic, Mardi Gras,
 Bluegrass Festival, etc. Most are already in our hardcoded EVENTS array, but
-scraping ensures we pick up new additions and any date changes the chamber
-publishes.
+scraping ensures we pick up new additions and date changes.
 
-The page is static HTML — requests works, no Selenium needed.
+The site has Cloudflare-style protection that returns 403 to direct requests —
+we MUST use Selenium. The base class scrape() handles this automatically.
 """
 
 from __future__ import annotations
 import re
 from datetime import datetime, timedelta
 
-import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as dateparser
 
-from .base import EventScraper, _REQUESTS_HEADERS
+from .base import EventScraper
 
 _MAX_FUTURE_DAYS = 365
 
@@ -28,22 +27,8 @@ class GoNevadaFestivalsScraper(EventScraper):
     name      = "Go Nevada County Festivals"
     url       = "https://gonevadacounty.com/festivals-special-events/"
     wait_css  = "body"
-    skip_rss  = True   # Static HTML, no RSS
-
-    def scrape(self, driver, discover=False):
-        print(f"  [{self.name}] → {self.url}")
-        try:
-            resp = requests.get(self.url, headers=_REQUESTS_HEADERS, timeout=20)
-            if resp.status_code == 200:
-                if discover:
-                    self._save_snapshot(resp.text)
-                soup = BeautifulSoup(resp.text, "html.parser")
-                events = self.parse(soup)
-                print(f"  [{self.name}] {len(events)} event(s) found")
-                return events
-        except Exception as e:
-            print(f"  [{self.name}] ERROR: {e}")
-        return []
+    skip_rss  = True       # Static HTML, no RSS
+    extra_wait = 3.0       # Allow Cloudflare challenge to resolve
 
     def parse(self, soup: BeautifulSoup) -> list[dict]:
         events = []
