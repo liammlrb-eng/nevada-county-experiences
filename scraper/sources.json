@@ -46,5 +46,37 @@
     "name": "Go Nevada County",
     "notes": "DISABLED — site returns 403 to headless Chrome (Cloudflare protection).",
     "url": "https://gonevadacounty.com/community-calendar/"
+  },
+  {
+    "enabled": true,
+    "id": "center_for_arts",
+    "interval_hours": 168,
+    "name": "Center for the Arts",
+    "notes": "Concert venue in Grass Valley. requests-first, Selenium fallback. ~30-50 events / 6 months.",
+    "url": "https://thecenterforthearts.org/events/"
+  },
+  {
+    "enabled": true,
+    "id": "miners_foundry",
+    "interval_hours": 168,
+    "name": "Miners Foundry",
+    "notes": "Cultural Center in Nevada City. Selenium required (site 403s direct HTTP).",
+    "url": "https://minersfoundry.org/events/"
+  },
+  {
+    "enabled": true,
+    "id": "ncac_calendar",
+    "interval_hours": 168,
+    "name": "NCAC Calendar",
+    "notes": "Nevada County Arts Council — comprehensive arts & culture calendar. Selenium required.",
+    "url": "https://www.nevadacountyarts.org/calendar/"
+  },
+  {
+    "enabled": true,
+    "id": "go_nevada_festivals",
+    "interval_hours": 336,
+    "name": "Go Nevada County Festivals",
+    "notes": "Manually-curated festivals page. Static HTML, no Selenium. Annual / recurring festivals.",
+    "url": "https://gonevadacounty.com/festivals-special-events/"
   }
 ]

@@ -30,9 +30,12 @@ from site_scrapers.eventbrite_nevada import EventbriteNevadaScraper
 from site_scrapers.nevada_city_chamber import NevadaCityChamberScraper
 from site_scrapers.kvmr              import KVMRScraper
 from site_scrapers.gv_chamber        import GVChamberScraper
+from site_scrapers.center_for_arts   import CenterForTheArtsScraper
+from site_scrapers.miners_foundry    import MinersFoundryScraper
+from site_scrapers.ncac_calendar     import NCACCalendarScraper
+from site_scrapers.go_nevada_festivals import GoNevadaFestivalsScraper
 from auto_tagger                     import tag_events
 # Future scrapers — uncomment as they're built:
-# from site_scrapers.miners_foundry  import MinersFoundryScraper
 # from site_scrapers.nevada_theatre  import NevadaTheatreScraper
 # from site_scrapers.syrcl           import SyrclScraper
 
@@ -42,13 +45,16 @@ from auto_tagger                     import tag_events
 # complete quickly before Selenium starts for the JS-rendered sites.
 #
 ALL_SCRAPERS = [
-    NevadaCityChamberScraper(),     # static HTML — no Selenium needed
+    NevadaCityChamberScraper(),     # static HTML — no Selenium
     GVChamberScraper(),             # static HTML — Elementor page
+    GoNevadaFestivalsScraper(),     # static HTML — gonevadacounty festival page
     KVMRScraper(),                  # RSS — Tribe Events feed
     TheUnionScraper(),              # RSS first, Selenium fallback
+    CenterForTheArtsScraper(),      # requests first, Selenium fallback
     GoNevadaScraper(),              # Selenium — Smart Post Show JS (Cloudflare blocked)
     EventbriteNevadaScraper(),      # Selenium — React-rendered cards
-    # MinersFoundryScraper(),
+    MinersFoundryScraper(),         # Selenium — site 403s direct requests
+    NCACCalendarScraper(),          # Selenium — JS-rendered calendar
     # NevadaTheatreScraper(),
     # SyrclScraper(),
 ]
