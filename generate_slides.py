@@ -167,7 +167,7 @@ def two_col_table(slide, headers, rows, top, *, left_w=4.5, right_w=8.0,
 
 
 # ═══════════════════════════ BUILD THE DECK ═══════════════════════════════
-TOTAL = 14
+TOTAL = 15
 
 # ─── Slide 1: Title ────────────────────────────────────────────────────────
 s = prs.slides.add_slide(BLANK)
@@ -481,7 +481,88 @@ two_col_table(s, ['Phase', 'What happens'], steps,
 
 page_footer(s, 11, TOTAL)
 
-# ─── Slide 12: The strategic insight ────────────────────────────────────
+# ─── Slide 12: What the chamber needs to do next ────────────────────────
+s = prs.slides.add_slide(BLANK)
+slide_header(s, 'What the chamber needs to do next',
+    'Findings from building the scraper layer — items that need a person, '
+    'not more code.')
+
+# Three columns of action items grouped by category
+col_y = Inches(1.85); col_h = Inches(4.6)
+
+# ── Column 1: Data partnerships ──
+add_text(s, 'DATA PARTNERSHIPS',
+         Inches(0.6), col_y, Inches(4.0), Inches(0.4),
+         size=12, bold=True, color=GOLD)
+add_bullets(s, [
+    'Ask NCAC for read access to their Trumba '
+    'master — its 540-event, 16-month window is '
+    'the most comprehensive feed in the county',
+    'Reach out to GoNevadaCounty (gonevadacounty.com) '
+    'for a public events feed — Cloudflare blocks '
+    'scrapers and we lose the 13 anchor festivals',
+    'Coordinate with The Union for a public events '
+    'feed — articles are paywalled and the RSS often '
+    'returns nothing scrape-able',
+    'Confirm whether the County itself runs a Trumba '
+    'master calendar — if so, federate from it instead '
+    'of NCAC alone',
+], Inches(0.6), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
+   size=9, line_spacing=1.35)
+
+# ── Column 2: Member outreach ──
+add_text(s, 'MEMBER OUTREACH',
+         Inches(4.7), col_y, Inches(4.0), Inches(0.4),
+         size=12, bold=True, color=GOLD)
+add_bullets(s, [
+    'Encourage venues to publish events on a '
+    'platform with a public feed — Trumba, Tribe '
+    'Events (WordPress), Eventbrite — not just '
+    'static HTML pages',
+    'Push schema.org/Event JSON-LD adoption — one '
+    'snippet on each event page makes scraping '
+    'reliable without custom code per site',
+    'Solicit "missing venue" submissions — a simple '
+    'web form for member venues to flag events that '
+    'didn\'t get auto-discovered',
+    'Identify the 5-10 venues responsible for the bulk '
+    'of visitor traffic and prioritize their data '
+    'reliability over long-tail coverage',
+], Inches(4.7), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
+   size=9, line_spacing=1.35)
+
+# ── Column 3: Operations ──
+add_text(s, 'OPERATIONS',
+         Inches(8.8), col_y, Inches(4.0), Inches(0.4),
+         size=12, bold=True, color=GOLD)
+add_bullets(s, [
+    'Designate a queue curator — someone clears the '
+    'pending-events queue 1-2x per week (Approve / '
+    'Dismiss takes ~5 minutes per session)',
+    'Run AI Categorize after each scrape — fixes '
+    'venue, area, tags on long-tail events ($0.50/mo)',
+    'Validate "no event" alerts — when a scraper '
+    'returns 0 events, the source has either gone '
+    'down or restructured (NCAC was a false negative '
+    'for months before we caught it)',
+    'Quarterly review of disabled scrapers — vendors '
+    'change platforms (e.g. NCAC moved to Trumba) and '
+    'previously-blocked sources become reachable',
+], Inches(8.8), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
+   size=9, line_spacing=1.35)
+
+# Bottom callout: what we already learned
+add_rect(s, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.5),
+         RGBColor(0xFB, 0xF7, 0xEE), GOLD)
+add_text(s,
+    'Concrete win from this work:  NCAC\'s calendar went from "0 events" '
+    '(blocked by an iframe) to 540 events — by hitting Trumba\'s JSON feed directly.',
+    Inches(0.7), Inches(6.55), Inches(11.9), Inches(0.4),
+    size=10, italic=True, color=BROWN, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+page_footer(s, 12, TOTAL)
+
+# ─── Slide 13: The strategic insight ────────────────────────────────────
 s = prs.slides.add_slide(BLANK)
 slide_header(s, 'The strategic insight',
     'What sets this apart from a generic tourism site.')
@@ -510,9 +591,9 @@ add_text(s,
     Inches(0.7), Inches(6.25), Inches(11.9), Inches(0.6),
     size=13, italic=True, color=BROWN, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 
-page_footer(s, 12, TOTAL)
+page_footer(s, 13, TOTAL)
 
-# ─── Slide 13: Demo flow summary ────────────────────────────────────────
+# ─── Slide 14: Demo flow summary ────────────────────────────────────────
 s = prs.slides.add_slide(BLANK)
 slide_header(s, 'The 8-minute demo flow',
     'A visitor planning a romantic November weekend in Western Nevada County.')
@@ -528,9 +609,9 @@ two_col_table(s, ['Act', 'What happens'], acts,
               Inches(1.85), left_w=2.0, right_w=10.1,
               body_size=11, row_height=0.85)
 
-page_footer(s, 13, TOTAL)
+page_footer(s, 14, TOTAL)
 
-# ─── Slide 14: Close ─────────────────────────────────────────────────────
+# ─── Slide 15: Close ─────────────────────────────────────────────────────
 s = prs.slides.add_slide(BLANK)
 # Brown band on left
 add_rect(s, 0, 0, Inches(4.5), SLIDE_H, BROWN)

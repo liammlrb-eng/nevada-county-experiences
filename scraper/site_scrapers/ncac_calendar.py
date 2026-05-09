@@ -13,13 +13,20 @@ The page's HTML contains:
     $Trumba.addSpud({ webName: "nevada-county-arts-council", ... })
 
 Trumba publishes machine-readable feeds for every public calendar at
-predictable URLs. We use the JSON feed (richest structured data):
+predictable URLs. We hit the JSON feed directly — bypassing the embed:
 
     https://www.trumba.com/calendars/nevada-county-arts-council.json
 
-Feed contains ~200 events with full metadata: title, description,
-startDateTime/endDateTime, location, eventImage, customFields
-(Type of event, City/Area, Price, Age range, Venue), permaLinkUrl, etc.
+PAGINATION
+==========
+Each call returns at most ~200 events from `startdate` forward. We page
+forward by setting startdate to the day after the latest event in the
+previous batch, until either an empty response or we exceed 16 months
+ahead. Empirically this yields ~600+ events spanning 16 months.
+
+Each event contains rich structured data: title, startDateTime/endDateTime,
+description, location, eventImage, customFields (Type of event, City/Area,
+Price, Age range, Venue), permaLinkUrl, etc.
 
 We filter to western Nevada County (Nevada City, Grass Valley, North San
 Juan, Penn Valley, Rough & Ready, Cedar Ridge); Truckee/Tahoe events are
@@ -28,14 +35,15 @@ dropped because they are far outside our target area.
 
 from __future__ import annotations
 import re, html, requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from bs4 import BeautifulSoup
 
 from .base import EventScraper, _REQUESTS_HEADERS
 
 _FEED_URL = "https://www.trumba.com/calendars/nevada-county-arts-council.json"
-_MAX_FUTURE_DAYS = 365
+_MAX_FUTURE_DAYS = 480     # ≈16 months — pagination horizon
+_MAX_PAGES       = 12      # safety cap on pagination loop
 
 # Western Nevada County only (drop Truckee / Palisades Tahoe / etc.)
 _KEEP_CITIES = {
@@ -104,13 +112,52 @@ class NCACCalendarScraper(EventScraper):
 
     # ── Override scrape() entirely — we don't need HTML parsing ──────────────
     def scrape(self, driver=None, discover: bool = False) -> list[dict]:
-        print(f"  [{self.name}] -> {_FEED_URL}  (Trumba JSON feed)")
-        try:
-            resp = requests.get(_FEED_URL, headers=_REQUESTS_HEADERS, timeout=20)
-            resp.raise_for_status()
-            data = resp.json()
-        except Exception as e:
-            print(f"  [{self.name}] Feed fetch failed: {e}")
+        print(f"  [{self.name}] -> {_FEED_URL}  (Trumba JSON feed, paginated)")
+
+        # ── Paginated fetch ─────────────────────────────────────────────────
+        # Trumba returns up to ~200 events per call. We page forward by
+        # setting startdate to the day after the latest event seen, until
+        # either we get an empty page or we exceed _MAX_FUTURE_DAYS.
+        raw = {}
+        cursor = date.today()
+        horizon = date.today() + timedelta(days=_MAX_FUTURE_DAYS)
+        for page in range(_MAX_PAGES):
+            qs = cursor.strftime("%Y%m%d")
+            try:
+                resp = requests.get(
+                    f"{_FEED_URL}?startdate={qs}",
+                    headers=_REQUESTS_HEADERS, timeout=20,
+                )
+                resp.raise_for_status()
+                batch = resp.json()
+            except Exception as e:
+                print(f"  [{self.name}] Page {page+1} fetch failed: {e}")
+                break
+            if not batch:
+                break
+            new_count = 0
+            latest_seen = cursor
+            for ev in batch:
+                eid = ev.get("eventID")
+                if eid and eid not in raw:
+                    raw[eid] = ev
+                    new_count += 1
+                start_str = (ev.get("startDateTime") or "")[:10]
+                if start_str:
+                    try:
+                        d = datetime.strptime(start_str, "%Y-%m-%d").date()
+                        if d > latest_seen:
+                            latest_seen = d
+                    except Exception:
+                        pass
+            print(f"  [{self.name}] page {page+1}: {len(batch)} returned, "
+                  f"{new_count} new, cursor -> {latest_seen}")
+            if new_count == 0 or latest_seen <= cursor or latest_seen >= horizon:
+                break
+            cursor = latest_seen + timedelta(days=1)
+
+        data = list(raw.values())
+        if not data:
             return []
 
         if discover:
