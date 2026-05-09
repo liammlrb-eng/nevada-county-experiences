@@ -1353,6 +1353,7 @@
           onchange="visitorDateTo=this.value;if(visitorDateFrom&&visitorDateFrom>visitorDateTo){visitorDateFrom=visitorDateTo;var f=document.getElementById('filterDateFrom');if(f)f.value=visitorDateFrom;}_visApplyDate()">
       </div>
       <div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap">
+        <button class="date-quick-btn active" id="vqBtnAll" onclick="_visSetAll()">All Future</button>
         <button class="date-quick-btn" id="vqBtnToday"   onclick="_visSetToday()">Today</button>
         <button class="date-quick-btn" id="vqBtnWeekend" onclick="_visSetWeekend()">This Weekend</button>
         <button class="date-quick-btn" id="vqBtnWeek"    onclick="_visSetWeek()">This Week</button>
@@ -1981,6 +1982,15 @@ function _visApplyDate() {
   if (evtTab && evtTab.classList.contains('active')) renderEvents();
   renderActiveFilters();
 }
+function _visSetAll() {
+  // "All Future" — clear the date range so every upcoming item shows
+  visitorDateFrom = ''; visitorDateTo = '';
+  const fromInp = document.getElementById('filterDateFrom');
+  const toInp   = document.getElementById('filterDateTo');
+  if (fromInp) fromInp.value = '';
+  if (toInp)   toInp.value   = '';
+  _visApplyDate();
+}
 function _visSetToday() {
   const s = new Date().toISOString().slice(0, 10);
   visitorDateFrom = s; visitorDateTo = s;
@@ -2010,9 +2020,12 @@ function _visClearDate() {
   const toInp   = document.getElementById('filterDateTo');
   if (fromInp) fromInp.value = '';
   if (toInp)   toInp.value   = '';
+  // No specific range → "All Future" is the active state
   ['vqBtnToday','vqBtnWeekend','vqBtnWeek'].forEach(id => {
     const b = document.getElementById(id); if (b) b.classList.remove('active');
   });
+  const allBtn = document.getElementById('vqBtnAll');
+  if (allBtn) allBtn.classList.add('active');
   renderEvents();
   renderActiveFilters();
 }
@@ -2545,12 +2558,14 @@ async function renderEvents() {
   }
 
   // Highlight the active preset button
-  ['vqBtnToday','vqBtnWeekend','vqBtnWeek'].forEach(id => {
+  ['vqBtnAll','vqBtnToday','vqBtnWeekend','vqBtnWeek'].forEach(id => {
     const b = document.getElementById(id);
     if (b) b.classList.remove('active');
   });
   const today = new Date().toISOString().slice(0,10);
-  if (dateFrom && dateFrom === dateTo && dateFrom === today) {
+  if (!dateFrom && !dateTo) {
+    const b = document.getElementById('vqBtnAll'); if (b) b.classList.add('active');
+  } else if (dateFrom && dateFrom === dateTo && dateFrom === today) {
     const b = document.getElementById('vqBtnToday'); if (b) b.classList.add('active');
   } else if (dateFrom && dateTo && (new Date(dateTo) - new Date(dateFrom)) <= 864e5 * 1.5) {
     const b = document.getElementById('vqBtnWeekend'); if (b) b.classList.add('active');
@@ -2858,10 +2873,27 @@ function renderModal() {
         }).join('')
       : `<div style="font-size:11px;color:#aaa;font-style:italic;padding:8px 0;text-align:center">No stops planned for this day yet.</div>`;
 
+    // If visitor has set a trip-start date, compute the actual calendar
+    // date for this Day N — shown as "Sat, May 17" beside "DAY 1".
+    let dayDateLabel = '';
+    if (typeof visitorDateFrom !== 'undefined' && visitorDateFrom) {
+      try {
+        const start = new Date(visitorDateFrom + 'T12:00:00');
+        const that = new Date(start);
+        that.setDate(start.getDate() + (d - 1));
+        dayDateLabel = that.toLocaleDateString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric',
+        });
+      } catch(e) {}
+    }
+
     return `
       <div style="margin-bottom:18px;border-radius:8px;background:#fbf7ee;padding:14px;border:1px solid #e8dfc8">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div style="font-size:14px;font-weight:700;color:var(--brown);letter-spacing:0.06em">DAY ${d}${tripDays > 1 ? ` <span style="color:#999;font-weight:400">of ${tripDays}</span>` : ''}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--brown);letter-spacing:0.06em">
+            DAY ${d}${tripDays > 1 ? ` <span style="color:#999;font-weight:400">of ${tripDays}</span>` : ''}
+            ${dayDateLabel ? `<span style="font-size:12px;color:var(--gold);font-weight:600;margin-left:8px;letter-spacing:0.04em">${dayDateLabel}</span>` : ''}
+          </div>
           <div style="flex:1;height:1px;background:#e0d8c8"></div>
           <div style="font-size:10px;color:#888">${day.lodging.length + day.stops.length} item${day.lodging.length + day.stops.length !== 1 ? 's' : ''}</div>
         </div>
@@ -3061,9 +3093,21 @@ function printItinerary() {
   const dayHtml = (d) => {
     const day = byDay[d] || { lodging: [], stops: [] };
     if (!day.lodging.length && !day.stops.length) return '';
+    // Compute calendar date for this day if a trip-start is set
+    let dayDateLabel = '';
+    if (typeof visitorDateFrom !== 'undefined' && visitorDateFrom) {
+      try {
+        const start = new Date(visitorDateFrom + 'T12:00:00');
+        const that = new Date(start);
+        that.setDate(start.getDate() + (d - 1));
+        dayDateLabel = ' · ' + that.toLocaleDateString('en-US', {
+          weekday: 'long', month: 'short', day: 'numeric',
+        });
+      } catch(e) {}
+    }
     return `
       <div class="day">
-        <h2>Day ${d}${tripDays > 1 ? ` of ${tripDays}` : ''}</h2>
+        <h2>Day ${d}${tripDays > 1 ? ` of ${tripDays}` : ''}${dayDateLabel}</h2>
         ${day.lodging.length
           ? `<div class="lodging-row"><strong>💤 Tonight's stay:</strong></div>${day.lodging.map(l => renderItem(l, '')).join('')}`
           : ''}
