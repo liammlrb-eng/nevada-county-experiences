@@ -1064,6 +1064,14 @@ sudo systemctl reload nginx""", CODE))
     flow.append(Paragraph(
         'Nightly scrape at 3 AM, AI categorization 30 minutes later. '
         'Chamber staff review pending events the next morning.', BODY))
+    flow.append(Paragraph(
+        '<b>Why this step matters:</b> the scraper is what triggers auto-pruning '
+        'of past events. Skip the schedule and the queue keeps growing — public '
+        'visitors still won\'t see expired events (the site filters client-side), '
+        'but the admin queue and the events.json file will accumulate stale '
+        'records that have to be cleaned up manually via the 🧹 Prune Past '
+        'button or <font face="Courier">POST /api/events/prune</font>.',
+        BODY))
     flow.append(Preformatted("""# Edit the user's crontab
 crontab -e
 

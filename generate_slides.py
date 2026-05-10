@@ -734,7 +734,7 @@ def slide_migration(s):
         ('Phase 3',  'Deploy: git clone, Python venv, install deps, drop API keys in the config file'),
         ('Phase 4',  'systemd service for auto-restart on crash, auto-start on reboot'),
         ('Phase 5',  'nginx reverse proxy + Let\'s Encrypt HTTPS (auto-renew via certbot)'),
-        ('Phase 6',  'Cron job: nightly source refresh at 3 AM + AI categorize at 3:30 AM'),
+        ('Phase 6',  'Schedule nightly: source refresh at 3 AM + AI categorize at 3:30 AM (refresh triggers auto-prune; skip this step and expired events pile up in the queue)'),
         ('Phase 7',  'Backups: provider snapshots ($1/mo) + daily JSON tar to off-site'),
         ('Phase 8',  'Test checklist: site loads, vibes work, events populate, AI button works, source updates run'),
         ('Phase 9',  'Hand-off to chamber: admin URL, billing alerts, cheat sheet, emergency contact'),

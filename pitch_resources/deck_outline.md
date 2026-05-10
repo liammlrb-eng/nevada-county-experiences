@@ -272,7 +272,7 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 | 3 | Deploy: git clone, Python venv, install deps, drop API keys |
 | 4 | systemd service for auto-restart |
 | 5 | nginx reverse proxy + Let's Encrypt HTTPS |
-| 6 | Cron job: nightly source refresh + AI categorize |
+| 6 | Schedule nightly: source refresh + AI categorize (refresh triggers auto-prune; skip this and expired events pile up in the queue) |
 | 7 | Backups: provider snapshots + daily JSON tar to off-site |
 | 8 | Test checklist |
 | 9 | Hand-off to chamber: admin URL, billing alerts, cheat sheet |
