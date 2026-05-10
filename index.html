@@ -3841,7 +3841,9 @@ const VIBE_PILLS = {
     { id: 'fishing',     label: '🎣 Fishing',          match: e => (e.tags||[]).includes('Fishing') },
     { id: 'boating',     label: '🛶 Boating',          match: e => (e.tags||[]).includes('Boating') },
     { id: 'running',     label: '🏃 Running',          match: e => (e.tags||[]).includes('Running') },
-    { id: 'racquet',     label: '🎾 Racquet & Disc',   match: e => /pickleball|tennis|disc golf|bocce/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'pickleball',  label: '🏓 Pickleball',       match: e => /pickleball/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
+    { id: 'tennis',      label: '🎾 Tennis',           match: e => /tennis|bocce/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
+    { id: 'discgolf',    label: '🥏 Disc Golf',        match: e => /disc golf/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
     { id: 'daypass',     label: '🏋️ Day-Pass Gyms',    match: e => e.type !== 'Lodging' && /\bgym\b|health club|crossfit|day pass/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
   ],
   handson: [
@@ -3888,7 +3890,8 @@ const VIBE_PILLS = {
     { id: 'hotels',      label: '🏨 Hotels',           match: e => e.type === 'Lodging' && /\bhotel\b/i.test(e.name + ' ' + (e.sub||'')) },
     { id: 'spa',         label: '💆 Spa & Float',      match: e => /float|spa|sauna|massage/i.test(e.name + ' ' + (e.sub||'')) },
     { id: 'gardens',     label: '🌷 Gardens',          match: e => (e.tags||[]).includes('Garden') },
-    { id: 'finedining',  label: '🍷 Fine Dining',      match: e => e.type === 'Restaurant' && (/farm.?to.?table|steakhouse|fine dining|chef/i.test((e.notes||'') + ' ' + (e.sub||''))) },
+    { id: 'wineries',    label: '🍷 Wineries',         match: e => e.type === 'Winery' || e.type === 'Tasting room' },
+    { id: 'finedining',  label: '🍴 Fine Dining',      match: e => e.type === 'Restaurant' && (/farm.?to.?table|steakhouse|fine dining|chef/i.test((e.notes||'') + ' ' + (e.sub||''))) },
   ],
   family: [
     { id: 'goldpan',     label: '⚱ Gold Panning',      match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
@@ -4106,16 +4109,22 @@ function filterExperiences() {
     }
 
     if (themeTags) {
-      const match = e.tags.some(tag => themeTags.has(tag.toLowerCase()));
-      if (!match) return false;
-      // Vibe-active grids exclude lodging always — stays are orthogonal and
-      // have the 🏠 Lodging tile / Find Lodging CTA.
-      const t = (e.type || '').toLowerCase();
-      if (t === 'lodging' && typeFilter !== 'lodging') return false;
-      // Wineries / tasting rooms only belong in Foodie — they bleed into other
-      // vibes (especially Active) via their Scenic / Romantic tags. Allow them
-      // when Foodie is one of the selected vibes, or Category is explicit.
-      if ((t === 'winery' || t === 'tasting room') && !selectedThemes.has('foodie') && typeFilter !== t) return false;
+      // When the user clicks a specific vibe-pill (🍷 Wineries, 🏡 B&Bs, etc.)
+      // the pill IS the filter — bypass the broader theme-tag check and the
+      // orthogonal-category exclusions. They explicitly opted into this slice.
+      const pillMatched = vibePillDef && vibePillDef.match(e);
+      if (!pillMatched) {
+        const match = e.tags.some(tag => themeTags.has(tag.toLowerCase()));
+        if (!match) return false;
+        // Vibe-active grids exclude lodging — stays are orthogonal and have
+        // the 🏠 Lodging tile / Find Lodging CTA.
+        const t = (e.type || '').toLowerCase();
+        if (t === 'lodging' && typeFilter !== 'lodging') return false;
+        // Wineries / tasting rooms belong in Foodie and Relaxed — they bleed
+        // into Active via Scenic and Family via Romantic tags otherwise.
+        const wineryFriendly = selectedThemes.has('foodie') || selectedThemes.has('relaxed');
+        if ((t === 'winery' || t === 'tasting room') && !wineryFriendly && typeFilter !== t) return false;
+      }
     }
     return true;
   });
