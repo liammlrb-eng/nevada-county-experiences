@@ -3830,6 +3830,7 @@ const VIBE_PILLS = {
     { id: 'boating',     label: '🛶 Boating',          match: e => (e.tags||[]).includes('Boating') },
     { id: 'running',     label: '🏃 Running',          match: e => (e.tags||[]).includes('Running') },
     { id: 'racquet',     label: '🎾 Racquet & Disc',   match: e => /pickleball|tennis|disc golf|bocce/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'daypass',     label: '🏋️ Day-Pass Gyms',    match: e => e.type !== 'Lodging' && /\bgym\b|health club|day pass/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
   ],
   handson: [
     { id: 'crafts',   label: '🎨 Crafts',                match: e => {
