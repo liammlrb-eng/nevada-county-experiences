@@ -10,14 +10,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
   :root {
-    --gold: #C9A84C;
+    --gold: #B8941A;          /* was #C9A84C — richer, more saturated for stronger accent */
     --gold-light: #E8C96A;
-    --brown: #6B4A2A;
+    --brown: #5A3D22;          /* was #6B4A2A — slightly deeper for headings */
     --cream: #F5F0E8;
     --dark: #1E1508;
     --forest: #3A5A3A;
     --rust: #8B4A2A;
-    --slate: #4A5568;
+    --slate: #2D3748;          /* was #4A5568 — darker for body-text contrast */
+    --slate-soft: #4A5568;     /* old --slate value, kept for genuinely muted text */
     --fog: #EDE8DE;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,6 +26,8 @@
     background: var(--cream);
     color: var(--dark);
     font-family: 'Josefin Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
     min-height: 100vh;
   }
 
@@ -98,7 +101,7 @@
   }
   .section-desc {
     color: var(--slate);
-    font-size: 15px;
+    font-size: 16px;
     letter-spacing: 0.02em;
     margin-bottom: 32px;
   }
@@ -324,7 +327,7 @@
 
   .exp-body { padding: 14px 16px 14px; }
   .exp-sub {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--slate);
     letter-spacing: 0.04em;
     margin-bottom: 6px;
@@ -334,7 +337,7 @@
     align-items: center;
     gap: 6px;
     margin-bottom: 8px;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--slate);
   }
   .exp-meta .dot { color: var(--gold); }
@@ -345,8 +348,8 @@
     margin-bottom: 10px;
   }
   .tag {
-    font-size: 9.5px;
-    letter-spacing: 0.08em;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 3px 8px;
     border-radius: 20px;
@@ -509,11 +512,12 @@
   }
   .event-name {
     font-family: 'Playfair Display', serif;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--dark);
     margin-bottom: 4px;
+    line-height: 1.25;
   }
-  .event-venue { font-size: 12px; color: var(--slate); margin-bottom: 8px; }
+  .event-venue { font-size: 13px; color: var(--slate); margin-bottom: 8px; }
   .event-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
 
   /* TABS */
