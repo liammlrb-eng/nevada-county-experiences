@@ -1802,10 +1802,9 @@ const EXPERIENCES = [
 
 ];
 
-const ITINERARIES = [
-  { id: 'itin-1', name: 'Gold Rush Day', duration: '1 Day', description: 'History, craft & Gold Country flavor' },
-  { id: 'itin-2', name: 'Wine & Relax Weekend', duration: '2 Days', description: 'Wineries, dining & relaxation in the foothills' },
-];
+// No seed itineraries — the chamber publishes them via My Itinerary → ✨ Publish as Suggested.
+// (Older versions shipped two stop-less placeholder itineraries that confused operators on the Edit flow.)
+const ITINERARIES = [];
 const ITINERARY_STOPS = [];
 
 // ── ITINERARY LIVE DATA + STORAGE ───────────────────────────────────
@@ -1834,6 +1833,17 @@ function loadItineraries() {
       const p = JSON.parse(rs);
       if (Array.isArray(p)) liveStops = p;
     }
+    // One-time cleanup: drop legacy seed placeholders that ship'd with no stops.
+    // Targets the two specific ids ('itin-1', 'itin-2') so we don't disturb a
+    // chamber admin's freshly-added (still-empty) work-in-progress itinerary.
+    const LEGACY_SEEDS = new Set(['itin-1', 'itin-2']);
+    const before = liveItineraries.length;
+    liveItineraries = liveItineraries.filter(it => {
+      if (!LEGACY_SEEDS.has(it.id)) return true;
+      const hasStops = liveStops.some(s => s.itinId === it.id);
+      return hasStops;   // keep only if someone actually added stops
+    });
+    if (before !== liveItineraries.length) saveAll();
   } catch(e) {}
 }
 
@@ -3332,7 +3342,7 @@ function editItinerary(id) {
   if (typeof IS_ADMIN_HOST === 'undefined' || !IS_ADMIN_HOST) return;
   const itin = liveItineraries.find(i => i.id === id);
   if (!itin) return;
-  if (myList.size > 0 && !confirm(`Load "${itin.name}" into your planner?\n\nThis will replace what's currently in My Itinerary.`)) return;
+  if (myList.size > 0 && !confirm(`Edit "${itin.name}"?\n\nIts saved stops will load into the planner for editing — anything currently in My Itinerary will be replaced.`)) return;
 
   myList.clear();
   dayMap = {};
