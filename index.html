@@ -3035,11 +3035,12 @@ function renderModal() {
 
     suggHtml = `
       <div style="margin-top:28px;border-top:2px solid #e8dfc8;padding-top:18px">
-        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
-          <span style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:700">✨ More to Explore</span>
-          <span style="font-size:11px;color:#999">${suggExp.length + suggEvt.length} based on your picks</span>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+          <span style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:700">✨ Near Your Stops</span>
+          <span style="font-size:11px;color:#999">${suggExp.length + suggEvt.length} picks</span>
+          <button onclick="browseAllFromModal()" style="margin-left:auto;background:transparent;border:1.5px solid var(--brown);color:var(--brown);padding:5px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.05em;white-space:nowrap" title="Close My Itinerary and browse the full Explore grid with filters">🔍 Browse all</button>
         </div>
-        <div style="font-size:12px;color:#718096;margin-bottom:14px">Nearby experiences and events that fit what you've added so far.</div>
+        <div style="font-size:12px;color:#718096;margin-bottom:14px">A short list, biased toward places <strong>near</strong> what you've already added and matching your tags. Want the full catalog? Use <strong>Browse all</strong> →</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px">
           ${expCardsHtml}${evtCardsHtml}
         </div>
@@ -3483,6 +3484,21 @@ function publishAsItinerary() {
 
   // Optional Plausible event
   if (typeof track === 'function') track('Itinerary Published', {stops: String(stops.length), days: String(tripDays), edit: isEditing ? '1' : '0'});
+}
+
+// Shortcut from the "✨ Near Your Stops" suggestions block — closes the
+// modal and drops the visitor (or admin) into the full Explore grid so
+// they're not constrained to the proximity-biased 6+4 picks.
+function browseAllFromModal() {
+  closeModal();
+  const expTab = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
+  if (expTab && !expTab.classList.contains('active')) {
+    switchTab('experiences', expTab);
+  }
+  setTimeout(() => {
+    const grid = document.getElementById('expGrid');
+    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
 }
 
 // Shortcut from My Itinerary → browse Lodging category in the grid
