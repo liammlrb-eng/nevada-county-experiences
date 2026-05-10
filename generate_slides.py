@@ -720,10 +720,14 @@ def slide_next_steps(s):
 
 def slide_migration(s):
     """
-    Note from chat-Claude: "9-phase migration plan for a prototype conversation
-    feels premature." Kept as a regular slide near the end, but consider this
-    a candidate for an appendix / skip-unless-asked depending on the room.
+    Per chat-Claude: "9-phase migration plan for a prototype conversation feels
+    premature." Demoted to the appendix — pull up only if IT is in the room or
+    someone explicitly asks how this would actually be hosted.
     """
+    # Appendix eyebrow — small caps top-right so it doesn't fight the title
+    add_text(s, 'APPENDIX  ·  PULL UP IF ASKED',
+             Inches(8.5), Inches(0.45), Inches(4.2), Inches(0.3),
+             size=9, bold=True, color=GOLD, align=PP_ALIGN.RIGHT)
     slide_header(s, 'Migration to a county server',
         'One focused half-day for someone comfortable with Linux; two days for a learner.')
 
@@ -806,8 +810,14 @@ SLIDE_ORDER = [
     (slide_cost,               True),   # Second big moment — $6/mo vs $5K–$30K
     # ── Act 5 ─────────────────────────────────────────────────────────────
     (slide_next_steps,         True),   # "Where the group can take this"
-    (slide_migration,          True),   # Optional / appendix-feeling — skip if no IT in room
     (slide_thank_you,          False),
+]
+
+# Appendix slides — shown after the close. Pull up only if asked
+# (chat-Claude: "9-phase migration plan for a prototype conversation feels
+# premature"). Numbered with an 'A' prefix instead of counting against TOTAL.
+APPENDIX_ORDER = [
+    (slide_migration,          True),
 ]
 
 TOTAL = len(SLIDE_ORDER)
@@ -820,6 +830,13 @@ for i, (build_fn, show_footer) in enumerate(SLIDE_ORDER, 1):
     if show_footer:
         page_footer(s, i, TOTAL)
 
+# Appendix — shown after Thank You so they're not in the main flow
+for ai, (build_fn, show_footer) in enumerate(APPENDIX_ORDER, 1):
+    s = prs.slides.add_slide(BLANK)
+    build_fn(s)
+    if show_footer:
+        page_footer(s, f'A{ai}', f'A{len(APPENDIX_ORDER)}')
+
 
 # ─── Save ───────────────────────────────────────────────────────────────
 import shutil
@@ -827,7 +844,7 @@ project_root = Path(__file__).resolve().parent
 out = project_root / 'demo_pitch.pptx'
 prs.save(str(out))
 print(f'Wrote: {out}')
-print(f'Slides: {TOTAL}')
+print(f'Slides: {TOTAL} main + {len(APPENDIX_ORDER)} appendix = {TOTAL + len(APPENDIX_ORDER)} total')
 print(f'Size: {out.stat().st_size:,} bytes ({out.stat().st_size/1024:.1f} KB)')
 
 # Mirror to pitch_resources/ so the chat-upload bundle stays in sync

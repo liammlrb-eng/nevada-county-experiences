@@ -259,10 +259,26 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 
 ---
 
-## Slide 14 — Migration to a county server  *(formerly slide 11 — consider as appendix)*
+## Slide 14 — Thank you
+**Thank you / Questions?**
+
+The leave-behind one-liner:
+
+> *"This isn't a website — it's a planning workspace for visitors and a
+> living directory for the chamber, with AI-assisted curation built in.
+> Privacy-respecting by default, owned by the county outright, maintained
+> in minutes per week."*
+
+- **Live demo:** liammlrb-eng.github.io/nevada-county-experiences
+- **Repo:** github.com/liammlrb-eng/nevada-county-experiences
+- **Pitch deck:** demo_pitch.pdf · **Operator guide:** operator_guide.pdf
+
+---
+
+## Slide A1 (APPENDIX) — Migration to a county server
 *One focused half-day for someone comfortable with Linux; two days for a learner.*
 
-> 💡 Per chat-Claude feedback: "9-phase migration plan for a prototype conversation feels premature." Consider skipping this slide unless IT is in the room and asking, or pulling it up only when someone asks "how would we actually host this?"
+> 💡 Per chat-Claude feedback: "9-phase migration plan for a prototype conversation feels premature." Demoted to the appendix — pull up only if IT is in the room or someone explicitly asks "how would we actually host this?" Slide footer reads "A1 / A1" instead of a regular page number to make the demotion visible.
 
 | Phase | What happens |
 |---|---|
@@ -277,18 +293,3 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 | 8 | Test checklist |
 | 9 | Hand-off to chamber: admin URL, billing alerts, cheat sheet |
 
----
-
-## Slide 15 — Thank you
-**Thank you / Questions?**
-
-The leave-behind one-liner:
-
-> *"This isn't a website — it's a planning workspace for visitors and a
-> living directory for the chamber, with AI-assisted curation built in.
-> Privacy-respecting by default, owned by the county outright, maintained
-> in minutes per week."*
-
-- **Live demo:** liammlrb-eng.github.io/nevada-county-experiences
-- **Repo:** github.com/liammlrb-eng/nevada-county-experiences
-- **Pitch deck:** demo_pitch.pdf · **Operator guide:** operator_guide.pdf

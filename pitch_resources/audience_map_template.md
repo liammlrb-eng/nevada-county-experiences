@@ -77,13 +77,13 @@ The current order (already applied in `demo_pitch.pptx`) is:
 11. AI tag refinement
 12. Cost
 13. **Where the group can take this** *(retitled from "What the chamber needs to do next")*
-14. Migration *(consider skipping if no IT in the room)*
-15. Thank you
+14. Thank you
+15. **Appendix A1**: Migration *(moved to appendix — pull up only if IT is in the room or asked)*
 
 Open decisions:
 
-- [ ] Keep migration as slide 14 or move to backup-only (skip unless asked)?
-- [ ] Add a Plausible Analytics fallback option to slide 9 (Privacy)?
+- [x] ~~Keep migration as slide 14 or move to backup-only~~ — moved to appendix (Slide A1)
+- [x] ~~Add a Plausible Analytics fallback option to slide 9 (Privacy)~~ — shipped
 - [ ] Adjust the Maker Traveler / Curious Forge callout on slide 7?
 - [ ] Anything else after the discovery call?
 
