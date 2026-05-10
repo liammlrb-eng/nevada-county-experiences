@@ -2749,10 +2749,14 @@ async function _loadEventsCache() {
         };
       });
     _eventsCacheTime = Date.now();
-    // Merge hardcoded EVENTS not already covered by API
+    // Merge hardcoded EVENTS not already covered by API.
+    // Synthesize a stable scraperId from the name so the visitor's
+    // "+ Add to My List" button renders and saved itineraries round-trip.
     const apiNames = new Set(_eventsCache.map(e => e.name.toLowerCase()));
+    const _slugify = s => 'hc_' + (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40);
     for (const ev of EVENTS) {
-      if (!apiNames.has(ev.name.toLowerCase())) _eventsCache.push(ev);
+      if (apiNames.has(ev.name.toLowerCase())) continue;
+      _eventsCache.push({ ...ev, scraperId: ev.scraperId || _slugify(ev.name) });
     }
     _eventsCache.sort((a, b) => (a.dateStart || '9999').localeCompare(b.dateStart || '9999'));
   } catch(e) {
