@@ -1809,6 +1809,7 @@ const ITIN_KEY  = 'ncexp:itineraries2';
 const STOPS_KEY = 'ncexp:itin_stops';
 let liveItineraries = JSON.parse(JSON.stringify(ITINERARIES));
 let liveStops       = [];
+let editingItinId   = null;   // when set, publishAsItinerary() updates instead of creating
 let selectedItinId  = null;
 let browserSearch   = '';
 let browserType     = '';
@@ -2566,11 +2567,20 @@ function renderItineraries() {
           </li>`;
         }).filter(Boolean).join('')
       : '<li style="color:#a0aec0;font-size:11px;font-family:Josefin Sans;list-style:none;padding:4px 0">No stops added yet</li>';
+    const adminBtns = (typeof IS_ADMIN_HOST !== 'undefined' && IS_ADMIN_HOST)
+      ? `<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed #e0d8c8">
+           <button onclick="editItinerary('${itin.id}')" title="Load this itinerary into the planner to edit"
+             style="background:#6b46c1;color:#fff;border:none;padding:5px 12px;border-radius:3px;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:0.05em;font-weight:600">✎ Edit</button>
+           <button onclick="deleteItineraryCard('${itin.id}')" title="Permanently delete this published itinerary"
+             style="background:transparent;color:#c0392b;border:1px solid #c0392b;padding:4px 11px;border-radius:3px;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:0.05em;font-weight:600">🗑 Delete</button>
+         </div>`
+      : '';
     return `<div class="itin-card">
       <div class="itin-theme">${itin.duration}</div>
       <div class="itin-title">${itin.name}</div>
       ${itin.description ? `<p style="font-size:12px;color:var(--slate);margin:0 0 10px;font-family:'Josefin Sans',sans-serif">${itin.description}</p>` : ''}
       <ul class="itin-stops">${stopsHtml}</ul>
+      ${adminBtns}
     </div>`;
   }).join('');
 }
@@ -3138,7 +3148,12 @@ function renderModal() {
       <button class="btn-primary" onclick="openMap()">🗺 View on Map</button>
       <button class="btn-primary" onclick="shareItinerary()">📤 Share / Save</button>
       <button class="btn-primary" onclick="printItinerary()" style="background:transparent;color:var(--brown);border-color:#d4c9b0">🖨 Print</button>
-      ${(typeof IS_ADMIN_HOST !== 'undefined' && IS_ADMIN_HOST) ? `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Itineraries section.">✨ Publish as Suggested</button>` : ''}
+      ${(typeof IS_ADMIN_HOST !== 'undefined' && IS_ADMIN_HOST) ? (
+        editingItinId !== null
+          ? `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save changes to the published itinerary.">✓ Update Itinerary</button>
+             <button class="btn-secondary" onclick="cancelEditItinerary()" title="Stop editing — your changes won't be saved to the published itinerary.">✗ Cancel Edit</button>`
+          : `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Itineraries section.">✨ Publish as Suggested</button>`
+      ) : ''}
       <button class="btn-secondary" onclick="clearAll()">Clear All</button>
     </div>
     <div style="font-size:10.5px;color:#888;text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid #f0e8d8">
@@ -3262,6 +3277,53 @@ function clearAll() {
   }
 }
 
+// ─── EDIT / DELETE PUBLISHED ITINERARY (admin) ────────────────────────────
+// editItinerary loads a published itinerary back into the visitor planner so
+// the chamber can tweak it. The next ✨ Publish click updates the existing
+// record (instead of creating a duplicate) — see publishAsItinerary().
+//
+// Day numbers are reverse-engineered from each stop's timeLabel, which we
+// originally wrote in the form "Day N" or "Day N · Tonight's Stay".
+function editItinerary(id) {
+  if (typeof IS_ADMIN_HOST === 'undefined' || !IS_ADMIN_HOST) return;
+  const itin = liveItineraries.find(i => i.id === id);
+  if (!itin) return;
+  if (myList.size > 0 && !confirm(`Load "${itin.name}" into your planner?\n\nThis will replace what's currently in My Itinerary.`)) return;
+
+  myList.clear();
+  dayMap = {};
+  let maxDay = 1;
+
+  const stops = liveStops
+    .filter(s => s.itinId === id)
+    .sort((a, b) => a.order - b.order);
+  for (const s of stops) {
+    const exp = liveExperiences.find(e => String(e.id) === String(s.expId));
+    if (!exp) continue;     // stop references an experience that no longer exists
+    const m = /Day\s+(\d+)/i.exec(s.timeLabel || '');
+    const day = m ? parseInt(m[1], 10) : 1;
+    if (day > maxDay) maxDay = day;
+    myList.add(exp.id);
+    dayMap[exp.id] = day;
+  }
+  tripDays = maxDay;
+  editingItinId = id;
+  _saveMyList();
+  updateFab();
+  openModal();
+}
+
+function deleteItineraryCard(id) {
+  // Reuse the existing deleteItinerary() (it has its own confirm prompt and
+  // re-renders the public Suggested Itineraries grid via renderItineraries()).
+  deleteItinerary(id);
+}
+
+function cancelEditItinerary() {
+  editingItinId = null;
+  renderModal();
+}
+
 // ─── PUBLISH AS SUGGESTED ITINERARY ───────────────────────────────────────
 // Lets chamber staff use the public day-by-day planner to create itineraries
 // that show up in the public "Suggested Itineraries" section. The button is
@@ -3295,18 +3357,24 @@ function publishAsItinerary() {
     return;
   }
 
-  const defaultName = 'Untitled Itinerary';
-  const name = (prompt('Itinerary name (visitors will see this):', defaultName) || '').trim();
+  const isEditing = editingItinId !== null;
+  const existing  = isEditing ? liveItineraries.find(i => i.id === editingItinId) : null;
+  if (isEditing && !existing) { editingItinId = null; /* stale ref — fall through to create */ }
+
+  const defaultName = (existing && existing.name) || 'Untitled Itinerary';
+  const namePrompt  = isEditing ? 'Update itinerary name:' : 'Itinerary name (visitors will see this):';
+  const name        = (prompt(namePrompt, defaultName) || '').trim();
   if (!name) return;  // user cancelled or left blank
 
   const totalNights = Math.max(0, tripDays - 1);
-  const defaultDuration = totalNights > 0
+  const computedDuration = totalNights > 0
     ? `${tripDays} days / ${totalNights} night${totalNights !== 1 ? 's' : ''}`
     : `${tripDays} day${tripDays !== 1 ? 's' : ''}`;
-  const duration = (prompt('Duration label (e.g. "Weekend", "3 days / 2 nights"):', defaultDuration) || defaultDuration).trim();
+  const defaultDuration = (existing && existing.duration) || computedDuration;
+  const durPrompt = isEditing ? 'Update duration label:' : 'Duration label (e.g. "Weekend", "3 days / 2 nights"):';
+  const duration  = (prompt(durPrompt, defaultDuration) || defaultDuration).trim();
 
-  const newItinId = genId();
-  const newItin = { id: newItinId, name, duration };
+  const targetItinId = isEditing ? editingItinId : genId();
 
   // Build stops in display order: day-by-day, lodging first per day
   const stops = [];
@@ -3322,7 +3390,7 @@ function publishAsItinerary() {
         : (tripDays > 1 ? `Day ${day}` : '');
       stops.push({
         id: genId(),
-        itinId: newItinId,
+        itinId: targetItinId,
         expId: it.id,
         timeLabel: dayLabel,
         order: order++,
@@ -3330,14 +3398,25 @@ function publishAsItinerary() {
     }
   }
 
-  // Append + persist
-  liveItineraries.push(newItin);
-  liveStops.push(...stops);
+  if (isEditing) {
+    existing.name = name;
+    existing.duration = duration;
+    liveStops = liveStops.filter(s => s.itinId !== targetItinId);   // drop old stops
+    liveStops.push(...stops);
+    editingItinId = null;
+  } else {
+    liveItineraries.push({ id: targetItinId, name, duration });
+    liveStops.push(...stops);
+  }
   saveAll();
 
   // Refresh the public Suggested Itineraries grid if it's mounted
   if (typeof renderItineraries === 'function') {
     try { renderItineraries(); } catch(e) { /* not yet rendered */ }
+  }
+  // Refresh the modal so the publish button reverts to "Publish as Suggested"
+  if (typeof renderModal === 'function') {
+    try { renderModal(); } catch(e) { /* modal not open */ }
   }
 
   // Toast confirmation
@@ -3345,10 +3424,11 @@ function publishAsItinerary() {
   const note = skippedEvents > 0
     ? ` (${skippedEvents} event${skippedEvents !== 1 ? 's' : ''} skipped — events can't be saved as itinerary stops)`
     : '';
-  _showShareToast(`✨ Published "${name}" — ${stops.length} stop${stops.length !== 1 ? 's' : ''}${note}`);
+  const verb = isEditing ? 'Updated' : 'Published';
+  _showShareToast(`✨ ${verb} "${name}" — ${stops.length} stop${stops.length !== 1 ? 's' : ''}${note}`);
 
   // Optional Plausible event
-  if (typeof track === 'function') track('Itinerary Published', {stops: String(stops.length), days: String(tripDays)});
+  if (typeof track === 'function') track('Itinerary Published', {stops: String(stops.length), days: String(tripDays), edit: isEditing ? '1' : '0'});
 }
 
 // Shortcut from My Itinerary → browse Lodging category in the grid
