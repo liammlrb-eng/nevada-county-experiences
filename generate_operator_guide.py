@@ -618,7 +618,7 @@ git push
         '<b>Spring</b>: walk through every experience entry — verify hours, URLs, and that the venue still exists. Use Manage Database → Experiences. Budget 4-6 hours.',
         '<b>Spring</b>: review all 9 vibes — are the photos still working? Are the taglines still accurate? Edit if needed.',
         '<b>Summer</b>: pre-festival-season scrape + AI categorize + manual review. Push to GitHub.',
-        '<b>Fall</b>: review the Suggested Itineraries — are they still relevant? Update photos and stops.',
+        '<b>Fall</b>: review the Suggested Experiences — are the published itineraries still relevant? Update photos and stops.',
         '<b>Anytime</b>: domain renewal — set a calendar reminder 90 days before expiry.',
         '<b>Anytime</b>: backup test — once a year, restore events.json from a tarball backup to a test folder, verify the file loads.',
     ]

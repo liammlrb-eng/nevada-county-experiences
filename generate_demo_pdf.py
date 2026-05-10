@@ -455,7 +455,7 @@ def build():
         ['<b>Find Lodging clears active vibes</b>',
          'Vibes (Foodie, Active, Wellness) describe a discovery mood — not lodging properties. When a visitor explicitly asks for lodging, that intent supersedes the vibe filter, otherwise zero stays show (lodgings aren\'t tagged "Foodie"). The system makes the right call and tells the visitor what changed via a brief toast.'],
         ['<b>Add Day returns to browse mode</b>',
-         '"Add another day" doesn\'t leave the visitor staring at an empty day inside the modal — it closes the modal, switches to the Experiences tab, scrolls to the grid, and shows a toast: "Day 2 added — pick stops below." New items default to the latest day, so adds land correctly without the visitor thinking about it.'],
+         '"Add another day" doesn\'t leave the visitor staring at an empty day inside the modal — it closes the modal, switches to the Explore tab, scrolls to the grid, and shows a toast: "Day 2 added — pick stops below." New items default to the latest day, so adds land correctly without the visitor thinking about it.'],
         ['<b>Events go into the itinerary, not direct to KVMR</b>',
          'Clicking "More Info" sent visitors off-site to KVMR/Eventbrite — many never came back. New flow lets visitors collect interesting events in their itinerary, see them side-by-side with experiences, then click through to source pages WHEN they\'re ready to commit. Itinerary becomes a comparison tool, not a redirect graveyard.'],
         ['<b>Calendar dates on day headers</b>',

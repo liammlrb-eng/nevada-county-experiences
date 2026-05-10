@@ -1382,8 +1382,8 @@
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('experiences', this)">Experiences</button>
-    <button class="tab-btn" onclick="switchTab('itineraries', this)">Suggested Itineraries</button>
+    <button class="tab-btn active" onclick="switchTab('experiences', this)">Explore</button>
+    <button class="tab-btn" onclick="switchTab('itineraries', this)">Suggested Experiences</button>
     <button class="tab-btn" onclick="switchTab('events', this)">Upcoming Events</button>
     <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()">⚙ Manage Database</button>
   </div>
@@ -3196,7 +3196,7 @@ function renderModal() {
         editingItinId !== null
           ? `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save changes to the published itinerary.">✓ Update Itinerary</button>
              <button class="btn-secondary" onclick="cancelEditItinerary()" title="Stop editing — your changes won't be saved to the published itinerary.">✗ Cancel Edit</button>`
-          : `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Itineraries section.">✨ Publish as Suggested</button>`
+          : `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Experiences section.">✨ Publish as Suggested</button>`
       ) : ''}
       <button class="btn-secondary" onclick="clearAll()">Clear All</button>
     </div>
@@ -3359,7 +3359,7 @@ function editItinerary(id) {
 
 function deleteItineraryCard(id) {
   // Reuse the existing deleteItinerary() (it has its own confirm prompt and
-  // re-renders the public Suggested Itineraries grid via renderItineraries()).
+  // re-renders the public Suggested Experiences grid via renderItineraries()).
   deleteItinerary(id);
 }
 
@@ -3370,7 +3370,7 @@ function cancelEditItinerary() {
 
 // ─── PUBLISH AS SUGGESTED ITINERARY ───────────────────────────────────────
 // Lets chamber staff use the public day-by-day planner to create itineraries
-// that show up in the public "Suggested Itineraries" section. The button is
+// that show up in the public "Suggested Experiences" section. The button is
 // only rendered when API_BASE !== null (i.e. python server.py is running),
 // so it's effectively a chamber-machine-only affordance — public visitors
 // on a static deployment never see it.
@@ -3454,7 +3454,7 @@ function publishAsItinerary() {
   }
   saveAll();
 
-  // Refresh the public Suggested Itineraries grid if it's mounted
+  // Refresh the public Suggested Experiences grid if it's mounted
   if (typeof renderItineraries === 'function') {
     try { renderItineraries(); } catch(e) { /* not yet rendered */ }
   }
