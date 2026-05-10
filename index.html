@@ -4411,17 +4411,30 @@ async function triggerAiCategorize() {
   } catch(e) { alert('Could not reach server. Make sure server.py is running.'); }
 }
 
+// Invalidate the public events cache, refetch, and re-render whichever public
+// tab is currently mounted (Experiences → events strip + count, Events tab →
+// full grid). Call this after any admin write that changes event statuses.
+async function _refreshPublicEventViews() {
+  _eventsCache = null;
+  try { await _loadEventsCache(); } catch(e) { /* offline / no snapshot */ }
+  try { renderExperiences(); } catch(e) { /* not mounted */ }
+  const eventsTab = document.getElementById('tab-events');
+  if (eventsTab && eventsTab.classList.contains('active')) {
+    try { renderEvents(); } catch(e) { /* not mounted */ }
+  }
+}
+
 async function approveEvent(id) {
   if (API_BASE === null) return;
   await fetch(`${API_BASE}/api/events/${encodeURIComponent(id)}/approve`, { method: 'POST' });
-  _eventsCache = null;        // public Events tab must re-fetch
+  _refreshPublicEventViews();
   renderEventsQueue();
 }
 
 async function dismissEvent(id) {
   if (API_BASE === null) return;
   await fetch(`${API_BASE}/api/events/${encodeURIComponent(id)}/dismiss`, { method: 'POST' });
-  _eventsCache = null;
+  _refreshPublicEventViews();
   renderEventsQueue();
 }
 
@@ -4440,7 +4453,7 @@ async function approveAllEvents(count) {
   } catch(e) {
     alert('Could not reach server.');
   }
-  _eventsCache = null;
+  _refreshPublicEventViews();
   renderEventsQueue();
 }
 
