@@ -446,7 +446,7 @@ def slide_personas(s):
         ('6. Wine Country Foodie',    'Napa-alternative — provenance, chef bios, tasting flights'),
         ('7. Wellness Refugee',       'Float, massage, yoga, gardens — filtering for what\'s NOT there'),
         ('8. Local "What\'s Up"',     'Residents — pure events feed, "what\'s on this weekend"'),
-        ('9. Maker Traveler  🎯',     'Travels for the workshop — Curious Forge anchors a destination identity'),
+        ('9. Maker Traveler',         'Travels for the workshop — a destination-class workshop venue can anchor a regional identity'),
     ]
     add_bullets(s, [f'{name}    —    {desc}' for name, desc in personas],
                 Inches(0.6), Inches(1.85), Inches(12.1), Inches(4.7),
@@ -456,7 +456,7 @@ def slide_personas(s):
     add_rect(s, Inches(0.6), Inches(6.0), Inches(12.1), Inches(0.85),
              RGBColor(0xFB, 0xF7, 0xEE), GOLD)
     add_text(s,
-        'Recommended marketing focus (over-serve four):  Maker Traveler  ·  Festival Pilgrim  ·  Romantic Weekender  ·  Foodie',
+        'Recommended marketing focus (over-serve four):  Festival Pilgrim  ·  Romantic Weekender  ·  Foodie  ·  Maker Traveler',
         Inches(0.7), Inches(6.05), Inches(11.9), Inches(0.75),
         size=12, bold=True, color=BROWN, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 

@@ -248,7 +248,7 @@ def build():
         ['<b>8. Local "What\'s Up"</b>',
          'Nevada County residents themselves, recurring use',
          '<i>"What\'s going on tonight?"</i> Already knows the venues. Wants pure events feed. Different mode entirely from tourists.'],
-        ['<b>9. Maker Traveler</b> 🎯',
+        ['<b>9. Maker Traveler</b>',
          '25-65, professional or semi-retired, often solo or paired, urban-based',
          '<i>"I want to forge a knife / blow glass / throw a pot."</i> Shopping a SKILL, not a place. Will travel to the right workshop. Needs schedule, level required, take-home, instructor credentials.'],
     ]
@@ -258,12 +258,13 @@ def build():
 
     flow.append(Spacer(1, 6))
     flow.append(Paragraph(
-        '<b>🎯 Maker Traveler highlight:</b> Western Nevada County is unusually '
-        'well-positioned here — The Curious Forge, Wolf Craft School, ASiF, and '
-        'Craftfolk Collective form a maker ecosystem few foothills counties can '
-        'match. This persona has the highest revenue-per-visit (2-3 nights, '
-        'workshop fee, 4-6 meals out, lodging usually unbooked from comparison '
-        'sites), and the marketing story writes itself.',
+        '<b>Maker Traveler note:</b> Western Nevada County is unusually well-'
+        'positioned here — a cluster of maker venues (metalwork, glass, '
+        'ceramics, fiber, woodworking) forms an ecosystem few foothills '
+        'counties can match. This persona has the highest revenue-per-visit '
+        '(2-3 nights, workshop fee, 4-6 meals out, lodging usually unbooked '
+        'from comparison sites), so even modest marketing investment '
+        'compounds well.',
         BODY))
 
     flow.append(PageBreak())
@@ -280,7 +281,7 @@ def build():
         ['Wine Country Foodie',         '✅ Strong',     'Foodie vibe + Restaurant sub-pills + 9 wineries + 9 tasting rooms in db.'],
         ['Wellness Refugee',            '✅ Strong',     'Recently broadened (Restorative tag, 5 new massage venues, float/spa/yoga properly captured).'],
         ['Local "What\'s Up"',          '⚠️ Weak',       'Same filtering as visitors today. A "this week" landing page + email digest would build resident audience.'],
-        ['<b>Maker Traveler</b>',       '⚠️ Partial',    '<b>Hands-On vibe + Workshops sub-pill in place</b>, but workshop calendars (Curious Forge, ASiF, Wolf Craft) aren\'t scraped — so dates/details require leaving the site. Highest-leverage gap to close.'],
+        ['<b>Maker Traveler</b>',       '⚠️ Partial',    '<b>Hands-On vibe + Workshops sub-pill in place</b>, but most workshop calendars aren\'t scraped — so dates/details require leaving the site. Highest-leverage gap to close.'],
     ]
     flow.append(build_table(
         [['Persona', 'Today', 'Gap / next step']] + coverage_rows,
@@ -297,10 +298,10 @@ def build():
     flow.append(Spacer(1, 6))
     rec_rows = [
         ['<b>Over-serve (focused marketing)</b>',                           '<b>Why</b>'],
-        ['🎯 Maker Traveler',                'Highest revenue per visit; defensible market position; The Curious Forge alone is a destination-caliber asset.'],
         ['Festival Pilgrim',                  'Drives concentrated peak-season tourism (Cornish Christmas, Wild &amp; Scenic, Bluegrass). High economic impact per weekend.'],
         ['Romantic Weekender',                'Bay Area weekend market is enormous and well-suited to the foothills product. Highest per-capita spend on lodging/dining.'],
         ['Wine Country Foodie',               'Napa-alternative positioning is achievable. Sierra foothills wine region needs visibility this site can provide.'],
+        ['Maker Traveler',                    'Highest revenue per visit; defensible market position; the existing cluster of maker venues is destination-caliber.'],
     ]
     flow.append(build_table(rec_rows,
         col_widths=[2.2*inch, 4.3*inch], header=False, body_size=9))

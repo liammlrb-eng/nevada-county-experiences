@@ -84,7 +84,7 @@ Open decisions:
 
 - [x] ~~Keep migration as slide 14 or move to backup-only~~ — moved to appendix (Slide A1)
 - [x] ~~Add a Plausible Analytics fallback option to slide 9 (Privacy)~~ — shipped
-- [ ] Adjust the Maker Traveler / Curious Forge callout on slide 7?
+- [x] ~~Adjust the Maker Traveler / Curious Forge callout on slide 7~~ — genericized brand mention + reordered Maker Traveler last in over-serve list
 - [ ] Anything else after the discovery call?
 
 ## Talking points to memorize

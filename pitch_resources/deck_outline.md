@@ -131,11 +131,11 @@ After the demo, personas land as "these are real people I just saw using the too
 6. **Wine Country Foodie** — Napa-alternative — provenance, chef bios, tasting flights
 7. **Wellness Refugee** — Float, massage, yoga, gardens — filtering for what's NOT there
 8. **Local "What's Up"** — Residents — pure events feed, "what's on this weekend"
-9. **Maker Traveler** 🎯 — Travels for the workshop — Curious Forge anchors a destination identity
+9. **Maker Traveler** — Travels for the workshop — a destination-class workshop venue can anchor a regional identity
 
-**Recommended marketing focus (over-serve four):** Maker Traveler · Festival Pilgrim · Romantic Weekender · Foodie
+**Recommended marketing focus (over-serve four):** Festival Pilgrim · Romantic Weekender · Foodie · Maker Traveler
 
-> ⚠️ Watch the room when the Maker Traveler / Curious Forge callout lands — if anyone doesn't know the Forge, be ready with a one-sentence explanation.
+> 💡 Brand-neutral framing: persona #9 used to name a specific venue (Curious Forge), and listed first in over-serve. Both reorderd/genericized so the deck doesn't read as the presenter promoting their own venue. The cluster of maker venues in the county is mentioned in the long-form PDF without naming specific businesses.
 
 ---
 
