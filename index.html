@@ -2408,22 +2408,53 @@ function renderExperiences() {
     </div>`;
   };
 
-  // ── Pinned items separator ────────────────────────────────────────────────
-  const pinnedHtml = (showPlaces && pinnedItems.length > 0)
+  // ── In-itinerary section (admin edit mode) ────────────────────────────────
+  // When the chamber clicks Edit on a published Suggested Experience, surface
+  // the itinerary's current stops at the very top of Explore so they can see
+  // what's already in it and easily remove items via the card X-button.
+  const isEditingItin = (typeof editingItinId !== 'undefined' && editingItinId !== null);
+  const itinPlaces = isEditingItin
+    ? [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean)
+    : [];
+  const itinEventIds = isEditingItin
+    ? [...myList].filter(id => typeof id === 'string' && id.startsWith('evt_'))
+    : [];
+  const itinEvents = isEditingItin
+    ? itinEventIds.map(id => (_eventsCache || []).find(e => e.scraperId === id.slice(4))).filter(Boolean)
+    : [];
+  const itinHtml = (isEditingItin && (itinPlaces.length || itinEvents.length))
+    ? `<div style="grid-column:1/-1;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:700;padding:6px 0 4px;border-bottom:2px solid var(--gold);margin-bottom:6px">✎ In this itinerary (${itinPlaces.length + itinEvents.length})</div>
+       ${itinPlaces.map(cardHtml).join('')}
+       ${itinEvents.map(eventCardHtml).join('')}
+       <div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--slate);padding:10px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">More to add</div>`
+    : '';
+
+  // In edit mode the saved stops are shown above; suppress the regular
+  // "Your picks from other vibes" pinned section so we don't duplicate them.
+  const pinnedHtml = (!isEditingItin && showPlaces && pinnedItems.length > 0)
     ? `<div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);padding:4px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">Your picks from other vibes</div>
        ${pinnedItems.map(cardHtml).join('')}
        <div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--slate);padding:8px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">${selectedThemes.size > 0 ? [...selectedThemes].map(tid=>THEMES.find(t=>t.id===tid)?.name).filter(Boolean).join(' + ') : 'All experiences'}</div>`
     : '';
 
+  // Strip out anything already shown in the "In this itinerary" section so
+  // it doesn't appear twice in the grid below.
+  const placesForGrid = isEditingItin
+    ? filtered.filter(e => !myList.has(e.id))
+    : filtered;
+  const eventsForGrid = isEditingItin
+    ? eventsInGrid.filter(ev => !ev.scraperId || !myList.has('evt_' + ev.scraperId))
+    : eventsInGrid;
+
   // ── Events separator (only when both kinds are visible side-by-side) ─────
-  const evtSeparatorHtml = (showPlaces && filtered.length > 0 && showUpcomingEvents && eventsInGrid.length > 0)
+  const evtSeparatorHtml = (showPlaces && placesForGrid.length > 0 && showUpcomingEvents && eventsForGrid.length > 0)
     ? `<div style="grid-column:1/-1;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--slate);padding:10px 0 4px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">Upcoming Events</div>`
     : '';
 
-  const placesHtml = showPlaces ? filtered.map(cardHtml).join('') : '';
-  const eventsHtml = showUpcomingEvents ? eventsInGrid.map(eventCardHtml).join('') : '';
+  const placesHtml = showPlaces ? placesForGrid.map(cardHtml).join('') : '';
+  const eventsHtml = showUpcomingEvents ? eventsForGrid.map(eventCardHtml).join('') : '';
 
-  grid.innerHTML = pinnedHtml + placesHtml + evtSeparatorHtml + eventsHtml;
+  grid.innerHTML = itinHtml + pinnedHtml + placesHtml + evtSeparatorHtml + eventsHtml;
 }
 
 function isHighlightTag(tag) {
@@ -3365,6 +3396,11 @@ function editItinerary(id) {
   editingItinId = id;
   _saveMyList();
   updateFab();
+  // Re-render Explore so the "In this itinerary" section reflects the new
+  // editing state immediately (matters when admin clicks Browse all next).
+  if (typeof renderExperiences === 'function') {
+    try { renderExperiences(); } catch(e) {}
+  }
   openModal();
 }
 
@@ -3377,6 +3413,9 @@ function deleteItineraryCard(id) {
 function cancelEditItinerary() {
   editingItinId = null;
   renderModal();
+  if (typeof renderExperiences === 'function') {
+    try { renderExperiences(); } catch(e) {}
+  }
 }
 
 // ─── PUBLISH AS SUGGESTED ITINERARY ───────────────────────────────────────
@@ -3472,6 +3511,10 @@ function publishAsItinerary() {
   // Refresh the modal so the publish button reverts to "Publish as Suggested"
   if (typeof renderModal === 'function') {
     try { renderModal(); } catch(e) { /* modal not open */ }
+  }
+  // Refresh the Explore grid so the "In this itinerary" banner clears after update
+  if (typeof renderExperiences === 'function') {
+    try { renderExperiences(); } catch(e) { /* not mounted */ }
   }
 
   // Toast confirmation
