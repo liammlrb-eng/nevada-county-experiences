@@ -548,8 +548,8 @@ def slide_admin(s):
          '"Music" splits into "Live Music" and "Open Mic" without a developer.'),
         ('🔗 Event-source URL management — add a new source by pasting a URL',
          'New venue website? Paste the URL, pick a parser pattern, done.'),
-        ('📅 Auto-prune past events; auto-dismiss internal admin meetings',
-         'Saturday\'s farmers market vanishes from the queue Sunday morning.'),
+        ('📅 Pruning past events on every scrape + 🧹 manual button between scrapes',
+         'Saturday\'s farmers market vanishes from the queue at the next refresh — public site never showed it after Sunday anyway.'),
         ('🌐 Public RSS feed at /feed.rss — partners republish without integration work',
          'Local newspaper\'s "this weekend" widget pulls straight from /feed.rss.'),
         ('💡 Public "Suggest a venue or event" form — submissions queue for chamber review',
@@ -686,9 +686,16 @@ def slide_next_steps(s):
              Inches(8.8), col_y, Inches(4.0), Inches(0.4),
              size=12, bold=True, color=GOLD)
     add_bullets(s, [
+        'Schedule the scraper to run nightly via Windows '
+        'Task Scheduler / cron / systemd — auto-prune of '
+        'past events is built in but only fires when the '
+        'scraper runs',
         'Designate a queue curator — someone clears the '
         'pending-events queue 1-2x per week (Approve / '
         'Dismiss takes ~5 minutes per session)',
+        'Click 🧹 Prune Past between scrapes for ad-hoc '
+        'cleanup — same logic as the auto-prune, useful '
+        'when events get added or dismissed off-cycle',
         'Run AI Categorize after each refresh — fixes '
         'venue, area, tags on long-tail events ($0.50/mo)',
         'Validate "no event" alerts — when a source '
@@ -699,7 +706,7 @@ def slide_next_steps(s):
         'change platforms (e.g. NCAC moved to Trumba) and '
         'previously-blocked sources become reachable',
     ], Inches(8.8), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
-       size=9, line_spacing=1.35)
+       size=8.5, line_spacing=1.3)
 
     # Bottom callout: what we already learned
     add_rect(s, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.5),

@@ -301,19 +301,38 @@ python scraper\\event_scraper.py --site "Nevada City Chamber" """, CODE))
         flow.append(Paragraph(f'• {s}', BULLET))
 
     flow.append(Spacer(1, 10))
-    flow.append(Paragraph('3d. Auto-pruning', H1))
+    flow.append(Paragraph('3d. Pruning past events', H1))
     flow.append(Paragraph(
-        'The system automatically removes:', BODY))
+        'The pruner removes:', BODY))
     prune = [
-        'Pending or approved events whose date has passed (next scrape)',
+        'Pending or approved events whose date has passed',
         'Dismissed events older than 60 days (long enough to prevent re-import)',
     ]
     for p in prune:
         flow.append(Paragraph(f'• {p}', BULLET))
     flow.append(Paragraph(
-        'You can trigger a manual prune from the API: '
-        '<font face="Courier">POST /api/events/prune</font> '
-        '(or just wait for the next scrape — happens automatically).',
+        '<b>Note:</b> public visitors never see expired events — the site '
+        'filters them out client-side regardless of pruning. Pruning is '
+        'queue housekeeping, not a visitor-facing concern.',
+        BODY))
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph(
+        '<b>When pruning runs:</b>', BODY))
+    when_prune = [
+        '<b>Automatically</b> on every scrape (right before merging fresh events)',
+        '<b>Manually</b> via the 🧹 Prune Past button at the top of the Events Queue',
+        '<b>Manually</b> via API — <font face="Courier">POST /api/events/prune</font>',
+    ]
+    for w in when_prune:
+        flow.append(Paragraph(f'• {w}', BULLET))
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph(
+        '<b>Action item — schedule the scraper:</b> the scraper does not run on '
+        'a schedule out of the box. Set up a nightly run via Windows Task '
+        'Scheduler (chamber laptop) or cron / systemd timer (VPS) so the '
+        'queue stays current and pruning fires automatically. Without a '
+        'schedule, expired events accumulate in the queue (still hidden '
+        'from visitors) until someone clicks Update Now or 🧹 Prune Past.',
         BODY))
 
     flow.append(PageBreak())

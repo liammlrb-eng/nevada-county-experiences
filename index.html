@@ -4275,6 +4275,7 @@ async function renderEventsQueue() {
       ${filterBtns(filter)}
       ${filter === 'pending' && newCount > 0 ? `<span style="background:var(--gold);color:#1a1000;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.06em">✦ ${newCount} new</span>` : ''}
       ${filter === 'pending' && pending.length > 0 && API_BASE !== null ? `<button onclick="approveAllEvents(${pending.length})" style="background:var(--forest);color:#fff;border:none;padding:5px 13px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;white-space:nowrap">✓ Accept All (${pending.length})</button>` : ''}
+      ${API_BASE !== null ? `<button onclick="pruneExpiredEvents()" title="Remove past pending/approved events and dismissed events older than 60 days. Auto-runs on every scrape; this button is for between-scrape cleanup." style="background:transparent;color:var(--brown);border:1px solid var(--brown);padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;white-space:nowrap">🧹 Prune Past</button>` : ''}
       <span style="margin-left:auto;font-size:11px;color:#999">${countLabel}</span>
       ${API_BASE !== null ? `<a href="${rssUrl}" target="_blank" style="font-size:11px;color:var(--rust);text-decoration:none" title="RSS feed of approved events">📡 RSS</a>` : ''}
     </div>
@@ -4478,6 +4479,22 @@ async function approveEvent(id) {
 async function dismissEvent(id) {
   if (API_BASE === null) return;
   await fetch(`${API_BASE}/api/events/${encodeURIComponent(id)}/dismiss`, { method: 'POST' });
+  _refreshPublicEventViews();
+  renderEventsQueue();
+}
+
+async function pruneExpiredEvents() {
+  if (API_BASE === null) return;
+  if (!confirm('Prune past events from the queue?\n\n• Removes pending / approved events whose date has passed\n• Removes dismissed events older than 60 days\n\nThis only deletes records from the queue — public visitors already don\'t see expired events.')) return;
+  const btn = document.querySelector('button[onclick="pruneExpiredEvents()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Pruning…'; }
+  try {
+    const r    = await fetch(`${API_BASE}/api/events/prune`, { method: 'POST' });
+    const data = await r.json();
+    alert(`✓ Pruned ${data.pruned} expired event${data.pruned !== 1 ? 's' : ''}.\n\n${data.remaining} event${data.remaining !== 1 ? 's' : ''} remain in the queue.`);
+  } catch(e) {
+    alert('Could not reach server.');
+  }
   _refreshPublicEventViews();
   renderEventsQueue();
 }

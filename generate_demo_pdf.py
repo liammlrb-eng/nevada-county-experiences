@@ -393,7 +393,7 @@ def build():
         ['Drag-drop itinerary builder', 'Three-panel UI: itineraries · stops · browse'],
         ['Events Queue',             'Pending / Approved / Dismissed with filter buttons'],
         ['Approve all',              'One-click bulk approval of pending events; auto-dismisses past dates'],
-        ['Auto-prune',               'Past events removed nightly; dismissed items purged after 60 days'],
+        ['Pruning',                  'Past events removed every scrape · 🧹 Prune Past button for between-scrape cleanup · dismissed events purged after 60 days · run scheduling is operator-configured'],
         ['Source management',        'Add/edit/disable scraper source URLs without touching code'],
     ]
     flow.append(build_table(

@@ -186,7 +186,7 @@ After the demo, personas land as "these are real people I just saw using the too
 - ✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it
 - 🏷 Tag taxonomy editor — add/rename/delete tags without code
 - 🔗 Event-source URL management — add a new source by pasting a URL
-- 📅 Auto-prune past events; auto-dismiss internal admin meetings
+- 📅 Pruning past events on every scrape + 🧹 manual button between scrapes
 - 🌐 Public RSS feed at /feed.rss — partners republish without integration work
 - 💡 Public "Suggest a venue or event" form — submissions queue for chamber review
   ↳ *Chamber emails members the URL; venue owner fills the form; entry lands in admin Suggestions tab.*
@@ -248,7 +248,9 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 - Identify the 5–10 venues responsible for the bulk of visitor traffic
 
 ### OPERATIONS
+- Schedule the scraper to run nightly (Windows Task Scheduler / cron / systemd) — auto-prune fires only when the scraper runs
 - Designate a queue curator (5 minutes, 1–2× per week)
+- Click 🧹 Prune Past between scrapes for ad-hoc cleanup
 - Run AI Categorize after each refresh
 - Validate "no event" alerts (NCAC was a false negative for months)
 - Quarterly review of disabled sources
