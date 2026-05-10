@@ -4108,10 +4108,14 @@ function filterExperiences() {
     if (themeTags) {
       const match = e.tags.some(tag => themeTags.has(tag.toLowerCase()));
       if (!match) return false;
-      // Vibe-active grids exclude lodging — stays are orthogonal to vibes
-      // and have their own surface (the 🏠 Stays tile + Find Lodging CTA).
-      // The user can still see lodging by setting Category=Lodging explicitly.
-      if ((e.type || '').toLowerCase() === 'lodging' && typeFilter !== 'lodging') return false;
+      // Vibe-active grids exclude lodging always — stays are orthogonal and
+      // have the 🏠 Lodging tile / Find Lodging CTA.
+      const t = (e.type || '').toLowerCase();
+      if (t === 'lodging' && typeFilter !== 'lodging') return false;
+      // Wineries / tasting rooms only belong in Foodie — they bleed into other
+      // vibes (especially Active) via their Scenic / Romantic tags. Allow them
+      // when Foodie is one of the selected vibes, or Category is explicit.
+      if ((t === 'winery' || t === 'tasting room') && !selectedThemes.has('foodie') && typeFilter !== t) return false;
     }
     return true;
   });
