@@ -4334,12 +4334,14 @@ async function triggerAiCategorize() {
 async function approveEvent(id) {
   if (API_BASE === null) return;
   await fetch(`${API_BASE}/api/events/${encodeURIComponent(id)}/approve`, { method: 'POST' });
+  _eventsCache = null;        // public Events tab must re-fetch
   renderEventsQueue();
 }
 
 async function dismissEvent(id) {
   if (API_BASE === null) return;
   await fetch(`${API_BASE}/api/events/${encodeURIComponent(id)}/dismiss`, { method: 'POST' });
+  _eventsCache = null;
   renderEventsQueue();
 }
 
@@ -4358,6 +4360,7 @@ async function approveAllEvents(count) {
   } catch(e) {
     alert('Could not reach server.');
   }
+  _eventsCache = null;
   renderEventsQueue();
 }
 
