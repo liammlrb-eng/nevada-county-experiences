@@ -2178,9 +2178,16 @@ function addToVibes(id) { toggleTheme(id); }
 
 // Whether to include upcoming events in the experiences grid (default: on)
 let showUpcomingEvents = true;
+// Whether to include places (static catalog) in the grid (default: on)
+let showPlaces         = true;
 
 function toggleEventsInGrid() {
   showUpcomingEvents = !showUpcomingEvents;
+  renderExperiences();
+}
+
+function togglePlacesInGrid() {
+  showPlaces = !showPlaces;
   renderExperiences();
 }
 
@@ -2267,11 +2274,24 @@ function renderExperiences() {
     eventsInGrid = candidates;
   }
 
-  // ── Results count + events toggle pill ───────────────────────────────────
+  // ── Results count + toggle pills ─────────────────────────────────────────
   const vibeLabel = selectedThemes.size === 1 ? ' matching your vibe'
     : selectedThemes.size > 1  ? ` matching ${selectedThemes.size} vibes` : '';
-  const placesText = `Showing <strong>${filtered.length}</strong> place${filtered.length !== 1 ? 's' : ''}${vibeLabel}`;
-  const pinnedText = pinnedItems.length > 0
+
+  let placesText;
+  if (showPlaces) {
+    // Inline count, click to hide
+    placesText = `<button onclick="togglePlacesInGrid()" title="Hide places"
+      style="background:none;border:none;padding:0;margin:0;cursor:pointer;font:inherit;color:inherit">Showing <strong>${filtered.length}</strong> place${filtered.length !== 1 ? 's' : ''}${vibeLabel}</button>`;
+  } else {
+    // Ghost pill — places hidden
+    placesText = `<button onclick="togglePlacesInGrid()" title="Show places"
+      style="font-size:10px;padding:3px 10px;border-radius:12px;border:1.5px solid #ccc;background:transparent;color:#999;cursor:pointer;font-family:inherit;letter-spacing:0.05em;vertical-align:middle">
+      📍 Show places
+     </button>`;
+  }
+
+  const pinnedText = (showPlaces && pinnedItems.length > 0)
     ? ` <span style="color:var(--slate);font-weight:400">+ ${pinnedItems.length} from your list</span>`
     : '';
 
@@ -2279,8 +2299,9 @@ function renderExperiences() {
   if (_eventsCache) {
     if (showUpcomingEvents && eventsInGrid.length > 0) {
       // Inline count, click to hide
+      const lead = showPlaces ? '+ ' : '';
       eventsText = ` <button onclick="toggleEventsInGrid()" title="Hide events"
-        style="background:none;border:none;padding:0;margin:0;cursor:pointer;font:inherit;color:inherit">+ <strong>${eventsInGrid.length}</strong> upcoming event${eventsInGrid.length !== 1 ? 's' : ''}</button>`;
+        style="background:none;border:none;padding:0;margin:0;cursor:pointer;font:inherit;color:inherit">${lead}<strong>${eventsInGrid.length}</strong> upcoming event${eventsInGrid.length !== 1 ? 's' : ''}</button>`;
     } else {
       // Toggle pill — ghost style when hidden / no matches
       eventsText = ` <button onclick="toggleEventsInGrid()" title="${showUpcomingEvents ? 'Hide events' : 'Show upcoming events'}"
@@ -2290,12 +2311,15 @@ function renderExperiences() {
     }
   }
 
-  const expCount = filtered.length + pinnedItems.length;
-  countEl.innerHTML = expCount > 0 || eventsInGrid.length > 0
+  const visiblePlaceCount = showPlaces ? (filtered.length + pinnedItems.length) : 0;
+  const visibleEventCount = showUpcomingEvents ? eventsInGrid.length : 0;
+  countEl.innerHTML = (visiblePlaceCount > 0 || visibleEventCount > 0 || !showPlaces || !showUpcomingEvents)
     ? placesText + pinnedText + eventsText
     : '';
 
-  if (filtered.length === 0 && pinnedItems.length === 0 && eventsInGrid.length === 0) {
+  // "No matches" is only meaningful when the user is trying to see places —
+  // if they explicitly hid both, leave the grid empty without the warning.
+  if (showPlaces && filtered.length === 0 && pinnedItems.length === 0 && (!showUpcomingEvents || eventsInGrid.length === 0)) {
     grid.innerHTML = '<div class="no-results">No experiences match your current filters.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Try adjusting your themes or filters.</span></div>';
     return;
   }
@@ -2371,22 +2395,21 @@ function renderExperiences() {
   };
 
   // ── Pinned items separator ────────────────────────────────────────────────
-  const pinnedHtml = pinnedItems.length > 0
+  const pinnedHtml = (showPlaces && pinnedItems.length > 0)
     ? `<div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);padding:4px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">Your picks from other vibes</div>
        ${pinnedItems.map(cardHtml).join('')}
        <div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--slate);padding:8px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">${selectedThemes.size > 0 ? [...selectedThemes].map(tid=>THEMES.find(t=>t.id===tid)?.name).filter(Boolean).join(' + ') : 'All experiences'}</div>`
     : '';
 
-  // ── Events separator (only if both events and experiences are showing) ────
-  const evtSeparatorHtml = eventsInGrid.length > 0 && filtered.length > 0
+  // ── Events separator (only when both kinds are visible side-by-side) ─────
+  const evtSeparatorHtml = (showPlaces && filtered.length > 0 && showUpcomingEvents && eventsInGrid.length > 0)
     ? `<div style="grid-column:1/-1;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--slate);padding:10px 0 4px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">Upcoming Events</div>`
     : '';
 
-  grid.innerHTML =
-    pinnedHtml +
-    filtered.map(cardHtml).join('') +
-    evtSeparatorHtml +
-    eventsInGrid.map(eventCardHtml).join('');
+  const placesHtml = showPlaces ? filtered.map(cardHtml).join('') : '';
+  const eventsHtml = showUpcomingEvents ? eventsInGrid.map(eventCardHtml).join('') : '';
+
+  grid.innerHTML = pinnedHtml + placesHtml + evtSeparatorHtml + eventsHtml;
 }
 
 function isHighlightTag(tag) {
