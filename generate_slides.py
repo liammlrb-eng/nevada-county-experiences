@@ -47,6 +47,11 @@ RULE   = RGBColor(0xCB, 0xD5, 0xE1)          # cool light divider line
 # 1.30 = ~30% larger across the board.
 FONT_SCALE = 1.30
 
+# Show or hide the '↳ scenario' italic sub-lines under every bullet and
+# table row. Off by default — the headline bullet alone is enough; the
+# scenarios crowd the layout and read as filler at projector distance.
+SHOW_SCENARIOS = False
+
 # 16:9 widescreen
 SLIDE_W = Inches(13.333)
 SLIDE_H = Inches(7.5)
@@ -92,9 +97,13 @@ def add_rect(slide, left, top, width, height, fill, line=None):
 
 
 def add_gold_rule(slide, left, top, width):
-    shp = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, width, Pt(2))
+    """Title underline. Name kept for backward compat but the actual color
+    is now deep ink (matching the heading) so rules look like a heading
+    underline rather than a gold ribbon. Amber is still used elsewhere
+    for callouts / badges where it pops against white."""
+    shp = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, width, Pt(2.5))
     shp.fill.solid()
-    shp.fill.fore_color.rgb = GOLD
+    shp.fill.fore_color.rgb = BROWN
     shp.line.fill.background()
 
 
@@ -168,7 +177,7 @@ def add_bullets(slide, items, left, top, width, height, *,
         para_idx += 1
 
         # Optional scenario sub-line: italic, indented, smaller
-        if scenario:
+        if scenario and SHOW_SCENARIOS:
             p2 = tf.add_paragraph()
             p2.alignment = PP_ALIGN.LEFT
             sr = p2.add_run()
@@ -222,10 +231,14 @@ def two_col_table(slide, headers, rows, top, *, left_w=4.5, right_w=8.0,
         else:
             a, b = row
             scenario = None
+        # Honor the global hide-scenarios flag — even 3-tuples render as
+        # just the headline pair when SHOW_SCENARIOS is False.
+        if not SHOW_SCENARIOS:
+            scenario = None
 
         if i % 2 == 0:
             add_rect(slide, left, y, Inches(left_w + right_w),
-                     Inches(row_height), RGBColor(0xFB, 0xF7, 0xEE))
+                     Inches(row_height), FOG)
 
         # Left column — vertically centered when row is tall
         add_text(slide, a, left + Inches(0.1), y + Inches(0.05),
@@ -306,7 +319,7 @@ def slide_strategic_insight(s):
 
     # Closing quote
     add_rect(s, Inches(0.6), Inches(6.2), Inches(12.1), Inches(0.7),
-             RGBColor(0xFB, 0xF7, 0xEE), GOLD)
+             FOG, GOLD)
     add_text(s,
         '"Convince a visitor to add one more night and you double or triple local revenue."',
         Inches(0.7), Inches(6.25), Inches(11.9), Inches(0.6),
@@ -407,7 +420,7 @@ def slide_itinerary(s):
 
     # Right: visual mock representation
     mock_x = Inches(7.9); mock_y = Inches(1.85); mock_w = Inches(4.8); mock_h = Inches(5.0)
-    add_rect(s, mock_x, mock_y, mock_w, mock_h, RGBColor(0xFB, 0xF7, 0xEE), RULE)
+    add_rect(s, mock_x, mock_y, mock_w, mock_h, FOG, RULE)
     add_text(s, '2 stops · 2 days / 1 night',
              mock_x + Inches(0.2), mock_y + Inches(0.15), mock_w - Inches(0.4), Inches(0.4),
              size=11, color=SLATE, italic=True)
@@ -474,7 +487,7 @@ def slide_personas(s):
 
     # Strategic call-out
     add_rect(s, Inches(0.6), Inches(6.0), Inches(12.1), Inches(0.85),
-             RGBColor(0xFB, 0xF7, 0xEE), GOLD)
+             FOG, GOLD)
     add_text(s,
         'Recommended marketing focus (over-serve four):  Festival Pilgrim  ·  Romantic Weekender  ·  Foodie  ·  Maker Traveler',
         Inches(0.7), Inches(6.05), Inches(11.9), Inches(0.75),
@@ -544,7 +557,7 @@ def slide_privacy(s):
 
     # Closing quote
     add_rect(s, Inches(0.6), Inches(6.0), Inches(12.1), Inches(0.85),
-             RGBColor(0xFB, 0xF7, 0xEE), GOLD)
+             FOG, GOLD)
     add_text(s,
         '"Visitors stay anonymous; the chamber gets credit for respecting them."',
         Inches(0.7), Inches(6.05), Inches(11.9), Inches(0.75),
@@ -605,7 +618,7 @@ def slide_ai(s):
 
     # Footer note
     add_rect(s, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.5),
-             RGBColor(0xFB, 0xF7, 0xEE), GOLD)
+             FOG, GOLD)
     add_text(s,
         'Hard $5/month spending cap settable in Anthropic console — cannot be exceeded.',
         Inches(0.7), Inches(6.55), Inches(11.9), Inches(0.4),
@@ -722,7 +735,7 @@ def slide_next_steps(s):
 
     # Bottom callout: what we already learned
     add_rect(s, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.5),
-             RGBColor(0xFB, 0xF7, 0xEE), GOLD)
+             FOG, GOLD)
     add_text(s,
         'Concrete win from this work:  NCAC\'s calendar went from "0 events" '
         '(blocked by an iframe) to 540 events — by hitting Trumba\'s JSON feed directly.',
