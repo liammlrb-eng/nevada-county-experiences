@@ -27,14 +27,23 @@ from pptx.enum.shapes import MSO_SHAPE
 from pathlib import Path
 
 # ── Brand palette (matches the PDF & site) ──────────────────────────────
-BROWN  = RGBColor(0x5C, 0x3A, 0x1F)
-GOLD   = RGBColor(0xC9, 0xA8, 0x4C)
+# Palette punched up for projector legibility — richer gold, darker slate,
+# rust + forest accents for variety on long slides.
+BROWN  = RGBColor(0x4A, 0x2D, 0x18)          # was 0x5C,0x3A,0x1F — deeper for stronger header contrast
+GOLD   = RGBColor(0xB8, 0x94, 0x1A)          # was 0xC9,0xA8,0x4C — more saturated, less brown-yellow
 GOLD_LIGHT = RGBColor(0xE8, 0xC9, 0x6A)
-SLATE  = RGBColor(0x4A, 0x55, 0x68)
+RUST   = RGBColor(0x8B, 0x4A, 0x2A)          # secondary accent — pairs with gold
+FOREST = RGBColor(0x3A, 0x5A, 0x3A)          # tertiary accent for "outdoor / nature" callouts
+SLATE  = RGBColor(0x2D, 0x37, 0x48)          # was 0x4A,0x55,0x68 — darker for body-text contrast
 FOG    = RGBColor(0xF5, 0xEF, 0xE2)
 DARK   = RGBColor(0x1E, 0x15, 0x08)
 WHITE  = RGBColor(0xFF, 0xFF, 0xFF)
 RULE   = RGBColor(0xD4, 0xC9, 0xB0)
+
+# Global font-size multiplier. Applied at every font.size = Pt(...) site
+# below so a single number controls the deck-wide legibility floor.
+# 1.30 = ~30% larger across the board.
+FONT_SCALE = 1.30
 
 # 16:9 widescreen
 SLIDE_W = Inches(13.333)
@@ -60,7 +69,7 @@ def add_text(slide, text, left, top, width, height, *,
     run = p.add_run()
     run.text = text
     run.font.name = font
-    run.font.size = Pt(size)
+    run.font.size = Pt(size * FONT_SCALE)
     run.font.bold = bold
     run.font.italic = italic
     run.font.color.rgb = color
@@ -142,13 +151,13 @@ def add_bullets(slide, items, left, top, width, height, *,
         p.alignment = PP_ALIGN.LEFT
         b = p.add_run()
         b.text = '• '
-        b.font.size = Pt(size + 2)
+        b.font.size = Pt((size + 2) * FONT_SCALE)
         b.font.bold = True
         b.font.color.rgb = bullet_color
         b.font.name = 'Calibri'
         r = p.add_run()
         r.text = text
-        r.font.size = Pt(size)
+        r.font.size = Pt(size * FONT_SCALE)
         r.font.color.rgb = color
         r.font.name = 'Calibri'
         p.line_spacing = line_spacing
@@ -162,7 +171,7 @@ def add_bullets(slide, items, left, top, width, height, *,
             p2.alignment = PP_ALIGN.LEFT
             sr = p2.add_run()
             sr.text = '       ↳  ' + scenario
-            sr.font.size = Pt(scenario_size)
+            sr.font.size = Pt(scenario_size * FONT_SCALE)
             sr.font.italic = True
             sr.font.color.rgb = scenario_color
             sr.font.name = 'Calibri'
