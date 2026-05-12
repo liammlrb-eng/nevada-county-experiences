@@ -347,26 +347,29 @@ def slide_discovery(s):
         ('Themed vibes (9 cards)',
          'Historic · Arts · Hands-On · Foodie · Active · Relaxed · Wellness · Family · Festivals',
          'No-plan visitor taps "Foodie" — relevant cards instantly filter in.'),
-        ('Vibe-level pills',
-         'Pick Foodie → narrow to Restaurants / Wineries / Markets / Bakeries / Food Events',
-         'Foodie visitor switches to "Wineries only" without leaving the vibe.'),
+        ('🏠 Lodging tile — direct route to stays',
+         'A 10th tile alongside the vibes; bypasses the vibe-funnel for "where do I sleep" intent',
+         'First-time visitor sees the house-shaped Lodging tile, jumps straight to 50+ stays.'),
+        ('Vibe-level pills (12+ across all vibes)',
+         'Foodie → Wineries / Restaurants / Markets · Active → Hiking / Pickleball / Day-Pass Gyms',
+         'Active-vibe visitor taps "🏋️ Day-Pass Gyms" — finds 8 places to keep their routine going.'),
         ('Category dropdown + sub-pills',
          'Lodging → Hotels / B&Bs / Glamping / Campgrounds / RV  (and more)',
          'Family of four picks Lodging → B&Bs to find character stays over chains.'),
-        ('Activity tags',
-         'Hiking · Biking · Swimming · Fishing · Boating · Running on every relevant card',
+        ('Activity tags on every card',
+         'Hiking · Biking · Swimming · Fishing · Boating · Running visible at a glance',
          'Mountain biker scrolls and immediately spots cards tagged "Biking".'),
-        ('Date filter',
-         'All Future (default) · Today · Weekend · Week — auto-clears summer-only items in winter',
-         'One-tap "Weekend" — only Sat/Sun events remain across every vibe.'),
+        ('Date filter + auto-season',
+         'All Future · Today · Weekend · This Week — auto-hides summer-only items in winter',
+         'December visitor never sees "Summer Concert Series" — it filters itself out.'),
         ('Area filter',
          'County-wide events show for any local area; city events filter normally',
          'Penn Valley resident filters out Nevada City clutter for a local night out.'),
         ('Tag-aware Smart Suggestions',
-         '"More to Explore" panel in the itinerary — geographic + tag scoring',
+         '"Near Your Stops" panel in the itinerary — geographic + tag scoring',
          'After Empire Mine goes in, the panel surfaces Holbrooke Hotel 0.4 mi away.'),
-    ], Inches(1.75), left_w=3.4, right_w=8.7, body_size=10, row_height=0.65,
-       scenario_size=8)
+    ], Inches(1.75), left_w=3.4, right_w=8.7, body_size=9, row_height=0.6,
+       scenario_size=7.5)
 
 
 def slide_itinerary(s):
@@ -387,12 +390,18 @@ def slide_itinerary(s):
          'Six stops in but no hotel — one tap surfaces every nearby B&B.'),
         ('Events go INTO the itinerary first; the visitor decides what to commit to',
          'Bluegrass concert tile lands in My Itinerary, not on KVMR\'s site.'),
+        ('🗺 Map view — every stop on a Leaflet map; click pins to navigate',
+         'Visitor opens the map: sees the full weekend laid out, decides Day 2 needs a lunch stop near the trail.'),
+        ('🖨 Print itinerary — clean PDF-ready layout for paper handouts',
+         'Older visitor prints the day-by-day plan, walks Mill Street with paper in hand.'),
         ('15-min add → opt-in save → survives tab close + browser restart',
          'Browser closes, phone reboots — itinerary still there next morning.'),
         ('Share link via native phone share sheet, email, text, or copy URL',
          'Visitor texts the URL to spouse: "this is what I\'m thinking."'),
+        ('No install, no account, no email — works in any browser',
+         'Visitor planning during a hotel-search lunch break — no signup wall.'),
     ], Inches(0.6), Inches(1.75), Inches(7.0), Inches(5.3),
-       size=11, line_spacing=1.2, scenario_size=9)
+       size=10, line_spacing=1.15, scenario_size=8)
 
     # Right: visual mock representation
     mock_x = Inches(7.9); mock_y = Inches(1.85); mock_w = Inches(4.8); mock_h = Inches(5.0)
@@ -541,8 +550,8 @@ def slide_privacy(s):
 
 
 def slide_admin(s):
-    slide_header(s, 'Behind the scenes',
-        'Chamber-staff operations: live data with minimal effort.')
+    slide_header(s, 'Behind the scenes — low-admin operations',
+        '~30 minutes per week of chamber-staff time keeps the site live and current.')
 
     add_bullets(s, [
         ('🔄 One-click event-source updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
@@ -551,6 +560,8 @@ def slide_admin(s):
          'Bulk-approve all KVMR events; dismiss the suspect ones individually.'),
         ('🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
          'One click after a refresh; 460 events get area + venue + tags fixed for ~20¢.'),
+        ('✨ Publish + edit chamber-curated experiences via the public planner — no separate admin tool',
+         'Chamber builds "Romantic Weekend" in My Itinerary, hits Publish — appears site-wide; edit / delete anytime.'),
         ('✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it',
          'New cidery opens — staff types one row, hits save, it\'s live on the public site.'),
         ('🏷 Tag taxonomy editor — add/rename/delete tags without code',
