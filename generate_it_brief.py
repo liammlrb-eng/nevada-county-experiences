@@ -593,7 +593,7 @@ impact_rows = [
      'Self-host Plausible on the same VPS (Docker image, ~$0 incremental). Or use the file-based access-log analytics built into nginx. Or disable analytics entirely.'],
     ['Outbound HTTPS to fonts.googleapis.com (visitor browsers)',
      'Custom fonts fall back to system serif/sans-serif. Site readable, slightly less branded look.',
-     'Self-host the Playfair Display + Josefin Sans WOFF2 files from /static/fonts and update the <font face="Courier">@font-face</font> rules. ~20 KB extra payload per visitor.'],
+     'Self-host the Playfair Display + Josefin Sans WOFF2 files from /static/fonts and update the @font-face rules in index.html. ~20 KB extra payload per visitor.'],
     ['Outbound HTTPS to cdnjs.cloudflare.com (Leaflet)',
      'Map view button fails. Itinerary still works; visitors lose the "View on Map" feature.',
      'Self-host Leaflet (one JS + one CSS file, ~150 KB total) from /static/leaflet/.'],
