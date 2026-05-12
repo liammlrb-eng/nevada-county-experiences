@@ -26,19 +26,21 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 from pathlib import Path
 
-# ── Brand palette (matches the PDF & site) ──────────────────────────────
-# Palette punched up for projector legibility — richer gold, darker slate,
-# rust + forest accents for variety on long slides.
-BROWN  = RGBColor(0x4A, 0x2D, 0x18)          # was 0x5C,0x3A,0x1F — deeper for stronger header contrast
-GOLD   = RGBColor(0xB8, 0x94, 0x1A)          # was 0xC9,0xA8,0x4C — more saturated, less brown-yellow
-GOLD_LIGHT = RGBColor(0xE8, 0xC9, 0x6A)
-RUST   = RGBColor(0x8B, 0x4A, 0x2A)          # secondary accent — pairs with gold
-FOREST = RGBColor(0x3A, 0x5A, 0x3A)          # tertiary accent for "outdoor / nature" callouts
-SLATE  = RGBColor(0x2D, 0x37, 0x48)          # was 0x4A,0x55,0x68 — darker for body-text contrast
-FOG    = RGBColor(0xF5, 0xEF, 0xE2)
-DARK   = RGBColor(0x1E, 0x15, 0x08)
+# ── Brand palette — modern ─────────────────────────────────────────────
+# Deep ink-blue as the primary dark; vivid amber as the warm accent; teal
+# as the cool accent. Replaces the earth-tone palette to feel less
+# brochure-y and more contemporary on a projector. BROWN/GOLD names kept
+# for backward compat — they now resolve to ink/amber.
+BROWN  = RGBColor(0x10, 0x24, 0x44)          # INK — deep slate-blue for headers (was warm brown)
+GOLD   = RGBColor(0xF2, 0xA9, 0x3E)          # AMBER — vivid warm accent (was muted gold)
+GOLD_LIGHT = RGBColor(0xFF, 0xD1, 0x8C)      # warm amber tint
+RUST   = RGBColor(0xF8, 0x71, 0x71)          # CORAL — bold callout accent (rarely used)
+FOREST = RGBColor(0x14, 0xB8, 0xA6)          # TEAL — cool accent for variety
+SLATE  = RGBColor(0x33, 0x41, 0x55)          # modern dark text
+FOG    = RGBColor(0xF1, 0xF5, 0xF9)          # cool light wash (was warm cream)
+DARK   = RGBColor(0x0F, 0x17, 0x2A)          # near-black ink
 WHITE  = RGBColor(0xFF, 0xFF, 0xFF)
-RULE   = RGBColor(0xD4, 0xC9, 0xB0)
+RULE   = RGBColor(0xCB, 0xD5, 0xE1)          # cool light divider line
 
 # Global font-size multiplier. Applied at every font.size = Pt(...) site
 # below so a single number controls the deck-wide legibility floor.
@@ -554,28 +556,18 @@ def slide_admin(s):
         '~30 minutes per week of chamber-staff time keeps the site live and current.')
 
     add_bullets(s, [
-        ('🔄 One-click event-source updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
-         'Chamber staffer clicks "Refresh Sources" Monday morning; ~50 new events appear.'),
-        ('✅ Approve / dismiss events in a queue; bulk-approve is one click',
-         'Bulk-approve all KVMR events; dismiss the suspect ones individually.'),
-        ('🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
-         'One click after a refresh; 460 events get area + venue + tags fixed for ~20¢.'),
-        ('✨ Publish + edit chamber-curated experiences via the public planner — no separate admin tool',
-         'Chamber builds "Romantic Weekend" in My Itinerary, hits Publish — appears site-wide; edit / delete anytime.'),
-        ('✏️ Inline-editable experience table — anyone who can edit a spreadsheet can maintain it',
-         'New cidery opens — staff types one row, hits save, it\'s live on the public site.'),
-        ('🏷 Tag taxonomy editor — add/rename/delete tags without code',
-         '"Music" splits into "Live Music" and "Open Mic" without a developer.'),
-        ('🔗 Event-source URL management — add a new source by pasting a URL',
-         'New venue website? Paste the URL, pick a parser pattern, done.'),
-        ('📅 Pruning past events on every scrape + 🧹 manual button between scrapes',
-         'Saturday\'s farmers market vanishes from the queue at the next refresh — public site never showed it after Sunday anyway.'),
-        ('🌐 Public RSS feed at /feed.rss — partners republish without integration work',
-         'Local newspaper\'s "this weekend" widget pulls straight from /feed.rss.'),
-        ('💡 Public "Suggest a venue or event" form — submissions queue for chamber review',
-         'Chamber emails members the URL; venue owner fills the form; entry lands in admin Suggestions tab.'),
-    ], Inches(0.6), Inches(1.65), Inches(12.1), Inches(5.4),
-       size=10, line_spacing=1.18, scenario_size=8)
+        'One-click event-source updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
+        'Approve / dismiss events in a queue; bulk-approve is one click',
+        'AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
+        'Publish and edit chamber-curated experiences via the public planner — no separate admin tool',
+        'Inline-editable experience table — anyone who can edit a spreadsheet can maintain it',
+        'Tag taxonomy editor — add, rename, delete tags without code',
+        'Event-source URL management — add a new source by pasting a URL',
+        'Pruning past events on every scrape, plus a manual button between scrapes',
+        'Public RSS feed at /feed.rss — partners republish without integration work',
+        'Public "Suggest a venue or event" form — submissions queue for chamber review',
+    ], Inches(0.6), Inches(1.75), Inches(12.1), Inches(5.3),
+       size=14, line_spacing=1.35)
 
 
 def slide_ai(s):
