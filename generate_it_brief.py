@@ -574,9 +574,109 @@ flow.append(build_table(sec_rows,
 flow.append(PageBreak())
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 7: POLICY-BLOCK IMPACT MATRIX
+# SECTION 7: FLASK SERVER — SECURITY REVIEW
 # ─────────────────────────────────────────────────────────────────────────────
-flow.append(Paragraph('7. Policy-Block Impact Matrix', H1))
+flow.append(Paragraph('7. Flask Server — Security Review', H1))
+flow.append(Paragraph(
+    'The public site is plain HTML/JS and can be deployed to any web server '
+    'with no special review. The <b>Flask admin server</b> is the only '
+    'component that warrants security scrutiny — it executes Python, '
+    'spawns subprocesses (headless Chromium for scrapes), holds API '
+    'credentials, and writes to the local filesystem. This section '
+    'enumerates the concerns and the mitigations available out of the box.',
+    BODY))
+
+flow.append(Paragraph('7a. What Flask does (in one paragraph)', H2))
+flow.append(Paragraph(
+    'A ~280-line Python script (<font face="Courier">server.py</font>) '
+    'using Flask. Listens on '
+    '<font face="Courier">localhost:5000</font> behind an nginx reverse '
+    'proxy. Serves the static <font face="Courier">index.html</font>; '
+    'exposes a small JSON API used by the in-page admin tabs '
+    '(Events Queue, AI Categorize trigger, Suggestions review, Scraper '
+    'Sources). Stateless across restarts — every request reads/writes '
+    'JSON files on disk; no database, no in-memory sessions.',
+    BODY))
+
+flow.append(Paragraph('7b. Concerns IT will raise (and pre-built mitigations)', H2))
+sec_concerns = [
+    ['Concern', 'Default state', 'Mitigation', 'Effort'],
+    ['Admin endpoints have no login wall',
+     'Gated by network only — listens on localhost; admin UI shown when host = 127.0.0.1 or URL contains ?admin=1 on a whitelisted hostname.',
+     'Add HTTP Basic auth at the nginx layer in front of /admin* paths. Optionally upgrade to SAML/OIDC via oauth2-proxy if the county has SSO.',
+     '5–30 min'],
+    ['Endpoints execute subprocesses (Python scraper, Chromium)',
+     '/api/scrape and /api/ai/categorize spawn child processes in a background thread on admin click.',
+     'Run Flask as an unprivileged user (ncexp) with a restricted shell; subprocesses inherit the same low-privilege identity. The only callable scripts are inside /opt/ncexp/scraper/, not arbitrary code.',
+     '15 min'],
+    ['Long-running Python process owns credentials and writes files',
+     'Anthropic API key in config.py (mode 0600). Writes to scraper_output/*.json.',
+     'systemd hardening: NoNewPrivileges=true, ProtectSystem=strict, ProtectHome=true, PrivateTmp=true, ReadWritePaths=/opt/ncexp/scraper_output, CapabilityBoundingSet=. Confines the process to its data directory.',
+     '30 min'],
+    ['Containerization / process isolation',
+     'Bare-metal Python process under systemd.',
+     'Optional: run in Docker/Podman with --read-only root, --cap-drop=ALL, volume-mount only scraper_output. Standard county-IT practice on many sites.',
+     '1–2 hours'],
+    ['Public suggestion form open to abuse',
+     'POST /api/suggestions accepts visitor input (name/email/description). Input length is capped server-side but no rate limit.',
+     'Add nginx limit_req zone — 30 req/min/IP on /api/suggestions. Optional: Cloudflare Turnstile (free, no cookies) on the form.',
+     '30 min'],
+    ['Python / Flask / Selenium / Chromium supply chain',
+     'Pip packages pinned in requirements.txt. Chromium installed via apt.',
+     'Schedule pip-audit weekly (or use Dependabot if mirrored to county GitHub). unattended-upgrades for OS + Chromium CVEs. Quarterly pip-outdated review.',
+     '15 min setup'],
+    ['No audit trail of admin actions',
+     'Admin clicks (approve/dismiss) are appended to events.json but not separately logged with operator identity.',
+     'Add nginx access log retention; if Basic auth is enabled, the username is logged per request. Optional: emit per-action audit entries to /var/log/ncexp-admin.log.',
+     '15 min'],
+    ['What if Flask itself is compromised?',
+     'Worst-case: attacker has read/write on scraper_output/ + can call the Anthropic API.',
+     'Provider snapshots provide hour-level rollback. Anthropic key has a $5/month hard spending cap. No PII to exfiltrate. systemd hardening limits filesystem damage to the data directory.',
+     'baseline + monitoring'],
+]
+flow.append(build_table(sec_concerns,
+    col_widths=[1.5*inch, 1.8*inch, 2.7*inch, 0.8*inch],
+    body_size=8))
+
+flow.append(Paragraph('7c. The "split deployment" option for strictest policies', H2))
+flow.append(Paragraph(
+    'If county policy treats the dynamic Flask layer as too sensitive to '
+    'host on its own server, the site can be split:',
+    BODY))
+split_rows = [
+    ['Public site', 'Static HTML/JS', 'Hosted on a CDN or county static-web bucket. Zero attack surface. No Python, no inbound port management, no patch cadence.'],
+    ['Admin layer', 'Flask + scraper', 'Hosted on a small internal VM the chamber operator reaches via VPN or county intranet only. Public internet never sees the Flask process.'],
+    ['Data hand-off', 'Generated artifact', 'Admin layer publishes its scraper_output/events.json to the public bucket on a cron (rsync, aws s3 cp, or equivalent). Visitors fetch it from the CDN.'],
+]
+flow.append(build_table(split_rows,
+    col_widths=[1.2*inch, 1.5*inch, 4.1*inch],
+    body_size=8.5))
+flow.append(Paragraph(
+    '<b>Trade-off:</b> the "Suggest a venue" public form needs SOME live '
+    'endpoint — either keep a tiny suggestions-only Flask on a hardened '
+    'sub-host, replace it with a static form-to-email service (Formspree, '
+    'Tally, Microsoft Forms), or remove the public form entirely. '
+    'Everything else works in the split model.',
+    BODY))
+
+flow.append(Paragraph('7d. What runs entirely without Flask', H2))
+flow.append(Paragraph(
+    'The visitor experience is HTML/JS only. With Flask off and only the '
+    'static <font face="Courier">index.html</font> + a periodically-updated '
+    '<font face="Courier">scraper_output/events.json</font> available, '
+    'visitors get: theme browsing, vibe-pill filtering, day-by-day '
+    'itinerary builder, opt-in localStorage save, share-link generation, '
+    'map view, print, and Suggested Experiences browse. The only things '
+    'that require Flask are the chamber-side admin tools and the public '
+    'Suggest-a-venue submission form.',
+    BODY))
+
+flow.append(PageBreak())
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 8: POLICY-BLOCK IMPACT MATRIX
+# ─────────────────────────────────────────────────────────────────────────────
+flow.append(Paragraph('8. Policy-Block Impact Matrix', H1))
 flow.append(Paragraph(
     'For each external service, what breaks if county policy disallows it '
     'and what the workaround is. Sites continues to function in nearly all '
@@ -634,9 +734,9 @@ flow.append(Paragraph(
 flow.append(PageBreak())
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 8: APPENDICES
+# SECTION 9: APPENDICES
 # ─────────────────────────────────────────────────────────────────────────────
-flow.append(Paragraph('8. Appendices', H1))
+flow.append(Paragraph('9. Appendices', H1))
 
 flow.append(Paragraph('A. systemd unit file', H2))
 flow.append(Preformatted("""[Unit]
