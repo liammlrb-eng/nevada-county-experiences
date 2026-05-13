@@ -176,7 +176,7 @@ inv_rows = [
      '$0',
      'Replaceable'],
     ['Google Fonts CDN',
-     'Playfair Display + Josefin Sans typefaces. Hotlinked in index.html &lt;head&gt;',
+     'Playfair Display + Josefin Sans typefaces. Hotlinked from the index.html head section',
      'Outbound HTTPS from visitor browser to fonts.googleapis.com',
      '$0',
      'Replaceable (self-host)'],
@@ -366,7 +366,7 @@ sizing_rows = [
     ['Resource', 'Minimum', 'Recommended', 'Why'],
     ['CPU', '1 vCPU', '2 vCPU', 'Headless Chromium during scrape; 1-2 minute peak'],
     ['RAM', '2 GB', '4 GB', 'Chromium memory footprint; Flask itself is tiny'],
-    ['Disk', '10 GB', '30 GB', 'Code &lt; 100 MB; JSON files grow slowly; backups optional'],
+    ['Disk', '10 GB', '30 GB', 'Code under 100 MB; JSON files grow slowly; backups optional'],
     ['Bandwidth', '5 GB/mo egress', '20 GB/mo', 'Static site; map/font CDN traffic served by 3rd parties'],
     ['Inbound ports', '443 only', '443 + 22 (SSH limited)', '80→443 redirect; SSH locked to admin IPs'],
 ]
