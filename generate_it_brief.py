@@ -9,7 +9,7 @@ Run:   python generate_it_brief.py
 Out:   it_migration_brief.pdf  (in project root + pitch_resources/)
 """
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import LETTER
+from reportlab.lib.pagesizes import LETTER, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
@@ -60,7 +60,7 @@ CODE = ParagraphStyle('Code', parent=styles['Code'],
     leftIndent=4, rightIndent=4, spaceBefore=4, spaceAfter=8)
 
 
-def section_rule(color=GOLD, width=6.5*inch, thickness=2):
+def section_rule(color=GOLD, width=9.5*inch, thickness=2):
     t = Table([['']], colWidths=[width], rowHeights=[thickness])
     t.setStyle(TableStyle([
         ('LINEABOVE', (0,0), (-1,-1), thickness, color),
@@ -107,9 +107,9 @@ def build_table(rows, col_widths, header=True, zebra=True, body_size=9):
 project_root = Path(__file__).resolve().parent
 out_path = project_root / 'it_migration_brief.pdf'
 
-doc = SimpleDocTemplate(str(out_path), pagesize=LETTER,
+doc = SimpleDocTemplate(str(out_path), pagesize=landscape(LETTER),
     leftMargin=0.7*inch, rightMargin=0.7*inch,
-    topMargin=0.7*inch, bottomMargin=0.7*inch,
+    topMargin=0.6*inch, bottomMargin=0.6*inch,
     title='Nevada County Experience — IT Migration & Dependencies Brief',
     author='Nevada County Experience project',
 )
@@ -217,8 +217,8 @@ inv_rows = [
      'Not used'],
 ]
 flow.append(build_table(inv_rows,
-    col_widths=[1.4*inch, 2.3*inch, 1.6*inch, 0.7*inch, 0.7*inch],
-    body_size=8.5))
+    col_widths=[2.0*inch, 3.2*inch, 2.3*inch, 1.0*inch, 1.0*inch],
+    body_size=9))
 
 flow.append(Paragraph(
     '<b>What we do not use:</b> no third-party tracking / advertising / '
@@ -255,8 +255,8 @@ arch_rows = [
      'Never leaves the visitor\'s device'],
 ]
 flow.append(build_table(arch_rows,
-    col_widths=[1.5*inch, 1.7*inch, 1.8*inch, 1.8*inch],
-    body_size=8.5))
+    col_widths=[2.1*inch, 2.4*inch, 2.5*inch, 2.5*inch],
+    body_size=9))
 flow.append(Spacer(1, 6))
 
 flow.append(Paragraph('2b. Data flow', H2))
@@ -371,8 +371,8 @@ sizing_rows = [
     ['Inbound ports', '443 only', '443 + 22 (SSH limited)', '80→443 redirect; SSH locked to admin IPs'],
 ]
 flow.append(build_table(sizing_rows,
-    col_widths=[1.3*inch, 1.1*inch, 1.5*inch, 3*inch],
-    body_size=8.5))
+    col_widths=[1.8*inch, 1.5*inch, 2.1*inch, 4.1*inch],
+    body_size=9))
 
 flow.append(PageBreak())
 
@@ -431,8 +431,8 @@ mig_rows = [
      'Chamber operator runs through the operator_guide.pdf flow unassisted'],
 ]
 flow.append(build_table(mig_rows,
-    col_widths=[1.0*inch, 3.0*inch, 1.2*inch, 1.8*inch],
-    body_size=8))
+    col_widths=[1.4*inch, 4.2*inch, 1.7*inch, 2.2*inch],
+    body_size=9))
 
 flow.append(Spacer(1, 6))
 
@@ -491,8 +491,8 @@ op_rows = [
      'Annual',  '4–6 hours',  'Admin → Experiences, row by row'],
 ]
 flow.append(build_table(op_rows,
-    col_widths=[2.6*inch, 1.2*inch, 1.0*inch, 2.2*inch],
-    body_size=8.5))
+    col_widths=[3.5*inch, 1.6*inch, 1.4*inch, 3.0*inch],
+    body_size=9))
 
 flow.append(Paragraph(
     '<b>Estimated steady-state chamber operator time:</b> ~30 minutes per '
@@ -525,8 +525,8 @@ it_rows = [
      'Annual',  '30 min',  'This document, section 1'],
 ]
 flow.append(build_table(it_rows,
-    col_widths=[2.6*inch, 1.4*inch, 1.0*inch, 2.0*inch],
-    body_size=8.5))
+    col_widths=[3.5*inch, 2.0*inch, 1.4*inch, 2.6*inch],
+    body_size=9))
 
 flow.append(Paragraph(
     '<b>Estimated steady-state county IT time:</b> ~30 minutes per month '
@@ -568,8 +568,8 @@ sec_rows = [
      'All Python deps pinned in requirements.txt. Frontend deps via CDN (Leaflet, fonts) — self-host option documented in section 7 if CDN use is restricted.'],
 ]
 flow.append(build_table(sec_rows,
-    col_widths=[1.8*inch, 5.0*inch],
-    body_size=8.5))
+    col_widths=[2.5*inch, 7.0*inch],
+    body_size=9))
 
 flow.append(PageBreak())
 
@@ -635,8 +635,8 @@ sec_concerns = [
      'baseline + monitoring'],
 ]
 flow.append(build_table(sec_concerns,
-    col_widths=[1.5*inch, 1.8*inch, 2.7*inch, 0.8*inch],
-    body_size=8))
+    col_widths=[2.1*inch, 2.5*inch, 3.8*inch, 1.1*inch],
+    body_size=9))
 
 flow.append(Paragraph('7c. The "split deployment" option for strictest policies', H2))
 flow.append(Paragraph(
@@ -649,8 +649,8 @@ split_rows = [
     ['Data hand-off', 'Generated artifact', 'Admin layer publishes its scraper_output/events.json to the public bucket on a cron (rsync, aws s3 cp, or equivalent). Visitors fetch it from the CDN.'],
 ]
 flow.append(build_table(split_rows,
-    col_widths=[1.2*inch, 1.5*inch, 4.1*inch],
-    body_size=8.5))
+    col_widths=[1.7*inch, 2.1*inch, 5.7*inch],
+    body_size=9))
 flow.append(Paragraph(
     '<b>Trade-off:</b> the "Suggest a venue" public form needs SOME live '
     'endpoint — either keep a tiny suggestions-only Flask on a hardened '
@@ -717,8 +717,8 @@ impact_rows = [
      'N/A — feature not yet built.'],
 ]
 flow.append(build_table(impact_rows,
-    col_widths=[1.8*inch, 2.5*inch, 2.5*inch],
-    body_size=8))
+    col_widths=[2.5*inch, 3.5*inch, 3.5*inch],
+    body_size=9))
 
 flow.append(Paragraph(
     '<b>The "everything off but the lights" scenario:</b> with every '
@@ -807,8 +807,8 @@ ref_rows = [
     ['Slide deck',                           'demo_pitch.pptx (in this bundle)'],
 ]
 flow.append(build_table(ref_rows,
-    col_widths=[2.8*inch, 4.0*inch],
-    body_size=8.5))
+    col_widths=[3.8*inch, 5.7*inch],
+    body_size=9))
 
 flow.append(Spacer(1, 8))
 flow.append(section_rule())
