@@ -71,11 +71,32 @@ def section_rule(color=GOLD, width=9.5*inch, thickness=2):
 
 
 def build_table(rows, col_widths, header=True, zebra=True, body_size=9):
-    t = Table(rows, colWidths=col_widths, repeatRows=1 if header else 0)
+    # Wrap every string cell in a Paragraph so text wraps within its column
+    # instead of overflowing horizontally. Without this, reportlab Table
+    # cells render as a single line and clip / overlap on long content.
+    # Paragraphs also let cells use inline <b>/<i> markup if needed.
+    body_para = ParagraphStyle('Cell',
+        parent=styles['Normal'],
+        fontName='Helvetica', fontSize=body_size, leading=body_size * 1.35,
+        textColor=DARK, spaceAfter=0, spaceBefore=0)
+    hdr_para = ParagraphStyle('CellHdr',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold', fontSize=body_size + 0.5,
+        leading=(body_size + 0.5) * 1.35, textColor=colors.white,
+        spaceAfter=0, spaceBefore=0)
+    wrapped_rows = []
+    for i, row in enumerate(rows):
+        new_row = []
+        for cell in row:
+            if isinstance(cell, str):
+                ps = hdr_para if (header and i == 0) else body_para
+                new_row.append(Paragraph(cell, ps))
+            else:
+                new_row.append(cell)
+        wrapped_rows.append(new_row)
+    t = Table(wrapped_rows, colWidths=col_widths, repeatRows=1 if header else 0)
     style = [
         ('VALIGN',       (0,0), (-1,-1), 'TOP'),
-        ('FONT',         (0,0), (-1,-1), 'Helvetica', body_size),
-        ('TEXTCOLOR',    (0,0), (-1,-1), DARK),
         ('LEFTPADDING',  (0,0), (-1,-1), 5),
         ('RIGHTPADDING', (0,0), (-1,-1), 5),
         ('TOPPADDING',   (0,0), (-1,-1), 4),
@@ -84,8 +105,6 @@ def build_table(rows, col_widths, header=True, zebra=True, body_size=9):
     if header:
         style += [
             ('BACKGROUND',(0,0),(-1,0), BROWN),
-            ('TEXTCOLOR', (0,0),(-1,0), colors.white),
-            ('FONT',      (0,0),(-1,0), 'Helvetica-Bold', body_size + 0.5),
             ('BOTTOMPADDING',(0,0),(-1,0), 6),
             ('TOPPADDING',(0,0),(-1,0), 6),
         ]
