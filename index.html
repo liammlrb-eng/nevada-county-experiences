@@ -4250,6 +4250,30 @@ function renderManageData() {
 // ── EVENTS QUEUE TAB ──────────────────────────────────────────────────────────
 const API_BASE = window.location.protocol === 'file:' ? null : '';  // null = file:// mode, no API
 
+// Fetch JSON from an /api/* endpoint with a clean failure mode. On a static
+// host (GitHub Pages, etc.) there is no Flask server, so /api/* paths return
+// the host's HTML 404 page — parsing that as JSON throws a cryptic
+// "Unexpected token '<'". This helper detects a non-JSON / error response
+// and throws Error('NO_API') instead, which callers treat as "no live
+// server" and degrade gracefully.
+async function _apiGetJSON(path) {
+  let r;
+  try {
+    r = await fetch(`${API_BASE}${path}`);
+  } catch (e) {
+    throw new Error('NO_API');           // network failure — server down
+  }
+  const text = await r.text();
+  if (!r.ok || text.trimStart().startsWith('<')) {
+    throw new Error('NO_API');           // HTML error page — not a live API
+  }
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    throw new Error('NO_API');           // body wasn't JSON
+  }
+}
+
 // ─── Admin-host detection ─────────────────────────────────────────────────
 // Some affordances (e.g. the "✨ Publish as Suggested Itinerary" button)
 // belong only on the chamber's admin machine — never on the public site.
@@ -4676,12 +4700,17 @@ async function renderSuggestionsTab() {
 
   let suggestions = [];
   try {
-    const r = await fetch(`${API_BASE}/api/suggestions`);
-    suggestions = await r.json();
+    suggestions = await _apiGetJSON('/api/suggestions');
   } catch(e) {
-    panel.innerHTML = `<div style="padding:24px;color:#c0392b;font-size:13px">Failed to load suggestions: ${e.message}</div>`;
+    // No live Flask server (e.g. viewing the static GitHub Pages build).
+    panel.innerHTML = `<div style="padding:24px;color:#888;font-size:13px">
+      Suggestions require the local admin server. You're viewing the static
+      site — start <code>python server.py</code> on the chamber machine to
+      review visitor submissions.
+    </div>`;
     return;
   }
+  if (!Array.isArray(suggestions)) suggestions = [];
 
   // Most recent first; pending before reviewed
   suggestions.sort((a, b) => {
