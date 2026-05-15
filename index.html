@@ -4294,19 +4294,28 @@ async function renderEventsQueue() {
   const panel = document.getElementById('eventsQueuePanel');
   if (!panel) return;
 
-  // Scrape & AI status
+  // Early static-host guard: probe the events API. On GitHub Pages / any
+  // non-Flask host this throws NO_API — show one clean message and stop,
+  // rather than rendering a broken empty queue.
+  let events = [];
+  try {
+    if (API_BASE === null) throw new Error('NO_API');
+    events = await _apiGetJSON('/api/events');
+  } catch(e) {
+    panel.innerHTML = `<div style="padding:24px;color:#888;font-size:13px">
+      The Events Queue requires the local admin server. You're viewing the
+      static site — start <code>python server.py</code> on the chamber
+      machine to review, approve, and scrape events.
+    </div>`;
+    return;
+  }
+  if (!Array.isArray(events)) events = [];
+
+  // Scrape & AI status — optional; failures here are non-fatal.
   let scrapeStatus = null;
   let aiStatus     = null;
-  if (API_BASE !== null) {
-    try {
-      const r = await fetch(`${API_BASE}/api/scrape/status`);
-      scrapeStatus = await r.json();
-    } catch(e) { /* server not running */ }
-    try {
-      const r = await fetch(`${API_BASE}/api/ai/status`);
-      aiStatus = await r.json();
-    } catch(e) { /* server not running */ }
-  }
+  try { scrapeStatus = await _apiGetJSON('/api/scrape/status'); } catch(e) { /* non-fatal */ }
+  try { aiStatus     = await _apiGetJSON('/api/ai/status');     } catch(e) { /* non-fatal */ }
 
   const aiBusy = aiStatus && aiStatus.running;
   const statusBar = `
@@ -4329,15 +4338,6 @@ async function renderEventsQueue() {
         🔄 Update Now
       </button>
     </div>`;
-
-  // Load events
-  let events = [];
-  if (API_BASE !== null) {
-    try {
-      const r = await fetch(`${API_BASE}/api/events`);
-      events = await r.json();
-    } catch(e) { /* server not running */ }
-  }
 
   const pending   = events.filter(e => e.status === 'pending');
   const approved  = events.filter(e => e.status === 'approved');
@@ -4798,12 +4798,19 @@ async function renderScraperSources() {
   if (!panel) return;
 
   let sources = [];
-  if (API_BASE !== null) {
-    try {
-      const r = await fetch(`${API_BASE}/api/sources`);
-      sources = await r.json();
-    } catch(e) { /* server not running */ }
+  try {
+    if (API_BASE === null) throw new Error('NO_API');
+    sources = await _apiGetJSON('/api/sources');
+  } catch(e) {
+    // No live Flask server (e.g. viewing the static GitHub Pages build).
+    panel.innerHTML = `<div style="padding:24px;color:#888;font-size:13px">
+      Event Sources require the local admin server. You're viewing the static
+      site — start <code>python server.py</code> on the chamber machine to
+      manage scraper sources.
+    </div>`;
+    return;
   }
+  if (!Array.isArray(sources)) sources = [];
 
   const rows = sources.length === 0
     ? `<tr><td colspan="6" style="text-align:center;padding:24px;color:#999">No sources found — start server.py first.</td></tr>`
