@@ -41,6 +41,22 @@ AI_PY            = os.path.join(SCRAPER_DIR, "ai_categorize.py")
 
 app = Flask(__name__, static_folder=BASE_DIR, static_url_path="")
 
+
+# ── No-cache for the JSON API ─────────────────────────────────────────────────
+# Without an explicit Cache-Control header browsers apply *heuristic* caching
+# to GET responses — so /api/events?status=approved gets cached and a normal
+# page refresh keeps showing stale data after the chamber approves new events
+# (only a hard Ctrl+F5 would bust it). Force every /api/* response to be
+# non-cacheable so the public site always reflects the current queue.
+@app.after_request
+def _no_cache_api(response):
+    if request.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"]        = "no-cache"
+        response.headers["Expires"]       = "0"
+    return response
+
+
 # ── Scrape job state ─────────────────────────────────────────────────────────
 _scrape_status = {
     "running":    False,
