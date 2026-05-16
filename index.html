@@ -2152,8 +2152,20 @@ function _visSetAll() {
   if (toInp)   toInp.value   = '';
   _visApplyDate();
 }
+// Local calendar date as 'YYYY-MM-DD'. Date.toISOString() returns the UTC
+// date — late-evening US-Pacific that has already rolled to tomorrow, which
+// made every "today / date >= today" comparison hide same-day events.
+// getFullYear/getMonth/getDate read LOCAL time, matching how the Python
+// scraper writes event dates.
+function _localISODate(d) {
+  d = d || new Date();
+  const y   = d.getFullYear();
+  const m   = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 function _visSetToday() {
-  const s = new Date().toISOString().slice(0, 10);
+  const s = _localISODate();
   visitorDateFrom = s; visitorDateTo = s;
   _visApplyDate();
 }
@@ -2163,16 +2175,16 @@ function _visSetWeekend() {
   sat.setDate(d.getDate() + (day === 6 ? 0 : 6 - day));
   const sun = new Date(sat);
   sun.setDate(sat.getDate() + 1);
-  visitorDateFrom = sat.toISOString().slice(0, 10);
-  visitorDateTo   = sun.toISOString().slice(0, 10);
+  visitorDateFrom = _localISODate(sat);
+  visitorDateTo   = _localISODate(sun);
   _visApplyDate();
 }
 function _visSetWeek() {
   const d   = new Date();
   const end = new Date(d);
   end.setDate(d.getDate() + 6);
-  visitorDateFrom = d.toISOString().slice(0, 10);
-  visitorDateTo   = end.toISOString().slice(0, 10);
+  visitorDateFrom = _localISODate(d);
+  visitorDateTo   = _localISODate(end);
   _visApplyDate();
 }
 function _visClearDate() {
@@ -2821,7 +2833,7 @@ async function _loadEventsCache() {
   if (!raw) return;
 
   try {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = _localISODate();
     _eventsCache = raw
       // Drop past dates AND anything Claude flagged low-quality
       .filter(ev => (!ev.date || ev.date >= today) && ev.ai_quality !== 'low')
@@ -2901,7 +2913,7 @@ async function renderEvents() {
     const b = document.getElementById(id);
     if (b) b.classList.remove('active');
   });
-  const today = new Date().toISOString().slice(0,10);
+  const today = _localISODate();
   if (!dateFrom && !dateTo) {
     const b = document.getElementById('vqBtnAll'); if (b) b.classList.add('active');
   } else if (dateFrom && dateFrom === dateTo && dateFrom === today) {
@@ -3045,7 +3057,7 @@ function getSuggestedEvents(maxN = 4) {
   const activeVibeTags = getActiveThemeTags();
   const dateFrom = typeof visitorDateFrom !== 'undefined' ? visitorDateFrom : '';
   const dateTo   = typeof visitorDateTo   !== 'undefined' ? visitorDateTo   : '';
-  const today    = new Date().toISOString().slice(0, 10);
+  const today    = _localISODate();
 
   return _eventsCache
     .filter(ev => {
@@ -4507,8 +4519,7 @@ let eventsDateTo       = '';
 let eventsSourceFilter = '';
 
 function _eqSetToday() {
-  const d = new Date();
-  const s = d.toISOString().slice(0, 10);
+  const s = _localISODate();
   eventsDateFrom = s; eventsDateTo = s;
   renderEventsQueue();
 }
@@ -4519,16 +4530,16 @@ function _eqSetWeekend() {
   sat.setDate(d.getDate() + (day === 6 ? 0 : 6 - day));
   const sun = new Date(sat);
   sun.setDate(sat.getDate() + 1);
-  eventsDateFrom = sat.toISOString().slice(0, 10);
-  eventsDateTo   = sun.toISOString().slice(0, 10);
+  eventsDateFrom = _localISODate(sat);
+  eventsDateTo   = _localISODate(sun);
   renderEventsQueue();
 }
 function _eqSetWeek() {
   const d   = new Date();
   const end = new Date(d);
   end.setDate(d.getDate() + 6);
-  eventsDateFrom = d.toISOString().slice(0, 10);
-  eventsDateTo   = end.toISOString().slice(0, 10);
+  eventsDateFrom = _localISODate(d);
+  eventsDateTo   = _localISODate(end);
   renderEventsQueue();
 }
 function _eqClearFilters() {
