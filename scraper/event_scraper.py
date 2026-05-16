@@ -23,6 +23,18 @@ Deployment:
 import os, sys, json, argparse
 from datetime import datetime
 
+# Force UTF-8 stdout/stderr. On Windows the console defaults to cp1252,
+# which cannot encode characters like '->' (U+2192) that appear in scraper
+# log lines — printing one raises UnicodeEncodeError and kills that source's
+# entire run. reconfigure() makes every print() in this process (and in the
+# imported site_scrapers) UTF-8 safe; errors='replace' is a belt-and-braces
+# fallback for any other exotic glyph.
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except AttributeError:
+    pass  # reconfigure() is Python 3.7+; older interpreters skip silently
+
 from site_scrapers.base              import make_driver
 from site_scrapers.the_union         import TheUnionScraper
 from site_scrapers.go_nevada         import GoNevadaScraper
