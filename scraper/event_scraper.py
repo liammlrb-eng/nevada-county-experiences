@@ -216,11 +216,24 @@ def run(scrapers, discover=False):
     with open(EVENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(merged, f, indent=2, ensure_ascii=False)
 
+    # ── Verify every event URL and flag the dead ones ───────────────────────
+    # Runs as the last step of the nightly scrape. Events whose URL doesn't
+    # resolve get url_ok=False, surfaced in the admin Events Queue for
+    # human follow-up. Re-reads/writes events.json itself.
+    link_summary = {"checked": 0, "flagged": 0}
+    try:
+        from check_event_links import check_all
+        link_summary = check_all()
+    except Exception as e:
+        print(f"  Link check skipped: {e}")
+
     print(f"\n{'=' * 56}")
     print(f"  Scraped this run   : {len(all_fresh)}")
     print(f"  New (added)        : {added}")
     print(f"  Expired (pruned)   : {pruned_cnt}")
     print(f"  Total in queue     : {len(merged)}")
+    print(f"  Links checked      : {link_summary['checked']}")
+    print(f"  Links flagged      : {link_summary['flagged']}")
     print(f"  Saved -> scraper_output/events.json")
     if discover:
         print(f"  HTML -> scraper_output/snapshots/")
