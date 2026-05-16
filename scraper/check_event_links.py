@@ -23,7 +23,7 @@ Concurrency: a thread pool keeps a full ~1,000-event sweep to a few
 minutes. Politeness: one request per URL, 12-second timeout, realistic
 User-Agent.
 """
-import os, sys, json, argparse
+import os, sys, json, time, argparse
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -45,13 +45,20 @@ _HEADERS = {
                   "AppleWebKit/537.36 (KHTML, like Gecko) "
                   "Chrome/124.0 Safari/537.36",
 }
-_TIMEOUT = 12
-_MAX_WORKERS = 10
+_TIMEOUT       = 12     # first attempt — fast, weeds out the clearly-fine URLs
+_TIMEOUT_RETRY = 30     # second attempt — patient, for slow hosts
+_MAX_WORKERS   = 10
 
 
-def check_url(url: str) -> tuple:
+def check_url(url: str, timeout: int = _TIMEOUT, _retry: bool = True) -> tuple:
     """Return (ok: bool, status: str). A URL is OK when it returns a
-    2xx or 3xx status. 4xx/5xx, timeouts, and connection errors fail."""
+    2xx or 3xx status. 4xx/5xx fail outright.
+
+    Transient failures (timeout, connection error) get ONE retry — the
+    timeout retry is given a much longer deadline. This stops a slow host
+    (e.g. kvmr.org answering HEAD slowly under concurrent load) from
+    producing a cluster of false-positive 'timeout' flags. A URL that
+    fails the patient retry too is genuinely suspect."""
     if not url or not url.strip():
         return (False, "no url")
     url = url.strip()
@@ -59,18 +66,24 @@ def check_url(url: str) -> tuple:
         return (False, "bad scheme")
     try:
         # HEAD first — cheap, no body download
-        r = requests.head(url, headers=_HEADERS, timeout=_TIMEOUT,
+        r = requests.head(url, headers=_HEADERS, timeout=timeout,
                            allow_redirects=True)
         # Some servers refuse HEAD (405) or mishandle it — retry with GET
         if r.status_code in (403, 405, 501) or r.status_code >= 500:
-            r = requests.get(url, headers=_HEADERS, timeout=_TIMEOUT,
+            r = requests.get(url, headers=_HEADERS, timeout=timeout,
                              allow_redirects=True, stream=True)
             r.close()
         ok = 200 <= r.status_code < 400
         return (ok, str(r.status_code))
     except requests.exceptions.Timeout:
+        if _retry:
+            time.sleep(1.5)
+            return check_url(url, timeout=_TIMEOUT_RETRY, _retry=False)
         return (False, "timeout")
     except requests.exceptions.ConnectionError:
+        if _retry:
+            time.sleep(1.5)
+            return check_url(url, timeout=timeout, _retry=False)
         return (False, "connection error")
     except requests.exceptions.RequestException as e:
         return (False, f"error: {type(e).__name__}")

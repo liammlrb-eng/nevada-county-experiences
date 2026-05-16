@@ -46,6 +46,7 @@ from site_scrapers.center_for_arts   import CenterForTheArtsScraper
 from site_scrapers.miners_foundry    import MinersFoundryScraper
 from site_scrapers.ncac_calendar     import NCACCalendarScraper
 from site_scrapers.go_nevada_festivals import GoNevadaFestivalsScraper
+from site_scrapers.woocommerce       import CuriousForgeScraper
 from auto_tagger                     import tag_events
 # Future scrapers — uncomment as they're built:
 # from site_scrapers.nevada_theatre  import NevadaTheatreScraper
@@ -66,6 +67,7 @@ ALL_SCRAPERS = [
     EventbriteNevadaScraper(),      # Selenium — React-rendered cards
     MinersFoundryScraper(),         # Selenium — site 403s direct requests
     NCACCalendarScraper(),          # Trumba JSON feed (~180 western county events)
+    CuriousForgeScraper(),          # WooCommerce Store API — maker classes, one event per session
     # ── Disabled (calendar pages exist but are unreachable) ──
     # GoNevadaFestivalsScraper(),   # Cloudflare 403s even via Selenium
     # NevadaTheatreScraper(),
