@@ -584,8 +584,14 @@
     border-bottom-color: var(--gold);
     font-weight: 600;
   }
-  .tab-panel { display: none; }
+  .tab-panel { display: none; margin-top: 8px; scroll-margin-top: 20px; }
   .tab-panel.active { display: block; }
+  /* Centered decorative divider between page sections */
+  .section-sep {
+    width: 90px; height: 2px; border: none;
+    margin: 30px auto;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
 
   /* FLOATING LIST BUTTON */
   .fab {
@@ -1347,7 +1353,7 @@
   }
   .seasonal-scroll {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     overflow-x: auto;
     padding: 2px 2px 10px;
     scroll-snap-type: x proximity;
@@ -1356,7 +1362,8 @@
   .seasonal-scroll::-webkit-scrollbar-track { background: transparent; }
   .seasonal-scroll::-webkit-scrollbar-thumb { background: #dbcfb4; border-radius: 4px; }
   .season-card {
-    flex: 0 0 250px;
+    flex: 1 1 165px;
+    min-width: 155px;
     scroll-snap-align: start;
     background: #fff;
     border: 1px solid #e6ddc9;
@@ -1372,13 +1379,13 @@
     box-shadow: 0 12px 26px rgba(30,21,8,0.17);
     border-color: var(--season-accent);
   }
-  .season-card.feature { flex-basis: 370px; }
+  .season-card.feature { flex-grow: 1.6; }
   .season-photo {
     position: relative;
-    height: 134px;
+    height: 112px;
     background: var(--fog);
   }
-  .season-card.feature .season-photo { height: 192px; }
+  .season-card.feature .season-photo { height: 148px; }
   .season-photo img {
     width: 100%; height: 100%;
     object-fit: cover; display: block;
@@ -1406,7 +1413,7 @@
     color: var(--brown); line-height: 1.24;
     margin-bottom: 6px;
   }
-  .season-card.feature .season-title { font-size: 21px; }
+  .season-card.feature .season-title { font-size: 18px; }
   .season-blurb {
     font-size: 12.5px; color: var(--slate);
     line-height: 1.5; margin-bottom: 9px;
@@ -1606,21 +1613,59 @@
     cursor: pointer;
   }
   .search-go:hover { background: var(--brown); }
+  /* Condensed one-line search + filter bar */
+  .filter-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin: 44px 0 4px;
+  }
+  .filter-bar .search-field { flex: 1 1 150px; min-width: 140px; }
+  .filter-bar select,
+  .filter-bar .fb-date {
+    height: 46px;
+    font-family: 'Josefin Sans', sans-serif; font-size: 13px;
+    color: var(--slate);
+    border: 1.5px solid #d8cdb8; border-radius: 8px;
+    padding: 0 9px; background: #fff; cursor: pointer;
+  }
+  .filter-bar select:focus,
+  .filter-bar .fb-date:focus { outline: none; border-color: var(--gold); }
+  .filter-bar .fb-date { width: 138px; cursor: text; }
+  /* Right-justified so the quick-date buttons sit under the date pickers */
+  .date-quick-group { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
 
   /* ── Help · field tips ────────────────────────────────────────────── */
   [data-tip] { position: relative; }
-  [data-tip]:hover::after,
-  [data-tip]:focus-within::after {
+  /* Hover-only — no :focus-within, which would keep the tip stuck open
+     while a select/input inside the field stays focused. */
+  [data-tip]:hover::after {
     content: attr(data-tip);
     position: absolute; left: 0; top: calc(100% + 5px);
-    background: var(--dark); color: #fff;
+    background: #fff; color: var(--slate);
+    border: 1px solid #d8cdb8;
     font-family: 'Josefin Sans', sans-serif;
     font-size: 11px; font-weight: 400; line-height: 1.45;
     padding: 7px 10px; border-radius: 6px;
-    width: max-content; max-width: 260px;
-    box-shadow: 0 5px 16px rgba(0,0,0,0.3);
+    width: max-content; max-width: 300px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
     z-index: 200; pointer-events: none;
   }
+  .help-banner {
+    width: 100%;
+    display: flex; align-items: center; gap: 11px;
+    background: var(--fog);
+    border: 1px solid #e6ddc9;
+    border-left: 4px solid var(--gold);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    cursor: pointer;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 13px; color: var(--slate);
+    text-align: left;
+  }
+  .help-banner:hover { background: #ece3d0; border-color: var(--gold); }
+  .help-banner .hb-icon { font-size: 18px; flex-shrink: 0; }
+  .help-banner .hb-arrow { margin-left: auto; color: var(--gold); font-weight: 700; flex-shrink: 0; }
   .help-strat {
     display: flex; gap: 12px; padding: 11px 2px;
     border-bottom: 1px solid #efe7d6;
@@ -1646,7 +1691,10 @@
     padding: 7px 16px; border: 1.5px solid #d8cdb8; border-radius: 20px;
     background: #fff; color: var(--slate); cursor: pointer;
   }
-  .tb-pill.active { background: var(--brown); color: #fff; border-color: var(--brown); }
+  .tb-pill.active {
+    background: #f1e6c8; color: var(--brown);
+    border-color: var(--gold); font-weight: 600;
+  }
   .tb-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 8px 16px; }
   .tb-panel { max-width: 760px; margin: 0 auto; }
   .tb-head {
@@ -1681,7 +1729,7 @@
 
 <div class="hero">
   <div class="hero-eyebrow">Nevada City · Grass Valley · Penn Valley · &amp; the Western Foothills</div>
-  <h1>Western Nevada County<br><em>Experience Finder</em></h1>
+  <h1>Western Nevada County<br><em>Trip Planner</em></h1>
   <div class="gold-rule"></div>
   <p class="hero-sub">Choose your vibe. Build your perfect Gold Country itinerary.</p>
 </div>
@@ -1691,56 +1739,65 @@
 
 <!-- THEME SELECTOR -->
 <div class="section">
-  <div class="section-label">Step 1</div>
-  <div class="section-title">Where, What & When</div>
-  <p class="section-desc">Search for something specific, or filter by area, category and date to find what's happening during your visit.</p>
+  <button class="help-banner" onclick="openHelp()">
+    <span class="hb-icon">❓</span>
+    <span>New here? See all the ways to find what you want — search, vibes, the planner &amp; more</span>
+    <span class="hb-arrow">→</span>
+  </button>
 
-  <div class="search-bar">
-    <div class="search-field" data-tip="Type a craft, activity, or venue name and press Find. Synonyms are built in — “metalsmith” also finds “blacksmithing”.">
+  <div id="manageBanner" class="manage-banner">
+    <span>✏️ <strong>Manage Mode</strong> — Click × on any card to remove it from your itinerary.</span>
+    <button class="manage-exit" onclick="exitManage()">Done</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('experiences', this)" title="Browse every venue and experience — filter by vibe, area, category or date">Explore</button>
+    <button class="tab-btn" onclick="switchTab('itineraries', this)" title="Ready-made day-by-day itineraries you can copy and customize">Suggested Experiences</button>
+    <button class="tab-btn" onclick="switchTab('events', this)" title="Concerts, festivals and classes — as a list or a calendar">Upcoming Events</button>
+    <button class="tab-btn" onclick="switchTab('plan', this)" title="Answer a few questions and get a tailored day-by-day draft">✨ Help Me Plan</button>
+    <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">⚙ Manage Database</button>
+  </div>
+
+  <!-- Condensed search + filter bar — search, area, category and dates on one line -->
+  <div class="filter-bar">
+    <div class="search-field" data-tip="Search for any craft, activity, venue or event — try “blacksmithing”, “wine tasting”, “live music” or “Cornish Christmas”, then press Find. Synonyms are built in, so “metalsmith” also finds a studio listed as “blacksmithing”.">
       <span class="search-icon">🔍</span>
       <input type="text" id="expSearch" autocomplete="off"
-        placeholder="Search — “blacksmithing”, “wine tasting”, “live music”…"
+        placeholder="Try “blacksmithing”…"
         onkeydown="if(event.key==='Enter'){event.preventDefault();runSearch();}">
       <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:none" title="Clear search" aria-label="Clear search">✕</button>
     </div>
     <button class="search-go" onclick="runSearch()">Find</button>
-  </div>
-  <div class="filters-row">
-    <div class="filter-group" data-tip="Limit results to one town. County-wide events still appear for every area.">
-      <label>Area</label>
-      <select id="filterArea">
-        <option value="">All Areas</option>
-        <optgroup label="Western Nevada County">
-          <option value="Nevada City">Nevada City</option>
-          <option value="Grass Valley">Grass Valley</option>
-          <option value="Near Nevada City">Near Nevada City</option>
-          <option value="Penn Valley">Penn Valley</option>
-          <option value="Chicago Park">Chicago Park</option>
-          <option value="North San Juan">North San Juan</option>
-          <option value="Washington">Washington</option>
-          <option value="Rough and Ready">Rough and Ready</option>
-          <option value="Smartsville">Smartsville</option>
-        </optgroup>
-        <optgroup label="Adjacent">
-          <option value="Colfax">Colfax</option>
-        </optgroup>
-        <optgroup label="County-Wide">
-          <option value="Nevada County">County-Wide</option>
-        </optgroup>
-      </select>
-    </div>
-    <div class="filter-group" data-tip="Filter by kind of place — dining, lodging, museums, wineries. This is the literal category, separate from the vibes below.">
-      <label>Category</label>
-      <select id="filterType">
-        <option value="">All Categories</option>
-        <optgroup label="Season">
-          <option value="season:Spring">🌸 Spring</option>
-          <option value="season:Summer">☀️ Summer</option>
-          <option value="season:Fall">🍂 Fall</option>
-          <option value="season:Winter">❄️ Winter</option>
-          <option value="season:Holiday">🎄 Holiday</option>
-        </optgroup>
-        <optgroup label="Category">
+    <select id="filterArea" title="Limit results to one town — county-wide events still appear for every area">
+      <option value="">All Areas</option>
+      <optgroup label="Western Nevada County">
+        <option value="Nevada City">Nevada City</option>
+        <option value="Grass Valley">Grass Valley</option>
+        <option value="Near Nevada City">Near Nevada City</option>
+        <option value="Penn Valley">Penn Valley</option>
+        <option value="Chicago Park">Chicago Park</option>
+        <option value="North San Juan">North San Juan</option>
+        <option value="Washington">Washington</option>
+        <option value="Rough and Ready">Rough and Ready</option>
+        <option value="Smartsville">Smartsville</option>
+      </optgroup>
+      <optgroup label="Adjacent">
+        <option value="Colfax">Colfax</option>
+      </optgroup>
+      <optgroup label="County-Wide">
+        <option value="Nevada County">County-Wide</option>
+      </optgroup>
+    </select>
+    <select id="filterType" title="Filter by kind of place — dining, lodging, museums, wineries">
+      <option value="">All Categories</option>
+      <optgroup label="Season">
+        <option value="season:Spring">🌸 Spring</option>
+        <option value="season:Summer">☀️ Summer</option>
+        <option value="season:Fall">🍂 Fall</option>
+        <option value="season:Winter">❄️ Winter</option>
+        <option value="season:Holiday">🎄 Holiday</option>
+      </optgroup>
+      <optgroup label="Category">
         <option value="Outdoor">Outdoor</option>
         <option value="Hands-on">🛠 Make & Create</option>
         <option value="Historic site">Historic Sites</option>
@@ -1756,52 +1813,30 @@
         <option value="Activity">Activities</option>
         <option value="Art event">Festivals & Events</option>
         <option value="Gallery">Galleries</option>
-      </select>
+      </optgroup>
+    </select>
+    <input type="date" id="filterDateFrom" class="fb-date" title="Visit start date"
+      onchange="visitorDateFrom=this.value;if(visitorDateTo&&visitorDateTo<visitorDateFrom){visitorDateTo=visitorDateFrom;var t=document.getElementById('filterDateTo');if(t)t.value=visitorDateTo;}_visApplyDate()">
+    <span style="color:#bbb;flex-shrink:0">–</span>
+    <input type="date" id="filterDateTo" class="fb-date" title="Visit end date"
+      onchange="visitorDateTo=this.value;if(visitorDateFrom&&visitorDateFrom>visitorDateTo){visitorDateFrom=visitorDateTo;var f=document.getElementById('filterDateFrom');if(f)f.value=visitorDateFrom;}_visApplyDate()">
+    <div class="date-quick-group">
+      <button class="date-quick-btn active" id="vqBtnAll"     onclick="_visSetAll()"     title="Show all upcoming dates">All</button>
+      <button class="date-quick-btn"        id="vqBtnToday"   onclick="_visSetToday()"   title="Today only">Today</button>
+      <button class="date-quick-btn"        id="vqBtnWeekend" onclick="_visSetWeekend()" title="This coming Saturday and Sunday">Weekend</button>
+      <button class="date-quick-btn"        id="vqBtnWeek"    onclick="_visSetWeek()"    title="The next 7 days">Week</button>
     </div>
-    <div class="filter-group" style="min-width:240px" data-tip="Set your visit dates. Seasonal-only spots hide outside their season, and the Calendar view follows these dates.">
-      <label>When?</label>
-      <div style="display:flex;align-items:center;gap:6px">
-        <input type="date" id="filterDateFrom" style="flex:1;min-width:0"
-          placeholder="From"
-          onchange="visitorDateFrom=this.value;if(visitorDateTo&&visitorDateTo<visitorDateFrom){visitorDateTo=visitorDateFrom;var t=document.getElementById('filterDateTo');if(t)t.value=visitorDateTo;}_visApplyDate()">
-        <span style="color:#ccc;font-size:16px;flex-shrink:0">—</span>
-        <input type="date" id="filterDateTo" style="flex:1;min-width:0"
-          placeholder="To"
-          onchange="visitorDateTo=this.value;if(visitorDateFrom&&visitorDateFrom>visitorDateTo){visitorDateFrom=visitorDateTo;var f=document.getElementById('filterDateFrom');if(f)f.value=visitorDateFrom;}_visApplyDate()">
-      </div>
-      <div style="display:flex;gap:4px;margin-top:7px">
-        <button class="date-quick-btn active" id="vqBtnAll"     onclick="_visSetAll()"     title="Show all upcoming dates">All</button>
-        <button class="date-quick-btn"        id="vqBtnToday"   onclick="_visSetToday()"   title="Today only">Today</button>
-        <button class="date-quick-btn"        id="vqBtnWeekend" onclick="_visSetWeekend()" title="This coming Saturday and Sunday">Weekend</button>
-        <button class="date-quick-btn"        id="vqBtnWeek"    onclick="_visSetWeek()"    title="The next 7 days">This Week</button>
-      </div>
-    </div>
-    <div id="subPillsRow" style="display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #e0d8c8;flex-wrap:wrap;gap:6px;align-items:center"></div>
   </div>
+  <div id="subPillsRow" style="display:none;margin:2px 0 14px;padding-top:10px;border-top:1px dashed #e0d8c8;flex-wrap:wrap;gap:6px;align-items:center"></div>
 
-  <div class="section-label" style="margin-top:8px">Step 2</div>
+  <hr class="section-sep">
+
   <div class="section-title">Choose Your Vibe</div>
   <p class="section-desc">Pick one or more vibes — they combine with the filters above to narrow your results.</p>
-
   <div class="themes-grid" id="themesGrid"></div>
   <div id="vibePillsRow" style="display:none;margin-top:14px;padding:10px 0 0;border-top:1px dashed #e0d8c8;flex-wrap:wrap;gap:6px;align-items:center"></div>
 
-  <div class="section-label" style="margin-top:16px">Step 3</div>
-  <div class="section-title" style="margin-bottom:8px">Browse & Build Your Experience</div>
-
-  <div id="manageBanner" class="manage-banner">
-    <span>✏️ <strong>Manage Mode</strong> — Click × on any card to remove it from your itinerary.</span>
-    <button class="manage-exit" onclick="exitManage()">Done</button>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('experiences', this)">Explore</button>
-    <button class="tab-btn" onclick="switchTab('itineraries', this)">Suggested Experiences</button>
-    <button class="tab-btn" onclick="switchTab('events', this)">Upcoming Events</button>
-    <button class="tab-btn" onclick="switchTab('plan', this)">✨ Help Me Plan</button>
-    <button class="tab-btn" style="margin-left:auto" onclick="openHelp()">❓ How to use</button>
-    <button class="tab-btn" style="color:var(--gold)" onclick="openManageData()">⚙ Manage Database</button>
-  </div>
+  <hr class="section-sep">
 
   <div id="tab-experiences" class="tab-panel active">
     <div id="activeFilterBar" style="display:none"></div>
@@ -1819,8 +1854,8 @@
 
   <div id="tab-events" class="tab-panel">
     <div class="events-view-toggle">
-      <button id="evViewList" class="ev-view-btn active" onclick="setEventsView('list')">☰ List</button>
-      <button id="evViewCal" class="ev-view-btn" onclick="setEventsView('calendar')">▦ Calendar</button>
+      <button id="evViewList" class="ev-view-btn active" onclick="setEventsView('list')" title="See events as a scrollable list">☰ List</button>
+      <button id="evViewCal" class="ev-view-btn" onclick="setEventsView('calendar')" title="See events laid out on a month calendar">▦ Calendar</button>
     </div>
     <div id="eventsGrid" class="events-grid"></div>
     <div id="eventsCalendar" style="display:none"></div>
@@ -1886,7 +1921,7 @@
       <div class="help-strat">
         <div class="help-emoji">🎭</div>
         <div><strong>You're browsing — inspire me</strong><br>
-          Pick one or more <em>vibes</em> in Step 2 (Historic, Arts, Foodie, Active…). Cards filter instantly; combine vibes to widen, add Area/Category/date to narrow.</div>
+          Pick one or more <em>vibes</em> in the <em>Browse by Vibe</em> section (Historic, Arts, Foodie, Active…). Cards filter instantly; combine vibes to widen, add Area/Category/date to narrow.</div>
       </div>
       <div class="help-strat">
         <div class="help-emoji">✨</div>
@@ -2086,11 +2121,11 @@ const SEASONAL_MOMENTS = [
     photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
     action:{ type:'vibe', value:'active' } },
   // ── SUMMER ──
-  { id:'yuba-swim', season:'summer', priority:9,
-    title:'Swimming season on the Yuba',
-    blurb:'Emerald pools and sun-warmed granite — the South Yuba is Nevada County’s summer living room.',
-    insider:'Go early; by afternoon the popular pools fill and the parking vanishes.',
-    cta:'Find river spots', start:'05-24', end:'09-21',
+  { id:'lake-days', season:'summer', priority:8,
+    title:'Lake days at Scotts Flat & Rollins',
+    blurb:'Calm reservoirs with sandy beaches, boat ramps and shady picnic coves — easygoing water the whole family can enjoy once the rivers settle.',
+    insider:'Scotts Flat has the gentlest swimming beach; arrive before noon on summer weekends for a good picnic spot.',
+    cta:'Find lake spots', start:'06-07', end:'09-15',
     photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
     action:{ type:'vibe', value:'active' } },
   { id:'farmers-markets', season:'summer', priority:6,
@@ -4089,10 +4124,18 @@ function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
+  const panel = document.getElementById('tab-' + tab);
+  panel.classList.add('active');
   if (tab === 'itineraries') renderItineraries();
   if (tab === 'events') renderEventsView();
   if (tab === 'plan') renderTripBuilderForm();
+  // The panels sit below the vibes — scroll the chosen content into view so a
+  // tab click carries the visitor to what they picked. Explore is the
+  // exception: its grid depends on the search/vibe filters directly above it,
+  // so jumping past them would hide the controls the visitor still needs.
+  if (tab !== 'experiences') {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 function openModal() {
@@ -4424,8 +4467,8 @@ function renderModal() {
   body.innerHTML = `
     ${lodgingBanner}
     <div class="events-view-toggle" style="margin-bottom:14px">
-      <button class="ev-view-btn ${modalView === 'plan' ? 'active' : ''}" onclick="setModalView('plan')">🗓 Day Plan</button>
-      <button class="ev-view-btn ${modalView === 'calendar' ? 'active' : ''}" onclick="setModalView('calendar')">📅 Calendar</button>
+      <button class="ev-view-btn ${modalView === 'plan' ? 'active' : ''}" onclick="setModalView('plan')" title="Your stops organized day by day">🗓 Day Plan</button>
+      <button class="ev-view-btn ${modalView === 'calendar' ? 'active' : ''}" onclick="setModalView('calendar')" title="Your stops laid out on a real-date calendar">📅 Calendar</button>
     </div>
     ${modalView === 'calendar'
       ? `<div id="modalCalendar">${_itineraryCalendarHTML()}</div>`
@@ -4434,16 +4477,16 @@ function renderModal() {
     </div>
     ${dayControls}`}
     <div class="modal-actions">
-      <button class="btn-primary" onclick="openMap()">🗺 View on Map</button>
-      <button class="btn-primary" onclick="shareItinerary()">📤 Share / Save</button>
-      <button class="btn-primary" onclick="printItinerary()" style="background:transparent;color:var(--brown);border-color:#d4c9b0">🖨 Print</button>
+      <button class="btn-primary" onclick="openMap()" title="See all your stops on a map, with parking & restrooms">🗺 View on Map</button>
+      <button class="btn-primary" onclick="shareItinerary()" title="Get a shareable link to your itinerary, or save it on this device">📤 Share / Save</button>
+      <button class="btn-primary" onclick="printItinerary()" style="background:transparent;color:var(--brown);border-color:#d4c9b0" title="Print a clean copy of your itinerary">🖨 Print</button>
       ${(typeof IS_ADMIN_HOST !== 'undefined' && IS_ADMIN_HOST) ? (
         editingItinId !== null
           ? `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save changes to the published itinerary.">✓ Update Itinerary</button>
              <button class="btn-secondary" onclick="cancelEditItinerary()" title="Stop editing — your changes won't be saved to the published itinerary.">✗ Cancel Edit</button>`
           : `<button class="btn-primary" onclick="publishAsItinerary()" style="background:#6b46c1;color:#fff;border-color:#6b46c1" title="Save the current day-by-day plan as a chamber-published itinerary, visible to all visitors in the Suggested Experiences section.">✨ Publish as Suggested</button>`
       ) : ''}
-      <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+      <button class="btn-secondary" onclick="clearAll()" title="Remove every stop from My Itinerary">Clear All</button>
     </div>
     <div style="font-size:10.5px;color:#888;text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid #f0e8d8">
       ${_hasSaveConsent()
@@ -6119,8 +6162,8 @@ async function renderEventsQueue() {
           <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--slate)" title="${(ev.location||ev.area||'').replace(/"/g,'&quot;')}">${ev.location||ev.area||''}</td>
           <td style="white-space:nowrap;text-align:right">
             ${filter === 'pending' ? `
-              <button onclick="approveEvent('${scraperId}')" style="background:var(--forest);color:#fff;border:none;padding:3px 7px;border-radius:3px;cursor:pointer;font-size:10px;margin-right:3px">✓</button>
-              <button onclick="dismissEvent('${scraperId}')" style="background:#c0392b;color:#fff;border:none;padding:3px 7px;border-radius:3px;cursor:pointer;font-size:10px">✗</button>
+              <button onclick="approveEvent('${scraperId}')" title="Approve — publish this event to the public site" style="background:var(--forest);color:#fff;border:none;padding:3px 7px;border-radius:3px;cursor:pointer;font-size:10px;margin-right:3px">✓</button>
+              <button onclick="dismissEvent('${scraperId}')" title="Dismiss — hide this event" style="background:#c0392b;color:#fff;border:none;padding:3px 7px;border-radius:3px;cursor:pointer;font-size:10px">✗</button>
             ` : filter === 'approved' ? '<span style="color:var(--forest);font-size:10px">✓ approved</span>' : '<span style="color:#bbb;font-size:10px">dismissed</span>'}
           </td>
         </tr>`;
@@ -6526,7 +6569,7 @@ async function renderScraperSources() {
         </td>
         <td style="color:var(--slate);font-size:11px;max-width:200px">${src.notes||''}</td>
         <td>
-          <button onclick="deleteSource(${i})" style="background:#c0392b;color:#fff;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;font-size:10px">✗</button>
+          <button onclick="deleteSource(${i})" title="Delete this event source" style="background:#c0392b;color:#fff;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;font-size:10px">✗</button>
         </td>
       </tr>`).join('');
 
