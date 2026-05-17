@@ -30,9 +30,12 @@ from .base import EventScraper, _REQUESTS_HEADERS
 
 _API = "https://nevadatheatre.com/wp-json/wp/v2/mec-events"
 _MAX_FUTURE_DAYS = 480
+_API_PER_PAGE    = 50    # nevadatheatre.com 500s on per_page=100
+_MAX_API_PAGES   = 12    # paginate the full mec-events post list
 
 _MONTHS = ("January|February|March|April|May|June|July|August|"
            "September|October|November|December")
+# MEC's .mec-start-date-label renders e.g. "May 13 2026"
 _DATE_RE = re.compile(rf"({_MONTHS})\s+(\d{{1,2}}),?\s+(20\d\d)", re.I)
 _TIME_RE = re.compile(r"(\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?)", re.I)
 
@@ -52,23 +55,38 @@ class NevadaTheatreScraper(EventScraper):
 
     def scrape(self, driver=None, discover: bool = False) -> list[dict]:
         print(f"  [{self.name}] -> {_API}  (MEC events via WP REST)")
-        try:
-            resp = requests.get(_API, headers=_REQUESTS_HEADERS, timeout=25,
-                                params={"per_page": 50})
-            resp.raise_for_status()
-            records = resp.json()
-        except Exception as e:
-            print(f"  [{self.name}] event-list fetch failed: {e}")
-            return []
-        if not isinstance(records, list) or not records:
+
+        # ── List ALL mec-events posts (the REST list is post-date ordered,
+        #    not event-date ordered, so upcoming events are scattered
+        #    through the full set — paginate everything). ──────────────────
+        records = []
+        for page in range(1, _MAX_API_PAGES + 1):
+            try:
+                resp = requests.get(_API, headers=_REQUESTS_HEADERS, timeout=25,
+                                    params={"per_page": _API_PER_PAGE, "page": page})
+                if resp.status_code == 400:
+                    break          # past the last page
+                resp.raise_for_status()
+                batch = resp.json()
+            except Exception as e:
+                print(f"  [{self.name}] list page {page} failed: {e}")
+                break
+            if not isinstance(batch, list) or not batch:
+                break
+            records.extend(batch)
+            if len(batch) < _API_PER_PAGE:
+                break
+        if not records:
             print(f"  [{self.name}] 0 events in REST list")
             return []
-        print(f"  [{self.name}] {len(records)} event(s) listed — fetching dates")
+        print(f"  [{self.name}] {len(records)} event post(s) listed — "
+              f"fetching dates")
 
         events = []
         seen   = set()
         today  = date.today()
         cutoff = today + timedelta(days=_MAX_FUTURE_DAYS)
+        fetched = 0
 
         for rec in records:
             title = html.unescape((rec.get("title") or {}).get("rendered", "").strip())
@@ -76,14 +94,19 @@ class NevadaTheatreScraper(EventScraper):
             if not title:
                 continue
 
-            # Fetch the event page and parse the displayed date/time
+            # Fetch the event page; read MEC's clean date/time elements
             try:
                 page = requests.get(link, headers=_REQUESTS_HEADERS, timeout=20).text
+                fetched += 1
             except Exception:
                 continue
-            text = BeautifulSoup(page, "html.parser").get_text(" ", strip=True)
+            soup = BeautifulSoup(page, "html.parser")
 
-            dm = _DATE_RE.search(text)
+            # MEC renders the start date in .mec-start-date-label ("May 13 2026")
+            dlabel = soup.select_one(".mec-start-date-label, .mec-events-abbr")
+            dtext  = dlabel.get_text(" ", strip=True) if dlabel else ""
+            dm = _DATE_RE.search(dtext) or _DATE_RE.search(
+                 soup.get_text(" ", strip=True))
             if not dm:
                 continue
             try:
@@ -92,13 +115,13 @@ class NevadaTheatreScraper(EventScraper):
             except ValueError:
                 continue
             if d < today or d > cutoff:
-                continue
+                continue          # past or too-far event — skip
             date_str = d.strftime("%Y-%m-%d")
 
-            # Time — first time token after the date in the page text
+            # Time — MEC's .mec-single-event-time ("Time 7:00 pm")
             time_str = ""
-            tail = text[dm.end():dm.end() + 120]
-            tm = _TIME_RE.search(tail)
+            tlabel = soup.select_one(".mec-single-event-time")
+            tm = _TIME_RE.search(tlabel.get_text(" ", strip=True) if tlabel else "")
             if tm:
                 t = tm.group(1).upper().replace(".", "").replace(" ", "")
                 time_str = re.sub(r"(\d)(AM|PM)", r"\1 \2", t)
@@ -125,7 +148,8 @@ class NevadaTheatreScraper(EventScraper):
                 url=link,
             ))
 
-        print(f"  [{self.name}] {len(events)} event(s) with parseable dates")
+        print(f"  [{self.name}] {len(events)} upcoming event(s) "
+              f"({fetched} pages fetched)")
         return events
 
     def parse(self, soup) -> list[dict]:
