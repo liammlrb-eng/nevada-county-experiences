@@ -276,7 +276,7 @@ def slide_title(s):
     add_text(s, 'Western\nNevada\nCounty',
              Inches(0.6), Inches(2.2), Inches(3.7), Inches(2.5),
              size=44, bold=True, color=GOLD_LIGHT, font='Calibri')
-    add_text(s, 'Experience Finder',
+    add_text(s, 'Trip Planner',
              Inches(0.6), Inches(4.4), Inches(3.7), Inches(0.7),
              size=22, color=WHITE, italic=True, font='Calibri')
     add_text(s, 'Visitor planning platform — county pitch deck',

@@ -15,7 +15,7 @@ sub-lines beneath the bullet they explain.
 ---
 
 ## Slide 1 — Title
-**Western Nevada County · Experience Finder**
+**Western Nevada County · Trip Planner**
 Visitor planning platform — county pitch deck.
 
 > A purpose-built tourism platform combining 161 curated experiences with
