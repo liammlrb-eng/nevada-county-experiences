@@ -356,9 +356,12 @@ def slide_what_this_is(s):
 
 def slide_discovery(s):
     slide_header(s, 'How visitors discover',
-        'Multiple paths to "I found it" — works for browse-mode and date-mode visitors.')
+        'Search, browse, or filter by date — multiple paths to "I found it".')
 
     two_col_table(s, ['Discovery path', 'What it does'], [
+        ('Universal keyword search',
+         'One box searches every venue and event — names, descriptions and tags — with built-in synonyms, so a search for "metalsmith" also finds a studio listed only as "blacksmithing"',
+         'A visitor types "blacksmithing", clicks Find, and lands on The Curious Forge at once.'),
         ('Themed vibes (9 cards)',
          'Historic · Arts · Hands-On · Foodie · Active · Relaxed · Wellness · Family · Festivals',
          'No-plan visitor taps "Foodie" — relevant cards instantly filter in.'),
@@ -383,7 +386,7 @@ def slide_discovery(s):
         ('Tag-aware Smart Suggestions',
          '"Near Your Stops" panel in the itinerary — geographic + tag scoring',
          'After Empire Mine goes in, the panel surfaces Holbrooke Hotel 0.4 mi away.'),
-    ], Inches(1.75), left_w=3.4, right_w=8.7, body_size=9, row_height=0.6,
+    ], Inches(1.62), left_w=3.4, right_w=8.7, body_size=9, row_height=0.55,
        scenario_size=7.5)
 
 
