@@ -1563,6 +1563,118 @@
     .cal-chip { font-size: 8.5px; }
     .cal-evrow-when { flex-basis: 70px; }
   }
+
+  /* ── Universal search bar ─────────────────────────────────────────── */
+  .search-bar { display: flex; align-items: center; gap: 9px; margin: 4px 0 16px; }
+  .search-field { position: relative; flex: 1; min-width: 0; }
+  .search-field input {
+    width: 100%;
+    height: 46px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 15px;
+    color: var(--slate);
+    border: 1.5px solid #d8cdb8;
+    border-radius: 8px;
+    padding: 0 38px;
+    background: #fff;
+  }
+  .search-field input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,148,26,0.12);
+  }
+  .search-field input::placeholder { color: #a89c84; }
+  .search-icon {
+    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; pointer-events: none;
+  }
+  .search-clear {
+    position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+    background: #e8dfc8; border: none; color: var(--brown);
+    width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+    font-size: 12px; line-height: 1;
+  }
+  .search-clear:hover { background: var(--gold); color: #fff; }
+  .search-go {
+    flex-shrink: 0;
+    height: 46px;
+    background: var(--gold); color: #fff;
+    border: none; border-radius: 8px;
+    padding: 0 24px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 14px; font-weight: 600; letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .search-go:hover { background: var(--brown); }
+
+  /* ── Help · field tips ────────────────────────────────────────────── */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after,
+  [data-tip]:focus-within::after {
+    content: attr(data-tip);
+    position: absolute; left: 0; top: calc(100% + 5px);
+    background: var(--dark); color: #fff;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 11px; font-weight: 400; line-height: 1.45;
+    padding: 7px 10px; border-radius: 6px;
+    width: max-content; max-width: 260px;
+    box-shadow: 0 5px 16px rgba(0,0,0,0.3);
+    z-index: 200; pointer-events: none;
+  }
+  .help-strat {
+    display: flex; gap: 12px; padding: 11px 2px;
+    border-bottom: 1px solid #efe7d6;
+    font-size: 13px; color: var(--slate); line-height: 1.5;
+  }
+  .help-strat:last-of-type { border-bottom: none; }
+  .help-emoji { font-size: 22px; flex-shrink: 0; width: 30px; text-align: center; }
+  .help-strat strong { color: var(--brown); font-size: 13.5px; }
+  .help-tips {
+    margin-top: 14px; background: var(--fog);
+    border-radius: 8px; padding: 12px 14px;
+    font-size: 12px; color: var(--slate); line-height: 1.6;
+  }
+  .help-tips strong { color: var(--brown); }
+  .tb-section { margin-bottom: 18px; }
+  .tb-label {
+    font-size: 13px; font-weight: 700; color: var(--brown);
+    margin-bottom: 8px; letter-spacing: 0.03em;
+  }
+  .tb-pills { display: flex; gap: 7px; flex-wrap: wrap; }
+  .tb-pill {
+    font-family: 'Josefin Sans', sans-serif; font-size: 13px;
+    padding: 7px 16px; border: 1.5px solid #d8cdb8; border-radius: 20px;
+    background: #fff; color: var(--slate); cursor: pointer;
+  }
+  .tb-pill.active { background: var(--brown); color: #fff; border-color: var(--brown); }
+  .tb-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 8px 16px; }
+  .tb-panel { max-width: 760px; margin: 0 auto; }
+  .tb-head {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--brown); margin-bottom: 4px;
+  }
+  .tb-intro { font-size: 13px; color: var(--slate); margin-bottom: 22px; }
+  .tb-row { display: flex; gap: 28px; flex-wrap: wrap; }
+  .tb-row .tb-section { flex: 1; min-width: 230px; }
+  .tb-check {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; color: var(--slate); cursor: pointer;
+  }
+  .tb-check input { accent-color: var(--gold); width: 15px; height: 15px; }
+  .tb-select {
+    width: 100%; font-family: 'Josefin Sans', sans-serif; font-size: 13px;
+    padding: 8px 10px; border: 1.5px solid #d8cdb8; border-radius: 6px;
+    color: var(--slate); background: #fff;
+  }
+  .tb-hint { font-size: 11px; color: var(--slate-soft); margin-top: 5px; font-style: italic; }
+  .tb-go {
+    width: 100%; background: var(--gold); color: #fff; border: none;
+    border-radius: 8px; padding: 13px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.05em;
+    cursor: pointer; margin-top: 4px;
+  }
+  .tb-go:hover { background: var(--brown); }
 </style>
 </head>
 <body>
@@ -1581,10 +1693,20 @@
 <div class="section">
   <div class="section-label">Step 1</div>
   <div class="section-title">Where, What & When</div>
-  <p class="section-desc">Filter by area, category, and date to find what's happening during your visit.</p>
+  <p class="section-desc">Search for something specific, or filter by area, category and date to find what's happening during your visit.</p>
 
+  <div class="search-bar">
+    <div class="search-field" data-tip="Type a craft, activity, or venue name and press Find. Synonyms are built in — “metalsmith” also finds “blacksmithing”.">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="expSearch" autocomplete="off"
+        placeholder="Search — “blacksmithing”, “wine tasting”, “live music”…"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();runSearch();}">
+      <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:none" title="Clear search" aria-label="Clear search">✕</button>
+    </div>
+    <button class="search-go" onclick="runSearch()">Find</button>
+  </div>
   <div class="filters-row">
-    <div class="filter-group">
+    <div class="filter-group" data-tip="Limit results to one town. County-wide events still appear for every area.">
       <label>Area</label>
       <select id="filterArea">
         <option value="">All Areas</option>
@@ -1607,7 +1729,7 @@
         </optgroup>
       </select>
     </div>
-    <div class="filter-group">
+    <div class="filter-group" data-tip="Filter by kind of place — dining, lodging, museums, wineries. This is the literal category, separate from the vibes below.">
       <label>Category</label>
       <select id="filterType">
         <option value="">All Categories</option>
@@ -1636,7 +1758,7 @@
         <option value="Gallery">Galleries</option>
       </select>
     </div>
-    <div class="filter-group" style="min-width:240px">
+    <div class="filter-group" style="min-width:240px" data-tip="Set your visit dates. Seasonal-only spots hide outside their season, and the Calendar view follows these dates.">
       <label>When?</label>
       <div style="display:flex;align-items:center;gap:6px">
         <input type="date" id="filterDateFrom" style="flex:1;min-width:0"
@@ -1676,7 +1798,9 @@
     <button class="tab-btn active" onclick="switchTab('experiences', this)">Explore</button>
     <button class="tab-btn" onclick="switchTab('itineraries', this)">Suggested Experiences</button>
     <button class="tab-btn" onclick="switchTab('events', this)">Upcoming Events</button>
-    <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()">⚙ Manage Database</button>
+    <button class="tab-btn" onclick="switchTab('plan', this)">✨ Help Me Plan</button>
+    <button class="tab-btn" style="margin-left:auto" onclick="openHelp()">❓ How to use</button>
+    <button class="tab-btn" style="color:var(--gold)" onclick="openManageData()">⚙ Manage Database</button>
   </div>
 
   <div id="tab-experiences" class="tab-panel active">
@@ -1687,6 +1811,10 @@
 
   <div id="tab-itineraries" class="tab-panel">
     <div id="itinGrid" class="itin-grid"></div>
+  </div>
+
+  <div id="tab-plan" class="tab-panel">
+    <div id="tripBuilderBody"></div>
   </div>
 
   <div id="tab-events" class="tab-panel">
@@ -1738,6 +1866,55 @@
       <p>These tags appear in the dropdown for all experiences.</p>
     </div>
     <div class="modal-body" id="tagManagerBody"></div>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpOverlay" onclick="if(event.target===this)closeHelp()" style="z-index:1100">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeHelp()">✕</button>
+      <h2>❓ How to find what you want</h2>
+      <p>There's no wrong way to explore — pick the path that fits you.</p>
+    </div>
+    <div class="modal-body">
+      <div class="help-strat">
+        <div class="help-emoji">🔍</div>
+        <div><strong>You already know what you want</strong><br>
+          Use the <em>Search</em> box at the top — type it and press <em>Find</em>. Synonyms are built in, so "metalsmith" still finds a studio listed as "blacksmithing".</div>
+      </div>
+      <div class="help-strat">
+        <div class="help-emoji">🎭</div>
+        <div><strong>You're browsing — inspire me</strong><br>
+          Pick one or more <em>vibes</em> in Step 2 (Historic, Arts, Foodie, Active…). Cards filter instantly; combine vibes to widen, add Area/Category/date to narrow.</div>
+      </div>
+      <div class="help-strat">
+        <div class="help-emoji">✨</div>
+        <div><strong>Plan it for me</strong><br>
+          Open the <em>✨ Help Me Plan</em> tab. Answer a few questions — days, pace, who's coming, activity level, interests — and get a tailored day-by-day draft you can edit.</div>
+      </div>
+      <div class="help-strat">
+        <div class="help-emoji">📅</div>
+        <div><strong>You have set dates</strong><br>
+          Set the <em>When?</em> filter, then open <em>Upcoming Events → Calendar</em> to see exactly what's on each day of your visit.</div>
+      </div>
+      <div class="help-strat">
+        <div class="help-emoji">🧭</div>
+        <div><strong>You want a ready-made trip</strong><br>
+          Open <em>Suggested Experiences</em> — curated itineraries. Hit <em>Customize this trip</em> on any of them to copy it into your own planner and tweak it.</div>
+      </div>
+      <div class="help-strat">
+        <div class="help-emoji">🏠</div>
+        <div><strong>You just need a place to stay</strong><br>
+          Tap the <em>🏠 Lodging</em> tile alongside the vibes — it jumps straight to every hotel, B&amp;B, cabin and campground.</div>
+      </div>
+      <div class="help-tips">
+        <strong>Good to know</strong><br>
+        • Anything you add lands in <strong>My Itinerary</strong> — organize it by day, view it on a map (with parking &amp; restrooms), or share a link.<br>
+        • The <strong>In Season Now</strong> strip near the top flags what's special this week — wildflowers, swimming season, festivals.<br>
+        • Filters stack: Area + Category + dates + a vibe all narrow together.
+      </div>
+    </div>
   </div>
 </div>
 <div class="map-overlay" id="mapOverlay" onclick="handleMapOverlayClick(event)">
@@ -2920,10 +3097,11 @@ function renderExperiences() {
     const typeVal   = (document.getElementById('filterType')?.value || '').toLowerCase();
     const isSeason  = typeVal.startsWith('season:');
 
+    const q = (searchQuery || '').trim();
     let candidates = _eventsCache;
 
-    // Theme filter
-    if (themeTags) {
+    // Theme filter — skipped when a keyword search is active (search wins).
+    if (!q && themeTags) {
       const themed = candidates.filter(e => e.tags.some(t => themeTags.has(t.toLowerCase())));
       if (themed.length > 0) candidates = themed;
     }
@@ -2936,8 +3114,8 @@ function renderExperiences() {
       });
     }
 
-    // Type/category filter — map to event tags; skip season filters (events have real dates)
-    if (typeVal && !isSeason) {
+    // Type/category filter — skipped during a keyword search.
+    if (!q && typeVal && !isSeason) {
       const evtTags = _typeToEvtTags[typeVal];
       if (evtTags) {
         candidates = candidates.filter(e => e.tags.some(t => evtTags.includes(t.toLowerCase())));
@@ -2957,8 +3135,11 @@ function renderExperiences() {
       });
     }
 
+    // Keyword search — matches event name, venue, tags and area.
+    if (q) candidates = candidates.filter(_matchesSearch);
+
     // Vibe-pill filter (Foodie → Markets, Active → Hiking, etc.)
-    if (selectedThemes.size === 1 && activeVibePill) {
+    if (!q && selectedThemes.size === 1 && activeVibePill) {
       const vibeId = [...selectedThemes][0];
       const vibeDef = (VIBE_PILLS[vibeId] || []).find(p => p.id === activeVibePill);
       if (vibeDef) candidates = candidates.filter(vibeDef.match);
@@ -3131,6 +3312,12 @@ function isHighlightTag(tag) {
 function renderActiveFilters() {
   const bar = document.getElementById('activeFilterBar');
   const chips = [];
+
+  // Search chip
+  const sq = (searchQuery || '').trim();
+  if (sq) chips.push(
+    `<span class="filter-chip">🔍 ${sq.replace(/&/g,'&amp;').replace(/</g,'&lt;')}<span class="filter-chip-x" onclick="clearSearch()">✕</span></span>`
+  );
 
   // One chip per active vibe
   selectedThemes.forEach(tid => {
@@ -3554,6 +3741,7 @@ function _eventsForView() {
   const themeTags = getActiveThemeTags();
   const dateFrom  = (typeof visitorDateFrom !== 'undefined') ? visitorDateFrom : '';
   const dateTo    = (typeof visitorDateTo   !== 'undefined') ? visitorDateTo   : '';
+  const q         = (searchQuery || '').trim();
   let evts = _eventsCache || EVENTS;
 
   // Date-range filter — an event matches if its span overlaps [from, to].
@@ -3567,8 +3755,11 @@ function _eventsForView() {
       return true;
     });
   }
-  // Vibe/theme filter (fall back to all if nothing matches the vibe).
-  if (themeTags) {
+  // A keyword search supersedes the vibe filter; otherwise apply the vibe
+  // (falling back to all if nothing matches it).
+  if (q) {
+    evts = evts.filter(_matchesSearch);
+  } else if (themeTags) {
     const themed = evts.filter(e => e.tags.some(t => themeTags.has(t.toLowerCase())));
     if (themed.length > 0) evts = themed;
   }
@@ -3901,6 +4092,7 @@ function switchTab(tab, btn) {
   document.getElementById('tab-' + tab).classList.add('active');
   if (tab === 'itineraries') renderItineraries();
   if (tab === 'events') renderEventsView();
+  if (tab === 'plan') renderTripBuilderForm();
 }
 
 function openModal() {
@@ -5168,10 +5360,400 @@ function _visitSeasons(dateStr) {
   return new Set(['winter']); // Jan, Feb
 }
 
+// ── Universal keyword search ─────────────────────────────────────────────────
+// An explicit "Find" search (committed on click / Enter — not live) that
+// supersedes the coarse vibe/category filters so a valid match is never
+// hidden. Drives the Explore grid and the Upcoming Events tab.
+let searchQuery    = '';
+let _searchRegexes = [];   // one compiled regex per query term (set by _compileSearch)
+
+// Synonym groups for the area's vocabulary — a query term also matches the
+// other words in any group it belongs to, so "metalsmith" finds a venue
+// described only as "blacksmithing" or "metalwork".
+const _SEARCH_SYNONYMS = [
+  // 'forge'/'forging' deliberately excluded — they collide with the venue
+  // name "The Curious Forge", which would pull in all ~160 of its class
+  // sessions on any metalwork search.
+  ['blacksmith','blacksmithing','metalsmith','metalsmithing','silversmith','metalwork','metalworking'],
+  ['pottery','ceramic','ceramics','stoneware'],
+  ['glass','glassblowing','glassblown'],
+  ['jewelry','jewellery'],
+  ['woodwork','woodworking','woodcarving','carpentry'],
+  ['wine','winery','wineries','vineyard','tasting'],
+  ['beer','brewery','breweries','brewpub','cidery','cider'],
+  ['hike','hiking','trail','trails','backpacking'],
+  ['bike','biking','cycling','cyclist'],
+  ['swim','swimming'],
+  ['music','concert','concerts','band','bands','symphony','musical'],
+  ['art','arts','gallery','galleries','painting','sculpture'],
+  ['theater','theatre','stage','performance'],
+  ['kids','family','children','playground'],
+  ['spa','wellness','massage','yoga','retreat','sauna'],
+  ['food','dining','restaurant','eatery','foodie','cuisine'],
+  ['museum','museums','history','historic','heritage','mine','mining'],
+  ['camp','camping','campground'],
+  ['lodging','hotel','hotels','motel','inn','cabin','glamping'],
+  ['fish','fishing','angling'],
+  ['workshop','workshops','class','classes','lesson','lessons'],
+];
+
+function _searchHaystack(o) {
+  const fields = [o.name, o.sub, o.notes, o.type, o.area, o.venue, o.dates];
+  const tags = Array.isArray(o.tags) ? o.tags.join(' ') : '';
+  return (fields.filter(Boolean).join(' ') + ' ' + tags).toLowerCase();
+}
+
+// Every word to accept for one query term — itself plus the members of any
+// synonym group it belongs to. Terms under 3 chars skip synonym expansion.
+function _expandTerm(term) {
+  const out = new Set([term]);
+  if (term.length >= 3) {
+    for (const group of _SEARCH_SYNONYMS) {
+      if (group.some(w => w.includes(term) || term.includes(w))) {
+        group.forEach(w => out.add(w));
+      }
+    }
+  }
+  return [...out];
+}
+
+// Compile the committed query into one regex per term. Each word is matched
+// at a word boundary as a prefix — so "forge" hits "forge"/"forging" but NOT
+// "unforgettable", while "metal" still hits "metalwork".
+function _compileSearch() {
+  const q = (searchQuery || '').trim().toLowerCase();
+  _searchRegexes = !q ? [] : q.split(/\s+/).map(term => {
+    const alt = _expandTerm(term)
+      .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
+    return new RegExp('\\b(?:' + alt + ')');
+  });
+}
+
+// True when every query term matches the item (each term also accepting its
+// synonyms). _compileSearch() must have run for the current query.
+function _matchesSearch(o) {
+  if (_searchRegexes.length === 0) return true;
+  const hay = _searchHaystack(o);
+  return _searchRegexes.every(re => re.test(hay));
+}
+
+// Commit the search box's current text — called by the Find button and Enter.
+function runSearch() {
+  const inp = document.getElementById('expSearch');
+  searchQuery = inp ? inp.value : '';
+  _compileSearch();
+  _applySearch();
+}
+
+function _applySearch() {
+  const btn = document.getElementById('searchClearBtn');
+  if (btn) btn.style.display = (searchQuery || '').trim() ? '' : 'none';
+  renderExperiences();
+  if (typeof renderActiveFilters === 'function') renderActiveFilters();
+  const evtTab = document.getElementById('tab-events');
+  if (evtTab && evtTab.classList.contains('active')) renderEventsView();
+}
+
+function clearSearch() {
+  searchQuery = '';
+  _searchRegexes = [];
+  const inp = document.getElementById('expSearch');
+  if (inp) inp.value = '';
+  _applySearch();
+}
+
+// ── TRIP BUILDER ─────────────────────────────────────────────────────────────
+// A rule-based itinerary generator (the "Help Me Plan" tab). A preferences
+// form feeds a scoring pass over the catalog — interest match, distance from
+// the hotel, group type, activity level, indoor/outdoor lean — and the picks
+// are dealt into a day-by-day draft that opens in the planner. No AI / external
+// service: it only ever picks real catalog venues (and real dated events).
+
+function openHelp()  { document.getElementById('helpOverlay').classList.add('open'); }
+function closeHelp() { document.getElementById('helpOverlay').classList.remove('open'); }
+
+// Highlight the picked pill within a single-choice pill group.
+function _tbPick(groupId, btn) {
+  document.querySelectorAll('#' + groupId + ' .tb-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Rough physical intensity of an experience — feeds the Activity-level filter.
+function _tripIntensity(e) {
+  const tags = (e.tags || []).map(t => t.toLowerCase());
+  const type = (e.type || '').toLowerCase();
+  if (tags.some(t => ['hiking','biking','running','swimming','sport','boating','climbing'].includes(t)))
+    return 'high';
+  if (['museum','gallery','tasting room','winery','restaurant','bakery','brewery','wellness','historic site']
+        .includes(type)) return 'low';
+  if (tags.some(t => ['restorative','wellness','spiritual'].includes(t))) return 'low';
+  return 'medium';
+}
+
+// Whether an experience is primarily an outdoor thing.
+function _tripIsOutdoor(e) {
+  const tags = (e.tags || []).map(t => t.toLowerCase());
+  if ((e.type || '').toLowerCase() === 'outdoor') return true;
+  return tags.some(t => ['outdoor','nature','scenic','hiking','biking','swimming',
+                         'fishing','boating','running','garden','environment'].includes(t));
+}
+
+// Optional "must-have" toggles — each guarantees one matching stop in the plan.
+const _TB_MUSTHAVE = {
+  meal:  { label: 'A standout meal',      match: e => (e.type||'').toLowerCase() === 'restaurant' },
+  music: { label: 'Live music or a show', match: e => (e.type||'').toLowerCase() === 'music venue'
+              || (e.tags||[]).some(t => ['music','theater','theatre'].includes(t.toLowerCase())) },
+  water: { label: 'River or water time',  match: e => (e.tags||[]).some(t => ['swimming','fishing','boating'].includes(t.toLowerCase())) },
+  wine:  { label: 'A winery or tasting',  match: e => ['winery','tasting room'].includes((e.type||'').toLowerCase()) },
+  craft: { label: 'A hands-on class',     match: e => (e.type||'').toLowerCase() === 'hands-on'
+              || (e.tags||[]).some(t => ['hands-on','workshop','craft'].includes(t.toLowerCase())) },
+  hike:  { label: 'A hike or trail',      match: e => (e.tags||[]).some(t => t.toLowerCase() === 'hiking')
+              || (e.type||'').toLowerCase() === 'outdoor' },
+};
+
+function renderTripBuilderForm() {
+  const body = document.getElementById('tripBuilderBody');
+  if (!body) return;
+
+  const pillRow = (groupId, opts, def) => opts.map(o =>
+    `<button type="button" class="tb-pill${o.v === def ? ' active' : ''}" data-val="${o.v}" onclick="_tbPick('${groupId}',this)">${o.l}</button>`
+  ).join('');
+
+  const interestHtml = THEMES.map(t =>
+    `<label class="tb-check"><input type="checkbox" class="tb-interest" value="${t.id}"> ${t.name}</label>`
+  ).join('');
+  const mustHtml = Object.keys(_TB_MUSTHAVE).map(k =>
+    `<label class="tb-check"><input type="checkbox" class="tb-musthave" value="${k}"> ${_TB_MUSTHAVE[k].label}</label>`
+  ).join('');
+
+  const lodgeOpts = liveExperiences
+    .filter(e => (e.type || '').toLowerCase() === 'lodging')
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(l => `<option value="${l.id}">${escVal(l.name)} — ${escVal(l.area)}</option>`)
+    .join('');
+
+  body.innerHTML = `
+    <div class="tb-panel">
+      <div class="tb-head">✨ Help Me Plan</div>
+      <div class="tb-intro">Answer a few questions and we'll draft a day-by-day itinerary — every stop a real local venue. You can edit everything afterward.</div>
+
+      <div class="tb-row">
+        <div class="tb-section" data-tip="Day 1 is your arrival day; stops spread evenly across these days.">
+          <div class="tb-label">How many days?</div>
+          <div class="tb-pills" id="tbDays">${pillRow('tbDays', [1,2,3,4,5].map(n => ({v:n,l:n})), 2)}</div>
+        </div>
+        <div class="tb-section" data-tip="Pace sets how many stops we plan per day.">
+          <div class="tb-label">Pace</div>
+          <div class="tb-pills" id="tbPace">${pillRow('tbPace', [{v:'relaxed',l:'Relaxed · 2/day'},{v:'balanced',l:'Balanced · 3'},{v:'packed',l:'Packed · 4'}], 'balanced')}</div>
+        </div>
+      </div>
+
+      <div class="tb-section" data-tip="Tailors everything — family favors kid-friendly spots, couple favors romantic, older favors gentle.">
+        <div class="tb-label">Who's coming?</div>
+        <div class="tb-pills" id="tbGroup">${pillRow('tbGroup', [{v:'family',l:'Young family'},{v:'couple',l:'Couple'},{v:'friends',l:'Friends'},{v:'solo',l:'Solo'},{v:'older',l:'Older / multi-gen'}], '')}</div>
+      </div>
+
+      <div class="tb-row">
+        <div class="tb-section" data-tip="Easy drops strenuous stops; Adventurous favors hikes and active days.">
+          <div class="tb-label">Activity level</div>
+          <div class="tb-pills" id="tbActivity">${pillRow('tbActivity', [{v:'easy',l:'Easy & gentle'},{v:'moderate',l:'Moderate'},{v:'adventurous',l:'Adventurous'}], 'moderate')}</div>
+        </div>
+        <div class="tb-section" data-tip="Lean the plan toward outdoor spots, indoor spots, or a mix.">
+          <div class="tb-label">Indoor or outdoor?</div>
+          <div class="tb-pills" id="tbIndoor">${pillRow('tbIndoor', [{v:'outdoor',l:'Mostly outdoors'},{v:'mix',l:'A mix'},{v:'indoor',l:'Mostly indoors'}], 'mix')}</div>
+        </div>
+      </div>
+
+      <div class="tb-section" data-tip="Pick a few — the plan round-robins through them so each is represented.">
+        <div class="tb-label">What are you into? <span style="font-weight:400;color:var(--slate-soft)">— pick a few</span></div>
+        <div class="tb-checks">${interestHtml}</div>
+      </div>
+
+      <div class="tb-section" data-tip="We'll guarantee at least one of each you tick lands in the plan.">
+        <div class="tb-label">Must-haves <span style="font-weight:400;color:var(--slate-soft)">— optional</span></div>
+        <div class="tb-checks">${mustHtml}</div>
+      </div>
+
+      <div class="tb-row">
+        <div class="tb-section" data-tip="Optional — set this and we'll weave in concerts, festivals & events happening during your stay.">
+          <div class="tb-label">Trip start date <span style="font-weight:400;color:var(--slate-soft)">— optional</span></div>
+          <input type="date" id="tbDateFrom" class="tb-select">
+        </div>
+        <div class="tb-section" data-tip="Choose your hotel and nearby stops score higher.">
+          <div class="tb-label">Where are you staying?</div>
+          <select id="tbLodging" class="tb-select">
+            <option value="">Not sure yet / just exploring</option>
+            ${lodgeOpts}
+          </select>
+        </div>
+      </div>
+
+      <button class="tb-go" onclick="generateTrip()">Build my itinerary →</button>
+    </div>`;
+}
+
+function generateTrip() {
+  const pick = id => document.querySelector('#' + id + ' .tb-pill.active')?.dataset.val || '';
+  const days     = parseInt(pick('tbDays') || '2', 10);
+  const pace     = pick('tbPace') || 'balanced';
+  const group    = pick('tbGroup');                  // '' | family | couple | friends | solo | older
+  const activity = pick('tbActivity') || 'moderate'; // easy | moderate | adventurous
+  const lean     = pick('tbIndoor') || 'mix';        // outdoor | mix | indoor
+  const interestIds = [...document.querySelectorAll('.tb-interest:checked')].map(c => c.value);
+  const mustHaves   = [...document.querySelectorAll('.tb-musthave:checked')].map(c => c.value);
+  const lodgingId   = document.getElementById('tbLodging').value;
+  const tripFrom    = document.getElementById('tbDateFrom').value || '';
+
+  if (interestIds.length === 0) {
+    alert('Pick at least one thing you’re into so we can tailor your trip.');
+    return;
+  }
+  if (myList.size > 0 &&
+      !confirm('Build a fresh trip plan?\n\nThis replaces whatever is currently in My Itinerary.')) return;
+
+  // Wanted tags = the union of the selected vibes' tags.
+  const wanted = new Set();
+  interestIds.forEach(id => {
+    const t = THEMES.find(x => x.id === id);
+    if (t) t.tags.forEach(tag => wanted.add(tag.toLowerCase()));
+  });
+
+  // The visitor's hotel anchors distance scoring (if they picked one).
+  const hotel = lodgingId ? liveExperiences.find(e => e.id === _normalizeId(lodgingId)) : null;
+  const hLat  = (hotel && typeof hotel.lat === 'number') ? hotel.lat : null;
+  const hLng  = (hotel && typeof hotel.lng === 'number') ? hotel.lng : null;
+
+  const perDay = pace === 'relaxed' ? 2 : pace === 'packed' ? 4 : 3;
+  const target = days * perDay;
+
+  // ── Score every candidate stop ──────────────────────────────────────────
+  const scored = liveExperiences
+    .filter(e => (e.type || '').toLowerCase() !== 'lodging')
+    .map(e => {
+      const tags = (e.tags || []).map(t => t.toLowerCase());
+      const type = (e.type || '').toLowerCase();
+      const intensity = _tripIntensity(e);
+      const tagHits = tags.filter(t => wanted.has(t)).length;
+      let score = tagHits * 12;
+      if (hLat != null && typeof e.lat === 'number' && typeof e.lng === 'number') {
+        score += Math.max(0, 10 - _haversineMiles(hLat, hLng, e.lat, e.lng));
+      }
+      // Activity level — tune toward the chosen energy.
+      if (activity === 'adventurous' && intensity === 'high') score += 7;
+      if (activity === 'easy' && intensity === 'low') score += 4;
+      // Indoor / outdoor lean.
+      const outdoor = _tripIsOutdoor(e);
+      if (lean === 'outdoor') score += outdoor ? 7 : -6;
+      else if (lean === 'indoor') score += outdoor ? -6 : 7;
+      // Who's coming.
+      if (group === 'family') {
+        score += tags.filter(t => t === 'family').length * 8;
+        if (type === 'brewery') score -= 12;
+      } else if (group === 'couple') {
+        if (tags.includes('romantic')) score += 9;
+      } else if (group === 'older') {
+        score += intensity === 'low' ? 5 : intensity === 'high' ? -9 : 0;
+      }
+      return { e, score, tagHits, intensity };
+    });
+
+  // 'Easy' activity level is a hard filter — drop genuinely strenuous stops.
+  const eligible = scored.filter(c => !(activity === 'easy' && c.intensity === 'high'));
+
+  const chosen = [];
+  const used = new Set();
+  const typeCount = {};
+  const cap = Math.max(2, Math.ceil(target / 3));
+  const addStop = c => {
+    used.add(c.e.id);
+    const ty = (c.e.type || '').toLowerCase();
+    typeCount[ty] = (typeCount[ty] || 0) + 1;
+    chosen.push(c);
+  };
+
+  // 1. Must-haves first — guaranteed, picked from the full scored set.
+  mustHaves.forEach(mh => {
+    if (chosen.length >= target) return;
+    const def = _TB_MUSTHAVE[mh];
+    if (!def) return;
+    const hit = scored.filter(c => !used.has(c.e.id) && def.match(c.e))
+                      .sort((a, b) => b.score - a.score)[0];
+    if (hit) addStop(hit);
+  });
+
+  // 2. Round-robin through the interests so every one is represented.
+  const interestSorted = [...eligible].sort((a, b) => b.score - a.score);
+  const perInterest = interestIds.map(id => {
+    const t = THEMES.find(x => x.id === id);
+    const itags = new Set((t ? t.tags : []).map(x => x.toLowerCase()));
+    return interestSorted.filter(c => (c.e.tags || []).some(tag => itags.has(tag.toLowerCase())));
+  });
+  let progressed = true;
+  while (chosen.length < target && progressed) {
+    progressed = false;
+    for (const list of perInterest) {
+      if (chosen.length >= target) break;
+      while (list.length) {
+        const c = list.shift();
+        if (used.has(c.e.id)) continue;
+        if ((typeCount[(c.e.type || '').toLowerCase()] || 0) >= cap) continue;
+        addStop(c);
+        progressed = true;
+        break;
+      }
+    }
+  }
+  // 3. Top up if still short.
+  for (const c of interestSorted) {
+    if (chosen.length >= target) break;
+    if (!used.has(c.e.id)) addStop(c);
+  }
+
+  if (chosen.length === 0) {
+    alert('We couldn’t find enough matches — try picking a few more interests.');
+    return;
+  }
+
+  // ── Lay the plan out ────────────────────────────────────────────────────
+  chosen.sort((a, b) => (a.e.area || '').localeCompare(b.e.area || ''));  // cluster by area
+  myList.clear();
+  dayMap = {};
+  chosen.forEach((c, i) => {
+    myList.add(c.e.id);
+    dayMap[c.e.id] = Math.min(Math.floor(i / perDay) + 1, days);
+  });
+  if (hotel) { myList.add(hotel.id); dayMap[hotel.id] = 1; }
+
+  // 4. Trip dates given → weave in one matching event per day.
+  if (tripFrom && _eventsCache && _eventsCache.length) {
+    const start = new Date(tripFrom + 'T12:00:00');
+    for (let d = 1; d <= days; d++) {
+      const dd = new Date(start.getTime() + (d - 1) * 86400000);
+      const dIso = `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`;
+      const best = _eventsCache
+        .filter(ev => ev.scraperId && ev.dateStart && !myList.has('evt_' + ev.scraperId)
+          && ev.dateStart <= dIso && (ev.dateEnd || ev.dateStart) >= dIso)
+        .map(ev => ({ ev, hits: (ev.tags || []).filter(t => wanted.has(t.toLowerCase())).length }))
+        .filter(x => x.hits > 0)
+        .sort((a, b) => b.hits - a.hits)[0];
+      if (best) { myList.add('evt_' + best.ev.scraperId); dayMap['evt_' + best.ev.scraperId] = d; }
+    }
+  }
+
+  tripDays = days;
+  editingItinId = null;          // a fresh visitor plan, not an edit of a published one
+  _saveMyList();
+  updateFab();
+  if (typeof renderExperiences === 'function') { try { renderExperiences(); } catch(e) {} }
+  openModal();
+}
+
 function filterExperiences() {
   const area = document.getElementById('filterArea').value.toLowerCase();
   const type = document.getElementById('filterType').value.toLowerCase();
   const themeTags = getActiveThemeTags();
+  const q = (searchQuery || '').trim();
 
   // Check if type filter is actually a season filter
   const seasonFilter = type.startsWith('season:') ? type.replace('season:', '') : null;
@@ -5193,10 +5775,14 @@ function filterExperiences() {
   }
 
   return liveExperiences.filter(e => {
+    // A keyword search is a precise intent — it supersedes the coarse vibe
+    // and category filters (which would otherwise hide a valid match). The
+    // concrete area + season/date constraints below still apply.
+    if (q && !_matchesSearch(e)) return false;
     if (area && !e.area.toLowerCase().includes(area)) return false;
-    if (typeFilter && e.type.toLowerCase() !== typeFilter) return false;
-    if (subPillDef && !subPillDef.match(e)) return false;
-    if (vibePillDef && !vibePillDef.match(e)) return false;
+    if (!q && typeFilter && e.type.toLowerCase() !== typeFilter) return false;
+    if (!q && subPillDef && !subPillDef.match(e)) return false;
+    if (!q && vibePillDef && !vibePillDef.match(e)) return false;
 
     const expSeason = (e.season || 'Year-Round');
 
@@ -5212,7 +5798,7 @@ function filterExperiences() {
       if (!parts.some(s => visitSeasons.has(s))) return false;
     }
 
-    if (themeTags) {
+    if (!q && themeTags) {
       // When the user clicks a specific vibe-pill (🍷 Wineries, 🏡 B&Bs, etc.)
       // the pill IS the filter — bypass the broader theme-tag check and the
       // orthogonal-category exclusions. They explicitly opted into this slice.
