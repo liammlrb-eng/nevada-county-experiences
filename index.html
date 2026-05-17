@@ -1311,6 +1311,258 @@
     /* Modals — full-width on phones */
     .modal { width: calc(100% - 16px); max-height: 92vh; }
   }
+
+  /* ── IN SEASON NOW — date-driven seasonal spotlight strip ──────────── */
+  .seasonal-band {
+    max-width: 960px;
+    margin: 30px auto 0;
+    padding: 0 24px;
+    --season-accent: #5C8C3C;
+  }
+  .seasonal-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 13px;
+  }
+  .seasonal-head .sh-kicker {
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--season-accent);
+    white-space: nowrap;
+  }
+  .seasonal-head .sh-rule {
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--season-accent), transparent);
+  }
+  .seasonal-head .sh-sub {
+    font-size: 12px;
+    color: var(--slate-soft);
+    font-style: italic;
+    white-space: nowrap;
+  }
+  .seasonal-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 2px 2px 10px;
+    scroll-snap-type: x proximity;
+  }
+  .seasonal-scroll::-webkit-scrollbar { height: 7px; }
+  .seasonal-scroll::-webkit-scrollbar-track { background: transparent; }
+  .seasonal-scroll::-webkit-scrollbar-thumb { background: #dbcfb4; border-radius: 4px; }
+  .season-card {
+    flex: 0 0 250px;
+    scroll-snap-align: start;
+    background: #fff;
+    border: 1px solid #e6ddc9;
+    border-radius: 11px;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  .season-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(30,21,8,0.17);
+    border-color: var(--season-accent);
+  }
+  .season-card.feature { flex-basis: 370px; }
+  .season-photo {
+    position: relative;
+    height: 134px;
+    background: var(--fog);
+  }
+  .season-card.feature .season-photo { height: 192px; }
+  .season-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .season-photo::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 52%, rgba(0,0,0,0.4));
+    pointer-events: none;
+  }
+  .season-badge {
+    position: absolute; top: 11px; left: 11px; z-index: 2;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: #fff; padding: 4px 10px; border-radius: 20px;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.32);
+  }
+  .season-body {
+    padding: 13px 15px 15px;
+    display: flex; flex-direction: column; flex: 1;
+  }
+  .season-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-weight: 700;
+    color: var(--brown); line-height: 1.24;
+    margin-bottom: 6px;
+  }
+  .season-card.feature .season-title { font-size: 21px; }
+  .season-blurb {
+    font-size: 12.5px; color: var(--slate);
+    line-height: 1.5; margin-bottom: 9px;
+  }
+  .season-insider {
+    font-size: 11.5px; color: var(--slate-soft);
+    font-style: italic; line-height: 1.45;
+    margin-bottom: 11px;
+  }
+  .season-go {
+    margin-top: auto; align-self: flex-start;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--season-accent);
+  }
+  @media (max-width: 640px) {
+    .season-card, .season-card.feature { flex-basis: 78vw; }
+  }
+
+  /* ── Seasonal moments — admin editor ──────────────────────────────── */
+  .seas-card {
+    border: 1px solid #e6ddc9;
+    border-radius: 9px;
+    padding: 13px 16px 15px;
+    margin-bottom: 12px;
+    background: #fff;
+  }
+  .seas-card label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate-soft);
+    font-weight: 600;
+    margin: 9px 0 3px;
+  }
+  .seas-card input[type=text],
+  .seas-card input[type=number],
+  .seas-card textarea,
+  .seas-card select {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 13px;
+    color: var(--slate);
+    border: 1px solid #d8cdb8;
+    border-radius: 5px;
+    padding: 6px 9px;
+    background: #fff;
+  }
+  .seas-card input[type=text],
+  .seas-card textarea { width: 100%; }
+  .seas-card textarea { resize: vertical; min-height: 46px; line-height: 1.5; }
+  .seas-card input:focus,
+  .seas-card textarea:focus,
+  .seas-card select:focus { outline: none; border-color: var(--gold); }
+  .seas-status {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #fff;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ── Upcoming Events — List/Calendar view ─────────────────────────── */
+  .events-view-toggle { display: flex; gap: 6px; margin-bottom: 16px; }
+  .ev-view-btn {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 6px 15px;
+    border: 1.5px solid #d8cdb8;
+    background: #fff; color: var(--slate-soft);
+    border-radius: 6px; cursor: pointer;
+  }
+  .ev-view-btn.active {
+    background: var(--brown); color: #fff; border-color: var(--brown);
+  }
+  .cal-head {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; margin-bottom: 6px;
+  }
+  .cal-nav {
+    background: #fff; border: 1.5px solid #d8cdb8; border-radius: 6px;
+    width: 32px; height: 32px; cursor: pointer;
+    font-size: 15px; color: var(--brown); line-height: 1;
+  }
+  .cal-nav:hover { border-color: var(--gold); }
+  .cal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px; font-weight: 700; color: var(--brown);
+    min-width: 190px; text-align: center;
+  }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+  }
+  .cal-dow {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700; color: var(--slate-soft);
+    text-align: center; padding: 4px 0;
+  }
+  .cal-cell {
+    min-height: 94px;
+    border: 1px solid #e6ddc9; border-radius: 7px;
+    background: #fff; padding: 5px 6px;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .cal-cell.empty { background: transparent; border: none; min-height: 0; }
+  .cal-cell.weekend { background: #faf6ee; }
+  .cal-cell.invisit { box-shadow: inset 0 0 0 2px var(--gold-light); }
+  .cal-cell.has-events { cursor: pointer; }
+  .cal-cell.has-events:hover { border-color: var(--gold); }
+  .cal-cell.selected { border-color: var(--brown); box-shadow: 0 0 0 1px var(--brown); }
+  .cal-daynum {
+    font-size: 12px; font-weight: 700; color: var(--slate);
+    width: 21px; height: 21px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+  .cal-cell.today .cal-daynum { background: var(--gold); color: #fff; }
+  .cal-chip {
+    font-size: 9.5px; font-weight: 600; color: #fff;
+    padding: 2px 5px; border-radius: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.45;
+  }
+  .cal-more { font-size: 9px; color: var(--slate-soft); font-weight: 600; padding-left: 3px; }
+  .cal-daypanel { margin-top: 20px; border-top: 2px solid var(--gold); padding-top: 14px; }
+  .cal-evrow {
+    display: flex; gap: 11px; align-items: center;
+    padding: 9px 2px; border-bottom: 1px solid #eee;
+  }
+  .cal-evrow-when { flex: 0 0 96px; font-size: 11px; font-weight: 700; color: var(--gold); }
+  .cal-evrow-main { flex: 1; min-width: 0; }
+  .cal-evrow-name { font-size: 13px; font-weight: 600; color: var(--slate); }
+  .cal-evrow-venue { font-size: 11px; color: var(--slate-soft); }
+  .cal-cell.outside { opacity: 0.4; }
+  .cal-panel-hd {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-weight: 700; color: var(--brown);
+    margin-bottom: 6px;
+  }
+  .cal-day-sub {
+    font-size: 12px; font-weight: 700; color: var(--brown);
+    margin: 13px 0 1px;
+  }
+  .cal-note {
+    text-align: center; font-size: 11px;
+    color: var(--slate-soft); font-style: italic;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 640px) {
+    .cal-cell { min-height: 72px; }
+    .cal-chip { font-size: 8.5px; }
+    .cal-evrow-when { flex-basis: 70px; }
+  }
 </style>
 </head>
 <body>
@@ -1321,6 +1573,9 @@
   <div class="gold-rule"></div>
   <p class="hero-sub">Choose your vibe. Build your perfect Gold Country itinerary.</p>
 </div>
+
+<!-- IN SEASON NOW — date-driven seasonal spotlight (filled by renderSeasonalBand) -->
+<div id="seasonalBand" class="seasonal-band" style="display:none"></div>
 
 <!-- THEME SELECTOR -->
 <div class="section">
@@ -1435,7 +1690,12 @@
   </div>
 
   <div id="tab-events" class="tab-panel">
+    <div class="events-view-toggle">
+      <button id="evViewList" class="ev-view-btn active" onclick="setEventsView('list')">☰ List</button>
+      <button id="evViewCal" class="ev-view-btn" onclick="setEventsView('calendar')">▦ Calendar</button>
+    </div>
     <div id="eventsGrid" class="events-grid"></div>
+    <div id="eventsCalendar" style="display:none"></div>
   </div>
 </div>
 
@@ -1606,6 +1866,182 @@ const THEMES = [
   { id: 'family',    name: 'Family',                  tagline: 'Adventures the whole crew will love',       tags: ['Family','Community','Holiday','Social','Hiking','Swimming'], photo: 'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?w=320&h=200&fit=crop' },
   { id: 'festival',  name: 'Festivals & Celebrations', tagline: 'Parades, fireworks & once-a-year traditions', tags: ['Festival','Holiday','Fundraiser'],                         photo: 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=320&h=200&fit=crop' },
 ];
+
+// ── SEASONAL MOMENTS ────────────────────────────────────────────────
+// Powers the "In Season Now" spotlight strip below the hero. Each moment
+// has an annual recurring date window (MM-DD); renderSeasonalBand() shows
+// only the ones active today (plus a 16-day "opening soon" lookahead), so
+// the strip is always current with zero routine admin.
+//
+//   start / end : MM-DD, recurs every year. end < start = wraps the new
+//                 year (e.g. snow-play 12-15 → 03-10).
+//   season      : drives nothing here directly; the band accent follows
+//                 the calendar season. Kept for future per-card theming.
+//   priority    : higher = ranked first among active moments of equal
+//                 urgency; the top moment becomes the larger feature card.
+//   action      : what tapping the card does —
+//                 {type:'vibe', value:<theme id>}  apply a vibe + go to Explore
+//                 {type:'events'}                  jump to the Upcoming Events tab
+//
+// Photos reuse the site's theme image set (guaranteed to load); swap in
+// venue-specific seasonal photography when refining.
+const SEASONAL_MOMENTS = [
+  // ── SPRING ──
+  { id:'wildflowers', season:'spring', priority:7,
+    title:'Wildflowers on the Yuba',
+    blurb:'Buttermilk Bend erupts with poppies, lupine and brodiaea, and docents lead free guided walks every weekend.',
+    insider:'Come by 10am for the docent walk — the trail has no shade by midday.',
+    cta:'Find trail walks', start:'03-07', end:'05-11',
+    photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'active' } },
+  { id:'spring-falls', season:'spring', priority:6,
+    title:'Waterfalls at full roar',
+    blurb:'Snowmelt drives the South Yuba and its side creeks to their loudest, most photogenic peak of the year.',
+    insider:'The Hwy 49 crossing and Independence Trail are the easy-access showstoppers.',
+    cta:'See river trails', start:'04-01', end:'06-08',
+    photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'active' } },
+  { id:'high-wildflowers', season:'spring', priority:5,
+    title:'Last of the spring bloom',
+    blurb:'As the foothill green fades, the higher trails just above town catch the season’s final wildflowers.',
+    insider:'Head uphill — Hirschman’s Pond and the upper Tribute Trail stay colorful longest.',
+    cta:'Find higher trails', start:'04-25', end:'05-20',
+    photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'active' } },
+  // ── SUMMER ──
+  { id:'yuba-swim', season:'summer', priority:9,
+    title:'Swimming season on the Yuba',
+    blurb:'Emerald pools and sun-warmed granite — the South Yuba is Nevada County’s summer living room.',
+    insider:'Go early; by afternoon the popular pools fill and the parking vanishes.',
+    cta:'Find river spots', start:'05-24', end:'09-21',
+    photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'active' } },
+  { id:'farmers-markets', season:'summer', priority:6,
+    title:'Farmers market season',
+    blurb:'Nevada City and Grass Valley markets overflow with foothill produce, cut flowers and live music.',
+    insider:'Tuesday in Grass Valley, Saturday in Nevada City — and go hungry.',
+    cta:'Browse the markets', start:'05-02', end:'10-25',
+    photo:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'foodie' } },
+  { id:'mim', season:'summer', priority:7,
+    title:'Music in the Mountains',
+    blurb:'The SummerFest fills three weeks with orchestral and chamber concerts under the pines.',
+    insider:'The outdoor concerts sell out first — book before you arrive in town.',
+    cta:'See the lineup', start:'06-12', end:'07-06',
+    photo:'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'summer-nights', season:'summer', priority:6,
+    title:'Summer street nights',
+    blurb:'Nevada City Summer Nights and Grass Valley’s Thursday Night Market turn downtown into a block party.',
+    insider:'Both run weekly and free — just show up and follow the music.',
+    cta:'What’s on downtown', start:'06-04', end:'08-27',
+    photo:'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'county-fair', season:'summer', priority:8,
+    title:'Nevada County Fair',
+    blurb:'Five days under the ponderosas at a fair regularly called the prettiest in California.',
+    insider:'Mid-week afternoons are the calmest if crowds aren’t your thing.',
+    cta:'Fair dates & tickets', start:'08-12', end:'08-16',
+    photo:'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'art-walk', season:'summer', priority:4,
+    title:'First Friday Art Walk',
+    blurb:'Downtown Nevada City galleries throw open their doors with music and makers the first Friday evening of the month.',
+    insider:'Start at the top of Broad Street and work your way downhill.',
+    cta:'Plan an art night', start:'06-05', end:'09-05',
+    photo:'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'arts' } },
+  // ── FALL ──
+  { id:'fall-color', season:'fall', priority:8,
+    title:'Fall color in Gold Country',
+    blurb:'Black oak and bigleaf maple set the historic downtowns and canyon trails ablaze.',
+    insider:'Peak is usually the last week of October — locals walk the Tribute Trail for it.',
+    cta:'Find color trails', start:'10-10', end:'11-12',
+    photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'active' } },
+  { id:'salmon-run', season:'fall', priority:6,
+    title:'The salmon run',
+    blurb:'Chinook salmon push up the lower Yuba to spawn — a quiet spectacle you can only catch in fall.',
+    insider:'The Hwy 20 river access is the spot; polarized sunglasses help you see them.',
+    cta:'Where to watch', start:'10-15', end:'11-30',
+    photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'active' } },
+  { id:'constitution-day', season:'fall', priority:6,
+    title:'Constitution Day Parade',
+    blurb:'Nevada City hosts the nation’s largest Constitution Day parade and celebration.',
+    insider:'Broad Street fills early — stake your curb spot well before the parade.',
+    cta:'Parade details', start:'09-12', end:'09-14',
+    photo:'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'draft-horse', season:'fall', priority:6,
+    title:'Draft Horse Classic',
+    blurb:'Thundering six-up hitches and a harvest fair fill the Fairgrounds for four days each September.',
+    insider:'The evening performances in the main arena are the ones to book.',
+    cta:'See the schedule', start:'09-17', end:'09-20',
+    photo:'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'harvest', season:'fall', priority:5,
+    title:'Foothill harvest season',
+    blurb:'Apples, pumpkins, fresh-pressed cider and the last warm vineyard afternoons of the year.',
+    insider:'Many foothill farms are u-pick — call ahead for the day’s picking.',
+    cta:'Taste the harvest', start:'09-20', end:'11-02',
+    photo:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'foodie' } },
+  // ── WINTER ──
+  { id:'cornish-christmas', season:'winter', priority:9,
+    title:'Cornish Christmas',
+    blurb:'Grass Valley’s Mill Street closes for a Victorian-era street fair every Friday evening before Christmas.',
+    insider:'Arrive at dusk for the lights, and follow your nose to the Cornish pasties.',
+    cta:'Cornish Christmas dates', start:'11-28', end:'12-19',
+    photo:'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'victorian-christmas', season:'winter', priority:9,
+    title:'Victorian Christmas',
+    blurb:'Nevada City’s gas-lit Broad Street fills with carolers, roasting chestnuts and full Victorian costume.',
+    insider:'Held Sundays plus two midweek evenings — dress warm, it’s entirely outdoors.',
+    cta:'Victorian Christmas dates', start:'12-03', end:'12-23',
+    photo:'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'wild-scenic', season:'winter', priority:7,
+    title:'Wild & Scenic Film Festival',
+    blurb:'SYRCL’s film festival — the country’s largest environmental film event — takes over both downtowns.',
+    insider:'A venue pass beats single tickets if you plan to see more than two sessions.',
+    cta:'Festival program', start:'01-15', end:'01-19',
+    photo:'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=640&h=420&fit=crop',
+    action:{ type:'events' } },
+  { id:'snow-play', season:'winter', priority:5,
+    title:'Snow play above the foothills',
+    blurb:'A short drive up Highway 20 reaches sledding hills, snowshoe loops and Nordic trails in the Tahoe National Forest.',
+    insider:'Carry chains November through April — they’re often required past Washington Ridge.',
+    cta:'Find winter trails', start:'12-15', end:'03-10',
+    photo:'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action:{ type:'vibe', value:'active' } },
+];
+
+// ── SEASONAL — live (editable) copy + persistence ───────────────────
+// SEASONAL_MOMENTS above is the built-in seed. liveSeasonal is what the
+// app actually renders and what the "🍂 Seasonal" admin tab edits; it
+// persists to localStorage so chamber edits survive reloads. A visitor
+// with no saved copy simply gets the seed.
+const SEASONAL_KEY = 'ncexp:seasonal_v1';
+let liveSeasonal = JSON.parse(JSON.stringify(SEASONAL_MOMENTS));
+
+function loadSeasonal() {
+  try {
+    const raw = localStorage.getItem(SEASONAL_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (Array.isArray(p)) liveSeasonal = p;
+    }
+  } catch (e) { /* keep the seed */ }
+}
+
+function saveSeasonal() {
+  try {
+    localStorage.setItem(SEASONAL_KEY, JSON.stringify(liveSeasonal));
+    if (typeof flashSaved === 'function') flashSaved();
+  } catch (e) { console.warn('Could not save seasonal moments:', e); }
+}
 
 const EXPERIENCES = [
   // HANDS-ON CREATIVE
@@ -2143,7 +2579,7 @@ function _visApplyDate() {
   // Re-render wherever the user is — events now live in the Experiences grid too
   renderExperiences();
   const evtTab = document.getElementById('tab-events');
-  if (evtTab && evtTab.classList.contains('active')) renderEvents();
+  if (evtTab && evtTab.classList.contains('active')) renderEventsView();
   renderActiveFilters();
 }
 function _visSetAll() {
@@ -2202,7 +2638,7 @@ function _visClearDate() {
   });
   const allBtn = document.getElementById('vqBtnAll');
   if (allBtn) allBtn.classList.add('active');
-  renderEvents();
+  renderEventsView();
   renderActiveFilters();
 }
 let manageDataTab = 'experiences'; // 'experiences' | 'itineraries'
@@ -2256,10 +2692,172 @@ function toggleTheme(id) {
   renderExperiences();
   // If the Events tab is currently active, re-filter it too
   const evtTab = document.getElementById('tab-events');
-  if (evtTab && evtTab.classList.contains('active')) renderEvents();
+  if (evtTab && evtTab.classList.contains('active')) renderEventsView();
 }
 
 function addToVibes(id) { toggleTheme(id); }
+
+
+// ── IN SEASON NOW — seasonal spotlight strip ─────────────────────────
+// Renders a horizontal strip of editorial cards below the hero, showing
+// only the SEASONAL_MOMENTS active for today's date. Self-maintaining:
+// no admin action needed for it to stay current as the calendar turns.
+
+const SEASON_ACCENT = {
+  spring: '#5C8C3C',   // fresh green
+  summer: '#2E7D9A',   // river blue
+  fall:   '#B5651D',   // rust
+  winter: '#2F5E4C',   // deep evergreen
+};
+
+function _seasonOf(d) {
+  const mo = d.getMonth();                 // 0 = Jan
+  if (mo <= 1 || mo === 11) return 'winter';
+  if (mo <= 4)              return 'spring';
+  if (mo <= 7)              return 'summer';
+  return 'fall';
+}
+
+// Given a moment + today, return its live status or null (not in window
+// and not opening within the lookahead). status ∈ ending|peak|new|soon.
+function _seasonalStatus(m, today) {
+  const DAY = 86400000;
+  const Y   = today.getFullYear();
+  const mk  = (mmdd, y) => {
+    const [mo, d] = mmdd.split('-').map(Number);
+    return new Date(y, mo - 1, d);
+  };
+  let start = mk(m.start, Y);
+  let end   = mk(m.end, Y);
+  if (end < start) {
+    // window wraps the new year (e.g. 12-15 → 03-10)
+    if (today >= start) end = mk(m.end, Y + 1);
+    else                start = mk(m.start, Y - 1);
+  }
+  end.setHours(23, 59, 59, 999);
+
+  if (today < start) {
+    const daysToStart = Math.ceil((start - today) / DAY);
+    return daysToStart <= 16 ? { status: 'soon', date: start } : null;
+  }
+  if (today > end) return null;
+
+  const daysIn   = Math.floor((today - start) / DAY);
+  const daysLeft = Math.floor((end - today) / DAY);
+  if (daysLeft <= 16) return { status: 'ending', date: end };
+  if (daysIn   <= 12) return { status: 'new',    date: start };
+  return { status: 'peak' };
+}
+
+// Tapping a seasonal card drops the visitor straight into related content.
+function _seasonalGo(id) {
+  const m = liveSeasonal.find(x => x.id === id);
+  if (!m || !m.action) return;
+  const a       = m.action;
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const goExplore = () => {
+    const panel = document.getElementById('tab-experiences');
+    if (tabBtns[0] && panel && !panel.classList.contains('active')) {
+      switchTab('experiences', tabBtns[0]);
+    }
+    document.getElementById('expGrid')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  try {
+    if (a.type === 'vibe') {
+      selectedThemes.clear();
+      selectedThemes.add(a.value);
+      activeVibePill = null;
+      renderThemes();
+      renderActiveFilters();
+      if (typeof renderVibePills === 'function') renderVibePills();
+      renderExperiences();
+      goExplore();
+    } else if (a.type === 'category') {
+      const el = document.getElementById('filterType');
+      if (el) el.value = a.value;
+      activeSubPill = null;
+      if (typeof renderSubPills === 'function') renderSubPills();
+      renderExperiences();
+      renderActiveFilters();
+      goExplore();
+    } else if (a.type === 'events') {
+      if (tabBtns[2]) switchTab('events', tabBtns[2]);
+      document.getElementById('tab-events')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (a.type === 'url') {
+      window.open(a.value, '_blank');
+    }
+  } catch (e) { console.warn('seasonal go failed', e); }
+}
+
+function renderSeasonalBand() {
+  const band = document.getElementById('seasonalBand');
+  if (!band) return;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Resolve every moment against today; keep the live ones.
+  const live = [];
+  for (const m of liveSeasonal) {
+    const st = _seasonalStatus(m, today);
+    if (st) live.push({ m, status: st.status, date: st.date });
+  }
+  if (!live.length) { band.style.display = 'none'; return; }
+
+  // Active moments first (ending → peak → new, then priority); 'soon' last.
+  // The first card becomes the larger feature — so a "last chance" item, or
+  // otherwise the highest-priority moment in season, leads the strip.
+  const RANK = { ending: 0, peak: 1, new: 2, soon: 9 };
+  live.sort((a, b) => {
+    const ga = a.status === 'soon' ? 1 : 0;
+    const gb = b.status === 'soon' ? 1 : 0;
+    if (ga !== gb) return ga - gb;
+    if (RANK[a.status] !== RANK[b.status]) return RANK[a.status] - RANK[b.status];
+    return (b.m.priority || 0) - (a.m.priority || 0);
+  });
+
+  // Band accent tracks the calendar season — the feature visibly changes
+  // with the year before a visitor reads a word.
+  band.style.setProperty('--season-accent', SEASON_ACCENT[_seasonOf(today)]);
+
+  const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const badgeFor = it => {
+    if (it.status === 'ending') return { txt: `⏳ Ends ${fmt(it.date)}`,  bg: '#C0392B' };
+    if (it.status === 'new')    return { txt: '✦ Just started',           bg: '#5C8C3C' };
+    if (it.status === 'soon')   return { txt: `◷ Opens ${fmt(it.date)}`,  bg: '#5A6B7A' };
+    return { txt: '☀ Peak now', bg: 'var(--gold)' };
+  };
+
+  const cards = live.map((it, i) => {
+    const m = it.m;
+    const b = badgeFor(it);
+    return `<article class="season-card${i === 0 ? ' feature' : ''}"
+        onclick="_seasonalGo('${m.id}')">
+      <div class="season-photo">
+        <span class="season-badge" style="background:${b.bg}">${b.txt}</span>
+        <img src="${m.photo}" alt="${m.title}" loading="lazy"
+             onerror="this.style.display='none'">
+      </div>
+      <div class="season-body">
+        <div class="season-title">${m.title}</div>
+        <div class="season-blurb">${m.blurb}</div>
+        ${m.insider ? `<div class="season-insider">“${m.insider}”</div>` : ''}
+        <div class="season-go">${m.cta || 'Explore'} →</div>
+      </div>
+    </article>`;
+  }).join('');
+
+  band.innerHTML = `
+    <div class="seasonal-head">
+      <span class="sh-kicker">In Season Now</span>
+      <span class="sh-rule"></span>
+      <span class="sh-sub">what locals would tell you to catch right now</span>
+    </div>
+    <div class="seasonal-scroll">${cards}</div>`;
+  band.style.display = 'block';
+}
 
 
 // Whether to include upcoming events in the experiences grid (default: on)
@@ -2279,12 +2877,21 @@ function togglePlacesInGrid() {
 
 function renderExperiences() {
   const filtered = filterExperiences();
-  const filteredIds = new Set(filtered.map(e => e.id));
 
-  // Items already in myList that are NOT in the current vibe filter — show pinned at top
-  const pinnedItems = [...myList]
+  // ── Selected stops ───────────────────────────────────────────────────────
+  // Everything the visitor has added to My Itinerary, resolved to full
+  // objects. These are pinned in a labeled section at the top of Explore so
+  // the visitor's picks never scatter through the grid as vibes/filters
+  // change — true whether they're building a fresh plan, customizing a
+  // suggested itinerary, or admin-editing a published one.
+  const selectedPlaces = [...myList]
     .map(id => liveExperiences.find(e => e.id === id))
-    .filter(e => e && !filteredIds.has(e.id));
+    .filter(Boolean);
+  const selectedEvents = [...myList]
+    .filter(id => typeof id === 'string' && id.startsWith('evt_'))
+    .map(id => (_eventsCache || []).find(e => e.scraperId === id.slice(4)))
+    .filter(Boolean);
+  const selectedCount = selectedPlaces.length + selectedEvents.length;
 
   const grid    = document.getElementById('expGrid');
   const countEl = document.getElementById('resultsCount');
@@ -2360,6 +2967,11 @@ function renderExperiences() {
     eventsInGrid = candidates;
   }
 
+  // The grid below the pinned "selected" section excludes anything already
+  // shown there, so a selected venue/event is never listed twice.
+  const placesForGrid = filtered.filter(e => !myList.has(e.id));
+  const eventsForGrid = eventsInGrid.filter(ev => !ev.scraperId || !myList.has('evt_' + ev.scraperId));
+
   // ── Results count + toggle pills ─────────────────────────────────────────
   const vibeLabel = selectedThemes.size === 1 ? ' matching your vibe'
     : selectedThemes.size > 1  ? ` matching ${selectedThemes.size} vibes` : '';
@@ -2368,7 +2980,7 @@ function renderExperiences() {
   if (showPlaces) {
     // Inline count, click to hide
     placesText = `<button onclick="togglePlacesInGrid()" title="Hide places"
-      style="background:none;border:none;padding:0;margin:0;cursor:pointer;font:inherit;color:inherit">Showing <strong>${filtered.length}</strong> place${filtered.length !== 1 ? 's' : ''}${vibeLabel}</button>`;
+      style="background:none;border:none;padding:0;margin:0;cursor:pointer;font:inherit;color:inherit">Showing <strong>${placesForGrid.length}</strong> place${placesForGrid.length !== 1 ? 's' : ''}${vibeLabel}</button>`;
   } else {
     // Ghost pill — places hidden
     placesText = `<button onclick="togglePlacesInGrid()" title="Show places"
@@ -2377,8 +2989,8 @@ function renderExperiences() {
      </button>`;
   }
 
-  const pinnedText = (showPlaces && pinnedItems.length > 0)
-    ? ` <span style="color:var(--slate);font-weight:400">+ ${pinnedItems.length} from your list</span>`
+  const pinnedText = (selectedCount > 0)
+    ? ` <span style="color:var(--slate);font-weight:400">+ ${selectedCount} selected</span>`
     : '';
 
   let eventsText = '';
@@ -2397,15 +3009,16 @@ function renderExperiences() {
     }
   }
 
-  const visiblePlaceCount = showPlaces ? (filtered.length + pinnedItems.length) : 0;
-  const visibleEventCount = showUpcomingEvents ? eventsInGrid.length : 0;
+  const visiblePlaceCount = (showPlaces ? placesForGrid.length : 0) + selectedCount;
+  const visibleEventCount = showUpcomingEvents ? eventsForGrid.length : 0;
   countEl.innerHTML = (visiblePlaceCount > 0 || visibleEventCount > 0 || !showPlaces || !showUpcomingEvents)
     ? placesText + pinnedText + eventsText
     : '';
 
   // "No matches" is only meaningful when the user is trying to see places —
   // if they explicitly hid both, leave the grid empty without the warning.
-  if (showPlaces && filtered.length === 0 && pinnedItems.length === 0 && (!showUpcomingEvents || eventsInGrid.length === 0)) {
+  // Selected stops always render, so a non-empty selection is never "no matches".
+  if (showPlaces && placesForGrid.length === 0 && selectedCount === 0 && (!showUpcomingEvents || eventsForGrid.length === 0)) {
     grid.innerHTML = '<div class="no-results">No experiences match your current filters.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Try adjusting your themes or filters.</span></div>';
     return;
   }
@@ -2480,43 +3093,24 @@ function renderExperiences() {
     </div>`;
   };
 
-  // ── In-itinerary section (admin edit mode) ────────────────────────────────
-  // When the chamber clicks Edit on a published Suggested Experience, surface
-  // the itinerary's current stops at the very top of Explore so they can see
-  // what's already in it and easily remove items via the card X-button.
+  // ── Selected-stops section ────────────────────────────────────────────────
+  // The visitor's My Itinerary picks (places + events) are pinned in a
+  // labeled section at the very top of Explore, ahead of everything else, so
+  // they never get scattered through the grid as vibes/filters change. This
+  // applies in every mode — building a fresh plan, customizing a suggested
+  // itinerary, or admin-editing a published one. placesForGrid / eventsForGrid
+  // (computed earlier) already exclude these, so nothing is ever listed twice.
   const isEditingItin = (typeof editingItinId !== 'undefined' && editingItinId !== null);
-  const itinPlaces = isEditingItin
-    ? [...myList].map(id => liveExperiences.find(e => e.id === id)).filter(Boolean)
-    : [];
-  const itinEventIds = isEditingItin
-    ? [...myList].filter(id => typeof id === 'string' && id.startsWith('evt_'))
-    : [];
-  const itinEvents = isEditingItin
-    ? itinEventIds.map(id => (_eventsCache || []).find(e => e.scraperId === id.slice(4))).filter(Boolean)
-    : [];
-  const itinHtml = (isEditingItin && (itinPlaces.length || itinEvents.length))
-    ? `<div style="grid-column:1/-1;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:700;padding:6px 0 4px;border-bottom:2px solid var(--gold);margin-bottom:6px">✎ In this itinerary (${itinPlaces.length + itinEvents.length})</div>
-       ${itinPlaces.map(cardHtml).join('')}
-       ${itinEvents.map(eventCardHtml).join('')}
-       <div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--slate);padding:10px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">More to add</div>`
+  const selLabel  = isEditingItin ? '✎ In this itinerary' : '✓ Your selected stops';
+  const moreLabel = isEditingItin ? 'More to add'          : 'More to explore';
+  const hasMore   = (showPlaces && placesForGrid.length > 0) ||
+                    (showUpcomingEvents && eventsForGrid.length > 0);
+  const selectedHtml = (selectedCount > 0)
+    ? `<div style="grid-column:1/-1;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:700;padding:6px 0 4px;border-bottom:2px solid var(--gold);margin-bottom:6px">${selLabel} (${selectedCount})</div>
+       ${selectedPlaces.map(cardHtml).join('')}
+       ${selectedEvents.map(eventCardHtml).join('')}
+       ${hasMore ? `<div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--slate);padding:10px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">${moreLabel}</div>` : ''}`
     : '';
-
-  // In edit mode the saved stops are shown above; suppress the regular
-  // "Your picks from other vibes" pinned section so we don't duplicate them.
-  const pinnedHtml = (!isEditingItin && showPlaces && pinnedItems.length > 0)
-    ? `<div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);padding:4px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">Your picks from other vibes</div>
-       ${pinnedItems.map(cardHtml).join('')}
-       <div style="grid-column:1/-1;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--slate);padding:8px 0 2px;border-bottom:1px solid #e8dfc8;margin-bottom:4px">${selectedThemes.size > 0 ? [...selectedThemes].map(tid=>THEMES.find(t=>t.id===tid)?.name).filter(Boolean).join(' + ') : 'All experiences'}</div>`
-    : '';
-
-  // Strip out anything already shown in the "In this itinerary" section so
-  // it doesn't appear twice in the grid below.
-  const placesForGrid = isEditingItin
-    ? filtered.filter(e => !myList.has(e.id))
-    : filtered;
-  const eventsForGrid = isEditingItin
-    ? eventsInGrid.filter(ev => !ev.scraperId || !myList.has('evt_' + ev.scraperId))
-    : eventsInGrid;
 
   // ── Events separator (only when both kinds are visible side-by-side) ─────
   const evtSeparatorHtml = (showPlaces && placesForGrid.length > 0 && showUpcomingEvents && eventsForGrid.length > 0)
@@ -2526,7 +3120,7 @@ function renderExperiences() {
   const placesHtml = showPlaces ? placesForGrid.map(cardHtml).join('') : '';
   const eventsHtml = showUpcomingEvents ? eventsForGrid.map(eventCardHtml).join('') : '';
 
-  grid.innerHTML = itinHtml + pinnedHtml + placesHtml + evtSeparatorHtml + eventsHtml;
+  grid.innerHTML = selectedHtml + placesHtml + evtSeparatorHtml + eventsHtml;
 }
 
 function isHighlightTag(tag) {
@@ -2720,6 +3314,14 @@ function renderItineraries() {
           </li>`;
         }).filter(Boolean).join('')
       : '<li style="color:#a0aec0;font-size:11px;font-family:Josefin Sans;list-style:none;padding:4px 0">No stops added yet</li>';
+    // Visitor-facing "Customize this trip" button — copies this itinerary's
+    // stops into the visitor's own My Itinerary planner so they can edit it
+    // as their own regular itinerary. Shown on every suggested itinerary card
+    // (admins included).
+    const customizeBtn =
+      `<button onclick="customizeItinerary('${itin.id}')"
+         title="Copy this itinerary into My Itinerary so you can edit it as your own"
+         style="margin-top:12px;width:100%;background:var(--forest);color:#fff;border:none;padding:9px 14px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:0.06em;font-weight:600">Customize this trip →</button>`;
     const adminBtns = (typeof IS_ADMIN_HOST !== 'undefined' && IS_ADMIN_HOST)
       ? `<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed #e0d8c8">
            <button onclick="editItinerary('${itin.id}')" title="Load this itinerary into the planner to edit"
@@ -2733,6 +3335,7 @@ function renderItineraries() {
       <div class="itin-title">${itin.name}</div>
       ${itin.description ? `<p style="font-size:12px;color:var(--slate);margin:0 0 10px;font-family:'Josefin Sans',sans-serif">${itin.description}</p>` : ''}
       <ul class="itin-stops">${stopsHtml}</ul>
+      ${customizeBtn}
       ${adminBtns}
     </div>`;
   }).join('');
@@ -2890,26 +3493,8 @@ async function renderEvents() {
 
   await _loadEventsCache();
 
-  let evts = _eventsCache || EVENTS;
-
-  // Date range filter — event overlaps if it ends on or after dateFrom AND starts on or before dateTo
-  if (dateFrom || dateTo) {
-    evts = evts.filter(ev => {
-      const s = ev.dateStart || '';
-      const e = ev.dateEnd   || ev.dateStart || '';
-      if (!s) return true;   // no date data → always include
-      if (dateFrom && e < dateFrom) return false;   // ends before range opens
-      if (dateTo   && s > dateTo)   return false;   // starts after range closes
-      return true;
-    });
-    evts = [...evts].sort((a, b) => (a.dateStart||'').localeCompare(b.dateStart||''));
-  }
-
-  // Theme-tag filter (fallback to all if nothing matches)
-  if (themeTags) {
-    const themed = evts.filter(e => e.tags.some(t => themeTags.has(t.toLowerCase())));
-    if (themed.length > 0) evts = themed;
-  }
+  // Date + theme filtering is shared with the Calendar view (_eventsForView).
+  const evts = _eventsForView();
 
   // Highlight the active preset button
   ['vqBtnAll','vqBtnToday','vqBtnWeekend','vqBtnWeek'].forEach(id => {
@@ -2961,13 +3546,361 @@ async function renderEvents() {
   }).join('');
 }
 
+// ── UPCOMING EVENTS — shared filtering + List/Calendar views ─────────────────
+// _eventsForView() is the single source of truth for which events the
+// Upcoming Events tab shows, so the List and Calendar views never disagree.
+// Assumes the event cache is already loaded (callers await _loadEventsCache).
+function _eventsForView() {
+  const themeTags = getActiveThemeTags();
+  const dateFrom  = (typeof visitorDateFrom !== 'undefined') ? visitorDateFrom : '';
+  const dateTo    = (typeof visitorDateTo   !== 'undefined') ? visitorDateTo   : '';
+  let evts = _eventsCache || EVENTS;
+
+  // Date-range filter — an event matches if its span overlaps [from, to].
+  if (dateFrom || dateTo) {
+    evts = evts.filter(ev => {
+      const s = ev.dateStart || '';
+      const e = ev.dateEnd || ev.dateStart || '';
+      if (!s) return true;                       // undated → always include
+      if (dateFrom && e < dateFrom) return false;
+      if (dateTo   && s > dateTo)   return false;
+      return true;
+    });
+  }
+  // Vibe/theme filter (fall back to all if nothing matches the vibe).
+  if (themeTags) {
+    const themed = evts.filter(e => e.tags.some(t => themeTags.has(t.toLowerCase())));
+    if (themed.length > 0) evts = themed;
+  }
+  return [...evts].sort((a, b) => (a.dateStart || '9999').localeCompare(b.dateStart || '9999'));
+}
+
+let eventsView    = 'list';   // 'list' | 'calendar'
+let calCursor     = null;     // Date pinned to the 1st of the displayed month
+let calSelectedDay = null;    // 'YYYY-MM-DD' of the day whose detail panel is open
+
+// Dispatcher — re-renders whichever Events view is active. Used everywhere a
+// filter change should refresh the Events tab.
+function renderEventsView() {
+  if (eventsView === 'calendar') renderEventsCalendar();
+  else renderEvents();
+}
+
+function setEventsView(v) {
+  eventsView = v;
+  const lb = document.getElementById('evViewList');
+  const cb = document.getElementById('evViewCal');
+  if (lb) lb.classList.toggle('active', v === 'list');
+  if (cb) cb.classList.toggle('active', v === 'calendar');
+  const grid = document.getElementById('eventsGrid');
+  const cal  = document.getElementById('eventsCalendar');
+  if (grid) grid.style.display = (v === 'list')     ? '' : 'none';
+  if (cal)  cal.style.display  = (v === 'calendar') ? '' : 'none';
+  renderEventsView();
+}
+
+function calNavMonth(delta) {
+  if (!calCursor) return;
+  calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + delta, 1);
+  calSelectedDay = null;
+  renderEventsCalendar();
+}
+
+function calSelectDay(iso) {
+  calSelectedDay = (calSelectedDay === iso) ? null : iso;   // toggle open/closed
+  renderEventsCalendar();
+}
+
+// ── Shared month-calendar builder ────────────────────────────────────────────
+// Used by both the Upcoming Events calendar and the My Itinerary calendar.
+// Returns { head, grid, byDay }; the caller composes head + notes + grid + panel.
+function _buildCalendarHTML(evts, opts) {
+  const cursor = opts.cursor;
+  const year = cursor.getFullYear(), month = cursor.getMonth();
+  const monthName = cursor.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const DAY = 86400000;
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  // Bucket events by ISO day — short spans fill each day; a long span (a
+  // recurring series stored as one wide range) pins to its start day only.
+  const byDay = {};
+  for (const ev of evts) {
+    if (!ev.dateStart) continue;
+    const s = new Date(ev.dateStart + 'T12:00:00');
+    if (isNaN(s)) continue;
+    let e = ev.dateEnd ? new Date(ev.dateEnd + 'T12:00:00') : s;
+    if (isNaN(e) || e < s) e = s;
+    const span = Math.round((e - s) / DAY);
+    const lastDay = (span >= 0 && span <= 6) ? span : 0;
+    for (let k = 0; k <= lastDay; k++) {
+      const d = new Date(s.getFullYear(), s.getMonth(), s.getDate() + k);
+      if (d.getFullYear() === year && d.getMonth() === month) {
+        (byDay[iso(d)] = byDay[iso(d)] || []).push(ev);
+      }
+    }
+  }
+
+  const startDow    = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayIso    = _localISODate();
+  const vF = opts.visitFrom || '', vT = opts.visitTo || '';
+
+  const dowHtml = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    .map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  let cells = '';
+  for (let i = 0; i < startDow; i++) cells += '<div class="cal-cell empty"></div>';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(year, month, day);
+    const dIso = iso(d);
+    const dEvts = byDay[dIso] || [];
+    const inVisit = vF && dIso >= vF && (!vT || dIso <= vT);
+    const cls = ['cal-cell'];
+    if (d.getDay() === 0 || d.getDay() === 6) cls.push('weekend');
+    if (inVisit) cls.push('invisit');
+    if (opts.dimOutside && vF && !inVisit) cls.push('outside');
+    if (dIso === todayIso) cls.push('today');
+    if (dEvts.length) cls.push('has-events');
+    if (dIso === opts.selectedDay) cls.push('selected');
+
+    let chips = '';
+    dEvts.slice(0, 3).forEach(ev => {
+      const c1 = _eventVisual(ev)[1];
+      chips += `<div class="cal-chip" style="background:${c1}" title="${escVal(ev.name)}">${escVal(ev.name)}</div>`;
+    });
+    if (dEvts.length > 3) chips += `<div class="cal-more">+${dEvts.length - 3} more</div>`;
+
+    cells += `<div class="${cls.join(' ')}"${dEvts.length ? ` onclick="${opts.dayFn}('${dIso}')"` : ''}>
+      <div class="cal-daynum">${day}</div>${chips}</div>`;
+  }
+  const trailing = (7 - ((startDow + daysInMonth) % 7)) % 7;
+  for (let i = 0; i < trailing; i++) cells += '<div class="cal-cell empty"></div>';
+
+  const head = `<div class="cal-head">
+    <button class="cal-nav" onclick="${opts.navFn}(-1)" title="Previous month">‹</button>
+    <div class="cal-title">${monthName}</div>
+    <button class="cal-nav" onclick="${opts.navFn}(1)" title="Next month">›</button>
+  </div>`;
+  return { head, grid: `<div class="cal-grid">${dowHtml}${cells}</div>`, byDay };
+}
+
+// One event row for a calendar day-detail panel. refreshFn re-renders the
+// host calendar after a +Add toggle.
+function _calDayRows(list, refreshFn) {
+  return list.map(ev => {
+    const added = ev.scraperId && myList.has('evt_' + ev.scraperId);
+    const when  = ev.times ? '🕐 ' + escVal(ev.times) : escVal(ev.dates || '');
+    return `<div class="cal-evrow">
+      <div class="cal-evrow-when">${when}</div>
+      <div class="cal-evrow-main">
+        <div class="cal-evrow-name">${escVal(ev.name)}</div>
+        <div class="cal-evrow-venue">📍 ${escVal(ev.venue || ev.area || '')}${ev.area ? ' · ' + escVal(ev.area) : ''}</div>
+      </div>
+      ${ev.scraperId ? `<button class="btn-add ${added ? 'added-btn' : ''}" style="font-size:11px;flex-shrink:0" onclick="toggleEventInList('${ev.scraperId}');${refreshFn}();">${added ? '✓ Added' : '+ Add'}</button>` : ''}
+      ${ev.url ? `<a class="btn-visit" href="${ev.url}" target="_blank" style="font-size:11px;flex-shrink:0">Info ↗</a>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function _visitRangeLabel(f, t) {
+  const fmt = s => { const d = new Date(s + 'T12:00:00'); return isNaN(d) ? s : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
+  if (!f) return '';
+  if (!t || t === f) return fmt(f);
+  return fmt(f) + ' – ' + fmt(t);
+}
+
+let _calLastDateKey = null;   // detects "When?" filter changes so the calendar re-anchors
+
+async function renderEventsCalendar() {
+  const host = document.getElementById('eventsCalendar');
+  if (!host) return;
+  if (!_eventsCache) host.innerHTML = '<div style="text-align:center;padding:40px;color:#999">Loading events…</div>';
+  await _loadEventsCache();
+
+  const evts = _eventsForView();   // already date + vibe filtered, same as List
+  const vF = (typeof visitorDateFrom !== 'undefined' && visitorDateFrom) ? visitorDateFrom : '';
+  const vT = (typeof visitorDateTo   !== 'undefined' && visitorDateTo)   ? visitorDateTo   : '';
+
+  // When the visitor picks dates, jump the calendar to that window so it
+  // shows their trip — not whatever month it happened to be sitting on.
+  const dateKey = vF + '|' + vT;
+  if (_calLastDateKey !== dateKey) {
+    _calLastDateKey = dateKey;
+    const anchor = vF ? new Date(vF + 'T12:00:00') : new Date();
+    calCursor = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+    calSelectedDay = null;
+  }
+  if (!calCursor) { const a = new Date(); calCursor = new Date(a.getFullYear(), a.getMonth(), 1); }
+
+  const cal = _buildCalendarHTML(evts, {
+    cursor: calCursor, selectedDay: calSelectedDay,
+    visitFrom: vF, visitTo: vT, dimOutside: true,
+    navFn: 'calNavMonth', dayFn: 'calSelectDay',
+  });
+
+  // Detail panel: a clicked day, else the whole visit window, else a hint.
+  let panel = '';
+  if (calSelectedDay && cal.byDay[calSelectedDay]) {
+    const dd = new Date(calSelectedDay + 'T12:00:00');
+    const lbl = dd.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const list = cal.byDay[calSelectedDay];
+    panel = `<div class="cal-daypanel">
+      <div class="cal-panel-hd">${lbl} — ${list.length} event${list.length !== 1 ? 's' : ''}</div>
+      ${_calDayRows(list, 'renderEventsCalendar')}</div>`;
+  } else if (vF) {
+    // A visit window is set — walk each day of the window and list what's on,
+    // so an event running into the window shows under the days it's actually
+    // happening (not under a start date before the trip).
+    const DAY = 86400000;
+    const isoOf = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const start = new Date(vF + 'T12:00:00');
+    const end   = vT ? new Date(vT + 'T12:00:00') : new Date(start);
+    let sections = '', any = false;
+    for (let d = new Date(start); d <= end; d = new Date(d.getTime() + DAY)) {
+      const dIso = isoOf(d);
+      const dayEvts = evts.filter(ev => {
+        const s = ev.dateStart || '';
+        if (!s) return false;
+        const e = ev.dateEnd || s;
+        const spanDays = Math.round((new Date(e + 'T12:00:00') - new Date(s + 'T12:00:00')) / DAY);
+        if (spanDays > 6) return s === dIso;       // long recurring series → start day only
+        return s <= dIso && e >= dIso;             // single/short event → any covered day
+      });
+      if (!dayEvts.length) continue;
+      any = true;
+      const lbl = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      sections += `<div class="cal-day-sub">${lbl} — ${dayEvts.length} event${dayEvts.length !== 1 ? 's' : ''}</div>${_calDayRows(dayEvts, 'renderEventsCalendar')}`;
+    }
+    panel = `<div class="cal-daypanel">
+      <div class="cal-panel-hd">Your visit · ${_visitRangeLabel(vF, vT)}</div>
+      ${any ? sections : '<div style="font-size:12px;color:var(--slate-soft);padding:8px 0">No events fall within your selected dates — try widening the date range.</div>'}
+    </div>`;
+  }
+
+  const notes = [];
+  if (selectedThemes.size) notes.push([...selectedThemes].map(t => THEMES.find(x => x.id === t)?.name).filter(Boolean).join(' + '));
+  if (vF) notes.push('showing your visit window');
+  else if (!evts.length) notes.push('no events match the current filters');
+
+  host.innerHTML = cal.head
+    + (notes.length ? `<div class="cal-note">${notes.join('  ·  ')}</div>` : '<div style="height:8px"></div>')
+    + cal.grid
+    + (panel || '<div class="cal-note" style="margin-top:14px">Tap any day with events to see what’s on — and add it to your itinerary.</div>');
+}
+
+// ── My Itinerary — calendar view ─────────────────────────────────────────────
+// Plots the WHOLE itinerary — places AND events — on real calendar dates by
+// mapping the planner's Day 1 / Day 2 / Day 3 onto a trip start date the
+// visitor sets. (Places have no date of their own, so without this mapping
+// the calendar would look empty for a typical place-based itinerary.)
+let modalView          = 'plan';   // 'plan' | 'calendar'
+let itinCalCursor      = null;
+let itinCalSelectedDay = null;
+let itinTripStart      = null;      // ISO date the visitor anchors Day 1 to
+
+function setModalView(v) { modalView = v; renderModal(); }
+function itinCalNavMonth(delta) {
+  if (!itinCalCursor) return;
+  itinCalCursor = new Date(itinCalCursor.getFullYear(), itinCalCursor.getMonth() + delta, 1);
+  itinCalSelectedDay = null;
+  renderModal();
+}
+function itinCalSelectDay(iso) {
+  itinCalSelectedDay = (itinCalSelectedDay === iso) ? null : iso;
+  renderModal();
+}
+function setItinTripStart(iso) {
+  itinTripStart = iso || null;
+  itinCalCursor = null;          // re-anchor the displayed month to the new start
+  itinCalSelectedDay = null;
+  renderModal();
+}
+function _itineraryTripStart() {
+  return itinTripStart
+    || ((typeof visitorDateFrom !== 'undefined' && visitorDateFrom) ? visitorDateFrom : _localISODate());
+}
+
+// One row in the itinerary calendar's day-detail panel — a place or an event.
+function _calItinRows(list) {
+  return list.map(it => {
+    const isEvent = it._kind === 'event';
+    const when = isEvent ? (it.times ? '🕐 ' + escVal(it.times) : escVal(it.dates || ''))
+                         : escVal(it.hours || '');
+    const icon = isEvent ? '📅' : (it.icon || '📍');
+    return `<div class="cal-evrow">
+      <div class="cal-evrow-when">${when}</div>
+      <div class="cal-evrow-main">
+        <div class="cal-evrow-name">${icon} ${escVal(it.name)}</div>
+        <div class="cal-evrow-venue">📍 ${escVal(it.venue || it.area || '')}</div>
+      </div>
+      <button class="item-remove" title="Remove from itinerary" style="position:static;flex-shrink:0"
+        onclick="removeFromList('${it._id}')">×</button>
+    </div>`;
+  }).join('');
+}
+
+// Calendar view inside the My Itinerary modal. Every stop — place or event —
+// is laid onto a real date: Day 1 = the trip start, Day 2 = the next day…
+function _itineraryCalendarHTML() {
+  // If events are in the plan but the cache isn't ready, load it then redraw.
+  if (!_eventsCache && [...myList].some(id => typeof id === 'string' && id.startsWith('evt_'))) {
+    _loadEventsCache().then(() => { if (modalView === 'calendar') renderModal(); }).catch(() => {});
+  }
+  const items = [...myList].map(_lookupItem).filter(Boolean);
+
+  const startIso = _itineraryTripStart();
+  const start = new Date(startIso + 'T12:00:00');
+  const DAY = 86400000;
+  const isoOf = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  // Map every stop onto a real date via its planner day number.
+  const placed = items.map(it => {
+    const day = dayMap[it._id] || 1;
+    const d = new Date(start.getTime() + (day - 1) * DAY);
+    return { ...it, _day: day, dateStart: isoOf(d), dateEnd: isoOf(d) };
+  });
+  const maxDay  = placed.reduce((m, p) => Math.max(m, p._day), 1);
+  const tripEnd = new Date(start.getTime() + (maxDay - 1) * DAY);
+
+  if (!itinCalCursor) itinCalCursor = new Date(start.getFullYear(), start.getMonth(), 1);
+
+  const cal = _buildCalendarHTML(placed, {
+    cursor: itinCalCursor, selectedDay: itinCalSelectedDay,
+    visitFrom: startIso, visitTo: isoOf(tripEnd), dimOutside: false,
+    navFn: 'itinCalNavMonth', dayFn: 'itinCalSelectDay',
+  });
+
+  let panel = '';
+  if (itinCalSelectedDay && cal.byDay[itinCalSelectedDay]) {
+    const dd = new Date(itinCalSelectedDay + 'T12:00:00');
+    const lbl = dd.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const list = cal.byDay[itinCalSelectedDay];
+    panel = `<div class="cal-daypanel">
+      <div class="cal-panel-hd">${lbl} · Day ${list[0]._day} — ${list.length} stop${list.length !== 1 ? 's' : ''}</div>
+      ${_calItinRows(list)}</div>`;
+  }
+
+  const startCtl = `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+    <label style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--slate-soft);font-weight:600">Trip starts</label>
+    <input type="date" value="${startIso}" onchange="setItinTripStart(this.value)"
+      style="font-family:inherit;font-size:12px;border:1.5px solid #d8cdb8;border-radius:5px;padding:4px 8px;color:var(--slate)">
+    <span style="font-size:11px;color:var(--slate-soft)">— Day 1 of your plan lands here</span>
+  </div>`;
+
+  const note = items.length === 0
+    ? `<div class="cal-note" style="margin-top:14px">Your itinerary is empty — add experiences and events and they'll lay out here by day.</div>`
+    : (panel ? '' : '<div class="cal-note" style="margin-top:14px">Tap any day to see that day’s stops.</div>');
+
+  return startCtl + cal.head + '<div style="height:6px"></div>' + cal.grid + panel + note;
+}
+
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
   if (tab === 'itineraries') renderItineraries();
-  if (tab === 'events') renderEvents();
+  if (tab === 'events') renderEventsView();
 }
 
 function openModal() {
@@ -3298,10 +4231,16 @@ function renderModal() {
 
   body.innerHTML = `
     ${lodgingBanner}
-    <div id="modalList">
+    <div class="events-view-toggle" style="margin-bottom:14px">
+      <button class="ev-view-btn ${modalView === 'plan' ? 'active' : ''}" onclick="setModalView('plan')">🗓 Day Plan</button>
+      <button class="ev-view-btn ${modalView === 'calendar' ? 'active' : ''}" onclick="setModalView('calendar')">📅 Calendar</button>
+    </div>
+    ${modalView === 'calendar'
+      ? `<div id="modalCalendar">${_itineraryCalendarHTML()}</div>`
+      : `<div id="modalList">
       ${Array.from({length: tripDays}, (_, i) => i + 1).map(dayHtml).join('')}
     </div>
-    ${dayControls}
+    ${dayControls}`}
     <div class="modal-actions">
       <button class="btn-primary" onclick="openMap()">🗺 View on Map</button>
       <button class="btn-primary" onclick="shareItinerary()">📤 Share / Save</button>
@@ -3326,6 +4265,97 @@ function renderModal() {
 // ── MAP ─────────────────────────────────────────────────────────────
 let leafletMap = null;
 
+// ── Parking & public-restroom facilities ─────────────────────────────────────
+// A curated set of PUBLIC parking lots and PUBLIC restrooms serving the
+// Nevada City and Grass Valley downtowns. Coordinates were compiled in
+// May 2026 from OpenStreetMap (amenity=parking / amenity=toilets) and
+// filtered to public-access facilities only — private and customer-only
+// business lots were deliberately excluded.
+//
+// This is a deliberately small, high-signal list: parking plays a
+// secondary role to the experiences themselves, so the map shows the
+// handful of lots a visitor would actually use rather than every polygon.
+// Chamber staff can verify and expand this list over time.
+const _FACILITIES = [
+  // ── Nevada City — parking ──
+  { type:'parking', area:'Nevada City', name:'Downtown Nevada City lots',
+    lat:39.2643, lng:-121.0186,
+    note:'Free public lots off Commercial & Pine Streets, steps from Broad Street.' },
+  { type:'parking', area:'Nevada City', name:'Broad Street (south end)',
+    lat:39.2618, lng:-121.0158,
+    note:'Free street & lot parking near the south end of Broad Street.' },
+  { type:'parking', area:'Nevada City', name:'Pioneer Park parking',
+    lat:39.2696, lng:-121.0182,
+    note:'Parking for Pioneer Park — pool, playground & picnic areas.' },
+  { type:'parking', area:'Nevada City', name:'Calanan Park / east downtown',
+    lat:39.2599, lng:-121.0105,
+    note:'Public parking near Calanan Park and the east side of downtown.' },
+  // ── Grass Valley — parking ──
+  { type:'parking', area:'Grass Valley', name:'Downtown Grass Valley (Mill Street)',
+    lat:39.2179, lng:-121.0585,
+    note:'Public parking in the Mill Street shopping & dining district.' },
+  { type:'parking', area:'Grass Valley', name:'Grass Valley Park & Ride',
+    lat:39.2161, lng:-121.0612,
+    note:'52-space park-and-ride lot at S. Auburn Street / Hwy 174.' },
+  { type:'parking', area:'Grass Valley', name:'Condon Park parking',
+    lat:39.2082, lng:-121.0777,
+    note:'Parking for Condon Park trails, playground & disc golf course.' },
+  // ── Nevada City — restrooms ──
+  { type:'restroom', area:'Nevada City', name:'Pioneer Park restrooms',
+    lat:39.2692, lng:-121.0175,
+    note:'Public restrooms at Pioneer Park.' },
+  { type:'restroom', area:'Nevada City', name:'Downtown Nevada City restroom',
+    lat:39.2628, lng:-121.0168,
+    note:'Public restroom in the downtown core, near Broad & Union Streets.' },
+  { type:'restroom', area:'Nevada City', name:'Calanan Park restroom',
+    lat:39.2602, lng:-121.0122,
+    note:'Wheelchair-accessible public restroom at Calanan Park.' },
+  // ── Grass Valley — restrooms ──
+  { type:'restroom', area:'Grass Valley', name:'Downtown Grass Valley restroom',
+    lat:39.2182, lng:-121.0599,
+    note:'Public restroom in the Mill Street district.' },
+  { type:'restroom', area:'Grass Valley', name:'Condon Park restrooms',
+    lat:39.2082, lng:-121.0777,
+    note:'Public restrooms at Condon Park.' },
+];
+
+// A small circular marker, visually subordinate to the gold numbered
+// itinerary pins — parking/restrooms are a supporting layer, not the focus.
+function _facilityIcon(type) {
+  const cfg = type === 'parking'
+    ? { bg:'#2C5AA0', label:'P' }
+    : { bg:'#1A8A7A', label:'<span style="font-size:12px">🚻</span>' };
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:24px;height:24px;
+      background:${cfg.bg};
+      border:2px solid #fff;
+      border-radius:50%;
+      box-shadow:0 2px 6px rgba(0,0,0,0.4);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-family:'Josefin Sans',sans-serif;
+      font-size:13px;font-weight:700;line-height:1;
+    ">${cfg.label}</div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -14]
+  });
+}
+
+function _facilityPopup(f) {
+  const dir  = `https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lng}`;
+  const kind = f.type === 'parking' ? '🅿️ Public Parking' : '🚻 Public Restroom';
+  return `<div class="popup-inner">
+    <div class="popup-name">${f.name}</div>
+    <div class="popup-sub">${kind} · ${f.area}</div>
+    ${f.note ? `<div class="popup-hours">${f.note}</div>` : ''}
+    <div class="popup-links">
+      <a class="popup-link" href="${dir}" target="_blank">Directions ↗</a>
+    </div>
+  </div>`;
+}
+
 function openMap() {
   // Map only shows items with lat/lng — events typically don't have coordinates
   const items = [...myList]
@@ -3337,7 +4367,8 @@ function openMap() {
   }
 
   document.getElementById('mapSubtitle').textContent =
-    `${items.length} location${items.length !== 1 ? 's' : ''} · click any marker for details`;
+    `${items.length} location${items.length !== 1 ? 's' : ''} · click a marker for details · ` +
+    `toggle parking & restrooms at top-right`;
   document.getElementById('mapOverlay').classList.add('open');
 
   // Init map after overlay is visible so dimensions are known
@@ -3412,6 +4443,22 @@ function openMap() {
     if (bounds.length > 1) {
       leafletMap.fitBounds(bounds, { padding: [40, 40] });
     }
+
+    // ── Parking & restroom overlay layers ──────────────────────────────────
+    // Built as separate layer groups and wired into Leaflet's layers control
+    // so the visitor can toggle them. They are NOT added to the map up front:
+    // the itinerary stops stay the focus, parking is opt-in.
+    const parkingLayer  = L.layerGroup();
+    const restroomLayer = L.layerGroup();
+    _FACILITIES.forEach(f => {
+      const m = L.marker([f.lat, f.lng], { icon: _facilityIcon(f.type) })
+        .bindPopup(L.popup({ maxWidth: 260, minWidth: 220 }).setContent(_facilityPopup(f)));
+      (f.type === 'parking' ? parkingLayer : restroomLayer).addLayer(m);
+    });
+    L.control.layers(null, {
+      '🅿️ Parking':   parkingLayer,
+      '🚻 Restrooms': restroomLayer
+    }, { collapsed: false, position: 'topright' }).addTo(leafletMap);
   }, 80);
 }
 
@@ -3470,6 +4517,46 @@ function editItinerary(id) {
   updateFab();
   // Re-render Explore so the "In this itinerary" section reflects the new
   // editing state immediately (matters when admin clicks Browse all next).
+  if (typeof renderExperiences === 'function') {
+    try { renderExperiences(); } catch(e) {}
+  }
+  openModal();
+}
+
+// ── VISITOR: Customize a Suggested Experience ────────────────────────────────
+// Copies a published itinerary's stops into the visitor's own My Itinerary
+// planner so they can start from a curated template and make it their own.
+//
+// This is deliberately NOT editItinerary(): it does NOT set editingItinId, so
+// publishing/saving later creates the visitor's own plan rather than
+// overwriting the chamber's published original. Available to every visitor —
+// no IS_ADMIN_HOST gate.
+function customizeItinerary(id) {
+  const itin = liveItineraries.find(i => i.id === id);
+  if (!itin) return;
+  if (myList.size > 0 && !confirm(`Start planning from "${itin.name}"?\n\nIts stops will be copied into My Itinerary so you can customize them — anything currently in My Itinerary will be replaced.`)) return;
+
+  myList.clear();
+  dayMap = {};
+  let maxDay = 1;
+
+  const stops = liveStops
+    .filter(s => s.itinId === id)
+    .sort((a, b) => a.order - b.order);
+  for (const s of stops) {
+    const exp = liveExperiences.find(e => String(e.id) === String(s.expId));
+    if (!exp) continue;     // stop references an experience that no longer exists
+    const m = /Day\s+(\d+)/i.exec(s.timeLabel || '');
+    const day = m ? parseInt(m[1], 10) : 1;
+    if (day > maxDay) maxDay = day;
+    myList.add(exp.id);
+    dayMap[exp.id] = day;
+  }
+  tripDays = maxDay;
+  editingItinId = null;     // visitor copy — NOT editing the published original
+  _saveMyList();
+  updateFab();
+  // Re-render Explore so the "In this itinerary" markers reflect the new list.
   if (typeof renderExperiences === 'function') {
     try { renderExperiences(); } catch(e) {}
   }
@@ -3799,6 +4886,8 @@ async function loadFromStorage() {
   renderActiveFilters();
   renderSubPills();
   renderExperiences();
+  loadSeasonal();
+  renderSeasonalBand();
   // Pre-load event cache in background so the Experiences strip appears promptly
   if (API_BASE !== null) {
     _loadEventsCache().then(() => renderExperiences()).catch(() => {});
@@ -4128,7 +5217,13 @@ function filterExperiences() {
       // the pill IS the filter — bypass the broader theme-tag check and the
       // orthogonal-category exclusions. They explicitly opted into this slice.
       const pillMatched = vibePillDef && vibePillDef.match(e);
-      if (!pillMatched) {
+      // Lodging is orthogonal to vibes — a B&B isn't an "arts" or "foodie"
+      // experience, it's simply where you sleep. When the visitor explicitly
+      // picks the Lodging category, show every stay in the area regardless of
+      // the active vibe instead of AND-combining the two (which matches
+      // nothing, since lodgings don't carry vibe tags).
+      const lodgingOptIn = typeFilter === 'lodging';
+      if (!pillMatched && !lodgingOptIn) {
         const match = e.tags.some(tag => themeTags.has(tag.toLowerCase()));
         if (!match) return false;
         // Vibe-active grids exclude lodging — stays are orthogonal and have
@@ -4196,6 +5291,7 @@ function renderManageData() {
     <div class="manage-tabs" style="flex-shrink:0">
       <button class="manage-tab-btn ${manageDataTab==='experiences'?'active':''}" onclick="switchManageTab('experiences')">Experiences</button>
       <button class="manage-tab-btn ${manageDataTab==='itineraries'?'active':''}" onclick="switchManageTab('itineraries')">Itineraries</button>
+      <button class="manage-tab-btn ${manageDataTab==='seasonal'?'active':''}" onclick="switchManageTab('seasonal')">🍂 Seasonal</button>
       <button class="manage-tab-btn ${manageDataTab==='events'?'active':''}" onclick="switchManageTab('events')">📅 Events Queue</button>
       <button class="manage-tab-btn ${manageDataTab==='suggestions'?'active':''}" onclick="switchManageTab('suggestions')">💡 Suggestions</button>
       <button class="manage-tab-btn ${manageDataTab==='sources'?'active':''}" onclick="switchManageTab('sources')">🔗 Event Sources</button>
@@ -4256,6 +5352,9 @@ function renderManageData() {
     subtitle.textContent = 'Manage event source URLs and schedules';
     body.innerHTML = tabBar + `<div id="sourcesPanel" style="padding:0;flex:1;min-height:0;overflow-y:auto"><div style="padding:24px;color:#888;font-size:13px">Loading sources…</div></div>`;
     renderScraperSources();
+  } else if (manageDataTab === 'seasonal') {
+    subtitle.textContent = `${liveSeasonal.length} seasonal moment${liveSeasonal.length !== 1 ? 's' : ''} · auto-saves on every change · the home-page strip shows only what's in season today`;
+    body.innerHTML = tabBar + renderSeasonalAdmin();
   } else {
     subtitle.textContent = `${liveItineraries.length} suggested itinerary${liveItineraries.length !== 1 ? 's' : ''} · auto-saves on every change`;
     body.innerHTML = tabBar + renderManageItinerariesHtml();
@@ -4647,7 +5746,7 @@ async function _refreshPublicEventViews() {
   try { renderExperiences(); } catch(e) { /* not mounted */ }
   const eventsTab = document.getElementById('tab-events');
   if (eventsTab && eventsTab.classList.contains('active')) {
-    try { renderEvents(); } catch(e) { /* not mounted */ }
+    try { renderEventsView(); } catch(e) { /* not mounted */ }
   }
 }
 
@@ -5404,6 +6503,189 @@ function switchManageTab(tab) {
   renderManageData();
 }
 
+// ── SEASONAL MOMENTS — admin editor ('🍂 Seasonal' tab) ──────────────
+const _SEAS_STATUS_META = {
+  ending: ['In season — ending soon', '#C0392B'],
+  peak:   ['In season',                '#B8941A'],
+  new:    ['In season — just started', '#5C8C3C'],
+  soon:   ['Opening soon',             '#5A6B7A'],
+};
+
+function _seasMonthOpts(selMM) {
+  const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return names.map((n, i) => {
+    const v = String(i + 1).padStart(2, '0');
+    return `<option value="${v}"${v === selMM ? ' selected' : ''}>${n}</option>`;
+  }).join('');
+}
+function _seasDayOpts(selDD) {
+  let o = '';
+  for (let d = 1; d <= 31; d++) {
+    const v = String(d).padStart(2, '0');
+    o += `<option value="${v}"${v === selDD ? ' selected' : ''}>${d}</option>`;
+  }
+  return o;
+}
+
+function renderSeasonalAdmin() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const vibeOpts = sel => THEMES.map(t =>
+    `<option value="vibe:${t.id}"${sel === 'vibe:' + t.id ? ' selected' : ''}>${t.name} vibe</option>`
+  ).join('');
+
+  const cards = liveSeasonal.map(m => {
+    const st = _seasonalStatus(m, today);
+    const meta = st ? _SEAS_STATUS_META[st.status] : ['Off-season', '#9aa3ad'];
+    const [sMo, sDay] = (m.start || '01-01').split('-');
+    const [eMo, eDay] = (m.end   || '12-31').split('-');
+    const actVal = (m.action && m.action.type === 'events') ? 'events'
+                 : (m.action && m.action.type === 'vibe')   ? 'vibe:' + m.action.value
+                 : '';
+    return `<div class="seas-card">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="seas-status" id="seasstatus-${m.id}" style="background:${meta[1]}">${meta[0]}</span>
+        <input type="text" value="${escVal(m.title)}" placeholder="Title"
+          onchange="seasonalUpdate('${m.id}','title',this.value)"
+          style="flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:15px;color:var(--brown)">
+        <button onclick="deleteSeasonalMoment('${m.id}')"
+          style="background:transparent;color:#c0392b;border:1px solid #c0392b;border-radius:5px;padding:5px 11px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;flex-shrink:0">Delete</button>
+      </div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <label>In season (recurs every year)</label>
+          <div style="display:flex;align-items:center;gap:4px">
+            <select onchange="seasonalUpdateDate('${m.id}','start','mo',this.value)">${_seasMonthOpts(sMo)}</select>
+            <select onchange="seasonalUpdateDate('${m.id}','start','day',this.value)">${_seasDayOpts(sDay)}</select>
+            <span style="font-size:12px;color:var(--slate-soft)">to</span>
+            <select onchange="seasonalUpdateDate('${m.id}','end','mo',this.value)">${_seasMonthOpts(eMo)}</select>
+            <select onchange="seasonalUpdateDate('${m.id}','end','day',this.value)">${_seasDayOpts(eDay)}</select>
+          </div>
+        </div>
+        <div>
+          <label>Priority (0–10)</label>
+          <input type="number" min="0" max="10" value="${Number(m.priority) || 0}"
+            onchange="seasonalUpdate('${m.id}','priority',this.value)" style="width:66px">
+        </div>
+        <div style="flex:1;min-width:190px">
+          <label>Tapping the card opens</label>
+          <select onchange="seasonalUpdateAction('${m.id}',this.value)" style="width:100%">
+            ${vibeOpts(actVal)}
+            <option value="events"${actVal === 'events' ? ' selected' : ''}>Upcoming Events tab</option>
+          </select>
+        </div>
+      </div>
+      <label>Blurb</label>
+      <textarea onchange="seasonalUpdate('${m.id}','blurb',this.value)"
+        placeholder="One or two sentences describing this seasonal moment…">${escVal(m.blurb)}</textarea>
+      <label>Insider tip (optional — shown in italics)</label>
+      <textarea onchange="seasonalUpdate('${m.id}','insider',this.value)"
+        placeholder="A local's tip — what an out-of-towner wouldn't know…">${escVal(m.insider)}</textarea>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div style="flex:0 0 200px">
+          <label>Button text</label>
+          <input type="text" value="${escVal(m.cta)}" placeholder="e.g. Find river spots"
+            onchange="seasonalUpdate('${m.id}','cta',this.value)">
+        </div>
+        <div style="flex:1;min-width:220px">
+          <label>Photo URL</label>
+          <input type="text" value="${escVal(m.photo)}" placeholder="https://…"
+            onchange="seasonalUpdate('${m.id}','photo',this.value)">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="manage-toolbar">
+      <span>Edits save automatically. The home-page strip shows only moments <strong>in season today</strong> — so an off-season moment won't appear until its window comes around.</span>
+      <span id="savedFlash" class="saved-flash">✓ Saved</span>
+      <button class="btn-add-row" onclick="addSeasonalMoment()">+ Add a moment</button>
+    </div>
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px">
+      ${cards || '<div style="padding:24px;color:#888;font-size:13px">No seasonal moments yet. Click <strong>+ Add a moment</strong> to create one.</div>'}
+      <div style="margin-top:6px;padding-top:12px;border-top:1px dashed #e0d8c8">
+        <button onclick="resetSeasonalDefaults()"
+          style="background:transparent;border:none;color:var(--slate-soft);font-family:inherit;font-size:11px;text-decoration:underline;cursor:pointer">
+          Reset all moments to the built-in defaults
+        </button>
+      </div>
+    </div>`;
+}
+
+function _refreshSeasStatus(id) {
+  const m = liveSeasonal.find(x => x.id === id);
+  const el = document.getElementById('seasstatus-' + id);
+  if (!m || !el) return;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const st = _seasonalStatus(m, today);
+  const meta = st ? _SEAS_STATUS_META[st.status] : ['Off-season', '#9aa3ad'];
+  el.textContent = meta[0];
+  el.style.background = meta[1];
+}
+
+function seasonalUpdate(id, field, value) {
+  const m = liveSeasonal.find(x => x.id === id);
+  if (!m) return;
+  m[field] = (field === 'priority') ? (parseInt(value, 10) || 0) : value;
+  saveSeasonal();
+  renderSeasonalBand();   // the visitor strip updates live
+}
+
+function seasonalUpdateDate(id, which, part, value) {
+  const m = liveSeasonal.find(x => x.id === id);
+  if (!m) return;
+  let [mo, day] = (m[which] || '01-01').split('-');
+  if (part === 'mo') mo = value; else day = value;
+  m[which] = mo + '-' + day;
+  saveSeasonal();
+  renderSeasonalBand();
+  _refreshSeasStatus(id);   // a date change can flip its in-season status
+}
+
+function seasonalUpdateAction(id, value) {
+  const m = liveSeasonal.find(x => x.id === id);
+  if (!m) return;
+  if (value === 'events') m.action = { type: 'events' };
+  else if (value.startsWith('vibe:')) m.action = { type: 'vibe', value: value.slice(5) };
+  saveSeasonal();
+  renderSeasonalBand();
+}
+
+function addSeasonalMoment() {
+  liveSeasonal.unshift({
+    id: 'seas-' + Date.now().toString(36),
+    season: 'spring', priority: 5,
+    title: 'New seasonal moment',
+    blurb: '', insider: '', cta: 'Explore',
+    start: '01-01', end: '12-31',
+    photo: 'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=640&h=420&fit=crop',
+    action: { type: 'vibe', value: 'active' },
+  });
+  saveSeasonal();
+  renderSeasonalBand();
+  renderManageData();   // rebuild the panel so the new card appears
+}
+
+function deleteSeasonalMoment(id) {
+  const m = liveSeasonal.find(x => x.id === id);
+  if (!m) return;
+  if (!confirm(`Delete the seasonal moment “${m.title || 'Untitled'}”?`)) return;
+  liveSeasonal = liveSeasonal.filter(x => x.id !== id);
+  saveSeasonal();
+  renderSeasonalBand();
+  renderManageData();
+}
+
+function resetSeasonalDefaults() {
+  if (!confirm('Reset all seasonal moments to the built-in defaults?\n\nAny moments you have added or edited will be lost.')) return;
+  liveSeasonal = JSON.parse(JSON.stringify(SEASONAL_MOMENTS));
+  saveSeasonal();
+  renderSeasonalBand();
+  renderManageData();
+}
+
 // ── ITINERARY EDITOR — 3-PANEL ───────────────────────────────────────
 function escVal(v) {
   return (v || '').toString()
@@ -5411,17 +6693,54 @@ function escVal(v) {
     .replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// The Itineraries tab is a simple list of what's been built. Editing is not
+// done here in a cramped panel — "Edit in planner" hands the itinerary to the
+// full day-by-day planner, whose "Browse all" launches the whole catalog with
+// add-to. One editor, shared with the ✎ Edit buttons on the public cards.
 function renderManageItinerariesHtml() {
+  const rows = liveItineraries.map(it => {
+    const n = liveStops.filter(s => s.itinId === it.id).length;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid #e6ddc9;border-radius:9px;margin-bottom:10px;background:#fff">
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--brown)">${escVal(it.name)}</div>
+        <div style="font-size:11.5px;color:var(--slate-soft);margin-top:2px">${escVal(it.duration || '')}${it.duration ? ' · ' : ''}${n} stop${n !== 1 ? 's' : ''}${it.description ? ' · ' + escVal(it.description) : ''}</div>
+      </div>
+      <button class="btn-add-row" style="flex-shrink:0" onclick="manageEditItinerary('${it.id}')"
+        title="Open this itinerary in the full planner — then Browse all to add stops from the whole catalog">✎ Edit in planner</button>
+      <button onclick="deleteItinerary('${it.id}')" style="flex-shrink:0;background:transparent;color:#c0392b;border:1px solid #c0392b;border-radius:4px;padding:6px 12px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600">🗑 Delete</button>
+    </div>`;
+  }).join('');
   return `
     <div class="manage-toolbar">
-      <span><strong>Easier:</strong> close this and use <strong>My Itinerary → ✨ Publish as Suggested</strong> to build day-by-day with the visitor planner. This panel is for editing what's already published.</span>
+      <span>Your published itineraries. <strong>Edit in planner</strong> opens one in the full day-by-day planner — from there <strong>🔍 Browse all</strong> launches the whole catalog with add-to.</span>
       <span id="savedFlash" class="saved-flash">✓ Saved</span>
+      <button class="btn-add-row" onclick="manageNewItinerary()">+ New itinerary</button>
     </div>
-    <div class="itin-3panel">
-      ${renderItinListPanel()}
-      ${renderStopsPanel()}
-      ${renderBrowserPanel()}
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px">
+      ${rows || '<div style="padding:24px;color:#888;font-size:13px">No itineraries built yet. Click <strong>+ New itinerary</strong> to build one in the planner.</div>'}
     </div>`;
+}
+
+// Hand a published itinerary to the shared planner editor.
+function manageEditItinerary(id) {
+  closeManageData();
+  editItinerary(id);   // loads its stops, sets editingItinId, opens the planner
+}
+
+// Start a fresh itinerary — clears the planner and opens it so the visitor
+// can Browse all and add stops, then Publish as Suggested.
+function manageNewItinerary() {
+  if (myList.size > 0 &&
+      !confirm('Start a new itinerary?\n\nThis clears whatever is currently in the My Itinerary planner.')) return;
+  myList.clear();
+  dayMap = {};
+  tripDays = 1;
+  editingItinId = null;
+  if (typeof _saveMyList === 'function') _saveMyList();
+  if (typeof updateFab === 'function') updateFab();
+  closeManageData();
+  if (typeof renderExperiences === 'function') { try { renderExperiences(); } catch(e) {} }
+  openModal();
 }
 
 function renderItinListPanel() {
