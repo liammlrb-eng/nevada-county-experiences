@@ -50,9 +50,9 @@ from site_scrapers.woocommerce       import CuriousForgeScraper
 from site_scrapers.shopify           import WolfCraftScraper
 from site_scrapers.tribe_events      import CrazyHorseScraper
 from site_scrapers.squarespace_events import GoldenEraScraper
+from site_scrapers.nevada_theatre     import NevadaTheatreScraper
 from auto_tagger                     import tag_events
 # Future scrapers — uncomment as they're built:
-# from site_scrapers.nevada_theatre  import NevadaTheatreScraper
 # from site_scrapers.syrcl           import SyrclScraper
 
 # ── Register scrapers here ────────────────────────────────────────────────────
@@ -74,9 +74,9 @@ ALL_SCRAPERS = [
     WolfCraftScraper(),             # Shopify products.json — craft workshops, one event per class
     CrazyHorseScraper(),            # The Events Calendar REST API — live music, DJs, trivia
     GoldenEraScraper(),             # Squarespace events JSON — Golden Era Lounge live music
+    NevadaTheatreScraper(),         # MEC plugin via WP REST + per-event date parse
     # ── Disabled (calendar pages exist but are unreachable) ──
     # GoNevadaFestivalsScraper(),   # Cloudflare 403s even via Selenium
-    # NevadaTheatreScraper(),
     # SyrclScraper(),
 ]
 
