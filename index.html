@@ -3484,6 +3484,9 @@ function addDay() {
   // can browse experiences/events to fill the new day. New items default
   // to the last day (= the day we just added), so adds land correctly.
   closeModal();
+  // Filling a new day means browsing the whole catalog — clear any leftover
+  // Lodging-only filter so every kind of stop is visible.
+  _clearStaleLodgingFilter();
   // Make sure we're on the Experiences tab (not Itineraries / Events)
   const expTab = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
   if (expTab && !expTab.classList.contains('active')) {
@@ -3788,6 +3791,15 @@ function _eventsForView() {
       if (dateFrom && e < dateFrom) return false;
       if (dateTo   && s > dateTo)   return false;
       return true;
+    });
+  }
+  // Area filter — mirrors the Explore grid: a county-wide event
+  // (area "Nevada County") matches any local area selection.
+  const areaVal = (document.getElementById('filterArea')?.value || '').toLowerCase();
+  if (areaVal) {
+    evts = evts.filter(ev => {
+      const ea = (ev.area || '').toLowerCase();
+      return ea === 'nevada county' || ea.includes(areaVal) || (ev.venue || '').toLowerCase().includes(areaVal);
     });
   }
   // A keyword search supersedes the vibe filter; otherwise apply the vibe
@@ -4710,6 +4722,10 @@ function clearAll() {
     myList.clear();
     dayMap = {};
     tripDays = 1;
+    // Exit edit mode — a wiped planner is a fresh plan, not a half-edited
+    // published itinerary. Without this, editingItinId stays pointing at the
+    // itinerary being edited and the next "Publish" silently overwrites it.
+    editingItinId = null;
     updateFab();
     _saveMyList();
     renderModal();
@@ -4750,6 +4766,9 @@ function editItinerary(id) {
   editingItinId = id;
   _saveMyList();
   updateFab();
+  // Editing an itinerary is not a lodging-only task — clear any leftover
+  // Lodging category filter so Browse all shows the whole catalog.
+  _clearStaleLodgingFilter();
   // Re-render Explore so the "In this itinerary" section reflects the new
   // editing state immediately (matters when admin clicks Browse all next).
   if (typeof renderExperiences === 'function') {
@@ -4791,6 +4810,9 @@ function customizeItinerary(id) {
   editingItinId = null;     // visitor copy — NOT editing the published original
   _saveMyList();
   updateFab();
+  // Customizing a trip is not a lodging-only task — clear any leftover
+  // Lodging category filter so Browse all shows the whole catalog.
+  _clearStaleLodgingFilter();
   // Re-render Explore so the "In this itinerary" markers reflect the new list.
   if (typeof renderExperiences === 'function') {
     try { renderExperiences(); } catch(e) {}
@@ -4898,6 +4920,10 @@ function publishAsItinerary() {
   }
   saveAll();
 
+  // Publishing/updating is not a lodging-only task — clear any leftover
+  // Lodging category filter so the Explore grid isn't locked to hotels.
+  if (typeof _clearStaleLodgingFilter === 'function') _clearStaleLodgingFilter();
+
   // Refresh the public Suggested Experiences grid if it's mounted
   if (typeof renderItineraries === 'function') {
     try { renderItineraries(); } catch(e) { /* not yet rendered */ }
@@ -4928,6 +4954,10 @@ function publishAsItinerary() {
 // they're not constrained to the proximity-biased 6+4 picks.
 function browseAllFromModal() {
   closeModal();
+  // The visitor wants the full catalog — drop any stale "Lodging" category
+  // filter left over from a previous Find Lodging, or they'd land on a
+  // hotels-only grid.
+  _clearStaleLodgingFilter();
   const expTab = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
   if (expTab && !expTab.classList.contains('active')) {
     switchTab('experiences', expTab);
@@ -4936,6 +4966,22 @@ function browseAllFromModal() {
     const grid = document.getElementById('expGrid');
     if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 120);
+}
+
+// The "Lodging" category filter is only meant to be active right after a
+// deliberate Find Lodging. Any other itinerary-editing flow that sends the
+// visitor back to the Explore grid (Browse all, Add a day, editing/customizing
+// an itinerary) must reset it — otherwise the grid stays locked to hotels and
+// hides everything else. Returns true if it cleared something.
+function _clearStaleLodgingFilter() {
+  const sel = document.getElementById('filterType');
+  if (!sel || sel.value !== 'Lodging') return false;
+  sel.value = '';
+  activeSubPill = null;
+  if (typeof renderSubPills === 'function')      renderSubPills();
+  if (typeof renderExperiences === 'function')   renderExperiences();
+  if (typeof renderActiveFilters === 'function') renderActiveFilters();
+  return true;
 }
 
 // Shortcut from My Itinerary → browse Lodging category in the grid
@@ -5070,7 +5116,13 @@ function printItinerary() {
 }
 
 // Event listeners
-document.getElementById('filterArea').addEventListener('change', () => { renderExperiences(); renderActiveFilters(); });
+document.getElementById('filterArea').addEventListener('change', () => {
+  renderExperiences();
+  renderActiveFilters();
+  // The Area dropdown also scopes the Upcoming Events tab — refresh it if open.
+  const evtTab = document.getElementById('tab-events');
+  if (evtTab && evtTab.classList.contains('active')) renderEventsView();
+});
 document.getElementById('filterType').addEventListener('change', () => { activeSubPill = null; renderSubPills(); renderExperiences(); renderActiveFilters(); });
 
 // ── PERSISTENT STORAGE ──────────────────────────────────────────────
@@ -7367,6 +7419,9 @@ function manageNewItinerary() {
   editingItinId = null;
   if (typeof _saveMyList === 'function') _saveMyList();
   if (typeof updateFab === 'function') updateFab();
+  // A fresh itinerary is not a lodging-only task — clear any leftover
+  // Lodging category filter so Browse all shows the whole catalog.
+  if (typeof _clearStaleLodgingFilter === 'function') _clearStaleLodgingFilter();
   closeManageData();
   if (typeof renderExperiences === 'function') { try { renderExperiences(); } catch(e) {} }
   openModal();
