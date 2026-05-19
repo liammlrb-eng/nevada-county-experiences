@@ -3635,6 +3635,85 @@ function _fmtApiDate(dateStr) {
 let _eventsCache = null;
 let _eventsCacheTime = 0;
 
+// ── Cross-source event de-duplication ────────────────────────────────────────
+// The same real-world event is routinely scraped from several calendars (the
+// venue's own site, the NCAC calendar, KVMR, Eventbrite…) with slightly
+// different titles and venue strings. _dedupeEvents() collapses those: two
+// events on the SAME date whose distinctive title words are a subset of one
+// another's, at a compatible venue, are treated as one — keeping the single
+// best-described copy.
+const _EVT_STOPWORDS = new Set(
+  ('the a an at of on to and for with by from in nevada city county ca ' +
+   'california grass valley').split(' '));
+
+// Distinctive (non-stopword, non-geographic) lowercase title tokens.
+function _evtDistinctTokens(title) {
+  return new Set(
+    (title || '').toLowerCase().split(/[^a-z0-9]+/)
+      .filter(t => t && !_EVT_STOPWORDS.has(t)));
+}
+
+// Normalized venue key — generic county/area-level fallbacks aren't a real
+// venue, so they collapse to '' (a wildcard that matches any venue).
+function _evtVenueKey(ev) {
+  const v = (ev.venue || '').toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (v === 'nevada county' || v === 'nevada city' || v === 'grass valley') return '';
+  return v;
+}
+function _evtVenueCompatible(a, b) {
+  const va = _evtVenueKey(a), vb = _evtVenueKey(b);
+  return va === '' || vb === '' || va.includes(vb) || vb.includes(va);
+}
+
+// True when a and b are the same event scraped twice. Conservative: same
+// non-empty date, the smaller distinctive-token set (≥2 tokens) must be a
+// full subset of the larger, and the venues must be compatible. This keeps
+// "… Level 1" vs "… Level 2" separate (distinct tokens) while merging
+// "… Level 1" vs "… Level 1: Straight Cuts".
+function _evtIsDuplicate(a, b) {
+  if (!a.dateStart || (a.dateStart !== b.dateStart)) return false;
+  const da = _evtDistinctTokens(a.name), db = _evtDistinctTokens(b.name);
+  const small = da.size <= db.size ? da : db;
+  const large = da.size <= db.size ? db : da;
+  if (small.size < 2) return false;
+  for (const t of small) if (!large.has(t)) return false;   // small ⊆ large
+  return _evtVenueCompatible(a, b);
+}
+
+// Higher = a better copy to keep (specific venue, link, image, time).
+function _evtCompleteness(ev) {
+  return (_evtVenueKey(ev) ? 4 : 0) + (ev.url ? 2 : 0)
+       + (ev.image ? 1 : 0) + (ev.times ? 1 : 0);
+}
+
+function _dedupeEvents(list) {
+  const byDate = {};
+  for (const ev of list) (byDate[ev.dateStart || ''] ||= []).push(ev);
+  const kept = [];
+  for (const date in byDate) {
+    const group = byDate[date];
+    if (!date) { kept.push(...group); continue; }   // undated — never merge
+    const used = new Array(group.length).fill(false);
+    for (let i = 0; i < group.length; i++) {
+      if (used[i]) continue;
+      const cluster = [group[i]]; used[i] = true;
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (let j = 0; j < group.length; j++) {
+          if (used[j]) continue;
+          if (cluster.some(c => _evtIsDuplicate(c, group[j]))) {
+            cluster.push(group[j]); used[j] = true; grew = true;
+          }
+        }
+      }
+      kept.push(cluster.sort((x, y) => _evtCompleteness(y) - _evtCompleteness(x))[0]);
+    }
+  }
+  return kept;
+}
+
 // ── Shared event cache loader (used by both Experiences strip and Events tab) ─
 // Tries the live API first (when the Flask server is running); falls back to
 // a static snapshot at scraper_output/events.json so GitHub Pages and any
@@ -3699,6 +3778,8 @@ async function _loadEventsCache() {
       if (apiNames.has(ev.name.toLowerCase())) continue;
       _eventsCache.push({ ...ev, scraperId: ev.scraperId || _slugify(ev.name) });
     }
+    // Collapse the same event scraped from multiple calendars into one.
+    _eventsCache = _dedupeEvents(_eventsCache);
     _eventsCache.sort((a, b) => (a.dateStart || '9999').localeCompare(b.dateStart || '9999'));
   } catch(e) {
     console.warn('[Events] API unavailable');
