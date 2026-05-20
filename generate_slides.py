@@ -285,7 +285,7 @@ def slide_title(s):
     add_gold_rule(s, Inches(4.9), Inches(3.6), Inches(7.5))
     add_text(s,
         'A purpose-built tourism platform combining 161 curated experiences '
-        'with 460+ live local events. Privacy-first, opt-in, no tracking.',
+        'with 1,200+ live local events. Privacy-first, opt-in, no tracking.',
         Inches(4.9), Inches(3.85), Inches(7.8), Inches(2.5),
         size=14, color=SLATE)
 
@@ -342,7 +342,7 @@ def slide_what_this_is(s):
 
     # Stat cards
     add_stat_card(s, Inches(0.6),  Inches(3.5), Inches(2.85), Inches(1.6), '161',  'Curated experiences\nacross 11 communities')
-    add_stat_card(s, Inches(3.65), Inches(3.5), Inches(2.85), Inches(1.6), '460+', 'Live events from\n6 sources')
+    add_stat_card(s, Inches(3.65), Inches(3.5), Inches(2.85), Inches(1.6), '1,200+', 'Live events from\n10+ sources')
     add_stat_card(s, Inches(6.7),  Inches(3.5), Inches(2.85), Inches(1.6), '9',    'Themed vibes\nfor discovery')
     add_stat_card(s, Inches(9.75), Inches(3.5), Inches(2.85), Inches(1.6), '$5–$20', 'Typical\nmonthly cost')
 
@@ -362,6 +362,9 @@ def slide_discovery(s):
         ('Universal keyword search',
          'One box searches every venue and event — names, descriptions and tags — with built-in synonyms, so a search for "metalsmith" also finds a studio listed only as "blacksmithing"',
          'A visitor types "blacksmithing", clicks Find, and lands on The Curious Forge at once.'),
+        ('🌿 In Season Now strip',
+         'A scrolling banner under the hero showing what\'s happening RIGHT NOW — wildflowers peaking, swim season open, festivals starting — with "Peak now / Just started / Ends soon" badges',
+         'October visitor lands and sees "Aspens are on fire right now" — books the trip on the spot.'),
         ('Themed vibes (9 cards)',
          'Historic · Arts · Hands-On · Foodie · Active · Relaxed · Wellness · Family · Festivals',
          'No-plan visitor taps "Foodie" — relevant cards instantly filter in.'),
@@ -386,8 +389,64 @@ def slide_discovery(s):
         ('Tag-aware Smart Suggestions',
          '"Near Your Stops" panel in the itinerary — geographic + tag scoring',
          'After Empire Mine goes in, the panel surfaces Holbrooke Hotel 0.4 mi away.'),
-    ], Inches(1.62), left_w=3.4, right_w=8.7, body_size=9, row_height=0.55,
+    ], Inches(1.55), left_w=3.4, right_w=8.7, body_size=9, row_height=0.50,
        scenario_size=7.5)
+
+
+def slide_help_me_plan(s):
+    """The trip generator — six questions, one click, a real day-by-day plan."""
+    slide_header(s, '✨ Help Me Plan — one-click trip generator',
+        'Six quick questions → a complete day-by-day itinerary made from real local venues.')
+
+    add_text(s,
+        'Removes the blank-page problem for first-time visitors. The planner scores '
+        'every venue in the catalog against the visitor\'s answers and assembles a '
+        'real trip — not generic suggestions, not AI hallucination, just rule-based '
+        'matching against curated local data.',
+        Inches(0.6), Inches(1.85), Inches(12.1), Inches(1.1),
+        size=13, color=DARK)
+
+    # Left: what the visitor answers
+    add_text(s, 'What the visitor answers',
+             Inches(0.6), Inches(3.05), Inches(6), Inches(0.4),
+             size=14, bold=True, color=GOLD)
+    add_bullets(s, [
+        'Trip length (1–5 days)',
+        'Pace — Relaxed / Balanced / Packed',
+        'Who\'s coming — Family / Couple / Friends / Solo / Multi-gen',
+        'Activity level — Easy / Moderate / Adventurous',
+        'Indoor vs outdoor lean',
+        'Interests (Foodie · Historic · Active · etc.)',
+        'Optional: must-haves (live music, hike, wine tasting…)',
+        'Optional: trip start date + chosen hotel',
+    ], Inches(0.6), Inches(3.5), Inches(6), Inches(3.0),
+       size=11, line_spacing=1.3)
+
+    # Right: what the visitor gets
+    add_text(s, 'What the visitor gets',
+             Inches(7.0), Inches(3.05), Inches(5.7), Inches(0.4),
+             size=14, bold=True, color=GOLD)
+    add_bullets(s, [
+        ('A complete day-by-day itinerary, ready to edit',
+         'No blank Day 1 — every day is pre-populated with real stops.'),
+        ('Stops biased toward the chosen hotel',
+         'Pick Holbrooke → most stops cluster near Grass Valley.'),
+        ('Matching events woven into the right day',
+         'Concert on visit Friday lands in Day 1 automatically.'),
+        ('Group-aware picks (kids, romance, adventure)',
+         'Family inputs → kid-friendly venues; couple → romantic.'),
+        ('Editable: change anything, add anything, remove anything',
+         'Visitor tweaks the plan in the same My Itinerary they\'d use anyway.'),
+    ], Inches(7.0), Inches(3.5), Inches(5.7), Inches(3.0),
+       size=11, line_spacing=1.2, scenario_size=9)
+
+    # Closing pitch line
+    add_rect(s, Inches(0.6), Inches(6.6), Inches(12.1), Inches(0.5),
+             FOG, GOLD)
+    add_text(s,
+        'Rule-based, not AI-generated — no hallucinated venues, no API costs. The output is always a real plan from real local data.',
+        Inches(0.7), Inches(6.65), Inches(11.9), Inches(0.4),
+        size=11, italic=True, color=BROWN, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 
 
 def slide_itinerary(s):
@@ -400,7 +459,7 @@ def slide_itinerary(s):
          'Visitor sees "Day 1: Sat May 17" instead of an undifferentiated stop list.'),
         ('Per-day "Tonight\'s Stay" lodging slot — empty slots prompt for booking',
          'Empty Day 2 stay tile reminds the visitor they haven\'t booked Sunday yet.'),
-        ('Drag-free move-between-days dropdown on every item',
+        ('Move stops between days (dropdown) + drag-to-reorder within a day',
          'Spouse on phone moves Friday\'s hike to Saturday in two taps.'),
         ('Add Day → returns visitor to browse mode for the new day',
          'Tap "Add Day," land on cards to pick Day 3 activities — flow continues.'),
@@ -408,16 +467,16 @@ def slide_itinerary(s):
          'Six stops in but no hotel — one tap surfaces every nearby B&B.'),
         ('Events go INTO the itinerary first; the visitor decides what to commit to',
          'Bluegrass concert tile lands in My Itinerary, not on KVMR\'s site.'),
+        ('📅 Set trip dates → events auto-weave to the right day + Calendar view available',
+         'Pick Jun 14–15; Saturday\'s bluegrass concert lands in Day 1 automatically.'),
         ('🗺 Map view — every stop on a Leaflet map; click pins to navigate',
          'Visitor opens the map: sees the full weekend laid out, decides Day 2 needs a lunch stop near the trail.'),
         ('🖨 Print itinerary — clean PDF-ready layout for paper handouts',
          'Older visitor prints the day-by-day plan, walks Mill Street with paper in hand.'),
-        ('15-min add → opt-in save → survives tab close + browser restart',
-         'Browser closes, phone reboots — itinerary still there next morning.'),
+        ('Opt-in save survives tab close + browser restart — no account, no install, no email',
+         'Browser closes, phone reboots — itinerary still there; no signup wall.'),
         ('Share link via native phone share sheet, email, text, or copy URL',
          'Visitor texts the URL to spouse: "this is what I\'m thinking."'),
-        ('No install, no account, no email — works in any browser',
-         'Visitor planning during a hotel-search lunch break — no signup wall.'),
     ], Inches(0.6), Inches(1.75), Inches(7.0), Inches(5.3),
        size=10, line_spacing=1.15, scenario_size=8)
 
@@ -458,6 +517,7 @@ def slide_demo_flow(s):
         'A live demo: visitor planning a romantic November weekend in Western Nevada County.')
 
     acts = [
+        ('Act 0 (optional) · 60 sec', '✨ Help Me Plan opener — answer six questions, full draft itinerary appears. Use for blank-page audiences; skip for power-users who want to see manual planning.'),
         ('Act 1 · 2 min',  'Set the scene — couple from Sacramento, click "This Weekend" + Festivals vibe'),
         ('Act 2 · 90 sec', 'Layer in Relaxed vibe + Lodging category + B&B sub-pill — real Victorian B&Bs surface'),
         ('Act 3 · 2 min',  'Build the weekend — Cornish Christmas + Holbrooke Hotel + Empire Mine + Lola Restaurant. Open My Itinerary — Smart Suggestions appear with "0.4 mi away" labels. Map view + Print + Share link.'),
@@ -465,8 +525,8 @@ def slide_demo_flow(s):
         ('Act 5 · 60 sec', 'Close the value props — time saved, local visibility, privacy, no vendor lock-in, AI integration, low maintenance'),
     ]
     two_col_table(s, ['Act', 'What happens'], acts,
-                  Inches(1.85), left_w=2.0, right_w=10.1,
-                  body_size=11, row_height=0.85)
+                  Inches(1.65), left_w=2.3, right_w=9.8,
+                  body_size=10, row_height=0.75)
 
 
 def slide_personas(s):
@@ -572,7 +632,7 @@ def slide_admin(s):
         '~30 minutes per week of chamber-staff time keeps the site live and current.')
 
     add_bullets(s, [
-        'One-click event-source updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union',
+        'One-click event-source updates from 11+ sources — KVMR, Eventbrite, NC/GV Chambers, Go Nevada, The Union, Nevada Theatre, Curious Forge, Crazy Horse Saloon, Golden Era Lounge, Wolf Craft Collective (and growing)',
         'Approve / dismiss events in a queue; bulk-approve is one click',
         'AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
         'Publish and edit chamber-curated experiences via the public planner — no separate admin tool',
@@ -594,9 +654,9 @@ def slide_ai(s):
     add_text(s, 'What it fixes', Inches(0.6), Inches(1.85), Inches(6), Inches(0.45),
              size=14, bold=True, color=GOLD)
     add_bullets(s, [
-        ('444 of 460 KVMR events tagged "Nevada County" → infers actual community',
+        ('Nearly every KVMR event tagged generic "Nevada County" → AI infers actual community',
          '"KVMR Storytelling Night" gets "Nevada City" instead of vague "Nevada County".'),
-        ('Empty location field on most KVMR events → extracts venue name',
+        ('Empty location field on most KVMR events → AI extracts venue name from description',
          '"Center for the Arts" surfaces as the venue from a description-only event.'),
         ('"Center for the Arts" → Grass Valley; "Miners Foundry" → Nevada City',
          'Visitor filtering by Grass Valley gets concerts without manual tagging.'),
@@ -613,10 +673,10 @@ def slide_ai(s):
     add_text(s, 'Cost', Inches(7.2), Inches(1.85), Inches(5.5), Inches(0.45),
              size=14, bold=True, color=GOLD)
     two_col_table(s, ['Run pattern', 'Monthly'], [
-        ('First-time bulk (460 events)',    '~$0.30 once'),
-        ('Daily refresh + categorize',      '$0.30 – $0.60'),
-        ('Weekly refresh + categorize',     '$0.16 – $0.52'),
-        ('Realistic chamber operation',     '~$0.50 – $1.00'),
+        ('First-time bulk (full catalog)',  '~$1 once'),
+        ('Daily refresh + categorize',      '$0.50 – $1.50'),
+        ('Weekly refresh + categorize',     '$0.20 – $0.60'),
+        ('Realistic chamber operation',     '~$0.50 – $1.50'),
     ], Inches(2.3), left_w=3.0, right_w=2.4, body_size=10, row_height=0.45)
 
     # Footer note
@@ -826,6 +886,7 @@ SLIDE_ORDER = [
     # ── Act 2 ─────────────────────────────────────────────────────────────
     (slide_what_this_is,       True),   # Numbers as evidence for Act 1's argument
     (slide_discovery,          True),
+    (slide_help_me_plan,       True),   # Trip generator — biggest new feature
     (slide_itinerary,          True),
     (slide_demo_flow,          True),   # Live demo — the emotional peak
     # ── Act 3 ─────────────────────────────────────────────────────────────

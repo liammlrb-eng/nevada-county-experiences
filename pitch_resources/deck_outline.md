@@ -1,13 +1,13 @@
 # demo_pitch.pptx — slide-by-slide outline
 
-15 slides, 16:9 widescreen. Brand palette: brown (#5C3A1F), gold (#C9A84C),
+15 main slides + 1 appendix, 16:9 widescreen. Brand palette: brown (#5C3A1F), gold (#C9A84C),
 slate (#4A5568), fog (#F5EFE2). All "↳ scenario" lines render as italic
 sub-lines beneath the bullet they explain.
 
 ## Narrative arc — 5 acts
 
 1. **Why we're here** — Title + Strategic insight (lodging revenue framing leads everything)
-2. **What I built to test the idea** — Numbers, Discovery, Itinerary, Live demo
+2. **What I built to test the idea** — Numbers, Discovery, Help Me Plan, Itinerary, Live demo
 3. **Why this approach works** — Personas, UX decisions, Privacy
 4. **How it runs** — Admin, AI, Cost (second big moment: $6/mo vs $5K–$30K)
 5. **What's next** — Where the group can take this · Migration (appendix-feel) · Close
@@ -19,7 +19,7 @@ sub-lines beneath the bullet they explain.
 Visitor planning platform — county pitch deck.
 
 > A purpose-built tourism platform combining 161 curated experiences with
-> 460+ live local events. Privacy-first, opt-in, no tracking.
+> 1,200+ live local events. Privacy-first, opt-in, no tracking.
 
 ---
 
@@ -56,7 +56,7 @@ events.
 
 | Stat card | Stat card | Stat card | Stat card |
 |---|---|---|---|
-| **161** Curated experiences across 11 communities | **460+** Live events from 6 sources | **9** Themed vibes for discovery | **$5–$20** Typical monthly cost |
+| **161** Curated experiences across 11 communities | **1,200+** Live events from 10+ sources | **9** Themed vibes for discovery | **$5–$20** Typical monthly cost |
 
 **Geographic scope:** Western Nevada County + adjacent Colfax. Truckee and
 Sierra-side are out of scope.
@@ -68,7 +68,10 @@ Sierra-side are out of scope.
 
 | Discovery path | What it does |
 |---|---|
+| **Universal keyword search** | One box searches every venue and event with built-in synonyms ("metalsmith" finds a "blacksmithing" studio)<br>↳ *Visitor types "blacksmithing", clicks Find, lands on The Curious Forge.* |
+| **🌿 In Season Now strip** | Scrolling banner under the hero showing what's happening RIGHT NOW — wildflowers peaking, swim season open, festivals starting — with "Peak now / Just started / Ends soon" badges<br>↳ *October visitor lands and sees "Aspens are on fire right now" — books on the spot.* |
 | **Themed vibes (9 cards)** | Historic · Arts · Hands-On · Foodie · Active · Relaxed · Wellness · Family · Festivals<br>↳ *No-plan visitor taps "Foodie" — relevant cards instantly filter in.* |
+| **🏠 Lodging tile** | A 10th tile alongside the vibes; bypasses the vibe-funnel for "where do I sleep" intent<br>↳ *First-time visitor sees house-shaped Lodging tile, jumps straight to 50+ stays.* |
 | **Vibe-level pills** | Pick Foodie → narrow to Restaurants / Wineries / Markets / Bakeries / Food Events<br>↳ *Foodie visitor switches to "Wineries only" without leaving the vibe.* |
 | **Category dropdown + sub-pills** | Lodging → Hotels / B&Bs / Glamping / Campgrounds / RV<br>↳ *Family of four picks Lodging → B&Bs to find character stays over chains.* |
 | **Activity tags** | Hiking · Biking · Swimming · Fishing · Boating · Running on every relevant card<br>↳ *Mountain biker scrolls and immediately spots cards tagged "Biking".* |
@@ -78,14 +81,46 @@ Sierra-side are out of scope.
 
 ---
 
-## Slide 5 — Day-by-day itinerary builder
+## Slide 5 — ✨ Help Me Plan — one-click trip generator  *(NEW)*
+*Six quick questions → a complete day-by-day itinerary made from real local venues.*
+
+Removes the blank-page problem for first-time visitors. The planner scores every
+venue in the catalog against the visitor's answers and assembles a real trip —
+not generic suggestions, not AI hallucination, just rule-based matching against
+curated local data.
+
+**What the visitor answers**
+- Trip length (1–5 days)
+- Pace — Relaxed / Balanced / Packed
+- Who's coming — Family / Couple / Friends / Solo / Multi-gen
+- Activity level — Easy / Moderate / Adventurous
+- Indoor vs outdoor lean
+- Interests (Foodie · Historic · Active · etc.)
+- Optional: must-haves (live music, hike, wine tasting…)
+- Optional: trip start date + chosen hotel
+
+**What the visitor gets**
+- A complete day-by-day itinerary, ready to edit
+  ↳ *No blank Day 1 — every day is pre-populated with real stops.*
+- Stops biased toward the chosen hotel
+  ↳ *Pick Holbrooke → most stops cluster near Grass Valley.*
+- Matching events woven into the right day
+  ↳ *Concert on visit Friday lands in Day 1 automatically.*
+- Group-aware picks (kids, romance, adventure)
+- Editable: change anything, add anything, remove anything
+
+> *"Rule-based, not AI-generated — no hallucinated venues, no API costs. The output is always a real plan from real local data."*
+
+---
+
+## Slide 6 — Day-by-day itinerary builder
 *Visitors think in nights, not stops — the planner reflects that.*
 
 - Each day has its own card with a numbered header and calendar date
   ↳ *Visitor sees "Day 1: Sat May 17" instead of an undifferentiated stop list.*
 - Per-day "Tonight's Stay" lodging slot — empty slots prompt for booking
   ↳ *Empty Day 2 stay tile reminds the visitor they haven't booked Sunday yet.*
-- Drag-free move-between-days dropdown on every item
+- Move stops between days (dropdown) + drag-to-reorder within a day
   ↳ *Spouse on phone moves Friday's hike to Saturday in two taps.*
 - Add Day → returns visitor to browse mode for the new day
   ↳ *Tap "Add Day," land on cards to pick Day 3 activities — flow continues.*
@@ -93,23 +128,26 @@ Sierra-side are out of scope.
   ↳ *Six stops in but no hotel — one tap surfaces every nearby B&B.*
 - Events go INTO the itinerary first; the visitor decides what to commit to
   ↳ *Bluegrass concert tile lands in My Itinerary, not on KVMR's site.*
-- 15-min add → opt-in save → survives tab close + browser restart
-  ↳ *Browser closes, phone reboots — itinerary still there next morning.*
+- 📅 Set trip dates → events auto-weave to the right day + Calendar view available  *(NEW)*
+  ↳ *Pick Jun 14–15; Saturday's bluegrass concert lands in Day 1 automatically.*
+- 🗺 Map view — every stop on a Leaflet map; click pins to navigate
+- 🖨 Print itinerary — clean PDF-ready layout for paper handouts
+- Opt-in save survives tab close + browser restart — no account, no install, no email
 - Share link via native phone share sheet, email, text, or copy URL
-  ↳ *Visitor texts the URL to spouse: "this is what I'm thinking."*
 
 Right-hand visual mock: 2-day itinerary with "DAY 1 of 2 · Sat, Jun 14",
 Tonight's Stay = Holbrooke Hotel, and Day 2 with empty lodging slot.
 
 ---
 
-## Slide 6 — Let me show you  *(retitled from "The 8-minute demo flow")*
+## Slide 7 — Let me show you  *(retitled from "The 8-minute demo flow")*
 *A live demo: visitor planning a romantic November weekend in Western Nevada County.*
 
 This slide cues the live demo — the emotional peak of the presentation.
 
 | Act | Time | What happens |
 |---|---|---|
+| Act 0 *(optional)* | 60 sec | ✨ Help Me Plan opener — answer six questions, full draft itinerary appears. Use for blank-page audiences; skip for power-users who want to see manual planning. |
 | Act 1 | 2 min | Set the scene — couple from Sacramento, click "This Weekend" + Festivals vibe |
 | Act 2 | 90 sec | Layer in Relaxed vibe + Lodging category + B&B sub-pill — Victorian B&Bs surface |
 | Act 3 | 2 min | Build the weekend — Cornish Christmas + Holbrooke Hotel + Empire Mine + Lola. Open My Itinerary — Smart Suggestions appear with "0.4 mi away" labels. |
@@ -118,7 +156,7 @@ This slide cues the live demo — the emotional peak of the presentation.
 
 ---
 
-## Slide 7 — Who this serves  *(formerly slide 3)*
+## Slide 8 — Who this serves  *(formerly slide 3)*
 *Nine visitor personas — each searches differently and converts on different content.*
 
 After the demo, personas land as "these are real people I just saw using the tool."
@@ -139,7 +177,7 @@ After the demo, personas land as "these are real people I just saw using the too
 
 ---
 
-## Slide 8 — Why it's easy to use  *(formerly slide 6)*
+## Slide 9 — Why it's easy to use  *(formerly slide 6)*
 *Friction points where most tourism sites lose visitors — and what we did instead.*
 
 | Decision | Why it matters |
@@ -155,7 +193,7 @@ After the demo, personas land as "these are real people I just saw using the too
 
 ---
 
-## Slide 9 — Privacy posture
+## Slide 10 — Privacy posture
 *No tracking. No cookies. Visitors stay anonymous; the chamber gets credit for it.*
 
 - No analytics, no cookies, no third-party trackers by default
@@ -176,10 +214,10 @@ After the demo, personas land as "these are real people I just saw using the too
 
 ---
 
-## Slide 10 — Behind the scenes  *(formerly slide 8)*
+## Slide 11 — Behind the scenes  *(formerly slide 8)*
 *Chamber-staff operations: live data with minimal effort.*
 
-- 🔄 One-click event-source updates from KVMR, Eventbrite, NC Chamber, GV Chamber, Go Nevada, The Union
+- 🔄 One-click event-source updates from 11+ sources — KVMR, Eventbrite, NC/GV Chambers, Go Nevada, The Union, Nevada Theatre, Curious Forge, Crazy Horse Saloon, Golden Era Lounge, Wolf Craft Collective (and growing)
   ↳ *Chamber staffer clicks "Refresh Sources" Monday morning; ~50 new events appear.*
 - ✅ Approve / dismiss events in a queue; bulk-approve is one click
 - 🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)
@@ -193,12 +231,12 @@ After the demo, personas land as "these are real people I just saw using the too
 
 ---
 
-## Slide 11 — AI-powered tag refinement
+## Slide 12 — AI-powered tag refinement
 *Claude Haiku adds intelligence where keyword rules stop short — at trivial cost.*
 
 **What it fixes**
-- 444 of 460 KVMR events tagged "Nevada County" → infers actual community
-- Empty location field on most KVMR events → extracts venue name
+- Nearly every KVMR event tagged generic "Nevada County" → AI infers actual community
+- Empty location field on most KVMR events → AI extracts venue name from description
 - "Center for the Arts" → Grass Valley; "Miners Foundry" → Nevada City
 - Cluttered descriptions → clean one-line summaries
 - Truckee / Sierra-side events flagged "low quality" → auto-hidden
@@ -207,16 +245,16 @@ After the demo, personas land as "these are real people I just saw using the too
 **Cost**
 | Run pattern | Monthly |
 |---|---|
-| First-time bulk (460 events) | ~$0.30 once |
-| Daily refresh + categorize | $0.30 – $0.60 |
-| Weekly refresh + categorize | $0.16 – $0.52 |
-| Realistic chamber operation | ~$0.50 – $1.00 |
+| First-time bulk (full catalog) | ~$1 once |
+| Daily refresh + categorize | $0.50 – $1.50 |
+| Weekly refresh + categorize | $0.20 – $0.60 |
+| Realistic chamber operation | ~$0.50 – $1.50 |
 
 > Hard $5/month spending cap settable in Anthropic console — cannot be exceeded.
 
 ---
 
-## Slide 12 — What it costs  *(formerly slide 10)*
+## Slide 13 — What it costs  *(formerly slide 10)*
 *Three operating scenarios for the first year of operation.*
 
 This is the second big moment of the deck — let the $6/mo vs $5K–$30K comparison land.
@@ -232,7 +270,7 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 
 ---
 
-## Slide 13 — Where the group can take this  *(retitled from "What the chamber needs to do next")*
+## Slide 14 — Where the group can take this  *(retitled from "What the chamber needs to do next")*
 *Findings from the build — collaborative work that would unlock the next version.*
 
 ### DATA PARTNERSHIPS
@@ -259,7 +297,7 @@ This is the second big moment of the deck — let the $6/mo vs $5K–$30K compar
 
 ---
 
-## Slide 14 — Thank you
+## Slide 15 — Thank you
 **Thank you / Questions?**
 
 The leave-behind one-liner:
