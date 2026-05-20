@@ -72,6 +72,14 @@
     "url": "https://www.nevadacountyarts.org/calendar/"
   },
   {
+    "enabled": true,
+    "id": "nevada_county_fairgrounds",
+    "interval_hours": 168,
+    "name": "Nevada County Fairgrounds",
+    "notes": "Saffire JSONP feed (services/eventsservice.asmx/GetEventsJsonP). Returns the venue's featured events -- Strawberry, Father's Day Bluegrass, High Sierra, Nevada County Fair, Draft Horse Classic, Country Christmas Faire, etc. No auth, no Selenium.",
+    "url": "https://www.nevadacountyfair.com/events/"
+  },
+  {
     "enabled": false,
     "id": "go_nevada_festivals",
     "interval_hours": 336,
