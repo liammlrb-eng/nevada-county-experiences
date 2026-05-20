@@ -3172,7 +3172,10 @@ function renderExperiences() {
       if (vibeDef) candidates = candidates.filter(vibeDef.match);
     }
 
-    eventsInGrid = candidates;
+    // Consolidate recurring/multi-day series so the strip + count don't
+    // balloon when one event scrapes as one row per day (Lavender Glow,
+    // weekly markets, etc.).
+    eventsInGrid = _consolidateSeries(candidates);
   }
 
   // The grid below the pinned "selected" section excludes anything already
@@ -3795,7 +3798,9 @@ async function renderEvents() {
   await _loadEventsCache();
 
   // Date + theme filtering is shared with the Calendar view (_eventsForView).
-  const evts = _eventsForView();
+  // Consolidate recurring series (Lavender Glow, weekly markets, etc.) into
+  // one card each — list-view only; the calendar still dots each day.
+  const evts = _consolidateSeries(_eventsForView());
 
   // Highlight the active preset button
   ['vqBtnAll','vqBtnToday','vqBtnWeekend','vqBtnWeek'].forEach(id => {
@@ -3833,7 +3838,7 @@ async function renderEvents() {
         ${e.image ? `<img src="${e.image}" alt="${e.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : ''}
       </div>
       <div class="event-card-body">
-        <div class="event-date">${e.dates}</div>
+        <div class="event-date">${e.dates}${e._seriesCount > 1 ? ` <span style="font-weight:400;color:#718096;font-size:11px">· ${e._seriesCount} dates</span>` : ''}</div>
         <div class="event-name">${e.name}</div>
         <div class="event-venue">📍 ${e.venue || e.area} · ${e.area}</div>
         <div class="event-tags">${e.tags.map(t => `<span class="tag">${t}</span>`).join('')}${e.source ? `<span class="tag" style="opacity:0.55;font-size:9px">${e.source}</span>` : ''}</div>
@@ -3848,6 +3853,107 @@ async function renderEvents() {
 }
 
 // ── UPCOMING EVENTS — shared filtering + List/Calendar views ─────────────────
+// Multi-day / recurring series consolidation (list view only).
+// Trumba and similar feeds emit one row per gallery-open day for ongoing
+// exhibits, weekly markets, daily classes, etc. — Lavender Glow alone scrapes
+// as 138 rows. Visitors browsing the list don't want 138 cards; they want one
+// card with the full date range. The calendar view still dots each day
+// individually so day-detail click-throughs work normally.
+//
+// Rule: within the same (venue, time-of-day) bucket, collapse rows whose
+// names share ≥60% Jaccard overlap on significant tokens. That catches the
+// "Lavender Glow | …" vs "Art in Public Spaces | Lavender Glow, …" variant
+// pair; keeps the 4:30 PM Opening Reception separate because its time differs.
+const _CONSOLIDATE_STOPWORDS = new Set([
+  'the','and','or','of','a','at','in','on','for','with','to','an',
+  'our','my','its','is','are','as','by','from','this','that'
+]);
+function _consolidateTokens(name) {
+  return (name || '').toLowerCase()
+    .replace(/[|·,–—\-:;()\/]/g, ' ')
+    .replace(/[^a-z0-9\s']/g, '')
+    .split(/\s+/)
+    .filter(w => w.length >= 3 && !_CONSOLIDATE_STOPWORDS.has(w));
+}
+function _consolidateJaccard(a, b) {
+  if (!a.length || !b.length) return 0;
+  const A = new Set(a), B = new Set(b);
+  let inter = 0;
+  for (const x of A) if (B.has(x)) inter++;
+  return inter / (A.size + B.size - inter);
+}
+function _consolidateFormatRange(s, e) {
+  if (!s) return '';
+  const fmt = d => new Date(d + 'T12:00:00')
+    .toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (!e || e === s) return fmt(s);
+  const sd = new Date(s + 'T12:00:00'), ed = new Date(e + 'T12:00:00');
+  if (sd.getFullYear() === ed.getFullYear()) {
+    return `${fmt(s)} – ${fmt(e)}, ${ed.getFullYear()}`;
+  }
+  return `${fmt(s)}, ${sd.getFullYear()} – ${fmt(e)}, ${ed.getFullYear()}`;
+}
+function _consolidateSeries(evts) {
+  // Index every event by its (venue|time) bucket for cheap candidate lookup.
+  const buckets = new Map();
+  const meta = evts.map((ev, idx) => {
+    const venue = (ev.venue || ev.area || '').toLowerCase().trim();
+    const time  = (ev.times || '').toLowerCase().trim();
+    const key   = venue + '|' + time;
+    const toks  = _consolidateTokens(ev.name);
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(idx);
+    return { ev, idx, key, toks };
+  });
+
+  const seen = new Set();
+  const out = [];
+  for (let i = 0; i < meta.length; i++) {
+    if (seen.has(i)) continue;
+    const m = meta[i];
+    if (!m.ev.dateStart) { out.push(m.ev); seen.add(i); continue; }
+
+    // Members of this series: self + every same-bucket row with high overlap.
+    const members = [m];
+    seen.add(i);
+    for (const j of (buckets.get(m.key) || [])) {
+      if (seen.has(j)) continue;
+      if (_consolidateJaccard(m.toks, meta[j].toks) >= 0.6) {
+        members.push(meta[j]);
+        seen.add(j);
+      }
+    }
+
+    if (members.length === 1) { out.push(m.ev); continue; }
+
+    // Merge. Pick the shortest name (usually the cleanest variant) and use
+    // the row with the richest body (image / description / url) as the base.
+    const rows = members.map(x => x.ev)
+      .sort((a, b) => (a.dateStart || '').localeCompare(b.dateStart || ''));
+    const first = rows[0], last = rows[rows.length - 1];
+    const base = rows.reduce((acc, r) => {
+      const score = (r.image ? 100 : 0)
+                  + ((r.description || '').length)
+                  + (r.url ? 20 : 0);
+      return score > acc.score ? { row: r, score } : acc;
+    }, { row: first, score: -1 }).row;
+    const name = rows.reduce((a, r) =>
+      (r.name && r.name.length < a.length) ? r.name : a,
+      rows[0].name);
+    const dateEnd = last.dateEnd || last.dateStart;
+
+    out.push({
+      ...base,
+      name,
+      dateStart: first.dateStart,
+      dateEnd,
+      dates: _consolidateFormatRange(first.dateStart, dateEnd),
+      _seriesCount: rows.length,
+    });
+  }
+  return out;
+}
+
 // _eventsForView() is the single source of truth for which events the
 // Upcoming Events tab shows, so the List and Calendar views never disagree.
 // Assumes the event cache is already loaded (callers await _loadEventsCache).
