@@ -217,8 +217,11 @@ python server.py""", CODE))
     # ─────────── SECTION 2: SCRAPE EVENTS ───────────────────────────────
     flow.append(Paragraph('2. Scrape new events', H_TITLE))
     flow.append(Paragraph(
-        'Pulls fresh events from KVMR, Eventbrite, NC Chamber, GV Chamber, '
-        'and other sources. Run weekly or whenever you want fresh data.',
+        'Pulls fresh events from 12 active sources — KVMR, NCAC Calendar, '
+        'Eventbrite, the Chambers, Center for the Arts, Miners Foundry, '
+        'Crazy Horse Saloon, Golden Era Lounge, The Curious Forge, '
+        'Wolf Craft Collective, and Nevada County Fairgrounds. Run weekly '
+        'or whenever you want fresh data.',
         H_SUB))
     flow.append(section_rule())
 
@@ -246,16 +249,32 @@ python scraper\\event_scraper.py --site "Nevada City Chamber" """, CODE))
     flow.append(Spacer(1, 10))
     flow.append(Paragraph('What gets scraped', H2))
     src_rows = [
-        ['KVMR',              'Tribe Events RSS feed', '~430 events / 6-month window'],
-        ['Eventbrite Nevada', 'Headless Chrome',       '~10 events'],
-        ['NC Chamber',        'Static HTML page',      '~10 events'],
-        ['GV Chamber',        'Elementor page',        '~5 events'],
-        ['The Union',         'RSS feed',              'Varies'],
-        ['Go Nevada',         'Headless Chrome (often Cloudflare-blocked)', 'Varies'],
+        ['NCAC Calendar',          'Trumba JSON feed',                     '~580 events'],
+        ['KVMR',                   'Tribe Events RSS feed',                '~490 events'],
+        ['The Curious Forge',      'WooCommerce Store API',                '~65 class sessions'],
+        ['Crazy Horse Saloon',     'The Events Calendar REST API',         '~25 events'],
+        ['Center for the Arts',    'requests + Selenium fallback',         '~20 concerts'],
+        ['Eventbrite Nevada',      'Headless Chrome (React)',              '~10 events'],
+        ['Nevada City Chamber',    'Static HTML',                          '~10 events'],
+        ['Wolf Craft Collective',  'Shopify products.json',                '~10 craft classes'],
+        ['Golden Era Lounge',      'Squarespace events JSON',              '~10 events'],
+        ['Nevada County Fairgrounds', 'Saffire JSONP (eventsservice.asmx)', '~7 fair/festival events'],
+        ['Miners Foundry',         'Headless Chrome (site 403s requests)', '~5-10 events'],
+        ['GV Chamber',             'Static HTML (Elementor)',              '~5 events'],
+        ['The Union',              'RSS first, Selenium fallback',         'Varies (paywall)'],
     ]
     flow.append(build_table(
         [['Source', 'Method', 'Typical volume']] + src_rows,
-        col_widths=[1.6*inch, 2.4*inch, 2.5*inch]))
+        col_widths=[2.0*inch, 2.7*inch, 1.8*inch]))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph(
+        '<b>Disabled scrapers</b> (kept in the codebase, off by default): '
+        '<i>Go Nevada</i> and <i>Go Nevada Festivals</i> — Cloudflare 403s both '
+        'requests and headless Chrome. <i>Nevada Theatre</i> — MEC plugin '
+        'archive is AJAX-lazy-loaded and not worth a slow brittle scrape '
+        '(KVMR already covers it well).',
+        BODY))
 
     flow.append(PageBreak())
 
@@ -371,9 +390,9 @@ python scraper\\event_scraper.py --site "Nevada City Chamber" """, CODE))
     flow.append(Spacer(1, 10))
     flow.append(Paragraph('4c. Cost', H1))
     cost_rows = [
-        ['First-time bulk run (all 460 events)', '~$0.30',           'one-time'],
-        ['Weekly: only new events',              '$0.04 - $0.13',    '$0.20-$0.50/mo'],
-        ['Daily: only new events',               '$0.01 - $0.02',    '$0.30-$0.60/mo'],
+        ['First-time bulk run (all ~1,240 events)', '~$0.80',        'one-time'],
+        ['Weekly: only new events',                 '$0.10 - $0.30', '$0.40 - $1.20/mo'],
+        ['Daily: only new events',                  '$0.02 - $0.05', '$0.60 - $1.50/mo'],
     ]
     flow.append(build_table(
         [['Run pattern', 'Per run', 'Monthly equiv']] + cost_rows,
@@ -391,7 +410,7 @@ python scraper\\event_scraper.py --site "Nevada City Chamber" """, CODE))
     # ─────────── SECTION 5: ADD/EDIT EXPERIENCES ────────────────────────
     flow.append(Paragraph('5. Add or edit an experience', H_TITLE))
     flow.append(Paragraph(
-        'The 161 curated experiences (Empire Mine, Lola Restaurant, B&amp;Bs, '
+        'The 164 curated experiences (Empire Mine, Lola Restaurant, B&amp;Bs, '
         'campgrounds, etc.) live in an inline-editable table.',
         H_SUB))
     flow.append(section_rule())
@@ -564,13 +583,24 @@ git push
 │   ├── auto_tagger.py            ← Keyword-based pre-tagging
 │   ├── config.py                 ← API KEYS — never committed to GitHub
 │   ├── sources.json              ← Scraper source URL list
-│   └── site_scrapers/            ← One file per source
-│       ├── kvmr.py
-│       ├── eventbrite_nevada.py
+│   └── site_scrapers/            ← One file per source (or per platform)
+│       ├── base.py               ← Shared EventScraper class + RSS autodiscovery
+│       ├── kvmr.py               ← Tribe Events RSS
+│       ├── ncac_calendar.py     ← Trumba JSON
+│       ├── eventbrite_nevada.py ← React via Selenium
 │       ├── nevada_city_chamber.py
 │       ├── gv_chamber.py
 │       ├── the_union.py
-│       └── ...
+│       ├── center_for_arts.py
+│       ├── miners_foundry.py
+│       ├── fairgrounds.py        ← Saffire JSONP (Nevada County Fairgrounds)
+│       ├── tribe_events.py       ← The Events Calendar REST (Crazy Horse)
+│       ├── woocommerce.py        ← WooCommerce Store API (Curious Forge)
+│       ├── shopify.py            ← Shopify products.json (Wolf Craft)
+│       ├── squarespace_events.py ← Squarespace events JSON (Golden Era)
+│       ├── nevada_theatre.py     ← MEC plugin (disabled — see event_scraper.py)
+│       ├── go_nevada.py          ← disabled (Cloudflare 403s)
+│       └── go_nevada_festivals.py ← disabled (Cloudflare 403s)
 ├── scraper_output/
 │   ├── events.json               ← The live event database (committed)
 │   ├── candidates.json           ← Scraper debug data (gitignored)
