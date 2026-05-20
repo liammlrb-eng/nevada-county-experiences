@@ -121,10 +121,10 @@ def page_footer(slide, page_num, total):
     """Footer with page number + brand line."""
     add_text(slide, 'Western Nevada County Experience',
              Inches(0.6), Inches(7.1), Inches(8), Inches(0.3),
-             size=9, color=SLATE)
+             size=10, color=SLATE)
     add_text(slide, f'{page_num} / {total}',
              Inches(11.5), Inches(7.1), Inches(1.2), Inches(0.3),
-             size=9, color=SLATE, align=PP_ALIGN.RIGHT)
+             size=10, color=SLATE, align=PP_ALIGN.RIGHT)
     add_gold_rule(slide, Inches(0.6), Inches(7.06), Inches(12.1))
 
 
@@ -141,7 +141,7 @@ def add_bullets(slide, items, left, top, width, height, *,
     scenario_color defaults to BROWN (the brand brown)
     """
     if scenario_size is None:
-        scenario_size = max(size - 2, 8)
+        scenario_size = max(size - 2, 10)
     if scenario_color is None:
         scenario_color = BROWN
     box = slide.shapes.add_textbox(left, top, width, height)
@@ -192,28 +192,36 @@ def add_bullets(slide, items, left, top, width, height, *,
     return box
 
 
-def add_stat_card(slide, left, top, width, height, big_text, label):
-    """Featured number + label, like a metric tile."""
+def add_stat_card(slide, left, top, width, height, big_text, label, *, big_size=44):
+    """Featured number + label, like a metric tile.
+
+    `big_size` is the nominal font size for the headline number; tune down
+    when the value is long (e.g. "$5K–$30K") so it doesn't wrap inside the
+    card width."""
     add_rect(slide, left, top, width, height, FOG, RULE)
     # Big number
     add_text(slide, big_text, left, top + Inches(0.2), width, Inches(0.9),
-             size=44, bold=True, color=GOLD, align=PP_ALIGN.CENTER, font='Calibri')
+             size=big_size, bold=True, color=GOLD, align=PP_ALIGN.CENTER, font='Calibri')
     # Label
     add_text(slide, label, left, top + Inches(1.05), width, Inches(0.5),
              size=11, color=SLATE, align=PP_ALIGN.CENTER, font='Calibri')
 
 
-def two_col_table(slide, headers, rows, top, *, left_w=4.5, right_w=8.0,
+def two_col_table(slide, headers, rows, top, *, left=None, left_w=4.5, right_w=8.0,
                   header_size=11, body_size=10, row_height=0.5,
                   scenario_size=None):
     """
     Simple 2-column table without using actual table shape (more layout control).
     Each row is either a 2-tuple (left, right) or a 3-tuple (left, right, scenario).
     A scenario renders as a second italic line in the right column.
+
+    `left` overrides the default left-edge position (Inches(0.6)). Pass a value
+    like Inches(7.0) to render a narrow table on the right half of a slide.
     """
     if scenario_size is None:
-        scenario_size = max(body_size - 2, 8)
-    left  = Inches(0.6)
+        scenario_size = max(body_size - 2, 10)
+    if left is None:
+        left = Inches(0.6)
     col2  = left + Inches(left_w)
     # Header row
     add_rect(slide, left, top, Inches(left_w + right_w), Inches(0.42), FOG)
@@ -315,7 +323,7 @@ def slide_strategic_insight(s):
         ('Smart suggestions are tag + geography aware — clusters keep visitors close to lodging',
          'After Holbrooke Hotel goes in, suggestions cluster around Mill Street.'),
     ], Inches(0.6), Inches(2.85), Inches(12.1), Inches(3.5),
-       size=11, line_spacing=1.2, scenario_size=9)
+       size=11, line_spacing=1.2, scenario_size=10)
 
     # Closing quote
     add_rect(s, Inches(0.6), Inches(6.2), Inches(12.1), Inches(0.7),
@@ -389,8 +397,8 @@ def slide_discovery(s):
         ('Tag-aware Smart Suggestions',
          '"Near Your Stops" panel in the itinerary — geographic + tag scoring',
          'After Empire Mine goes in, the panel surfaces Holbrooke Hotel 0.4 mi away.'),
-    ], Inches(1.55), left_w=3.4, right_w=8.7, body_size=9, row_height=0.50,
-       scenario_size=7.5)
+    ], Inches(1.55), left_w=3.4, right_w=8.7, body_size=10, row_height=0.52,
+       scenario_size=10)
 
 
 def slide_help_me_plan(s):
@@ -438,7 +446,7 @@ def slide_help_me_plan(s):
         ('Editable: change anything, add anything, remove anything',
          'Visitor tweaks the plan in the same My Itinerary they\'d use anyway.'),
     ], Inches(7.0), Inches(3.5), Inches(5.7), Inches(3.0),
-       size=11, line_spacing=1.2, scenario_size=9)
+       size=11, line_spacing=1.2, scenario_size=10)
 
     # Closing pitch line
     add_rect(s, Inches(0.6), Inches(6.6), Inches(12.1), Inches(0.5),
@@ -478,7 +486,7 @@ def slide_itinerary(s):
         ('Share link via native phone share sheet, email, text, or copy URL',
          'Visitor texts the URL to spouse: "this is what I\'m thinking."'),
     ], Inches(0.6), Inches(1.75), Inches(7.0), Inches(5.3),
-       size=10, line_spacing=1.15, scenario_size=8)
+       size=10, line_spacing=1.15, scenario_size=10)
 
     # Right: visual mock representation
     mock_x = Inches(7.9); mock_y = Inches(1.85); mock_w = Inches(4.8); mock_h = Inches(5.0)
@@ -506,7 +514,7 @@ def slide_itinerary(s):
              size=11, bold=True, color=BROWN)
     add_text(s, '💤  No lodging picked for tonight  →  [Find Lodging]',
              mock_x + Inches(0.4), mock_y + Inches(3.2), mock_w - Inches(0.6), Inches(0.5),
-             size=9, italic=True, color=SLATE)
+             size=10, italic=True, color=SLATE)
     add_text(s, '📅  Father\'s Day Bluegrass — Sat 7:00 PM',
              mock_x + Inches(0.4), mock_y + Inches(3.7), mock_w - Inches(0.6), Inches(0.5),
              size=10, color=GOLD)
@@ -588,8 +596,8 @@ def slide_ux_decisions(s):
          'December visitor never sees "summer concert series" as a dead lead.'),
     ]
     two_col_table(s, ['Decision', 'Why it matters'], ux_pairs,
-                  Inches(1.65), left_w=4.0, right_w=8.1, body_size=9,
-                  row_height=0.6, scenario_size=8)
+                  Inches(1.65), left_w=4.0, right_w=8.1, body_size=10,
+                  row_height=0.62, scenario_size=10)
 
 
 def slide_privacy(s):
@@ -616,7 +624,7 @@ def slide_privacy(s):
         ('Opt-in measurement available if needed (Plausible — no cookies, no PII)',
          'If the chamber wants aggregate metrics later, flip a config flag — no rebuild.'),
     ], Inches(0.6), Inches(1.7), Inches(12.1), Inches(4.7),
-       size=11, line_spacing=1.18, scenario_size=9)
+       size=11, line_spacing=1.18, scenario_size=10)
 
     # Closing quote
     add_rect(s, Inches(0.6), Inches(6.0), Inches(12.1), Inches(0.85),
@@ -632,7 +640,7 @@ def slide_admin(s):
         '~30 minutes per week of chamber-staff time keeps the site live and current.')
 
     add_bullets(s, [
-        'One-click event-source updates from 11+ sources — KVMR, Eventbrite, NC/GV Chambers, Go Nevada, The Union, Nevada Theatre, Curious Forge, Crazy Horse Saloon, Golden Era Lounge, Wolf Craft Collective (and growing)',
+        'One-click event-source updates from 11+ sources (full inventory in appendix)',
         'Approve / dismiss events in a queue; bulk-approve is one click',
         'AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)',
         'Publish and edit chamber-curated experiences via the public planner — no separate admin tool',
@@ -667,7 +675,7 @@ def slide_ai(s):
         ('Future source refreshes auto-categorize new events with the same logic',
          'Tuesday\'s new event gets correct area + venue + tags without human touch.'),
     ], Inches(0.6), Inches(2.3), Inches(6), Inches(4.2),
-       size=10, line_spacing=1.15, scenario_size=8)
+       size=10, line_spacing=1.15, scenario_size=10)
 
     # Right: cost table
     add_text(s, 'Cost', Inches(7.2), Inches(1.85), Inches(5.5), Inches(0.45),
@@ -677,7 +685,7 @@ def slide_ai(s):
         ('Daily refresh + categorize',      '$0.50 – $1.50'),
         ('Weekly refresh + categorize',     '$0.20 – $0.60'),
         ('Realistic chamber operation',     '~$0.50 – $1.50'),
-    ], Inches(2.3), left_w=3.0, right_w=2.4, body_size=10, row_height=0.45)
+    ], Inches(2.3), left=Inches(7.2), left_w=3.2, right_w=2.3, body_size=10, row_height=0.55)
 
     # Footer note
     add_rect(s, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.5),
@@ -692,15 +700,18 @@ def slide_cost(s):
     slide_header(s, 'What it costs',
         'Three operating scenarios for the first year of operation.')
 
-    # 4 stat cards: Lean, Typical, Premium, Comparison
+    # 4 stat cards: Lean, Typical, Premium, Comparison. Headline numbers use
+    # a smaller font here (vs. the 161/1,200+ stats on slide 3) because the
+    # cost values are longer strings — "$300–$500", "$5K–$30K" — and wrap
+    # inside the card width at the default size=44.
     add_stat_card(s, Inches(0.6),  Inches(1.85), Inches(2.85), Inches(1.7),
-                  '$0–$50',  'LEAN\nFree hosting + AI off')
+                  '$0–$50',  'LEAN\nFree hosting + AI off', big_size=30)
     add_stat_card(s, Inches(3.65), Inches(1.85), Inches(2.85), Inches(1.7),
-                  '$80–$150', 'TYPICAL\n$5/mo VPS + weekly AI')
+                  '$80–$150', 'TYPICAL\n$5/mo VPS + weekly AI', big_size=30)
     add_stat_card(s, Inches(6.7),  Inches(1.85), Inches(2.85), Inches(1.7),
-                  '$300–$500', 'PREMIUM\nManaged + daily AI')
+                  '$300–$500', 'PREMIUM\nManaged + daily AI', big_size=30)
     add_stat_card(s, Inches(9.75), Inches(1.85), Inches(2.85), Inches(1.7),
-                  '$5K–$30K',  'COMMERCIAL ALT.\nCrowdRiff / Simpleview')
+                  '$5K–$30K',  'COMMERCIAL ALT.\nCrowdRiff / Simpleview', big_size=30)
 
     # Bullet list of what's NOT a cost
     add_text(s, 'What\'s NOT a cost',
@@ -746,7 +757,7 @@ def slide_next_steps(s):
         'master calendar — if so, federate from it instead '
         'of NCAC alone',
     ], Inches(0.6), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
-       size=9, line_spacing=1.35)
+       size=10, line_spacing=1.3)
 
     # ── Column 2: Member outreach ──
     add_text(s, 'MEMBER OUTREACH',
@@ -767,7 +778,7 @@ def slide_next_steps(s):
         'of visitor traffic and prioritize their data '
         'reliability over long-tail coverage',
     ], Inches(4.7), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
-       size=9, line_spacing=1.35)
+       size=10, line_spacing=1.3)
 
     # ── Column 3: Operations ──
     add_text(s, 'OPERATIONS',
@@ -794,7 +805,7 @@ def slide_next_steps(s):
         'change platforms (e.g. NCAC moved to Trumba) and '
         'previously-blocked sources become reachable',
     ], Inches(8.8), col_y + Inches(0.4), Inches(4.0), col_h - Inches(0.4),
-       size=8.5, line_spacing=1.3)
+       size=10, line_spacing=1.25)
 
     # Bottom callout: what we already learned
     add_rect(s, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.5),
@@ -803,6 +814,43 @@ def slide_next_steps(s):
         'Concrete win from this work:  NCAC\'s calendar went from "0 events" '
         '(blocked by an iframe) to 540 events — by hitting Trumba\'s JSON feed directly.',
         Inches(0.7), Inches(6.55), Inches(11.9), Inches(0.4),
+        size=10, italic=True, color=BROWN, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+
+def slide_sources_appendix(s):
+    """Full inventory of the event sources currently feeding the queue.
+    Pulled off the main Admin slide to keep that slide scannable; pull this
+    up if anyone asks 'where do the events actually come from?'"""
+    add_text(s, 'APPENDIX  ·  PULL UP IF ASKED',
+             Inches(8.5), Inches(0.45), Inches(4.2), Inches(0.3),
+             size=10, bold=True, color=GOLD, align=PP_ALIGN.RIGHT)
+    slide_header(s, 'Event sources — full inventory',
+        '11 sources feeding the events queue today. New ones plug in by '
+        'pasting a URL — no code required for sources on common platforms.')
+
+    rows = [
+        ('KVMR',                       'Local public radio — community events feed (Trumba calendar)'),
+        ('Eventbrite',                 'Public ticketed events tagged Nevada County / Grass Valley / Nevada City'),
+        ('Nevada City Chamber',        'Member venues + chamber-curated events from nevadacitychamber.com'),
+        ('Grass Valley Chamber',       'Member venues + downtown events from downtowngrassvalley.com'),
+        ('Go Nevada County',           'County tourism site — anchor festivals + visitor events'),
+        ('The Union',                  'Local newspaper — community calendar feed'),
+        ('Nevada Theatre',             'WP Modern Events Calendar (MEC) plugin via WP REST'),
+        ('Curious Forge',              'WooCommerce Store API — workshop classes & maker sessions'),
+        ('Crazy Horse Saloon',         'Tribe Events (WordPress) — live music nights'),
+        ('Golden Era Lounge',          'Squarespace Events — live music nights'),
+        ('Wolf Craft Collective',      'Shopify — craft workshops and pop-ups'),
+    ]
+    two_col_table(s, ['Source', 'What it provides'], rows,
+                  Inches(1.85), left_w=3.4, right_w=8.7,
+                  body_size=11, row_height=0.45)
+
+    # Bottom note about adding more
+    add_rect(s, Inches(0.6), Inches(6.6), Inches(12.1), Inches(0.5),
+             FOG, GOLD)
+    add_text(s,
+        'New sources added by pasting a URL into the admin "Event Sources" tab. The 5 newest in this list (Nevada Theatre through Wolf Craft) all use generic scraper templates that work on any site running the same platform.',
+        Inches(0.7), Inches(6.65), Inches(11.9), Inches(0.4),
         size=10, italic=True, color=BROWN, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 
 
@@ -815,7 +863,7 @@ def slide_migration(s):
     # Appendix eyebrow — small caps top-right so it doesn't fight the title
     add_text(s, 'APPENDIX  ·  PULL UP IF ASKED',
              Inches(8.5), Inches(0.45), Inches(4.2), Inches(0.3),
-             size=9, bold=True, color=GOLD, align=PP_ALIGN.RIGHT)
+             size=10, bold=True, color=GOLD, align=PP_ALIGN.RIGHT)
     slide_header(s, 'Migration to a county server',
         'One focused half-day for someone comfortable with Linux; two days for a learner.')
 
@@ -873,10 +921,10 @@ def slide_thank_you(s):
 # Five-act structure based on chat-Claude's reorder feedback (May 2026):
 #
 #   Act 1 — Why we're here     (title + strategic insight)
-#   Act 2 — What I built       (what this is + discovery + itinerary + demo)
-#   Act 3 — Why this works     (personas + UX + privacy)
+#   Act 2 — What I built       (what this is + discovery + who it serves + help-me-plan + itinerary + demo)
+#   Act 3 — Why this works     (UX + privacy)
 #   Act 4 — How it runs        (admin + AI + cost)
-#   Act 5 — What's next        (group next steps + migration appendix + close)
+#   Act 5 — What's next        (group next steps + appendices + close)
 #
 # Each entry: (function, show_page_footer)
 SLIDE_ORDER = [
@@ -886,11 +934,11 @@ SLIDE_ORDER = [
     # ── Act 2 ─────────────────────────────────────────────────────────────
     (slide_what_this_is,       True),   # Numbers as evidence for Act 1's argument
     (slide_discovery,          True),
+    (slide_personas,           True),   # Who this serves — sets up the rest of Act 2
     (slide_help_me_plan,       True),   # Trip generator — biggest new feature
     (slide_itinerary,          True),
     (slide_demo_flow,          True),   # Live demo — the emotional peak
     # ── Act 3 ─────────────────────────────────────────────────────────────
-    (slide_personas,           True),   # After demo, personas feel like real people
     (slide_ux_decisions,       True),
     (slide_privacy,            True),
     # ── Act 4 ─────────────────────────────────────────────────────────────
@@ -906,6 +954,7 @@ SLIDE_ORDER = [
 # (chat-Claude: "9-phase migration plan for a prototype conversation feels
 # premature"). Numbered with an 'A' prefix instead of counting against TOTAL.
 APPENDIX_ORDER = [
+    (slide_sources_appendix,   True),
     (slide_migration,          True),
 ]
 

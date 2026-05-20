@@ -1,14 +1,14 @@
 # demo_pitch.pptx — slide-by-slide outline
 
-15 main slides + 1 appendix, 16:9 widescreen. Brand palette: brown (#5C3A1F), gold (#C9A84C),
+15 main slides + 2 appendix, 16:9 widescreen. Brand palette: brown (#5C3A1F), gold (#C9A84C),
 slate (#4A5568), fog (#F5EFE2). All "↳ scenario" lines render as italic
 sub-lines beneath the bullet they explain.
 
 ## Narrative arc — 5 acts
 
 1. **Why we're here** — Title + Strategic insight (lodging revenue framing leads everything)
-2. **What I built to test the idea** — Numbers, Discovery, Help Me Plan, Itinerary, Live demo
-3. **Why this approach works** — Personas, UX decisions, Privacy
+2. **What I built to test the idea** — Numbers, Discovery, Who this serves, Help Me Plan, Itinerary, Live demo
+3. **Why this approach works** — UX decisions, Privacy
 4. **How it runs** — Admin, AI, Cost (second big moment: $6/mo vs $5K–$30K)
 5. **What's next** — Where the group can take this · Migration (appendix-feel) · Close
 
@@ -81,7 +81,31 @@ Sierra-side are out of scope.
 
 ---
 
-## Slide 5 — ✨ Help Me Plan — one-click trip generator  *(NEW)*
+## Slide 5 — Who this serves  *(moved earlier — was slide 8)*
+*Nine visitor personas — each searches differently and converts on different content.*
+
+Sets up Act 2: before showing how the planner works, the room understands who's
+going to use it. Trade-off vs. the prior "after demo" placement — personas read
+as abstract on first encounter rather than as "real people I just saw using the
+tool" — accepted to ground the audience in the user base earlier.
+
+1. **Romantic Weekender** — Couples 35-65, Bay Area / Sac, B&Bs + dining + wineries
+2. **Festival Pilgrim** — Anchored to a specific event (Cornish Christmas, Wild & Scenic, Bluegrass)
+3. **Trail & Lake Seeker** — Hiking / biking / swimming / paddling — needs distance & difficulty
+4. **Multi-Gen Family** — Parents with kids 5–15 — "will my 8-year-old be bored?"
+5. **Arts & Heritage Traveler** — Substance over photos; reads notes; values authenticity
+6. **Wine Country Foodie** — Napa-alternative — provenance, chef bios, tasting flights
+7. **Wellness Refugee** — Float, massage, yoga, gardens — filtering for what's NOT there
+8. **Local "What's Up"** — Residents — pure events feed, "what's on this weekend"
+9. **Maker Traveler** — Travels for the workshop — a destination-class workshop venue can anchor a regional identity
+
+**Recommended marketing focus (over-serve four):** Festival Pilgrim · Romantic Weekender · Foodie · Maker Traveler
+
+> 💡 Brand-neutral framing: persona #9 used to name a specific venue (Curious Forge), and listed first in over-serve. Both reordered/genericized so the deck doesn't read as the presenter promoting their own venue. The cluster of maker venues in the county is mentioned in the long-form PDF without naming specific businesses.
+
+---
+
+## Slide 6 — ✨ Help Me Plan — one-click trip generator  *(NEW)*
 *Six quick questions → a complete day-by-day itinerary made from real local venues.*
 
 Removes the blank-page problem for first-time visitors. The planner scores every
@@ -113,7 +137,7 @@ curated local data.
 
 ---
 
-## Slide 6 — Day-by-day itinerary builder
+## Slide 7 — Day-by-day itinerary builder
 *Visitors think in nights, not stops — the planner reflects that.*
 
 - Each day has its own card with a numbered header and calendar date
@@ -140,7 +164,7 @@ Tonight's Stay = Holbrooke Hotel, and Day 2 with empty lodging slot.
 
 ---
 
-## Slide 7 — Let me show you  *(retitled from "The 8-minute demo flow")*
+## Slide 8 — Let me show you  *(retitled from "The 8-minute demo flow")*
 *A live demo: visitor planning a romantic November weekend in Western Nevada County.*
 
 This slide cues the live demo — the emotional peak of the presentation.
@@ -153,27 +177,6 @@ This slide cues the live demo — the emotional peak of the presentation.
 | Act 3 | 2 min | Build the weekend — Cornish Christmas + Holbrooke Hotel + Empire Mine + Lola. Open My Itinerary — Smart Suggestions appear with "0.4 mi away" labels. |
 | Act 4 | 90 sec | Behind the scenes — admin Events Queue, Approve All, AI Categorize, Event Sources |
 | Act 5 | 60 sec | Close the value props — time saved, local visibility, privacy, no vendor lock-in |
-
----
-
-## Slide 8 — Who this serves  *(formerly slide 3)*
-*Nine visitor personas — each searches differently and converts on different content.*
-
-After the demo, personas land as "these are real people I just saw using the tool."
-
-1. **Romantic Weekender** — Couples 35-65, Bay Area / Sac, B&Bs + dining + wineries
-2. **Festival Pilgrim** — Anchored to a specific event (Cornish Christmas, Wild & Scenic, Bluegrass)
-3. **Trail & Lake Seeker** — Hiking / biking / swimming / paddling — needs distance & difficulty
-4. **Multi-Gen Family** — Parents with kids 5–15 — "will my 8-year-old be bored?"
-5. **Arts & Heritage Traveler** — Substance over photos; reads notes; values authenticity
-6. **Wine Country Foodie** — Napa-alternative — provenance, chef bios, tasting flights
-7. **Wellness Refugee** — Float, massage, yoga, gardens — filtering for what's NOT there
-8. **Local "What's Up"** — Residents — pure events feed, "what's on this weekend"
-9. **Maker Traveler** — Travels for the workshop — a destination-class workshop venue can anchor a regional identity
-
-**Recommended marketing focus (over-serve four):** Festival Pilgrim · Romantic Weekender · Foodie · Maker Traveler
-
-> 💡 Brand-neutral framing: persona #9 used to name a specific venue (Curious Forge), and listed first in over-serve. Both reorderd/genericized so the deck doesn't read as the presenter promoting their own venue. The cluster of maker venues in the county is mentioned in the long-form PDF without naming specific businesses.
 
 ---
 
@@ -217,7 +220,7 @@ After the demo, personas land as "these are real people I just saw using the too
 ## Slide 11 — Behind the scenes  *(formerly slide 8)*
 *Chamber-staff operations: live data with minimal effort.*
 
-- 🔄 One-click event-source updates from 11+ sources — KVMR, Eventbrite, NC/GV Chambers, Go Nevada, The Union, Nevada Theatre, Curious Forge, Crazy Horse Saloon, Golden Era Lounge, Wolf Craft Collective (and growing)
+- 🔄 One-click event-source updates from 11+ sources (full inventory in appendix)
   ↳ *Chamber staffer clicks "Refresh Sources" Monday morning; ~50 new events appear.*
 - ✅ Approve / dismiss events in a queue; bulk-approve is one click
 - 🤖 AI Categorize button (Claude Haiku) — refines area, venue, tags, quality (~$0.20 per full run)
@@ -313,7 +316,30 @@ The leave-behind one-liner:
 
 ---
 
-## Slide A1 (APPENDIX) — Migration to a county server
+## Slide A1 (APPENDIX) — Event sources, full inventory
+*11 sources feeding the events queue today. Pulled off the main Admin slide
+to keep that slide scannable; pull this up if anyone asks "where do the events
+actually come from?"*
+
+| Source | What it provides |
+|---|---|
+| **KVMR** | Local public radio — community events feed (Trumba calendar) |
+| **Eventbrite** | Public ticketed events tagged Nevada County / Grass Valley / Nevada City |
+| **Nevada City Chamber** | Member venues + chamber-curated events from nevadacitychamber.com |
+| **Grass Valley Chamber** | Member venues + downtown events from downtowngrassvalley.com |
+| **Go Nevada County** | County tourism site — anchor festivals + visitor events |
+| **The Union** | Local newspaper — community calendar feed |
+| **Nevada Theatre** | WP Modern Events Calendar (MEC) plugin via WP REST |
+| **Curious Forge** | WooCommerce Store API — workshop classes & maker sessions |
+| **Crazy Horse Saloon** | Tribe Events (WordPress) — live music nights |
+| **Golden Era Lounge** | Squarespace Events — live music nights |
+| **Wolf Craft Collective** | Shopify — craft workshops and pop-ups |
+
+> *"New sources added by pasting a URL into the admin Event Sources tab. The 5 newest in this list (Nevada Theatre through Wolf Craft) all use generic scraper templates that work on any site running the same platform."*
+
+---
+
+## Slide A2 (APPENDIX) — Migration to a county server
 *One focused half-day for someone comfortable with Linux; two days for a learner.*
 
 > 💡 Per chat-Claude feedback: "9-phase migration plan for a prototype conversation feels premature." Demoted to the appendix — pull up only if IT is in the room or someone explicitly asks "how would we actually host this?" Slide footer reads "A1 / A1" instead of a regular page number to make the demotion visible.
