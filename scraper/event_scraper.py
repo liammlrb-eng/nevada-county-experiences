@@ -243,6 +243,16 @@ def run(scrapers, discover=False):
     except Exception as e:
         print(f"  Link check skipped: {e}")
 
+    # ── Refresh outbound public feeds (ICS / RSS / JSON / venues) ───────────
+    # Partners subscribe to feeds/events.{ics,rss,json} on the GitHub Pages
+    # site. Regenerate on every scrape so the feeds reflect the freshly
+    # approved queue + the latest curated experiences.
+    try:
+        from generate_feeds import build as build_feeds
+        build_feeds()
+    except Exception as e:
+        print(f"  Feed generation skipped: {e}")
+
     print(f"\n{'=' * 56}")
     print(f"  Scraped this run   : {len(all_fresh)}")
     print(f"  New (added)        : {added}")

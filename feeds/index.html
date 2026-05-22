@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nevada County Experience — Public Feeds</title>
+<meta name="description" content="Free public feeds (ICS, RSS, JSON) of upcoming events and curated venues across Western Nevada County, California.">
+<style>
+  :root {
+    --brown:#5C3A1F; --gold:#C9A84C; --slate:#4A5568;
+    --fog:#F5EFE2; --dark:#1E1508; --rule:#D4C9B0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--dark); background: #FBF7EE; margin: 0;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 36px 24px 80px; }
+  h1 { color: var(--brown); margin: 0 0 4px; font-size: 30px; }
+  .sub { color: var(--slate); margin: 0 0 28px; font-size: 15px; }
+  h2 { color: var(--brown); margin: 32px 0 10px; font-size: 20px;
+       border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+  h3 { color: var(--gold); margin: 18px 0 6px; font-size: 14px;
+       text-transform: uppercase; letter-spacing: 0.06em; }
+  .feed-card {
+    background: #fff; border: 1px solid var(--rule); border-radius: 6px;
+    padding: 16px 18px; margin: 12px 0;
+  }
+  .feed-card .name { font-weight: 600; color: var(--brown); font-size: 15px; }
+  .feed-card .desc { color: var(--slate); font-size: 13px; margin: 4px 0 10px; }
+  .feed-card a.url {
+    display: inline-block; background: var(--fog); color: var(--brown);
+    padding: 6px 10px; border-radius: 4px; font-family: ui-monospace, Consolas, monospace;
+    font-size: 12px; text-decoration: none; word-break: break-all;
+  }
+  .feed-card a.url:hover { background: var(--gold); color: #fff; }
+  code {
+    background: var(--fog); color: var(--brown); padding: 2px 6px;
+    border-radius: 3px; font-size: 13px; font-family: ui-monospace, Consolas, monospace;
+  }
+  pre {
+    background: #fff; border: 1px solid var(--rule); border-radius: 4px;
+    padding: 12px 14px; overflow-x: auto; font-size: 12px;
+    font-family: ui-monospace, Consolas, monospace; line-height: 1.5;
+  }
+  .lic {
+    background: #fff8e1; border: 1px solid var(--gold); border-radius: 6px;
+    padding: 14px 16px; margin: 24px 0;
+  }
+  .lic strong { color: var(--brown); }
+  a { color: #B07020; }
+  .back { color: var(--slate); font-size: 13px; text-decoration: none; }
+  .back:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="../">← Back to Nevada County Experience</a>
+
+<h1>Public Feeds</h1>
+<p class="sub">Free, open data for upcoming events and curated venues across Western Nevada County, California. Updated nightly. No API key. No rate limit. Just subscribe.</p>
+
+<h2>Events feeds</h2>
+<p>Approved events from the next ~16 months. Aggregated from 12 sources (KVMR, NCAC Calendar, Eventbrite, both Chambers, Center for the Arts, Miners Foundry, Crazy Horse, Wolf Craft, Curious Forge, Golden Era, Nevada County Fairgrounds), de-duplicated, AI-categorized, and hand-curated through an admin review queue.</p>
+
+<div class="feed-card">
+  <div class="name">📅 iCal (.ics) — calendar app subscribe</div>
+  <div class="desc">Drop this URL into Google Calendar, Apple Calendar, or Outlook as a subscribed calendar. Events refresh automatically.</div>
+  <a class="url" href="events.ics">https://liammlrb-eng.github.io/nevada-county-experiences/feeds/events.ics</a>
+</div>
+
+<div class="feed-card">
+  <div class="name">📰 RSS 2.0 — for newsletters &amp; partner sites</div>
+  <div class="desc">Embed in a chamber newsletter, partner website, or feed reader. Each item includes title, venue, date/time, description, categories, and source attribution.</div>
+  <a class="url" href="events.rss">https://liammlrb-eng.github.io/nevada-county-experiences/feeds/events.rss</a>
+</div>
+
+<div class="feed-card">
+  <div class="name">🔧 JSON — for developers &amp; integrations</div>
+  <div class="desc">Structured event records with stable fields (id, title, date, end_date, time, venue, area, category, tags, description, url, image, source). Build a custom integration, an app, a dashboard.</div>
+  <a class="url" href="events.json">https://liammlrb-eng.github.io/nevada-county-experiences/feeds/events.json</a>
+</div>
+
+<h2>Venues feed</h2>
+<p>The 170 curated venues and experiences shown on the Explore tab — restaurants, lodging, hiking, museums, galleries, parks, lifestyle spots, festivals. Changes only when an admin edits the catalog.</p>
+
+<div class="feed-card">
+  <div class="name">🗺️ JSON — curated venues &amp; experiences</div>
+  <div class="desc">Each record: id, name, blurb, area, type, tags, hours, notes, url, directions, coordinates, season, icon. Stable IDs are safe to use as foreign keys.</div>
+  <a class="url" href="venues.json">https://liammlrb-eng.github.io/nevada-county-experiences/feeds/venues.json</a>
+</div>
+
+<h2>License &amp; attribution</h2>
+<div class="lic">
+  <p><strong>CC BY 4.0</strong> — you may use, redistribute, remix, and build commercial products on this data, provided you credit:</p>
+  <p style="margin:8px 0 4px"><strong>Nevada County Experience</strong> — <a href="../">liammlrb-eng.github.io/nevada-county-experiences</a></p>
+  <p style="margin:0;color:var(--slate);font-size:13px">A backlink in the footer of your site or newsletter is enough. The individual event records also carry a <code>source</code> field naming the original publisher (KVMR, NCAC, etc.) — please preserve that on display whenever possible.</p>
+</div>
+
+<h2>For developers</h2>
+
+<h3>Example: Google Calendar subscribe</h3>
+<pre>1. Open Google Calendar
+2. Left sidebar → "Other calendars" → "+ Subscribe to calendar"
+3. Paste:  https://liammlrb-eng.github.io/nevada-county-experiences/feeds/events.ics
+4. Done — events appear in your calendar and refresh automatically.</pre>
+
+<h3>Example: JSON fetch (Node, Python, anything)</h3>
+<pre>fetch('https://liammlrb-eng.github.io/nevada-county-experiences/feeds/events.json')
+  .then(r =&gt; r.json())
+  .then(data =&gt; {
+    console.log(data.count, 'events');
+    data.events.forEach(ev =&gt; console.log(ev.date, ev.title, '@', ev.venue));
+  });</pre>
+
+<h3>JSON schema (events.json)</h3>
+<pre>{
+  "feed":         "Nevada County Experience — Events",
+  "homepage":     "https://liammlrb-eng.github.io/nevada-county-experiences/",
+  "generated_at": "2026-05-22T21:59:30Z",
+  "count":        1162,
+  "license":      "CC BY 4.0 — attribution required",
+  "attribution":  "Nevada County Experience — ...",
+  "events": [
+    {
+      "id":          "4a9000b1a2a0",      // stable hash
+      "title":       "...",
+      "date":        "2026-05-22",         // ISO start date
+      "end_date":    "2026-05-22",
+      "time":        "9:00 PM",            // free-text local time, may be ""
+      "end_time":    "",
+      "venue":       "Crazy Horse Saloon",
+      "area":        "Nevada City",
+      "category":    "Music event",
+      "tags":        ["Music"],
+      "description": "Up to 600 chars.",
+      "url":         "https://...",        // event source page
+      "image":       "https://...",        // may be ""
+      "source":      "Crazy Horse Saloon"  // which publisher we ingested it from
+    }
+  ]
+}</pre>
+
+<h2>How it works</h2>
+<p>This site is a federated aggregator. It pulls events from a dozen Nevada County publishers (RSS, JSON APIs, scraped HTML — whatever each venue exposes), filters out duplicates and Sierra-side noise, and presents the union as one trip-planning experience. These feeds are the outbound side of that pipeline — they make the aggregated calendar usable in <em>your</em> tools, not just on this site.</p>
+
+<p>If you publish events for a Nevada County venue and want to make sure we pick them up, see the <a href="../">main site</a> for ways to submit. The easiest is to add <a href="https://schema.org/Event" target="_blank">schema.org/Event JSON-LD</a> to your existing event page — Google, this site, and other aggregators will all ingest it automatically.</p>
+
+<h2>Questions / requests</h2>
+<p>Found a bug, want a different format, or want to syndicate at a higher cadence than nightly? Open an issue on the <a href="https://github.com/liammlrb-eng/nevada-county-experiences" target="_blank">project's GitHub repo</a>.</p>
+
+<p style="margin-top:40px;color:var(--slate);font-size:12px;text-align:center">
+  Nevada County Experience · public data infrastructure for Western Nevada County, CA
+</p>
+
+</div>
+</body>
+</html>
