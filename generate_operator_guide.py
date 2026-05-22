@@ -156,9 +156,10 @@ def build():
         ['Run AI to clean up tags & areas',      'Section 4',                   '~1 min'],
         ['Add or edit an experience',            'Section 5',                   '2 min/entry'],
         ['Update the live demo on GitHub Pages', 'Section 6',                   '2 min'],
+        ['Share public feeds with a partner',    'Section 7',                   '1 min'],
         ['Stop the server',                      'Section 1c',                  '5 sec'],
-        ['Something\'s broken',                  'Section 7 (Troubleshooting)', 'varies'],
-        ['Where do files live?',                 'Section 8 (File map)',        'reference'],
+        ['Something\'s broken',                  'Section 8 (Troubleshooting)', 'varies'],
+        ['Where do files live?',                 'Section 9 (File map)',        'reference'],
     ]
     flow.append(build_table(qr_rows,
         col_widths=[3.0*inch, 2.0*inch, 1.5*inch], header=True))
@@ -529,8 +530,110 @@ git push
 
     flow.append(PageBreak())
 
-    # ─────────── SECTION 7: TROUBLESHOOTING ─────────────────────────────
-    flow.append(Paragraph('7. Troubleshooting', H_TITLE))
+    # ─────────── SECTION 7: PUBLIC FEEDS ────────────────────────────────
+    flow.append(Paragraph('7. Public feeds — what partners can subscribe to', H_TITLE))
+    flow.append(Paragraph(
+        'After every scrape, four feed files are regenerated and pushed to '
+        'GitHub Pages. Anyone can subscribe — no API key, no rate limit. '
+        'Share the URLs with chamber members, partner sites, and event organisers.',
+        H_SUB))
+    flow.append(section_rule())
+
+    flow.append(Paragraph('7a. The four feed URLs', H1))
+    feed_rows = [
+        ['iCal (.ics)',
+         'feeds/events.ics',
+         'Drop into Google Cal / Apple / Outlook as a subscribed calendar'],
+        ['RSS 2.0',
+         'feeds/events.rss',
+         'Newsletters, partner sites, feed readers'],
+        ['Events JSON',
+         'feeds/events.json',
+         'Developers building apps / dashboards / integrations'],
+        ['Venues JSON',
+         'feeds/venues.json',
+         'The 170 curated experiences — stable IDs safe as foreign keys'],
+    ]
+    flow.append(build_table(
+        [['Feed', 'Path under site root', 'For']] + feed_rows,
+        col_widths=[1.2*inch, 1.8*inch, 3.5*inch], body_size=9))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph(
+        '<b>Site root:</b> <font face="Courier">'
+        'https://liammlrb-eng.github.io/nevada-county-experiences/</font>',
+        BODY))
+    flow.append(Paragraph(
+        '<b>Public docs page:</b> <font face="Courier">/feeds/</font> '
+        '(under the site root) — subscribe instructions, license, JSON '
+        'schema, example code. Send this URL to anyone asking "how do I '
+        'get your events?"',
+        BODY))
+
+    flow.append(Spacer(1, 10))
+    flow.append(Paragraph('7b. When the feeds refresh', H1))
+    flow.append(Paragraph(
+        'Automatically. <font face="Courier">generate_feeds.py</font> runs '
+        'as the last step of every scrape (after link checking). It reads '
+        '<font face="Courier">scraper_output/events.json</font> + the '
+        'EXPERIENCES list and rewrites the four feed files under '
+        '<font face="Courier">feeds/</font>. As soon as you push the '
+        'scrape commit (Section 6), the new feeds go live within '
+        '~1 minute (GitHub Pages rebuild). No manual step needed.',
+        BODY))
+
+    flow.append(Spacer(1, 10))
+    flow.append(Paragraph('7c. License — CC BY 4.0', H1))
+    flow.append(Paragraph(
+        'Subscribers may use, redistribute, remix, and build commercial '
+        'products on the data provided they credit <b>Nevada County '
+        'Experience</b> with a backlink to the homepage. Each event '
+        'record also carries a <font face="Courier">source</font> field '
+        'naming the original publisher (KVMR, NCAC, etc.) — partners '
+        'should preserve that on display whenever practical so the '
+        'original venue gets credit too.',
+        BODY))
+
+    flow.append(Spacer(1, 10))
+    flow.append(Paragraph('7d. Sharing with a partner — what to send', H1))
+    share_rows = [
+        ['Newsletter editor wants our events',
+         'Send the RSS URL. Their newsletter tool subscribes; events appear automatically.'],
+        ['Partner site wants to embed our calendar',
+         'Send the docs page (/feeds/) and the iCal URL. Most CMS calendar widgets accept an .ics URL.'],
+        ['Member venue subscribing in their Google Cal',
+         'Send the iCal URL. Google Cal → Other Calendars → + → From URL → paste.'],
+        ['Developer / integrator',
+         'Send the docs page (/feeds/) — it has the JSON schema, examples, and license notes.'],
+        ['Someone wants venues on a map',
+         'Send the venues.json URL. Each record has lat/lng, name, blurb, tags.'],
+    ]
+    flow.append(build_table(
+        [['Audience / ask', 'What to send']] + share_rows,
+        col_widths=[2.8*inch, 3.7*inch], body_size=9))
+
+    flow.append(Spacer(1, 10))
+    flow.append(Paragraph('7e. What\'s in the feeds (filtering rules)', H1))
+    flow.append(Paragraph(
+        'The feeds mirror what the public site shows:', BODY))
+    filter_rules = [
+        '<b>Only approved events</b> — <font face="Courier">'
+            'status = "approved"</font>. Pending and dismissed never leave the site.',
+        '<b>Only future events</b> — anything whose end date is before today drops off automatically.',
+        '<b>AI fields preferred</b> — <font face="Courier">ai_area</font>, '
+            '<font face="Courier">ai_venue</font>, <font face="Courier">'
+            'ai_summary</font>, <font face="Courier">ai_tags</font> are '
+            'used when present; raw scraper fields are the fallback.',
+        '<b>Descriptions capped</b> at 600 characters in the JSON feed (full description on the source URL).',
+        '<b>Stable IDs</b> — every event has a 12-char hash that survives re-scrapes. Safe to use as a key.',
+    ]
+    for r in filter_rules:
+        flow.append(Paragraph(f'• {r}', BULLET))
+
+    flow.append(PageBreak())
+
+    # ─────────── SECTION 8: TROUBLESHOOTING ─────────────────────────────
+    flow.append(Paragraph('8. Troubleshooting', H_TITLE))
     flow.append(Paragraph(
         'Most common issues and how to fix them.',
         H_SUB))
@@ -566,8 +669,8 @@ git push
 
     flow.append(PageBreak())
 
-    # ─────────── SECTION 8: FILE MAP ────────────────────────────────────
-    flow.append(Paragraph('8. File map — where things live', H_TITLE))
+    # ─────────── SECTION 9: FILE MAP ────────────────────────────────────
+    flow.append(Paragraph('9. File map — where things live', H_TITLE))
     flow.append(Paragraph(
         'Quick reference for what\'s in the project folder.',
         H_SUB))
@@ -581,6 +684,7 @@ git push
 │   ├── event_scraper.py          ← Main scraper (orchestrates all sources)
 │   ├── ai_categorize.py          ← AI cleanup (Claude Haiku)
 │   ├── auto_tagger.py            ← Keyword-based pre-tagging
+│   ├── generate_feeds.py         ← Builds feeds/ outputs (runs after each scrape)
 │   ├── config.py                 ← API KEYS — never committed to GitHub
 │   ├── sources.json              ← Scraper source URL list
 │   └── site_scrapers/            ← One file per source (or per platform)
@@ -605,6 +709,12 @@ git push
 │   ├── events.json               ← The live event database (committed)
 │   ├── candidates.json           ← Scraper debug data (gitignored)
 │   └── snapshots/                ← Rendered HTML for selector debug (gitignored)
+├── feeds/
+│   ├── index.html                ← Public docs page for partners (/feeds/)
+│   ├── events.ics                ← iCal feed — calendar app subscribe
+│   ├── events.rss                ← RSS 2.0 — newsletters, partner sites
+│   ├── events.json               ← JSON — developer integrations
+│   └── venues.json               ← The 170 curated experiences
 ├── demo_pitch.pdf                ← County presentation deck
 ├── operator_guide.pdf            ← This file
 ├── generate_demo_pdf.py          ← Source for demo_pitch.pdf
@@ -639,11 +749,11 @@ git push
 
     flow.append(PageBreak())
 
-    # ─────────── SECTION 9: ANNUAL TASKS + EMERGENCY ─────────────────────
-    flow.append(Paragraph('9. Annual tasks &amp; emergency contacts', H_TITLE))
+    # ─────────── SECTION 10: ANNUAL TASKS + EMERGENCY ────────────────────
+    flow.append(Paragraph('10. Annual tasks &amp; emergency contacts', H_TITLE))
     flow.append(section_rule())
 
-    flow.append(Paragraph('9a. Once-a-year checklist', H1))
+    flow.append(Paragraph('10a. Once-a-year checklist', H1))
     annual = [
         '<b>Spring</b>: walk through every experience entry — verify hours, URLs, and that the venue still exists. Use Manage Database → Experiences. Budget 4-6 hours.',
         '<b>Spring</b>: review all 9 vibes — are the photos still working? Are the taglines still accurate? Edit if needed.',
@@ -656,7 +766,7 @@ git push
         flow.append(Paragraph(f'• {a}', BULLET))
 
     flow.append(Spacer(1, 14))
-    flow.append(Paragraph('9b. Emergency contact ladder', H1))
+    flow.append(Paragraph('10b. Emergency contact ladder', H1))
     flow.append(Paragraph(
         'When something breaks and you need help, in order:', BODY))
     contact = [
@@ -671,7 +781,7 @@ git push
         flow.append(Paragraph(f'• {c}', BULLET))
 
     flow.append(Spacer(1, 14))
-    flow.append(Paragraph('9c. Before calling for help — gather this', H1))
+    flow.append(Paragraph('10c. Before calling for help — gather this', H1))
     gather_rows = [
         ['What you tried',                  'List the steps that led to the problem'],
         ['Exact error text',                'Copy-paste from console window or browser. Screenshot if needed.'],
