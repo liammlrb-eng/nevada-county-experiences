@@ -1585,6 +1585,12 @@
   }
   .bm-cal-btn[hidden] { display: none; }
 
+  /* The "In Season" pill — same shape as the calendar pill but with a
+     leaf-green active state so seasonal vs. view modes read distinctly. */
+  .bm-seasonal-btn.active {
+    background: var(--forest); color: #fff; border-color: var(--forest);
+  }
+
   .events-view-toggle { display: flex; gap: 6px; margin-bottom: 16px; }
   .events-count {
     font-size: 13px; color: var(--slate);
@@ -1972,6 +1978,7 @@
         <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
         <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
       </div>
+      <button id="bmSeasonal" type="button" class="bm-cal-btn bm-seasonal-btn" onclick="toggleSeasonal()" title="Filter to what's happening right now">🌿 In Season</button>
       <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
     </div>
     <div id="activeFilterBar" style="display:none"></div>
@@ -3219,6 +3226,69 @@ let showPlaces         = true;
 // flags above + the highlight state on the mode toggle buttons.
 let browseMode = 'both';
 
+// "In Season" prominent toggle in the browse-mode row. When on, filters
+// BOTH venues (by their `season` field) and events (by date falling in
+// the current season window — plus the upcoming season if we're within
+// ~4 weeks of the transition). Seasonal events are the biggest driver
+// of county tourism, so this filter sits next to the mode toggle, not
+// buried under a vibe.
+let seasonalActive = false;
+
+// Compute the active "in season" window — today through end of current
+// season, with the upcoming season included if we're near the transition.
+// Returns { startIso, endIso, seasons: Set, label, icon }.
+function _currentSeasonalWindow() {
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = today.getMonth();        // 0-11
+  const TRANSITION_DAYS = 30;
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const order = ['winter','spring','summer','fall'];
+  let cur, curEnd, nextLabel, nextEnd;
+  if      (m >= 2 && m <= 4)  { cur='spring'; curEnd=new Date(y, 4, 31);            nextLabel='summer'; nextEnd=new Date(y, 7, 31); }
+  else if (m >= 5 && m <= 7)  { cur='summer'; curEnd=new Date(y, 7, 31);            nextLabel='fall';   nextEnd=new Date(y, 10, 30); }
+  else if (m >= 8 && m <= 10) { cur='fall';   curEnd=new Date(y, 10, 30);           nextLabel='winter'; nextEnd=new Date(y+1, 1, 28); }
+  else                         { cur='winter';
+    // Dec rolls into next year; Jan/Feb stay in current year.
+    curEnd  = (m === 11) ? new Date(y+1, 1, 28) : new Date(y, 1, 28);
+    nextLabel = 'spring';
+    nextEnd = (m === 11) ? new Date(y+1, 4, 31) : new Date(y, 4, 31);
+  }
+  const msPerDay = 24*60*60*1000;
+  const daysToTransition = Math.ceil((curEnd - today) / msPerDay);
+  const includeNext = daysToTransition <= TRANSITION_DAYS;
+  const icons = { spring: '🌸', summer: '☀️', fall: '🍂', winter: '❄️' };
+  const seasonSet = new Set([cur]);
+  if (includeNext) seasonSet.add(nextLabel);
+  return {
+    startIso: fmt(today),
+    endIso:   fmt(includeNext ? nextEnd : curEnd),
+    seasons:  seasonSet,
+    label:    includeNext ? `${cur} → ${nextLabel}` : cur,
+    icon:     icons[cur] || '🌿',
+  };
+}
+
+function toggleSeasonal() {
+  seasonalActive = !seasonalActive;
+  _renderSeasonalBtn();
+  renderExperiences();
+  if (showUpcomingEvents) renderEventsView();
+  if (typeof renderActiveFilters === 'function') renderActiveFilters();
+}
+
+function _renderSeasonalBtn() {
+  const btn = document.getElementById('bmSeasonal');
+  if (!btn) return;
+  const w = _currentSeasonalWindow();
+  const cap = w.label.replace(/\b\w/g, c => c.toUpperCase());
+  btn.classList.toggle('active', seasonalActive);
+  btn.innerHTML = `${w.icon} ${seasonalActive ? cap : 'In Season'}`;
+  btn.title = seasonalActive
+    ? `Showing things happening this ${w.label}. Click to clear.`
+    : `Filter to what's happening right now (${w.label})`;
+}
+
 function toggleEventsInGrid() {
   showUpcomingEvents = !showUpcomingEvents;
   // Stay in sync with the prominent browse-mode toggle.
@@ -3240,14 +3310,7 @@ function setBrowseMode(mode) {
   if (browseMode === 'venues' && eventsView === 'calendar') eventsView = 'list';
   _renderBrowseModeToggle();
   _applyBrowseModeVisibility();
-  // Render whichever grid is actually visible now.
-  if (browseMode === 'events' && eventsView === 'list') {
-    if (typeof renderEvents === 'function') renderEvents();
-  } else if (eventsView === 'calendar') {
-    if (typeof renderEventsCalendar === 'function') renderEventsCalendar();
-  } else {
-    renderExperiences();
-  }
+  _renderActiveGrids();
 }
 
 // Flip between list and calendar within whatever mode is active.
@@ -3256,11 +3319,21 @@ function toggleCalendarView() {
   eventsView = (eventsView === 'calendar') ? 'list' : 'calendar';
   _renderBrowseModeToggle();
   _applyBrowseModeVisibility();
-  if (eventsView === 'calendar') {
-    if (typeof renderEventsCalendar === 'function') renderEventsCalendar();
-  } else if (browseMode === 'events') {
-    if (typeof renderEvents === 'function') renderEvents();
-  } else {
+  _renderActiveGrids();
+}
+
+// Render every grid that's currently visible. With calendar+list shown
+// together, this means firing both render paths in the right order.
+function _renderActiveGrids() {
+  if (eventsView === 'calendar' && browseMode !== 'venues' &&
+      typeof renderEventsCalendar === 'function') {
+    renderEventsCalendar();
+  }
+  if (browseMode === 'events' &&
+      typeof renderEvents === 'function') {
+    renderEvents();
+  }
+  if (browseMode === 'venues' || browseMode === 'both') {
     renderExperiences();
   }
 }
@@ -3284,14 +3357,19 @@ function _applyBrowseModeVisibility() {
       : 'See events laid out on a month calendar';
   }
 
-  // Decide which container is visible.
+  // Decide which container(s) are visible. When the visitor turns Calendar
+  // on, we keep the matching list below it — calendar for at-a-glance "when",
+  // list for richer per-event detail. The old exclusive-toggle behavior was
+  // less useful than having both together.
   let showExp = false, showList = false, showCal = false;
   if (calendarOn && showCalBtn) {
     showCal = true;
+    if (browseMode === 'events')    showList = true;   // events list under the calendar
+    else if (browseMode === 'both') showExp  = true;   // mixed strip under the calendar
   } else if (browseMode === 'events') {
     showList = true;
   } else {
-    showExp = true;             // venues or both
+    showExp = true;             // venues or both, list mode
   }
   if (exp)  exp.style.display  = showExp  ? '' : 'none';
   if (lst)  lst.style.display  = showList ? '' : 'none';
@@ -4277,6 +4355,17 @@ function _eventsForView() {
   const dateTo    = (typeof visitorDateTo   !== 'undefined') ? visitorDateTo   : '';
   const q         = (searchQuery || '').trim();
   let evts = _eventsCache || EVENTS;
+
+  // "In Season" toggle — filter events whose start date falls inside the
+  // current (and near-transition: next) season window.
+  if (seasonalActive) {
+    const w = _currentSeasonalWindow();
+    evts = evts.filter(ev => {
+      const s = ev.dateStart || '';
+      if (!s) return false;
+      return s >= w.startIso && s <= w.endIso;
+    });
+  }
 
   // Date-range filter — an event matches if its span overlaps [from, to],
   // AND (for recurring events) if at least one day of the requested window
@@ -6442,6 +6531,10 @@ function filterExperiences() {
   const dateFrom = typeof visitorDateFrom !== 'undefined' ? visitorDateFrom : '';
   const visitSeasons = !seasonFilter ? _visitSeasons(dateFrom) : null;
 
+  // "In Season" toggle — supersedes any visit-derived season; applies the
+  // current+next season set to venue filtering.
+  const seasonalWindow = seasonalActive ? _currentSeasonalWindow() : null;
+
   // Sub-pill matcher (e.g. Lodging > B&Bs)
   const typeRaw = document.getElementById('filterType').value;
   const subPillDef = (SUB_PILLS[typeRaw] || []).find(p => p.id === activeSubPill);
@@ -6467,6 +6560,13 @@ function filterExperiences() {
     if (visitSeasons && expSeason !== 'Year-Round') {
       const parts = expSeason.toLowerCase().split(',').map(s => s.trim());
       if (!parts.some(s => visitSeasons.has(s))) return false;
+    }
+
+    // "In Season" toggle: same shape as the visit-derived filter but uses
+    // the prominent top-level pill's current+next season set.
+    if (seasonalWindow && expSeason !== 'Year-Round') {
+      const parts = expSeason.toLowerCase().split(',').map(s => s.trim());
+      if (!parts.some(s => seasonalWindow.seasons.has(s))) return false;
     }
 
     if (!q && themeTags) {
@@ -8219,6 +8319,8 @@ _loadMyList();
 updateFab();
 // Load admin data (experiences, itineraries) from storage; fall back to defaults
 loadFromStorage();
+// Paint the In-Season button label with the current season once boot is done.
+if (typeof _renderSeasonalBtn === 'function') _renderSeasonalBtn();
 </script>
 </body>
 </html>
