@@ -1627,25 +1627,7 @@
   }
   .evt-fallback-line2 {
     font-size: 13px; color: var(--slate); line-height: 1.5;
-    margin-bottom: 10px;
   }
-  .evt-fallback-cta { display: flex; gap: 8px; flex-wrap: wrap; }
-  .evt-fallback-go {
-    background: var(--forest, #3A5A3A); color: #fff;
-    border: none; padding: 7px 14px; border-radius: 999px;
-    font-family: inherit; font-size: 12px; font-weight: 600;
-    cursor: pointer; letter-spacing: 0.03em;
-    transition: filter 0.15s ease;
-  }
-  .evt-fallback-go:hover { filter: brightness(1.1); }
-  .evt-fallback-clear {
-    background: transparent; color: var(--brown);
-    border: 1px solid var(--rule);
-    padding: 7px 12px; border-radius: 999px;
-    font-family: inherit; font-size: 12px; font-weight: 600;
-    cursor: pointer; letter-spacing: 0.03em;
-  }
-  .evt-fallback-clear:hover { background: #fff; }
   .ev-view-btn {
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
@@ -4286,10 +4268,6 @@ function _eventFallbackVenues() {
       <div class="evt-fallback-body">
         <div class="evt-fallback-line1">No ${pillNoun} events ${datePhrase}.</div>
         <div class="evt-fallback-line2">Here are <strong>${venues.length}</strong> ${phrase}${teaserNames ? ` — ${teaserNames.replace(/</g,'&lt;')}${moreCount > 0 ? ` and ${moreCount} more` : ''}` : ''}.</div>
-        <div class="evt-fallback-cta">
-          <button onclick="setBrowseMode('venues')" class="evt-fallback-go">View all ${phrase} →</button>
-          <button onclick="toggleVibePill('${leadVibeId}','${leadPill.id}')" class="evt-fallback-clear">Drop the ${pillLabel.replace(/^[^\w]+\s*/, '')} pill</button>
-        </div>
       </div>
     </div>
     ${cards}`;
