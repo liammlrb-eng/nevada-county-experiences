@@ -4183,9 +4183,11 @@ function _eventFallbackVenues() {
   if (!_anyVibePillActive || !_anyVibePillActive()) return null;
   if (typeof liveExperiences === 'undefined' || !Array.isArray(liveExperiences)) return null;
 
-  // Pick the first active pill with a workable venue path. Banner names
-  // this one; the venue list ORs together every active pill's match.
-  let leadVibeId = null, leadPill = null;
+  // Collect every active pill with a workable venue path. The banner
+  // names ALL of them so the count + phrase match what's actually shown
+  // (previously the banner read off only the first pill — "15 places to
+  // ride" when half of the 15 were fishing spots from a second pill).
+  const activePills = [];
   const matchers = [];
   for (const vibeId of selectedThemes) {
     const defs = (typeof _vibePillDefsFor === 'function') ? _vibePillDefsFor(vibeId) : [];
@@ -4193,10 +4195,10 @@ function _eventFallbackVenues() {
       const fn = def.venueFallback || def.match;
       if (!fn) continue;
       matchers.push(fn);
-      if (!leadPill) { leadVibeId = vibeId; leadPill = def; }
+      activePills.push({ vibeId, def });
     }
   }
-  if (!matchers.length || !leadPill) return null;
+  if (!matchers.length || !activePills.length) return null;
 
   const venues = liveExperiences.filter(v =>
     matchers.some(fn => { try { return fn(v); } catch(e) { return false; } })
@@ -4204,15 +4206,28 @@ function _eventFallbackVenues() {
 
   if (!venues.length) return null;
 
-  const phrase = leadPill.fallbackLabel || (leadPill.label.replace(/^[^\w]+\s*/, '').toLowerCase()) || 'related places';
-  const pillLabel = leadPill.label;
-  // Banner noun: pill label minus leading emoji and any trailing
-  // "Festivals" / "Events" suffix so we don't read "music festivals events".
-  const pillNoun = pillLabel
+  // Build natural-language joins from the active pills so multi-pill
+  // selections read accurately: "biking or fishing", "places to ride or
+  // fishing spots", etc.
+  const _cleanLabel = lbl => (lbl||'')
     .replace(/^[^\w]+\s*/, '')
     .replace(/\s*festivals?\s*$/i, '')
     .replace(/\s*events?\s*$/i, '')
     .toLowerCase();
+  const _joinOr = arr => {
+    const xs = arr.filter(Boolean);
+    if (xs.length === 0) return '';
+    if (xs.length === 1) return xs[0];
+    if (xs.length === 2) return xs.join(' or ');
+    return xs.slice(0, -1).join(', ') + ', or ' + xs[xs.length - 1];
+  };
+  // Dedupe (multiple pills can share a fallbackLabel — e.g. festival.film
+  // and arts.films both fall back to "movie theaters").
+  const pillNouns      = [...new Set(activePills.map(p => _cleanLabel(p.def.label)))];
+  const fallbackLabels = [...new Set(activePills.map(p => p.def.fallbackLabel || _cleanLabel(p.def.label)))];
+  const pillNounStr = _joinOr(pillNouns);
+  const phrase      = _joinOr(fallbackLabels) || 'related places';
+
   const dateFrom = (typeof visitorDateFrom !== 'undefined') ? visitorDateFrom : '';
   const dateTo   = (typeof visitorDateTo   !== 'undefined') ? visitorDateTo   : '';
   const hasDateFilter = !!(dateFrom || dateTo);
@@ -4257,7 +4272,7 @@ function _eventFallbackVenues() {
     <div class="evt-fallback-banner" style="grid-column:1/-1">
       <div class="evt-fallback-icon">🌲</div>
       <div class="evt-fallback-body">
-        <div class="evt-fallback-line1">No ${pillNoun} events ${datePhrase}.</div>
+        <div class="evt-fallback-line1">No ${pillNounStr} events ${datePhrase}.</div>
         <div class="evt-fallback-line2">Here are <strong>${venues.length}</strong> ${phrase}${teaserNames ? ` — ${teaserNames.replace(/</g,'&lt;')}${moreCount > 0 ? ` and ${moreCount} more` : ''}` : ''}.</div>
       </div>
     </div>
