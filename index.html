@@ -1605,6 +1605,47 @@
     background: #fff; border: 1px solid var(--rule); border-radius: 10px;
     font-size: 11px; color: var(--brown);
   }
+
+  /* Banner shown above the venue cards when an event filter narrows to
+     zero but a related venue match exists ("No biking events — here
+     are 14 places to ride year-round"). Forest-green tint, not alarm. */
+  .evt-fallback-banner {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: linear-gradient(180deg, #F0EBDE 0%, #E8E0CC 100%);
+    border: 1px solid #C2B68F;
+    border-left: 4px solid var(--forest, #3A5A3A);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .evt-fallback-icon { font-size: 26px; line-height: 1.1; flex-shrink: 0; }
+  .evt-fallback-body { flex: 1; }
+  .evt-fallback-line1 {
+    font-family: 'Fraunces','Playfair Display',Georgia,serif;
+    font-size: 17px; font-weight: 600; color: var(--brown);
+    line-height: 1.25; margin-bottom: 4px;
+  }
+  .evt-fallback-line2 {
+    font-size: 13px; color: var(--slate); line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .evt-fallback-cta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .evt-fallback-go {
+    background: var(--forest, #3A5A3A); color: #fff;
+    border: none; padding: 7px 14px; border-radius: 999px;
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.03em;
+    transition: filter 0.15s ease;
+  }
+  .evt-fallback-go:hover { filter: brightness(1.1); }
+  .evt-fallback-clear {
+    background: transparent; color: var(--brown);
+    border: 1px solid var(--rule);
+    padding: 7px 12px; border-radius: 999px;
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.03em;
+  }
+  .evt-fallback-clear:hover { background: #fff; }
   .ev-view-btn {
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
@@ -4174,6 +4215,86 @@ function _renderEventsCount(shownCount, totalUnfiltered) {
   el.classList.add('show');
 }
 
+// "No events? Here are matching venues" fallback. Fires from renderEvents
+// when the event list is empty AND a vibe + pill is active. Picks the
+// first active pill that has either an explicit venueFallback or a match
+// function that works on venues, runs it across liveExperiences, and
+// returns { venues, html } — or null when nothing eligible turns up.
+function _eventFallbackVenues() {
+  if (!selectedThemes || selectedThemes.size === 0) return null;
+  if (!_anyVibePillActive || !_anyVibePillActive()) return null;
+  if (typeof liveExperiences === 'undefined' || !Array.isArray(liveExperiences)) return null;
+
+  // Pick the first active pill with a workable venue path. Banner names
+  // this one; the venue list ORs together every active pill's match.
+  let leadVibeId = null, leadPill = null;
+  const matchers = [];
+  for (const vibeId of selectedThemes) {
+    const defs = (typeof _vibePillDefsFor === 'function') ? _vibePillDefsFor(vibeId) : [];
+    for (const def of defs) {
+      const fn = def.venueFallback || def.match;
+      if (!fn) continue;
+      matchers.push(fn);
+      if (!leadPill) { leadVibeId = vibeId; leadPill = def; }
+    }
+  }
+  if (!matchers.length || !leadPill) return null;
+
+  const venues = liveExperiences.filter(v =>
+    matchers.some(fn => { try { return fn(v); } catch(e) { return false; } })
+  ).slice(0, 18);
+
+  if (!venues.length) return null;
+
+  const phrase = leadPill.fallbackLabel || (leadPill.label.replace(/^[^\w]+\s*/, '').toLowerCase()) || 'related places';
+  const pillLabel = leadPill.label;
+  const dateFrom = (typeof visitorDateFrom !== 'undefined') ? visitorDateFrom : '';
+  const dateTo   = (typeof visitorDateTo   !== 'undefined') ? visitorDateTo   : '';
+  let windowPhrase = 'in this window';
+  const today = _localISODate();
+  if (dateFrom && dateFrom === dateTo && dateFrom === today)        windowPhrase = 'today';
+  else if (dateFrom && dateTo) {
+    const span = (new Date(dateTo) - new Date(dateFrom)) / 86400000;
+    if (span <= 1.5)      windowPhrase = 'this weekend';
+    else if (span <= 6.5) windowPhrase = 'this week';
+  }
+  const teaserNames = venues.slice(0, 3).map(v => v.name).join(', ');
+  const moreCount = venues.length - 3;
+  const cards = venues.map(v => {
+    const added = myList && myList.has(v.id);
+    const photo = v.photo
+      ? `<img src="${v.photo}" alt="${(v.name||'').replace(/"/g,'&quot;')}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
+      : '';
+    return `<div class="exp-card ${added ? 'added' : ''}" style="position:relative">
+      <div class="exp-card-img" style="position:relative">${photo}${v.icon ? `<span style="position:absolute;left:8px;top:8px;font-size:22px;text-shadow:0 2px 6px rgba(0,0,0,0.4)">${v.icon}</span>` : ''}</div>
+      <div class="exp-card-body">
+        <div class="exp-name">${(v.name||'').replace(/</g,'&lt;')}</div>
+        <div class="exp-area">📍 ${(v.area||'')}</div>
+        <div class="exp-sub">${(v.sub||'').replace(/</g,'&lt;')}</div>
+        <div class="exp-actions" style="margin-top:auto;padding-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <button class="btn-add ${added ? 'added-btn' : ''}" onclick="toggleList(${v.id});renderExperiences();renderEvents();" style="font-size:11px">${added ? '✓ Added' : '+ Add to My List'}</button>
+          ${v.url ? `<a class="btn-visit" href="${v.url}" target="_blank" style="font-size:11px">More Info ↗</a>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const html = `
+    <div class="evt-fallback-banner" style="grid-column:1/-1">
+      <div class="evt-fallback-icon">🌲</div>
+      <div class="evt-fallback-body">
+        <div class="evt-fallback-line1">No ${pillLabel.replace(/^[^\w]+\s*/, '').toLowerCase()} ${windowPhrase}.</div>
+        <div class="evt-fallback-line2">Here are <strong>${venues.length}</strong> ${phrase}${teaserNames ? ` — ${teaserNames.replace(/</g,'&lt;')}${moreCount > 0 ? ` and ${moreCount} more` : ''}` : ''}.</div>
+        <div class="evt-fallback-cta">
+          <button onclick="setBrowseMode('venues')" class="evt-fallback-go">View all ${phrase} →</button>
+          <button onclick="toggleVibePill('${leadVibeId}','${leadPill.id}')" class="evt-fallback-clear">Drop the ${pillLabel.replace(/^[^\w]+\s*/, '')} pill</button>
+        </div>
+      </div>
+    </div>
+    ${cards}`;
+  return { venues, html };
+}
+
 async function renderEvents() {
   const themeTags  = getActiveThemeTags();
   const dateFrom   = typeof visitorDateFrom !== 'undefined' ? visitorDateFrom : '';
@@ -4211,6 +4332,15 @@ async function renderEvents() {
   }
 
   if (evts.length === 0) {
+    // If the visitor narrowed with a pill that has a venue equivalent,
+    // fall through to "no events — here are X venues that match your
+    // intent year-round" instead of the bare empty state. Much more
+    // useful for activity-shaped queries (biking, hiking, wineries).
+    const fallback = _eventFallbackVenues();
+    if (fallback && fallback.venues.length > 0) {
+      document.getElementById('eventsGrid').innerHTML = fallback.html;
+      return;
+    }
     document.getElementById('eventsGrid').innerHTML = `
       <div style="text-align:center;padding:48px 24px;color:#999">
         <div style="font-size:32px;margin-bottom:12px">📅</div>
@@ -5853,86 +5983,114 @@ let activeVibePills = {};
 // older callsite doesn't ReferenceError. Always null.
 let activeVibePill = null;
 
+// Each pill optionally carries:
+//   venueFallback(e)  — match function applied to VENUES when the event list
+//                       is empty under this pill. Defaults to the pill's
+//                       main `match` (works for activity- and place-shaped
+//                       pills whose match already keys off venue fields).
+//   fallbackLabel    — short noun phrase that fills the banner:
+//                       "Here are N <fallbackLabel> instead."
+// Pills with neither field still fall back via `match` + a generic label.
 const VIBE_PILLS = {
   foodie: [
-    { id: 'restaurants', label: '🍽 Restaurants',     match: e => e.type === 'Restaurant' },
-    { id: 'wineries',    label: '🍷 Wineries',         match: e => e.type === 'Winery' || e.type === 'Tasting room' },
-    { id: 'breweries',   label: '🍺 Breweries',        match: e => e.type === 'Brewery' || /tap house|brewing|taproom/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'bakeries',    label: '🥖 Bakeries',         match: e => e.type === 'Bakery' || /bakery|sourdough|pastries|donut|pasties/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'markets',     label: '🛒 Markets & Farms',  match: e => /farmers market|night market|plant sale|marketplace|community garden/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Market') || (e.tags||[]).includes('Garden') },
-    { id: 'foodevents',  label: '🎉 Food Events',      match: e => /food festival|wine festival|harvest|food walk|food tour|wine.?walk/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Food & Drink') },
+    { id: 'restaurants', label: '🍽 Restaurants',     fallbackLabel: 'places to dine', match: e => e.type === 'Restaurant' },
+    { id: 'wineries',    label: '🍷 Wineries',         fallbackLabel: 'tasting rooms and wineries', match: e => e.type === 'Winery' || e.type === 'Tasting room' },
+    { id: 'breweries',   label: '🍺 Breweries',        fallbackLabel: 'taprooms and breweries', match: e => e.type === 'Brewery' || /tap house|brewing|taproom/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'bakeries',    label: '🥖 Bakeries',         fallbackLabel: 'bakeries to visit', match: e => e.type === 'Bakery' || /bakery|sourdough|pastries|donut|pasties/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'markets',     label: '🛒 Markets & Farms',  fallbackLabel: 'markets and farms', match: e => /farmers market|night market|plant sale|marketplace|community garden/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Market') || (e.tags||[]).includes('Garden') },
+    { id: 'foodevents',  label: '🎉 Food Events',      fallbackLabel: 'places to eat, drink and graze',
+      match: e => /food festival|wine festival|harvest|food walk|food tour|wine.?walk/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Food & Drink'),
+      venueFallback: e => ['Restaurant','Winery','Tasting room','Brewery','Bakery'].includes(e.type) },
   ],
   active: [
-    { id: 'hiking',      label: '🥾 Hiking',           match: e => (e.tags||[]).includes('Hiking') },
-    { id: 'biking',      label: '🚲 Biking',           match: e => (e.tags||[]).includes('Biking') },
-    { id: 'swimming',    label: '🏊 Swimming',         match: e => (e.tags||[]).includes('Swimming') },
-    { id: 'fishing',     label: '🎣 Fishing',          match: e => (e.tags||[]).includes('Fishing') },
-    { id: 'boating',     label: '🛶 Boating',          match: e => (e.tags||[]).includes('Boating') },
-    { id: 'running',     label: '🏃 Running',          match: e => (e.tags||[]).includes('Running') },
-    { id: 'pickleball',  label: '🏓 Pickleball',       match: e => /pickleball/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
-    { id: 'tennis',      label: '🎾 Tennis',           match: e => /tennis|bocce/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
-    { id: 'discgolf',    label: '🥏 Disc Golf',        match: e => /disc golf/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
-    { id: 'daypass',     label: '🏋️ Day-Pass Gyms',    match: e => e.type !== 'Lodging' && /\bgym\b|health club|crossfit|day pass/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
+    { id: 'hiking',      label: '🥾 Hiking',           fallbackLabel: 'trails to walk',  match: e => (e.tags||[]).includes('Hiking') },
+    { id: 'biking',      label: '🚲 Biking',           fallbackLabel: 'places to ride',  match: e => (e.tags||[]).includes('Biking') },
+    { id: 'swimming',    label: '🏊 Swimming',         fallbackLabel: 'swim spots',      match: e => (e.tags||[]).includes('Swimming') },
+    { id: 'fishing',     label: '🎣 Fishing',          fallbackLabel: 'fishing spots',   match: e => (e.tags||[]).includes('Fishing') },
+    { id: 'boating',     label: '🛶 Boating',          fallbackLabel: 'paddle and boat spots', match: e => (e.tags||[]).includes('Boating') },
+    { id: 'running',     label: '🏃 Running',          fallbackLabel: 'running routes',  match: e => (e.tags||[]).includes('Running') },
+    { id: 'pickleball',  label: '🏓 Pickleball',       fallbackLabel: 'pickleball courts', match: e => /pickleball/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
+    { id: 'tennis',      label: '🎾 Tennis',           fallbackLabel: 'tennis and bocce courts', match: e => /tennis|bocce/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
+    { id: 'discgolf',    label: '🥏 Disc Golf',        fallbackLabel: 'disc-golf courses', match: e => /disc golf/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
+    { id: 'daypass',     label: '🏋️ Day-Pass Gyms',    fallbackLabel: 'gyms with day passes', match: e => e.type !== 'Lodging' && /\bgym\b|health club|crossfit|day pass/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
   ],
   handson: [
-    { id: 'crafts',   label: '🎨 Crafts',                match: e => {
+    { id: 'crafts',   label: '🎨 Crafts',                fallbackLabel: 'studios offering classes year-round',
+      match: e => {
         const t = ((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name + ' ' + (e.description||'')).toLowerCase();
         // Word-bounded / phrase-specific to avoid name false-positives (Weaver, Clay Camero)
         return /\bceramics?\b|pottery|wheel.thrown|stoneware|glass.blow|stained.glass|\bforge\b|forging|blacksmith|metalsmith|silversmith|metalwork|jewelry.making|jewelry.class|jewelry.workshop|fiber.arts|weaving|knitting|sewing.class|quilting|painting.class|painting.workshop|drawing.class|watercolor.class|mixed.media|woodworking|wood.carving|natural.dye|hat.making|craft.fair|craft.workshop|craft.school|makerspace/.test(t);
-    } },
-    { id: 'movement', label: '💃 Movement & Dance',      match: e => {
+      },
+      venueFallback: e => /curious forge|wolf craft|miners foundry|makerspace|studio|gallery/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'movement', label: '💃 Movement & Dance',      fallbackLabel: 'dance and movement studios',
+      match: e => {
         const t = ((e.name||'') + ' ' + (e.description||'')).toLowerCase();
         return /\bdance\b|salsa|bachata|swing.out|contra dance|line dance|ecstatic|tai chi|qi gong|mindful movement|movement class|tango|flamenco|ballet|ballroom/.test(t);
-    } },
-    { id: 'nature',   label: '🌿 Nature & Garden',       match: e => {
+      },
+      venueFallback: e => /\bdance\b|\byoga\b|studio|wellness|movement/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'nature',   label: '🌿 Nature & Garden',       fallbackLabel: 'gardens, parks and trails',
+      match: e => {
         const t = ((e.notes||'') + ' ' + (e.sub||'') + ' ' + e.name + ' ' + (e.description||'')).toLowerCase();
         return /gold pan|herbal medicine|plant sale|master gardener|garden workshop|garden tour|wildflower walk|botanical|foraging|native plant|mushroom hunt|bird walk|naturalist|permaculture|remedy garden|calscape/.test(t);
-    } },
-    { id: 'learn',    label: '📚 Workshops & Talks',     match: e => {
+      },
+      venueFallback: e => (e.tags||[]).includes('Garden') || (e.tags||[]).includes('Nature') || /\bpark\b|\btrail\b|garden|botanical/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'learn',    label: '📚 Workshops & Talks',     fallbackLabel: 'museums and learning spots',
+      match: e => {
         const tags = e.tags || [];
         if (tags.includes('Workshop') || tags.includes('Lecture')) return true;
         return /workshop|class|seminar|lecture|tutorial|training\b|course\b/i.test((e.name||'') + ' ' + (e.sub||''));
-    } },
+      },
+      venueFallback: e => e.type === 'Museum' || /curious forge|miners foundry|library|cultural/i.test(e.name) },
   ],
   arts: [
-    { id: 'theater',     label: '🎭 Theater',          match: e => { const t = (e.name + ' ' + (e.sub||'')).toLowerCase(); return /theat(re|er)|stages|cats\b|community asian/.test(t) && !/cinema/.test(t); } },
-    { id: 'cinema',      label: '🎬 Cinema',           match: e => /cinema|del oro|onyx|sierra cinemas/i.test(e.name) },
-    { id: 'concerts',    label: '🎵 Concert Halls',    match: e => /center for the arts|miners foundry|inconcert|schoolhouse cultural|nevada theatre/i.test(e.name) },
-    { id: 'galleries',   label: '🖼 Galleries',        match: e => e.type === 'Gallery' || /gallery|art walk/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'films',       label: '🎬 Film Events',      match: e => (e.tags||[]).includes('Film') || /film festival/i.test(e.name) },
+    { id: 'theater',     label: '🎭 Theater',          fallbackLabel: 'theaters to bookmark',  match: e => { const t = (e.name + ' ' + (e.sub||'')).toLowerCase(); return /theat(re|er)|stages|cats\b|community asian/.test(t) && !/cinema/.test(t); } },
+    { id: 'cinema',      label: '🎬 Cinema',           fallbackLabel: 'movie theaters',         match: e => /cinema|del oro|onyx|sierra cinemas/i.test(e.name) },
+    { id: 'concerts',    label: '🎵 Concert Halls',    fallbackLabel: 'concert halls',          match: e => /center for the arts|miners foundry|inconcert|schoolhouse cultural|nevada theatre/i.test(e.name) },
+    { id: 'galleries',   label: '🖼 Galleries',        fallbackLabel: 'galleries to visit',     match: e => e.type === 'Gallery' || /gallery|art walk/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'films',       label: '🎬 Film Events',      fallbackLabel: 'movie theaters',
+      match: e => (e.tags||[]).includes('Film') || /film festival/i.test(e.name),
+      venueFallback: e => /cinema|del oro|onyx|sierra cinemas|nevada theatre/i.test(e.name) },
   ],
   historic: [
-    { id: 'museums',     label: '🏛 Museums',          match: e => e.type === 'Museum' },
-    { id: 'mines',       label: '⛏ Mines',             match: e => /mine|mining|empire|north star|pelton/i.test(e.name) && !/yard/i.test(e.name) },
-    { id: 'goldpan',     label: '⚱ Gold Panning',      match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'sites',       label: '🏘 Historic Sites',   match: e => e.type === 'Historic site' || /historic|heritage|gold rush/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'museums',     label: '🏛 Museums',          fallbackLabel: 'museums to visit',       match: e => e.type === 'Museum' },
+    { id: 'mines',       label: '⛏ Mines',             fallbackLabel: 'historic mine sites',    match: e => /mine|mining|empire|north star|pelton/i.test(e.name) && !/yard/i.test(e.name) },
+    { id: 'goldpan',     label: '⚱ Gold Panning',      fallbackLabel: 'places to pan for gold', match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'sites',       label: '🏘 Historic Sites',   fallbackLabel: 'historic sites',         match: e => e.type === 'Historic site' || /historic|heritage|gold rush/i.test(e.name + ' ' + (e.sub||'')) },
   ],
   wellness: [
-    { id: 'yoga',        label: '🧘 Yoga',             match: e => /yoga|pilates|warmth|wild mountain|kinfolk|golden mandala/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'meditation',  label: '🕉 Meditation',       match: e => /meditation|insight|mindful|ananda|expanding light/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'spa',         label: '💆 Spa & Float',      match: e => /float|spa|sauna|massage|sound healing|reiki|day spa/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'gardens',     label: '🌷 Gardens',          match: e => (e.tags||[]).includes('Garden') || /garden|hermitage|tulip|botanical/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'yoga',        label: '🧘 Yoga',             fallbackLabel: 'yoga studios',           match: e => /yoga|pilates|warmth|wild mountain|kinfolk|golden mandala/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'meditation',  label: '🕉 Meditation',       fallbackLabel: 'meditation centers',     match: e => /meditation|insight|mindful|ananda|expanding light/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'spa',         label: '💆 Spa & Float',      fallbackLabel: 'spas and float tanks',   match: e => /float|spa|sauna|massage|sound healing|reiki|day spa/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'gardens',     label: '🌷 Gardens',          fallbackLabel: 'gardens',                match: e => (e.tags||[]).includes('Garden') || /garden|hermitage|tulip|botanical/i.test(e.name + ' ' + (e.sub||'')) },
   ],
   relaxed: [
-    { id: 'bnbs',        label: '🏡 B&Bs / Inns',      match: e => e.type === 'Lodging' && /\binn\b|b&b|bed.?and.?breakfast|cottages|parsonage|harmony ridge|speakeasy|sierra mountain/i.test(e.name) && !/campground/i.test(e.name) },
-    { id: 'hotels',      label: '🏨 Hotels',           match: e => e.type === 'Lodging' && /\bhotel\b/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'spa',         label: '💆 Spa & Float',      match: e => /float|spa|sauna|massage/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'gardens',     label: '🌷 Gardens',          match: e => (e.tags||[]).includes('Garden') },
-    { id: 'wineries',    label: '🍷 Wineries',         match: e => e.type === 'Winery' || e.type === 'Tasting room' },
-    { id: 'finedining',  label: '🍴 Fine Dining',      match: e => e.type === 'Restaurant' && (/farm.?to.?table|steakhouse|fine dining|chef/i.test((e.notes||'') + ' ' + (e.sub||''))) },
+    { id: 'bnbs',        label: '🏡 B&Bs / Inns',      fallbackLabel: 'inns and B&Bs',          match: e => e.type === 'Lodging' && /\binn\b|b&b|bed.?and.?breakfast|cottages|parsonage|harmony ridge|speakeasy|sierra mountain/i.test(e.name) && !/campground/i.test(e.name) },
+    { id: 'hotels',      label: '🏨 Hotels',           fallbackLabel: 'hotels',                 match: e => e.type === 'Lodging' && /\bhotel\b/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'spa',         label: '💆 Spa & Float',      fallbackLabel: 'spas and float tanks',   match: e => /float|spa|sauna|massage/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'gardens',     label: '🌷 Gardens',          fallbackLabel: 'gardens',                match: e => (e.tags||[]).includes('Garden') },
+    { id: 'wineries',    label: '🍷 Wineries',         fallbackLabel: 'tasting rooms',          match: e => e.type === 'Winery' || e.type === 'Tasting room' },
+    { id: 'finedining',  label: '🍴 Fine Dining',      fallbackLabel: 'fine-dining restaurants', match: e => e.type === 'Restaurant' && (/farm.?to.?table|steakhouse|fine dining|chef/i.test((e.notes||'') + ' ' + (e.sub||''))) },
   ],
   family: [
-    { id: 'goldpan',     label: '⚱ Gold Panning',      match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'pools',       label: '🏊 Pools',            match: e => /\bpool/i.test(e.name + ' ' + (e.sub||'')) && !/spa|float/i.test(e.name + ' ' + (e.sub||'')) },
-    { id: 'markets',     label: '🛒 Markets & Fairs',  match: e => /market|fair|rodeo|fairgrounds/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Market') },
-    { id: 'museums',     label: '🏛 Museums',          match: e => e.type === 'Museum' && (e.tags||[]).includes('Family') },
-    { id: 'parks',       label: '🌲 Parks',            match: e => /park|trail|state park/i.test(e.name + ' ' + (e.sub||'')) && !/parking/i.test(e.name) },
+    { id: 'goldpan',     label: '⚱ Gold Panning',      fallbackLabel: 'places to pan for gold', match: e => /gold pan/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'pools',       label: '🏊 Pools',            fallbackLabel: 'pools',                  match: e => /\bpool/i.test(e.name + ' ' + (e.sub||'')) && !/spa|float/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'markets',     label: '🛒 Markets & Fairs',  fallbackLabel: 'markets and fairgrounds', match: e => /market|fair|rodeo|fairgrounds/i.test(e.name + ' ' + (e.sub||'')) || (e.tags||[]).includes('Market') },
+    { id: 'museums',     label: '🏛 Museums',          fallbackLabel: 'family-friendly museums', match: e => e.type === 'Museum' && (e.tags||[]).includes('Family') },
+    { id: 'parks',       label: '🌲 Parks',            fallbackLabel: 'parks and trails',       match: e => /park|trail|state park/i.test(e.name + ' ' + (e.sub||'')) && !/parking/i.test(e.name) },
   ],
   festival: [
-    { id: 'holiday',     label: '🎄 Holiday',          match: e => (e.tags||[]).includes('Holiday') || /christmas|new year|mardi gras|halloween/i.test(e.name) },
-    { id: 'film',        label: '🎬 Film Festivals',   match: e => /film festival/i.test(e.name) },
-    { id: 'music',       label: '🎵 Music Festivals',  match: e => /music festival|bluegrass festival|sugar pine music|music in the mountains/i.test(e.name) },
-    { id: 'cultural',    label: '🎨 Cultural',         match: e => /poetry|heritage|open studios|storytelling/i.test(e.name) },
+    { id: 'holiday',     label: '🎄 Holiday',          fallbackLabel: 'historic downtown spots',
+      match: e => (e.tags||[]).includes('Holiday') || /christmas|new year|mardi gras|halloween/i.test(e.name),
+      venueFallback: e => e.type === 'Historic site' || /holbrooke|downtown nevada city|downtown grass valley|cornish|victorian/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'film',        label: '🎬 Film Festivals',   fallbackLabel: 'cinemas in the area',
+      match: e => /film festival/i.test(e.name),
+      venueFallback: e => /cinema|del oro|onyx|sierra cinemas|nevada theatre/i.test(e.name) },
+    { id: 'music',       label: '🎵 Music Festivals',  fallbackLabel: 'year-round music venues',
+      match: e => /music festival|bluegrass festival|sugar pine music|music in the mountains/i.test(e.name),
+      venueFallback: e => e.type === 'Music venue' || /center for the arts|miners foundry|nevada theatre|crazy horse|golden era/i.test(e.name) },
+    { id: 'cultural',    label: '🎨 Cultural',         fallbackLabel: 'galleries and cultural spots',
+      match: e => /poetry|heritage|open studios|storytelling/i.test(e.name),
+      venueFallback: e => e.type === 'Gallery' || e.type === 'Museum' || /art council|nevada county arts/i.test(e.name) },
   ],
 };
 
