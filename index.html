@@ -157,10 +157,10 @@
   }
   .section-desc {
     color: var(--slate);
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 0.01em;
     line-height: 1.55;
-    max-width: 640px;
+    max-width: 880px;          /* roomy enough for one-line vibes copy */
     margin-bottom: 36px;
   }
 
@@ -1600,8 +1600,10 @@
     background: #fff; color: var(--brown);
     cursor: pointer;
     font-family: inherit; font-size: 12px; font-weight: 600;
-    padding: 8px 14px; border-radius: 999px;
+    padding: 7px 14px; border-radius: 999px;
     letter-spacing: 0.04em;
+    white-space: nowrap;           /* never wrap — keeps pill height honest */
+    line-height: 1.2;
     transition: all 0.15s ease;
   }
   .bm-cal-btn:hover { border-color: var(--gold); background: var(--fog); }
@@ -3339,7 +3341,7 @@ function _currentSeasonalWindow() {
     startIso: fmt(today),
     endIso:   fmt(includeNext ? nextEnd : curEnd),
     seasons:  seasonSet,
-    label:    includeNext ? `${cur} → ${nextLabel}` : cur,
+    label:    includeNext ? `${cur} & ${nextLabel}` : cur,
     icon:     icons[cur] || '🌿',
   };
 }
