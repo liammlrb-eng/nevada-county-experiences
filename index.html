@@ -3262,8 +3262,9 @@ function renderExperiences() {
           const vibeTagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
           const tagMatch = (c.tags || []).some(t => vibeTagSet.has(t.toLowerCase()));
           if (!tagMatch) return false;
-          const pillDef = _vibePillDefFor(vibeId);
-          return pillDef ? pillDef.match(c) : true;
+          const pillDefs = _vibePillDefsFor(vibeId);
+          if (pillDefs.length === 0) return true;            // vibe with no narrowing
+          return pillDefs.some(pd => pd.match(c));           // OR within the vibe
         });
       });
     }
@@ -5577,15 +5578,15 @@ async function saveToStorage() {
 // Patch all functions that read EXPERIENCES to use liveExperiences instead
 // We override the filter function to use liveExperiences
 // ── VIBE-LEVEL SUB-PILLS ─────────────────────────────────────────────
-// Per-vibe pill state. Each selected vibe can independently activate ONE
-// pill, and the filter result is the OR-union across vibes:
-//   "Foodie 🍷 wineries OR Music 🎵 concert halls" — both rows visible,
-//   both narrowings active, results union.
-// Shape: { vibeId: pillId, ... }
+// Per-vibe pill state. Each selected vibe can independently activate ANY
+// NUMBER of pills (multi-select within the vibe, OR'd). The filter at the
+// call site then OR-unions across vibes:
+//   "Foodie 🍷 wineries + 🥖 bakeries · Music 🎵 concert halls"
+//   → (Foodie AND (winery OR bakery)) OR (Music AND concert hall)
+// Shape: { vibeId: [pillId, ...] }
 let activeVibePills = {};
-// Compatibility shim: keep the old single-key name in scope for any
-// downstream code that still references it (legacy `activeVibePill`
-// reads/writes are gradually being removed). Always reflects null now.
+// Compatibility shim — legacy single-key name, kept as a no-op so any
+// older callsite doesn't ReferenceError. Always null.
 let activeVibePill = null;
 
 const VIBE_PILLS = {
@@ -5671,23 +5672,30 @@ const VIBE_PILLS = {
   ],
 };
 
-// Per-vibe pill helpers. Each selected vibe can independently activate at
-// most one pill; the filter at the call site composes them as an OR-union
+// Per-vibe pill helpers. Each vibe can have ANY number of pills active
+// (multi-select within the vibe). Match logic = OR within a vibe, OR-union
 // across vibes (see renderExperiences / filterExperiences).
-function _vibePillIdFor(vibeId)  { return activeVibePills[vibeId] || null; }
-function _vibePillDefFor(vibeId) {
-  const pillId = _vibePillIdFor(vibeId);
-  if (!pillId) return null;
-  return (VIBE_PILLS[vibeId] || []).find(p => p.id === pillId) || null;
+function _vibePillIdsFor(vibeId) {
+  const arr = activeVibePills[vibeId];
+  return Array.isArray(arr) ? arr : [];
 }
-function _anyVibePillActive() { return Object.keys(activeVibePills).length > 0; }
-// Compatibility shims for callers that still ask for "the" active pill.
-// They get the first vibe's active pill, if any — good enough for legacy
-// places that aren't multi-pill-aware yet (e.g. renderActiveFilters chip).
+function _vibePillDefsFor(vibeId) {
+  const ids = _vibePillIdsFor(vibeId);
+  if (!ids.length) return [];
+  const pills = VIBE_PILLS[vibeId] || [];
+  return ids.map(id => pills.find(p => p.id === id)).filter(Boolean);
+}
+function _anyVibePillActive() {
+  return Object.values(activeVibePills).some(arr => Array.isArray(arr) && arr.length);
+}
+// Legacy single-pill shims — return the first active pill across vibes, if
+// any. Kept around for callsites we haven't migrated yet.
 function _activeVibePillParts() {
-  const vid = Object.keys(activeVibePills)[0];
-  if (!vid) return null;
-  return { vibeId: vid, pillId: activeVibePills[vid] };
+  for (const vid of Object.keys(activeVibePills)) {
+    const ids = activeVibePills[vid];
+    if (Array.isArray(ids) && ids.length) return { vibeId: vid, pillId: ids[0] };
+  }
+  return null;
 }
 function _activeVibePillDef() {
   const p = _activeVibePillParts();
@@ -5720,12 +5728,12 @@ function renderVibePills() {
   row.innerHTML = vibesWithPills.map(vibeId => {
     const pills      = VIBE_PILLS[vibeId];
     const vibeName   = (THEMES.find(t => t.id === vibeId) || {}).name || vibeId;
-    const activePill = _vibePillIdFor(vibeId);
+    const activeIds  = new Set(_vibePillIdsFor(vibeId));
     const pillBtns = pills.map(p => {
-      const on = activePill === p.id;
+      const on = activeIds.has(p.id);
       return `<button onclick="toggleVibePill('${vibeId}','${p.id}')" style="font-size:11px;padding:5px 12px;border-radius:14px;border:1.5px solid ${on?'var(--gold)':'#d4c9b0'};background:${on?'var(--gold)':'transparent'};color:${on?'#fff':'var(--slate)'};cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:0.04em;transition:all 0.15s">${p.label}</button>`;
     }).join('');
-    const clear = activePill
+    const clear = activeIds.size
       ? `<button onclick="toggleVibePill('${vibeId}', null)" style="font-size:11px;padding:5px 10px;border:none;background:transparent;color:#999;cursor:pointer;font-family:inherit">Clear ✕</button>`
       : '';
     return `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
@@ -5735,17 +5743,20 @@ function renderVibePills() {
   }).join('');
 }
 
-// Each vibe maintains its own active pill (or none). Toggling the same
-// pill clears it; clicking a different pill on the same vibe replaces it.
-// Pass (vibeId, null) to clear that vibe's pill explicitly.
+// Multi-select pills per vibe. Clicking adds the pill to that vibe's
+// active list (OR within the vibe); clicking the same pill again removes
+// it. Pass (vibeId, null) to clear all of that vibe's pills.
 function toggleVibePill(vibeId, pillId) {
   if (!vibeId) return;                                  // ignore stray clicks
   if (!pillId) {
     delete activeVibePills[vibeId];
-  } else if (activeVibePills[vibeId] === pillId) {
-    delete activeVibePills[vibeId];                     // toggle off
   } else {
-    activeVibePills[vibeId] = pillId;                   // set / replace
+    const arr = Array.isArray(activeVibePills[vibeId]) ? [...activeVibePills[vibeId]] : [];
+    const idx = arr.indexOf(pillId);
+    if (idx >= 0) arr.splice(idx, 1);
+    else          arr.push(pillId);
+    if (arr.length === 0) delete activeVibePills[vibeId];
+    else                  activeVibePills[vibeId] = arr;
   }
   renderVibePills();
   renderExperiences();
@@ -6312,8 +6323,9 @@ function filterExperiences() {
         const vibeTagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
         const tagMatch = (e.tags || []).some(t => vibeTagSet.has(t.toLowerCase()));
         if (!tagMatch) return false;
-        const pillDef = _vibePillDefFor(vibeId);
-        return pillDef ? pillDef.match(e) : true;
+        const pillDefs = _vibePillDefsFor(vibeId);
+        if (pillDefs.length === 0) return true;
+        return pillDefs.some(pd => pd.match(e));
       });
       if (!passes && !lodgingOptIn) return false;
       // Once we're past the per-vibe pass, keep the legacy "stays are
