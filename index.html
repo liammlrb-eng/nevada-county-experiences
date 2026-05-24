@@ -1939,33 +1939,11 @@
         <option value="Nevada County">County-Wide</option>
       </optgroup>
     </select>
-    <select id="filterType" title="Filter by kind of place — dining, lodging, museums, wineries">
-      <option value="">All Categories</option>
-      <optgroup label="Season">
-        <option value="season:Spring">🌸 Spring</option>
-        <option value="season:Summer">☀️ Summer</option>
-        <option value="season:Fall">🍂 Fall</option>
-        <option value="season:Winter">❄️ Winter</option>
-        <option value="season:Holiday">🎄 Holiday</option>
-      </optgroup>
-      <optgroup label="Category">
-        <option value="Outdoor">Outdoor</option>
-        <option value="Hands-on">🛠 Make & Create</option>
-        <option value="Historic site">Historic Sites</option>
-        <option value="Museum">Museums</option>
-        <option value="Music venue">Music & Arts</option>
-        <option value="Restaurant">Dining</option>
-        <option value="Brewery">Breweries & Bars</option>
-        <option value="Tasting room">Wine Tasting</option>
-        <option value="Winery">Wineries</option>
-        <option value="Bakery">Bakeries</option>
-        <option value="Wellness">Wellness</option>
-        <option value="Lodging">Lodging</option>
-        <option value="Activity">Activities</option>
-        <option value="Art event">Festivals & Events</option>
-        <option value="Gallery">Galleries</option>
-      </optgroup>
-    </select>
+    <!-- Category dropdown removed — superseded by Vibes (with their pill
+         rows), the Stays tile, and the 🌿 In Season toggle. The unified
+         pill model covers every category-narrowing use case the dropdown
+         offered, without the second navigation surface. -->
+
     <input type="date" id="filterDateFrom" class="fb-date" title="Visit start date"
       onchange="visitorDateFrom=this.value;if(visitorDateTo&&visitorDateTo<visitorDateFrom){visitorDateTo=visitorDateFrom;var t=document.getElementById('filterDateTo');if(t)t.value=visitorDateTo;}_visApplyDate()">
     <span style="color:#bbb;flex-shrink:0">–</span>
@@ -3045,7 +3023,7 @@ function renderThemes() {
   // of thing." Click runs the existing findLodging() flow (clears vibes, sets
   // Category=Lodging, scrolls to grid).
   const staysTile = `
-    <div class="theme-card stays-card" onclick="findLodging()" title="Browse all lodging — clears vibes since lodging spans all of them">
+    <div class="theme-card stays-card${staysActive ? ' selected' : ''}" onclick="toggleStays()" title="Browse all lodging — adds a Stays pill row (Hotels / B&Bs / Glamping / Campgrounds / RV)">
       <span class="stays-icon">🏠</span>
       <span class="stays-label">Lodging</span>
     </div>`;
@@ -3509,19 +3487,18 @@ function renderExperiences() {
     // item passes if at least one vibe's contribution matches. This lets
     // "Foodie 🍷 Wineries + Music 🎵 Concert Halls" return wineries AND
     // concert halls rather than the intersection (which would be empty).
-    if (!q && _anyVibePillActive() && selectedThemes.size > 0) {
-      candidates = candidates.filter(c => {
-        return [...selectedThemes].some(vibeId => {
-          const vibe = THEMES.find(t => t.id === vibeId);
-          if (!vibe) return false;
-          const vibeTagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
-          const tagMatch = (c.tags || []).some(t => vibeTagSet.has(t.toLowerCase()));
-          if (!tagMatch) return false;
-          const pillDefs = _vibePillDefsFor(vibeId);
-          if (pillDefs.length === 0) return true;            // vibe with no narrowing
-          return pillDefs.some(pd => pd.match(c));           // OR within the vibe
+    {
+      const activeIds = _activeVibeIds();
+      if (!q && _anyVibePillActive() && activeIds.length > 0) {
+        candidates = candidates.filter(c => {
+          return activeIds.some(vibeId => {
+            if (!_vibeBaseMatch(vibeId, c)) return false;
+            const pillDefs = _vibePillDefsFor(vibeId);
+            if (pillDefs.length === 0) return true;          // vibe with no narrowing
+            return pillDefs.some(pd => pd.match(c));         // OR within the vibe
+          });
         });
-      });
+      }
     }
 
     // Consolidate recurring/multi-day series so the strip + count don't
@@ -3715,11 +3692,8 @@ function renderActiveFilters() {
     `<span class="filter-chip chip-meta">${areaEl.options[areaEl.selectedIndex].text}<span class="filter-chip-x" onclick="document.getElementById('filterArea').value='';renderExperiences();renderActiveFilters()">✕</span></span>`
   );
 
-  // Category chip
-  const typeEl = document.getElementById('filterType');
-  if (typeEl.value) chips.push(
-    `<span class="filter-chip chip-meta">${typeEl.options[typeEl.selectedIndex].text}<span class="filter-chip-x" onclick="document.getElementById('filterType').value='';renderExperiences();renderActiveFilters()">✕</span></span>`
-  );
+  // (Category chip removed — the dropdown is gone. Vibes / Stays / In
+  // Season pills render their own active-state chips above.)
 
   // Date chip
   const df = typeof visitorDateFrom !== 'undefined' ? visitorDateFrom : '';
@@ -3747,12 +3721,16 @@ function clearAllFilters() {
   selectedThemes.clear();
   activeVibePills = {};
   activeSubPill = null;
-  document.getElementById('filterArea').value = '';
-  document.getElementById('filterType').value = '';
+  staysActive = false;
+  seasonalActive = false;
+  const stayCard = document.querySelector('.theme-card.stays-card');
+  if (stayCard) stayCard.classList.remove('selected');
+  const areaEl = document.getElementById('filterArea');
+  if (areaEl) areaEl.value = '';
   _visClearDate();    // resets date state + re-renders events
   renderThemes();
-  if (typeof renderVibePills === 'function') renderVibePills();
-  if (typeof renderSubPills === 'function')  renderSubPills();
+  if (typeof renderVibePills === 'function')   renderVibePills();
+  if (typeof _renderSeasonalBtn === 'function') _renderSeasonalBtn();
   renderActiveFilters();
   renderExperiences();
 }
@@ -5720,55 +5698,78 @@ function browseAllFromModal() {
   }, 120);
 }
 
-// The "Lodging" category filter is only meant to be active right after a
-// deliberate Find Lodging. Any other itinerary-editing flow that sends the
-// visitor back to the Explore grid (Browse all, Add a day, editing/customizing
-// an itinerary) must reset it — otherwise the grid stays locked to hotels and
-// hides everything else. Returns true if it cleared something.
+// Stays toggle is the new "Lodging" state. Other itinerary-editing flows
+// that send the visitor back to the Explore grid (Browse all, Add a day,
+// editing an itinerary) clear it — otherwise the grid stays locked to
+// lodging and hides everything else. Returns true if it cleared.
 function _clearStaleLodgingFilter() {
-  const sel = document.getElementById('filterType');
-  if (!sel || sel.value !== 'Lodging') return false;
-  sel.value = '';
-  activeSubPill = null;
-  if (typeof renderSubPills === 'function')      renderSubPills();
+  if (!staysActive) return false;
+  staysActive = false;
+  delete activeVibePills['stays'];
+  const stayCard = document.querySelector('.theme-card.stays-card');
+  if (stayCard) stayCard.classList.remove('selected');
+  if (typeof renderVibePills === 'function')     renderVibePills();
   if (typeof renderExperiences === 'function')   renderExperiences();
   if (typeof renderActiveFilters === 'function') renderActiveFilters();
   return true;
 }
 
 // Shortcut from My Itinerary → browse Lodging category in the grid
-function findLodging() {
+// Toggle the Stays pseudo-vibe. Activating it clears mood vibes (lodging
+// is orthogonal — Foodie/Active tag-sets don't include any lodging) and
+// brings up the Stays pill row. Re-toggling clears stays back off.
+function toggleStays() {
   closeModal();
-  // Make sure we're on the Experiences tab (not Itineraries / Events)
   const expTab = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
   if (expTab && !expTab.classList.contains('active')) {
     switchTab('experiences', expTab);
   }
-  // Vibes don't apply to lodging searches — Foodie/Active/etc. tag-sets
-  // exclude all lodging since none are tagged with food/sport/etc tags.
-  // Clear vibes (and sub-pills, vibe-pills) so the visitor sees ALL stays.
   const hadVibes = selectedThemes.size > 0;
-  selectedThemes.clear();
-  activeSubPill = null;
-  activeVibePills = {};
-  // Set the Category filter to Lodging
-  const sel = document.getElementById('filterType');
-  if (sel) sel.value = 'Lodging';
-  // Re-render everything that depends on this state
-  if (typeof renderThemes === 'function') renderThemes();
-  if (typeof renderSubPills === 'function') renderSubPills();
-  if (typeof renderVibePills === 'function') renderVibePills();
-  renderExperiences();
-  renderActiveFilters();
-  // Subtle notification so the visitor knows what changed
-  if (hadVibes && typeof _showShareToast === 'function') {
+  staysActive = !staysActive;
+  if (staysActive) {
+    // Clear mood vibes + any pills attached to them. Stays + mood vibes
+    // would always intersect to zero (lodging isn't mood-tagged), so this
+    // mirrors the old findLodging() escape hatch into the unified model.
+    selectedThemes.clear();
+    for (const vid of Object.keys(activeVibePills)) {
+      if (vid !== 'stays') delete activeVibePills[vid];
+    }
+  } else {
+    delete activeVibePills['stays'];
+  }
+  // Reflect the toggle on the tile.
+  const stayCard = document.querySelector('.theme-card.stays-card');
+  if (stayCard) stayCard.classList.toggle('selected', staysActive);
+
+  if (typeof renderThemes === 'function')     renderThemes();
+  if (typeof renderVibePills === 'function')  renderVibePills();
+  if (typeof _renderActiveGrids === 'function') _renderActiveGrids();
+  else renderExperiences();
+  if (typeof renderActiveFilters === 'function') renderActiveFilters();
+
+  if (staysActive && hadVibes && typeof _showShareToast === 'function') {
     _showShareToast('Showing all lodging — vibes cleared so nothing\'s hidden');
   }
-  // Smooth-scroll to the experiences grid
   setTimeout(() => {
     const grid = document.getElementById('expGrid');
     if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 120);
+}
+
+// Back-compat alias — old callers still wire onclick="findLodging()".
+function findLodging() {
+  // If Stays isn't already on, toggleStays will turn it on. If it's on,
+  // re-clicking the tile should still feel like "go to lodging" — leave
+  // it on (no-op) rather than toggling off.
+  if (!staysActive) toggleStays();
+  else {
+    // Just bring the visitor back to the grid.
+    closeModal();
+    setTimeout(() => {
+      const grid = document.getElementById('expGrid');
+      if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+  }
 }
 
 function enterManage() {
@@ -5875,7 +5876,7 @@ document.getElementById('filterArea').addEventListener('change', () => {
   // Events now live inside Explore — re-render whenever they're in scope.
   if (showUpcomingEvents) renderEventsView();
 });
-document.getElementById('filterType').addEventListener('change', () => { activeSubPill = null; renderSubPills(); renderExperiences(); renderActiveFilters(); });
+// (filterType change listener removed along with the Category dropdown.)
 
 // ── PERSISTENT STORAGE ──────────────────────────────────────────────
 // Storage priority: localStorage (works everywhere) → window.storage (Claude artifacts)
@@ -5975,6 +5976,30 @@ let activeVibePills = {};
 // older callsite doesn't ReferenceError. Always null.
 let activeVibePill = null;
 
+// "Stays" pseudo-vibe — utility filter for places to sleep. Treated as a
+// vibe in the pill machinery (its key is 'stays', VIBE_PILLS['stays'] is
+// its pill list) but its match function is type==='Lodging' instead of a
+// tag-set lookup since lodging isn't tagged with mood vibes.
+let staysActive = false;
+
+// Returns the union of selected vibes + stays-if-active. Used by the
+// per-vibe filter and renderVibePills.
+function _activeVibeIds() {
+  const ids = [...selectedThemes];
+  if (staysActive) ids.unshift('stays');
+  return ids;
+}
+
+// Whether a venue passes a given vibe's "tag/type match" (without pill
+// narrowing). Stays uses type==='Lodging'; real vibes use their tag set.
+function _vibeBaseMatch(vibeId, e) {
+  if (vibeId === 'stays') return e && e.type === 'Lodging';
+  const vibe = THEMES.find(t => t.id === vibeId);
+  if (!vibe) return false;
+  const tagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
+  return (e.tags || []).some(t => tagSet.has(t.toLowerCase()));
+}
+
 // Each pill optionally carries:
 //   venueFallback(e)  — match function applied to VENUES when the event list
 //                       is empty under this pill. Defaults to the pill's
@@ -6070,6 +6095,22 @@ const VIBE_PILLS = {
     { id: 'museums',     label: '🏛 Museums',          fallbackLabel: 'family-friendly museums', match: e => e.type === 'Museum' && (e.tags||[]).includes('Family') },
     { id: 'parks',       label: '🌲 Parks',            fallbackLabel: 'parks and trails',       match: e => /park|trail|state park/i.test(e.name + ' ' + (e.sub||'')) && !/parking/i.test(e.name) },
   ],
+  // Stays is a pseudo-vibe — appears as a pill row when the Stays tile is
+  // clicked. Each pill narrows lodging-type venues further. There's no
+  // event-side equivalent (you don't go to events to find lodging), so no
+  // venueFallback needed; the row is venue-only by nature.
+  stays: [
+    { id: 'hotels',      label: '🏨 Hotels',           fallbackLabel: 'hotels',
+      match: e => e.type === 'Lodging' && (/\bhotel\b/i.test(e.name + ' ' + (e.sub||'')) || /grass valley courtyard suites|outside inn/i.test(e.name)) },
+    { id: 'bnbs',        label: '🏡 B&Bs / Inns',     fallbackLabel: 'inns and B&Bs',
+      match: e => e.type === 'Lodging' && /\binn\b|b&b|bed.?and.?breakfast|cottages|parsonage|harmony ridge|speakeasy|sierra mountain/i.test(e.name) && !/campground|\bhotel\b|outside inn|glamp/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'glamping',    label: '🏕️ Glamping',        fallbackLabel: 'glamping spots',
+      match: e => /glamp/i.test(e.name) },
+    { id: 'campgrounds', label: '⛺ Campgrounds',      fallbackLabel: 'campgrounds',
+      match: e => /campground|campsite/i.test(e.name + ' ' + (e.sub||'')) && !/glamp/i.test(e.name) },
+    { id: 'rv',          label: '🚐 RV Parks',         fallbackLabel: 'RV parks',
+      match: e => /rv park/i.test(e.name + ' ' + (e.sub||'')) },
+  ],
   festival: [
     { id: 'holiday',     label: '🎄 Holiday',          fallbackLabel: 'historic downtown spots',
       match: e => (e.tags||[]).includes('Holiday') || /christmas|new year|mardi gras|halloween/i.test(e.name),
@@ -6119,20 +6160,26 @@ function _activeVibePillDef() {
 function renderVibePills() {
   const row = document.getElementById('vibePillsRow');
   if (!row) return;
-  // Show one row per selected vibe that has narrowing pills defined.
-  // 0 vibes -> hidden. 1+ vibes -> labeled rows stacked.
-  const vibesWithPills = [...selectedThemes].filter(vid => (VIBE_PILLS[vid] || []).length);
-  if (vibesWithPills.length === 0) {
+  // Show one row per active vibe that has narrowing pills defined. Stays
+  // is treated as a pseudo-vibe; it gets a row whenever staysActive is on.
+  // 0 active vibes -> hidden. 1+ -> labeled rows stacked.
+  const activeIds   = _activeVibeIds();
+  const withPills = activeIds.filter(vid => (VIBE_PILLS[vid] || []).length);
+  if (withPills.length === 0) {
     row.style.display = 'none';
     row.innerHTML = '';
     activeVibePills = {};
     return;
   }
 
-  // Sweep pills whose owning vibe is no longer selected.
+  // Sweep pills whose owning vibe is no longer active (vibe deselected or
+  // Stays turned off).
   for (const vid of Object.keys(activeVibePills)) {
-    if (!selectedThemes.has(vid)) delete activeVibePills[vid];
+    const stillActive = (vid === 'stays') ? staysActive : selectedThemes.has(vid);
+    if (!stillActive) delete activeVibePills[vid];
   }
+  // Local alias keeps the rest of the function readable.
+  const vibesWithPills = withPills;
 
   row.style.display = 'flex';
   row.style.flexDirection = 'column';
@@ -6141,7 +6188,9 @@ function renderVibePills() {
 
   row.innerHTML = vibesWithPills.map(vibeId => {
     const pills      = VIBE_PILLS[vibeId];
-    const vibeName   = (THEMES.find(t => t.id === vibeId) || {}).name || vibeId;
+    const vibeName   = (vibeId === 'stays')
+      ? 'Stays'
+      : ((THEMES.find(t => t.id === vibeId) || {}).name || vibeId);
     const activeIds  = new Set(_vibePillIdsFor(vibeId));
     const pillBtns = pills.map(p => {
       const on = activeIds.has(p.id);
@@ -6261,7 +6310,12 @@ const SUB_PILLS = {
 };
 
 function renderSubPills() {
+  // Sub-pills lived under the Category dropdown, which is gone. Keep this
+  // function as a no-op so legacy callers don't ReferenceError.
   const row = document.getElementById('subPillsRow');
+  if (row) { row.style.display = 'none'; row.innerHTML = ''; }
+  return;
+  // eslint-disable-next-line no-unreachable
   if (!row) return;
   const typeVal = document.getElementById('filterType').value;
   // Strip "season:" prefix — those don't get sub-pills
@@ -6693,80 +6747,60 @@ function generateTrip() {
 }
 
 function filterExperiences() {
-  const area = document.getElementById('filterArea').value.toLowerCase();
-  const type = document.getElementById('filterType').value.toLowerCase();
-  const themeTags = getActiveThemeTags();
-  const q = (searchQuery || '').trim();
+  const area = (document.getElementById('filterArea')?.value || '').toLowerCase();
+  const q    = (searchQuery || '').trim();
 
-  // Check if type filter is actually a season filter
-  const seasonFilter = type.startsWith('season:') ? type.replace('season:', '') : null;
-  const typeFilter   = seasonFilter ? null : type;
-
-  // Derive visit season from date picker (only when no explicit season filter chosen)
+  // Derive visit season from date picker.
   const dateFrom = typeof visitorDateFrom !== 'undefined' ? visitorDateFrom : '';
-  const visitSeasons = !seasonFilter ? _visitSeasons(dateFrom) : null;
+  const visitSeasons = _visitSeasons(dateFrom);
 
-  // "In Season" toggle — supersedes any visit-derived season; applies the
-  // current+next season set to venue filtering.
+  // "In Season" toggle overlays the visit-derived season window.
   const seasonalWindow = seasonalActive ? _currentSeasonalWindow() : null;
 
-  // Sub-pill matcher (e.g. Lodging > B&Bs)
-  const typeRaw = document.getElementById('filterType').value;
-  const subPillDef = (SUB_PILLS[typeRaw] || []).find(p => p.id === activeSubPill);
+  // Active vibes including the Stays pseudo-vibe (when its tile is on).
+  const activeIds = _activeVibeIds();
+  const lodgingOptIn = staysActive;
 
   return liveExperiences.filter(e => {
     // A keyword search is a precise intent — it supersedes the coarse vibe
-    // and category filters (which would otherwise hide a valid match). The
-    // concrete area + season/date constraints below still apply.
+    // filters (which would otherwise hide a valid match). Concrete area
+    // and season/date constraints still apply.
     if (q && !_matchesSearch(e)) return false;
     if (area && !e.area.toLowerCase().includes(area)) return false;
-    if (!q && typeFilter && e.type.toLowerCase() !== typeFilter) return false;
-    if (!q && subPillDef && !subPillDef.match(e)) return false;
 
     const expSeason = (e.season || 'Year-Round');
 
-    if (seasonFilter) {
-      if (expSeason === 'Year-Round') return true;
-      if (!expSeason.toLowerCase().includes(seasonFilter)) return false;
-    }
-
     // Auto season filter: hide seasonal experiences outside the visit window.
-    // expSeason may be comma-separated e.g. 'Spring,Summer,Fall' — pass if ANY part matches.
     if (visitSeasons && expSeason !== 'Year-Round') {
       const parts = expSeason.toLowerCase().split(',').map(s => s.trim());
       if (!parts.some(s => visitSeasons.has(s))) return false;
     }
 
-    // "In Season" toggle: same shape as the visit-derived filter but uses
-    // the prominent top-level pill's current+next season set.
+    // "In Season" toggle: current+next season window.
     if (seasonalWindow && expSeason !== 'Year-Round') {
       const parts = expSeason.toLowerCase().split(',').map(s => s.trim());
       if (!parts.some(s => seasonalWindow.seasons.has(s))) return false;
     }
 
-    if (!q && themeTags) {
-      // Per-vibe OR-union: an experience passes if at least one selected
-      // vibe's (tag-match AND its active pill, if any) matches.
-      const lodgingOptIn = typeFilter === 'lodging';
-      const passes = [...selectedThemes].some(vibeId => {
-        const vibe = THEMES.find(t => t.id === vibeId);
-        if (!vibe) return false;
-        const vibeTagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
-        const tagMatch = (e.tags || []).some(t => vibeTagSet.has(t.toLowerCase()));
-        if (!tagMatch) return false;
+    if (!q && activeIds.length > 0) {
+      // Per-vibe OR-union: an experience passes if at least one active vibe's
+      // (base-match AND its active pill, if any) matches. Stays is one of
+      // the activeIds when its tile is on; _vibeBaseMatch handles its
+      // type==='Lodging' rule specially.
+      const passes = activeIds.some(vibeId => {
+        if (!_vibeBaseMatch(vibeId, e)) return false;
         const pillDefs = _vibePillDefsFor(vibeId);
         if (pillDefs.length === 0) return true;
         return pillDefs.some(pd => pd.match(e));
       });
-      if (!passes && !lodgingOptIn) return false;
-      // Once we're past the per-vibe pass, keep the legacy "stays are
-      // orthogonal to mood vibes" + "wineries only with Foodie/Relaxed"
-      // guards so unrelated lodgings / wineries don't bleed into vibes.
+      if (!passes) return false;
+      // Mood vibes shouldn't surface lodging / wineries unless explicitly
+      // invited (Stays tile, or Foodie/Relaxed for wineries).
       if (!lodgingOptIn) {
         const t = (e.type || '').toLowerCase();
-        if (t === 'lodging' && typeFilter !== 'lodging') return false;
+        if (t === 'lodging') return false;
         const wineryFriendly = selectedThemes.has('foodie') || selectedThemes.has('relaxed');
-        if ((t === 'winery' || t === 'tasting room') && !wineryFriendly && typeFilter !== t) return false;
+        if ((t === 'winery' || t === 'tasting room') && !wineryFriendly) return false;
       }
     }
     return true;
