@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nevada County — Discover Your Experience</title>
 <link rel="alternate" type="application/rss+xml" title="Nevada County Experience — Events" href="/feed.rss">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -25,85 +27,141 @@
   body {
     background: var(--cream);
     color: var(--dark);
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 15px;
     line-height: 1.55;
     min-height: 100vh;
   }
 
-  /* HERO */
+  /* HERO ─────────────────────────────────────────────────────────────────
+     Cinematic landing — full-bleed regional photograph behind a layered
+     atmospheric gradient. Type is set in Fraunces (display serif, optical
+     size variable) so the headline reads as editorial rather than admin.
+     TODO: rotate the background image by season (spring=wildflowers,
+     summer=river, fall=oak leaves, winter=pines). For now the spring
+     foothills shot stands in. */
   .hero {
-    background: var(--dark);
-    background-image: 
-      radial-gradient(ellipse at 20% 50%, rgba(139,74,42,0.35) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 20%, rgba(58,90,58,0.3) 0%, transparent 55%),
-      radial-gradient(ellipse at 60% 80%, rgba(201,168,76,0.15) 0%, transparent 50%);
-    padding: 56px 24px 48px;
-    text-align: center;
     position: relative;
+    min-height: 62vh;
+    padding: 88px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
     overflow: hidden;
+    color: var(--cream);
+    background:
+      linear-gradient(to bottom,
+        rgba(10,6,2,0.42) 0%,
+        rgba(10,6,2,0.28) 35%,
+        rgba(10,6,2,0.55) 75%,
+        rgba(10,6,2,0.85) 100%),
+      url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=2400&q=80&auto=format&fit=crop') center 40% / cover no-repeat;
+    background-color: var(--dark);
   }
+  /* Subtle warm vignette to anchor the text in the center of the frame */
   .hero::before {
     content: '';
     position: absolute; inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 1;
+    background:
+      radial-gradient(ellipse at 50% 60%, transparent 0%, rgba(10,6,2,0.4) 80%, rgba(10,6,2,0.6) 100%),
+      radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 50%);
+    pointer-events: none;
   }
+  .hero > * { position: relative; z-index: 1; }
+
   .hero-eyebrow {
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.4em;
-    color: var(--gold);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.42em;
+    color: var(--gold-light);
     text-transform: uppercase;
-    margin-bottom: 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
   }
   .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 6vw, 58px);
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-variation-settings: "opsz" 120, "SOFT" 30;
+    font-size: clamp(40px, 7.5vw, 78px);
+    font-weight: 600;
     color: var(--cream);
-    line-height: 1.1;
-    margin-bottom: 12px;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.45);
   }
   .hero h1 em {
     color: var(--gold-light);
     font-style: italic;
+    font-weight: 400;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
   }
   .hero-sub {
-    color: rgba(245,240,232,0.65);
-    font-size: 14px;
-    letter-spacing: 0.08em;
-    font-weight: 300;
+    color: rgba(245,240,232,0.82);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    font-weight: 400;
+    max-width: 560px;
+    margin: 0 auto;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
   }
   .gold-rule {
-    width: 80px; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 20px auto;
+    width: 72px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+    margin: 24px auto;
+  }
+  /* Soft chevron at the bottom that says "scroll, there's more below" */
+  .hero-scroll-cue {
+    position: absolute;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    color: rgba(245,240,232,0.55);
+    font-size: 18px;
+    line-height: 1;
+    pointer-events: none;
+    animation: heroBob 2.4s ease-in-out infinite;
+  }
+  @keyframes heroBob {
+    0%, 100% { transform: translate(-50%, 0); opacity: 0.4; }
+    50%      { transform: translate(-50%, 6px); opacity: 0.8; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll-cue { animation: none; }
   }
 
-  /* THEME SECTION */
+  /* THEME SECTION ─ widened + roomier so the page reads like a publication
+     rather than a packed list. Type still classifies as Inter/Fraunces. */
   .section {
-    max-width: 960px;
+    max-width: 1080px;
     margin: 0 auto;
-    padding: 48px 24px 0;
+    padding: 64px 28px 0;
   }
   .section-label {
     font-size: 12px;
-    letter-spacing: 0.35em;
+    letter-spacing: 0.38em;
     color: var(--gold);
     text-transform: uppercase;
-    margin-bottom: 10px;
+    font-weight: 500;
+    margin-bottom: 12px;
   }
   .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(22px, 3.5vw, 32px);
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-variation-settings: "opsz" 96, "SOFT" 30;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 600;
     color: var(--brown);
-    margin-bottom: 6px;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    margin-bottom: 8px;
   }
   .section-desc {
     color: var(--slate);
     font-size: 16px;
-    letter-spacing: 0.02em;
-    margin-bottom: 32px;
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+    max-width: 640px;
+    margin-bottom: 36px;
   }
 
   /* THEME CARDS */
@@ -167,7 +225,7 @@
     font-size: 9.5px;
     color: rgba(255,255,255,0.72);
     font-style: italic;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     margin-top: 1px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
@@ -244,7 +302,7 @@
     border: 1.5px solid #d4c9b0;
     border-radius: 6px;
     padding: 10px 14px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 15px;
     color: var(--dark);
     cursor: pointer;
@@ -324,7 +382,7 @@
     position: absolute;
     bottom: 0; left: 0; right: 0;
     padding: 10px 14px 10px;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 15px;
     font-weight: 700;
     color: white;
@@ -342,7 +400,7 @@
     backdrop-filter: blur(4px);
     padding: 3px 7px;
     border-radius: 20px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-weight: 600;
   }
   .exp-added-badge {
@@ -356,7 +414,7 @@
     text-transform: uppercase;
     padding: 3px 8px;
     border-radius: 20px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     display: none;
   }
   .exp-card.added .exp-added-badge { display: block; }
@@ -406,7 +464,7 @@
     border: 1.5px solid var(--gold);
     background: transparent;
     color: var(--brown);
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.12em;
@@ -421,7 +479,7 @@
     border-radius: 6px;
     border: 1.5px solid #d4c9b0;
     background: transparent;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 10px;
     letter-spacing: 0.1em;
     color: var(--slate);
@@ -481,7 +539,7 @@
     font-weight: 600;
   }
   .itin-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 17px;
     color: var(--dark);
     margin-bottom: 4px;
@@ -547,7 +605,7 @@
     font-weight: 600;
   }
   .event-name {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 18px;
     color: var(--dark);
     margin-bottom: 4px;
@@ -567,7 +625,7 @@
     padding: 12px 22px;
     background: none;
     border: none;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 13px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -603,7 +661,7 @@
     border: 2px solid var(--gold);
     border-radius: 50px;
     padding: 14px 24px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px;
     letter-spacing: 0.15em;
     font-weight: 600;
@@ -663,7 +721,7 @@
     position: sticky; top: 0; z-index: 1;
   }
   .modal-header h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 24px;
     color: var(--cream);
     margin-bottom: 4px;
@@ -706,7 +764,7 @@
   }
   .itinerary-item .item-body { flex: 1; }
   .itinerary-item .item-name {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 16px;
     color: var(--dark);
     margin-bottom: 3px;
@@ -757,7 +815,7 @@
     color: var(--gold-light);
     border: 2px solid var(--gold);
     border-radius: 8px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -772,7 +830,7 @@
     color: var(--slate);
     border: 1.5px solid #d4c9b0;
     border-radius: 8px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -809,7 +867,7 @@
     padding: 6px 12px 6px 14px;
     border: 1.5px solid var(--gold);
     border-radius: 20px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -836,7 +894,7 @@
     align-items: center;
     padding: 6px 16px;
     border-radius: 20px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -853,7 +911,7 @@
     padding: 48px 20px;
     color: var(--slate);
     font-style: italic;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 16px;
   }
 
@@ -880,7 +938,7 @@
     color: var(--gold);
     padding: 5px 12px;
     border-radius: 4px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 10px;
     letter-spacing: 0.12em;
     cursor: pointer;
@@ -897,7 +955,7 @@
   }
   .manage-tab-btn {
     padding: 12px 22px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 10px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
@@ -919,33 +977,33 @@
   .itin-panel:last-child { border-right: none; }
   .itin-panel-hd {
     padding: 10px 14px; background: var(--fog); border-bottom: 1px solid #e0d8c8;
-    font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: 0.22em;
+    font-family: 'Inter', system-ui, sans-serif; font-size: 10px; letter-spacing: 0.22em;
     text-transform: uppercase; color: var(--gold); font-weight: 700;
     display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 6px;
   }
   .itin-panel-body { flex: 1; overflow-y: auto; }
-  .itin-empty-msg { padding: 28px 14px; text-align: center; color: #a0aec0; font-size: 11px; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.04em; line-height: 1.6; }
+  .itin-empty-msg { padding: 28px 14px; text-align: center; color: #a0aec0; font-size: 11px; font-family: 'Inter', system-ui, sans-serif; letter-spacing: 0.04em; line-height: 1.6; }
   /* Left panel */
   .itin-row { display: flex; align-items: center; padding: 10px 12px; border-bottom: 1px solid #f0e8d8; cursor: pointer; gap: 6px; border-left: 3px solid transparent; transition: background 0.12s; }
   .itin-row:hover { background: rgba(201,168,76,0.05); }
   .itin-row.active { background: rgba(201,168,76,0.1); border-left-color: var(--gold); }
   .itin-row-info { flex: 1; min-width: 0; }
-  .itin-row-name { font-family: 'Josefin Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--brown); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .itin-row-name { font-family: 'Inter', system-ui, sans-serif; font-size: 13px; font-weight: 600; color: var(--brown); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .itin-row-dur { font-size: 11px; color: var(--slate); margin-top: 1px; }
   .itin-del-btn { background: none; border: none; cursor: pointer; color: #ccc; font-size: 16px; padding: 0 3px; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
   .itin-del-btn:hover { color: var(--rust); }
   /* Middle panel */
-  .itin-name-input { font-family: 'Josefin Sans', sans-serif; font-size: 14px; font-weight: 600; border: 1px solid #d4c9b0; border-radius: 4px; padding: 5px 8px; color: var(--brown); background: white; flex: 1; min-width: 0; text-transform: none; letter-spacing: normal; }
+  .itin-name-input { font-family: 'Inter', system-ui, sans-serif; font-size: 14px; font-weight: 600; border: 1px solid #d4c9b0; border-radius: 4px; padding: 5px 8px; color: var(--brown); background: white; flex: 1; min-width: 0; text-transform: none; letter-spacing: normal; }
   .itin-name-input:hover { border-color: var(--gold); }
   .itin-name-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.15); outline: none; }
   .itin-name-input::placeholder { color: #b8aa88; font-weight: 400; font-style: italic; text-transform: none; }
-  .itin-duration-input { font-family: 'Josefin Sans', sans-serif; font-size: 12px; border: 1px solid #d4c9b0; border-radius: 4px; padding: 5px 8px; color: var(--slate); background: white; width: 110px; flex-shrink: 0; text-transform: none; letter-spacing: normal; }
+  .itin-duration-input { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; border: 1px solid #d4c9b0; border-radius: 4px; padding: 5px 8px; color: var(--slate); background: white; width: 110px; flex-shrink: 0; text-transform: none; letter-spacing: normal; }
   .itin-duration-input:hover { border-color: var(--gold); }
   .itin-duration-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.15); outline: none; }
   .itin-duration-input::placeholder { color: #b8aa88; font-style: italic; text-transform: none; }
-  .itin-edit-label { font-family: 'Josefin Sans', sans-serif; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--slate); font-weight: 600; margin-right: 4px; opacity: 0.7; }
+  .itin-edit-label { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--slate); font-weight: 600; margin-right: 4px; opacity: 0.7; }
   .stop-row { display: flex; align-items: center; gap: 5px; padding: 7px 10px; border-bottom: 1px solid #f0e8d8; }
-  .stop-label-input { font-family: 'Josefin Sans', sans-serif; font-size: 10px; border: 1px solid #e0d8c8; border-radius: 3px; padding: 3px 5px; width: 72px; flex-shrink: 0; color: var(--slate); }
+  .stop-label-input { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; border: 1px solid #e0d8c8; border-radius: 3px; padding: 3px 5px; width: 72px; flex-shrink: 0; color: var(--slate); }
   .stop-label-input:focus { outline: none; border-color: var(--gold); }
   .stop-exp-info { flex: 1; min-width: 0; }
   .stop-exp-name { font-size: 11px; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -956,7 +1014,7 @@
   .stop-del-btn:hover { color: var(--rust); }
   /* Right panel */
   .browser-controls { padding: 8px 10px; border-bottom: 1px solid #e0d8c8; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; background: white; }
-  .browser-input { font-family: 'Josefin Sans', sans-serif; font-size: 11px; border: 1px solid #d4c9b0; border-radius: 4px; padding: 5px 8px; width: 100%; box-sizing: border-box; }
+  .browser-input { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; border: 1px solid #d4c9b0; border-radius: 4px; padding: 5px 8px; width: 100%; box-sizing: border-box; }
   .browser-input:focus { outline: none; border-color: var(--gold); }
   .browser-row { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid #f5f0e8; }
   .browser-row:hover { background: rgba(201,168,76,0.05); }
@@ -1010,7 +1068,7 @@
     flex-shrink: 0;
   }
   .map-header h3 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     color: var(--cream);
     font-size: 18px;
     flex: 1;
@@ -1051,7 +1109,7 @@
   .leaflet-popup-tip { background: #C9A84C !important; }
   .popup-inner {
     padding: 14px 16px 12px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
   .popup-num {
     display: inline-block;
@@ -1066,7 +1124,7 @@
     margin-bottom: 7px;
   }
   .popup-name {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 15px;
     color: #1E1508;
     line-height: 1.25;
@@ -1114,7 +1172,7 @@
     color: white;
     border: none;
     border-radius: 6px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1129,7 +1187,7 @@
     color: var(--dark);
     border: none;
     border-radius: 6px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1156,7 +1214,7 @@
   .manage-table th {
     background: var(--dark);
     color: var(--gold-light);
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -1187,7 +1245,7 @@
     border: 1px solid transparent;
     border-radius: 4px;
     padding: 4px 6px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px;
     background: transparent;
     color: var(--dark);
@@ -1408,7 +1466,7 @@
     display: flex; flex-direction: column; flex: 1;
   }
   .season-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 17px; font-weight: 700;
     color: var(--brown); line-height: 1.24;
     margin-bottom: 6px;
@@ -1454,7 +1512,7 @@
   .seas-card input[type=number],
   .seas-card textarea,
   .seas-card select {
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 13px;
     color: var(--slate);
     border: 1px solid #d8cdb8;
@@ -1495,7 +1553,7 @@
     font-size: 11px; color: var(--brown);
   }
   .ev-view-btn {
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
     padding: 6px 15px;
     border: 1.5px solid #d8cdb8;
@@ -1516,7 +1574,7 @@
   }
   .cal-nav:hover { border-color: var(--gold); }
   .cal-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 21px; font-weight: 700; color: var(--brown);
     min-width: 190px; text-align: center;
   }
@@ -1565,7 +1623,7 @@
   .cal-evrow-venue { font-size: 11px; color: var(--slate-soft); }
   .cal-cell.outside { opacity: 0.4; }
   .cal-panel-hd {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 17px; font-weight: 700; color: var(--brown);
     margin-bottom: 6px;
   }
@@ -1590,7 +1648,7 @@
   .search-field input {
     width: 100%;
     height: 46px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 15px;
     color: var(--slate);
     border: 1.5px solid #d8cdb8;
@@ -1621,7 +1679,7 @@
     background: var(--gold); color: #fff;
     border: none; border-radius: 8px;
     padding: 0 24px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px; font-weight: 600; letter-spacing: 0.05em;
     cursor: pointer;
   }
@@ -1635,7 +1693,7 @@
   .filter-bar select,
   .filter-bar .fb-date {
     height: 46px;
-    font-family: 'Josefin Sans', sans-serif; font-size: 13px;
+    font-family: 'Inter', system-ui, sans-serif; font-size: 13px;
     color: var(--slate);
     border: 1.5px solid #d8cdb8; border-radius: 8px;
     padding: 0 9px; background: #fff; cursor: pointer;
@@ -1655,7 +1713,7 @@
     position: absolute; left: 0; top: calc(100% + 5px);
     background: #fff; color: var(--slate);
     border: 1px solid #d8cdb8;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px; font-weight: 400; line-height: 1.45;
     padding: 7px 10px; border-radius: 6px;
     width: max-content; max-width: 300px;
@@ -1672,7 +1730,7 @@
     padding: 12px 16px;
     margin-bottom: 18px;
     cursor: pointer;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 13px; color: var(--slate);
     text-align: left;
   }
@@ -1700,7 +1758,7 @@
   }
   .tb-pills { display: flex; gap: 7px; flex-wrap: wrap; }
   .tb-pill {
-    font-family: 'Josefin Sans', sans-serif; font-size: 13px;
+    font-family: 'Inter', system-ui, sans-serif; font-size: 13px;
     padding: 7px 16px; border: 1.5px solid #d8cdb8; border-radius: 20px;
     background: #fff; color: var(--slate); cursor: pointer;
   }
@@ -1711,7 +1769,7 @@
   .tb-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 8px 16px; }
   .tb-panel { max-width: 760px; margin: 0 auto; }
   .tb-head {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
     font-size: 22px; font-weight: 700; color: var(--brown); margin-bottom: 4px;
   }
   .tb-intro { font-size: 13px; color: var(--slate); margin-bottom: 22px; }
@@ -1723,7 +1781,7 @@
   }
   .tb-check input { accent-color: var(--gold); width: 15px; height: 15px; }
   .tb-select {
-    width: 100%; font-family: 'Josefin Sans', sans-serif; font-size: 13px;
+    width: 100%; font-family: 'Inter', system-ui, sans-serif; font-size: 13px;
     padding: 8px 10px; border: 1.5px solid #d8cdb8; border-radius: 6px;
     color: var(--slate); background: #fff;
   }
@@ -1731,7 +1789,7 @@
   .tb-go {
     width: 100%; background: var(--gold); color: #fff; border: none;
     border-radius: 8px; padding: 13px;
-    font-family: 'Josefin Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 15px; font-weight: 700; letter-spacing: 0.05em;
     cursor: pointer; margin-top: 4px;
   }
@@ -1745,6 +1803,7 @@
   <h1>Western Nevada County<br><em>Trip Planner</em></h1>
   <div class="gold-rule"></div>
   <p class="hero-sub">Choose your vibe. Build your perfect Gold Country itinerary.</p>
+  <div class="hero-scroll-cue" aria-hidden="true">▾</div>
 </div>
 
 <!-- IN SEASON NOW — date-driven seasonal spotlight (filled by renderSeasonalBand) -->
@@ -2001,7 +2060,7 @@
       <form id="suggestForm" onsubmit="submitSuggestion(event)">
         <div style="display:flex;flex-direction:column;gap:14px">
 
-          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Inter', system-ui, sans-serif">
             WHAT IS IT?
             <select name="kind" required style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px;background:#fff">
               <option value="">— choose one —</option>
@@ -2012,25 +2071,25 @@
             </select>
           </label>
 
-          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Inter', system-ui, sans-serif">
             NAME *
             <input type="text" name="name" required maxlength="120" placeholder="e.g. Pine Tree Cafe"
               style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px">
           </label>
 
-          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Inter', system-ui, sans-serif">
             WEBSITE OR LINK <span style="font-weight:400;color:var(--slate);text-transform:none;letter-spacing:0">(optional)</span>
             <input type="url" name="url" maxlength="300" placeholder="https://"
               style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px">
           </label>
 
-          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Inter', system-ui, sans-serif">
             BRIEF DESCRIPTION
             <textarea name="description" maxlength="600" rows="3" placeholder="What makes it worth listing? Address, hours, vibe, dates if it's an event…"
               style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px;resize:vertical"></textarea>
           </label>
 
-          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Josefin Sans'">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:0.06em;color:var(--brown);font-weight:600;font-family:'Inter', system-ui, sans-serif">
             YOUR EMAIL <span style="font-weight:400;color:var(--slate);text-transform:none;letter-spacing:0">(optional — only if you want a reply)</span>
             <input type="email" name="submitter_email" maxlength="120" placeholder="you@example.com"
               style="padding:9px 10px;border:1px solid #d4c9b0;border-radius:4px;font-family:inherit;font-size:13px">
@@ -3246,7 +3305,7 @@ function renderExperiences() {
   // if they explicitly hid both, leave the grid empty without the warning.
   // Selected stops always render, so a non-empty selection is never "no matches".
   if (showPlaces && placesForGrid.length === 0 && selectedCount === 0 && (!showUpcomingEvents || eventsForGrid.length === 0)) {
-    grid.innerHTML = '<div class="no-results">No experiences match your current filters.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Try adjusting your themes or filters.</span></div>';
+    grid.innerHTML = '<div class="no-results">No experiences match your current filters.<br><span style="font-size:13px;font-family:Inter,system-ui,sans-serif;color:#718096">Try adjusting your themes or filters.</span></div>';
     return;
   }
 
@@ -3533,7 +3592,7 @@ function updateFab() {
 function renderItineraries() {
   const grid = document.getElementById('itinGrid');
   if (!liveItineraries.length) {
-    grid.innerHTML = '<div class="no-results">No itineraries yet.<br><span style="font-size:13px;font-family:Josefin Sans;color:#718096">Build a day-by-day plan in <strong>My Itinerary</strong>, then click <strong>✨ Publish as Suggested</strong> — it will appear here for all visitors.</span></div>';
+    grid.innerHTML = '<div class="no-results">No itineraries yet.<br><span style="font-size:13px;font-family:Inter,system-ui,sans-serif;color:#718096">Build a day-by-day plan in <strong>My Itinerary</strong>, then click <strong>✨ Publish as Suggested</strong> — it will appear here for all visitors.</span></div>';
     return;
   }
   grid.innerHTML = liveItineraries.map(itin => {
@@ -3549,7 +3608,7 @@ function renderItineraries() {
             <span>${exp.name}<em style="color:#A0AEC0;font-size:10px"> · ${exp.area}</em></span>
           </li>`;
         }).filter(Boolean).join('')
-      : '<li style="color:#a0aec0;font-size:11px;font-family:Josefin Sans;list-style:none;padding:4px 0">No stops added yet</li>';
+      : '<li style="color:#a0aec0;font-size:11px;font-family:Inter,system-ui,sans-serif;list-style:none;padding:4px 0">No stops added yet</li>';
     // Visitor-facing "Customize this trip" button — copies this itinerary's
     // stops into the visitor's own My Itinerary planner so they can edit it
     // as their own regular itinerary. Shown on every suggested itinerary card
@@ -3569,7 +3628,7 @@ function renderItineraries() {
     return `<div class="itin-card">
       <div class="itin-theme">${itin.duration}</div>
       <div class="itin-title">${itin.name}</div>
-      ${itin.description ? `<p style="font-size:12px;color:var(--slate);margin:0 0 10px;font-family:'Josefin Sans',sans-serif">${itin.description}</p>` : ''}
+      ${itin.description ? `<p style="font-size:12px;color:var(--slate);margin:0 0 10px;font-family:'Inter', system-ui, sans-serif,sans-serif">${itin.description}</p>` : ''}
       <ul class="itin-stops">${stopsHtml}</ul>
       ${customizeBtn}
       ${adminBtns}
@@ -4839,7 +4898,7 @@ function _facilityIcon(type) {
       border-radius:50%;
       box-shadow:0 2px 6px rgba(0,0,0,0.4);
       display:flex;align-items:center;justify-content:center;
-      color:#fff;font-family:'Josefin Sans',sans-serif;
+      color:#fff;font-family:'Inter', system-ui, sans-serif,sans-serif;
       font-size:13px;font-weight:700;line-height:1;
     ">${cfg.label}</div>`,
     iconSize: [24, 24],
@@ -4913,7 +4972,7 @@ function openMap() {
           display:flex;align-items:center;justify-content:center;
         "><span style="
           transform:rotate(45deg);
-          font-family:'Josefin Sans',sans-serif;
+          font-family:'Inter', system-ui, sans-serif,sans-serif;
           font-size:13px;font-weight:700;
           color:#1E1508;line-height:1;
         ">${i + 1}</span></div>`,
@@ -6501,7 +6560,7 @@ async function renderEventsQueue() {
       ${API_BASE !== null ? `<a href="${rssUrl}" target="_blank" style="font-size:11px;color:var(--rust);text-decoration:none" title="RSS feed of approved events">📡 RSS</a>` : ''}
     </div>
     <div style="flex-shrink:0;padding:6px 14px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8c8;background:#faf7f2;flex-wrap:wrap">
-      <span style="font-size:10px;font-family:'Josefin Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#aaa;white-space:nowrap">Date</span>
+      <span style="font-size:10px;font-family:'Inter', system-ui, sans-serif,sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#aaa;white-space:nowrap">Date</span>
       <input type="date" value="${dateFrom}"
         onchange="eventsDateFrom=this.value;renderEventsQueue()"
         style="font-size:11px;padding:3px 6px;border:1.5px solid #d4c9b0;border-radius:5px;background:white;font-family:inherit;color:var(--slate);cursor:pointer">
@@ -6530,7 +6589,7 @@ async function renderEventsQueue() {
           <col style="width:120px">
           <col style="width:66px">
         </colgroup>
-        <thead><tr style="background:var(--dark);color:var(--gold-light);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;position:sticky;top:0;z-index:2">
+        <thead><tr style="background:var(--dark);color:var(--gold-light);font-family:'Inter', system-ui, sans-serif,sans-serif;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;position:sticky;top:0;z-index:2">
           <th style="padding:6px 8px;text-align:left;font-weight:600">Source</th>
           <th style="padding:6px 8px;text-align:left;font-weight:600">Title</th>
           <th style="padding:6px 8px;text-align:left;font-weight:600">Date</th>
@@ -6779,7 +6838,7 @@ async function renderSuggestionsTab() {
 
   if (suggestions.length === 0) {
     panel.innerHTML = `
-      <div style="padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8;font-size:12px;color:var(--brown);font-family:'Josefin Sans';letter-spacing:0.06em;font-weight:600">
+      <div style="padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8;font-size:12px;color:var(--brown);font-family:'Inter', system-ui, sans-serif;letter-spacing:0.06em;font-weight:600">
         SUGGESTIONS &nbsp;<span style="color:#999;font-weight:400">— 0 received</span>
       </div>
       <div style="padding:24px;color:#888;font-size:13px">
@@ -6825,7 +6884,7 @@ async function renderSuggestionsTab() {
 
   panel.innerHTML = `
     <div style="padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8;display:flex;align-items:center;gap:8px">
-      <span style="font-size:12px;font-family:'Josefin Sans';letter-spacing:0.06em;color:var(--brown);font-weight:600">SUGGESTIONS</span>
+      <span style="font-size:12px;font-family:'Inter', system-ui, sans-serif;letter-spacing:0.06em;color:var(--brown);font-weight:600">SUGGESTIONS</span>
       <span style="font-size:11px;color:#999">${suggestions.length} total · ${pendingCount} pending</span>
       <span style="margin-left:auto;font-size:11px;color:#999">Approval here just marks status — copy details to the Experiences or Events tabs to publish.</span>
     </div>
@@ -6885,7 +6944,7 @@ async function renderScraperSources() {
 
   panel.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--fog);border-bottom:1px solid #e0d8c8">
-      <span style="font-size:12px;font-family:'Josefin Sans';letter-spacing:0.06em;color:var(--brown);font-weight:600">EVENT SOURCES</span>
+      <span style="font-size:12px;font-family:'Inter', system-ui, sans-serif;letter-spacing:0.06em;color:var(--brown);font-weight:600">EVENT SOURCES</span>
       <span style="margin-left:auto;font-size:11px;color:#999">${sources.length} source${sources.length!==1?'s':''}</span>
       <button onclick="addSource()" style="background:var(--forest);color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">+ Add Source</button>
       <button onclick="saveSources()" style="background:var(--brown);color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">💾 Save</button>
@@ -7069,9 +7128,9 @@ function renderTagManager() {
   body.innerHTML = `
     <div style="padding:16px 20px 8px">
       <div style="display:flex;gap:8px;margin-bottom:16px">
-        <input id="newTagInput" placeholder="Add new tag..." style="flex:1;padding:8px 10px;border:1px solid var(--gold);border-radius:6px;font-family:'Josefin Sans',sans-serif;font-size:12px;outline:none"
+        <input id="newTagInput" placeholder="Add new tag..." style="flex:1;padding:8px 10px;border:1px solid var(--gold);border-radius:6px;font-family:'Inter', system-ui, sans-serif,sans-serif;font-size:12px;outline:none"
           onkeydown="if(event.key==='Enter')addCustomTag()">
-        <button onclick="addCustomTag()" style="background:var(--gold);color:var(--dark);border:none;border-radius:6px;padding:8px 14px;font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;cursor:pointer">+ ADD</button>
+        <button onclick="addCustomTag()" style="background:var(--gold);color:var(--dark);border:none;border-radius:6px;padding:8px 14px;font-family:'Inter', system-ui, sans-serif,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;cursor:pointer">+ ADD</button>
       </div>
       <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--slate);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--fog)">
         ${masterTags.length} tags — click × to remove unused tags
@@ -7225,7 +7284,7 @@ function manageRow(e, i, isNew = false) {
     <td><input value="${safeVal(e.name)}" data-field="name" data-id="${e.id}" onchange="markDirty(${e.id},'name',this.value)"></td>
     <td><input value="${safeVal(e.sub)}" data-field="sub" data-id="${e.id}" onchange="markDirty(${e.id},'sub',this.value)"></td>
     <td><input class="medium" value="${safeVal(e.area)}" data-field="area" data-id="${e.id}" onchange="markDirty(${e.id},'area',this.value)"></td>
-    <td><select data-field="type" data-id="${e.id}" onchange="markDirty(${e.id},'type',this.value)" style="font-family:'Josefin Sans',sans-serif;font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--dark);cursor:pointer;width:100%;min-width:150px">
+    <td><select data-field="type" data-id="${e.id}" onchange="markDirty(${e.id},'type',this.value)" style="font-family:'Inter', system-ui, sans-serif,sans-serif;font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--dark);cursor:pointer;width:100%;min-width:150px">
       ${['Activity','Art event','Brewery','Gallery','Historic site','Lodging','Museum','Music venue','Outdoor','Restaurant','Tasting room','Wellness'].map(t =>
         `<option value="${t}" ${e.type === t ? 'selected' : ''}>${t}</option>`
       ).join('')}
@@ -7237,7 +7296,7 @@ function manageRow(e, i, isNew = false) {
         ${(e.tags||[]).length ? (e.tags||[]).map(t => `<span class="tag-pill">${t}</span>`).join('') : '<span class="tag-pill-empty">+ tags</span>'}
       </div>
     </td>
-    <td><select data-field="season" data-id="${e.id}" onchange="markDirty(${e.id},'season',this.value)" style="font-family:'Josefin Sans',sans-serif;font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--dark);cursor:pointer;width:100%;min-width:110px">
+    <td><select data-field="season" data-id="${e.id}" onchange="markDirty(${e.id},'season',this.value)" style="font-family:'Inter', system-ui, sans-serif,sans-serif;font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--dark);cursor:pointer;width:100%;min-width:110px">
       ${['Year-Round','Spring','Summer','Fall','Winter','Spring,Summer','Summer,Fall','Fall,Winter','Holiday'].map(s =>
         `<option value="${s}" ${(e.season||'Year-Round') === s ? 'selected' : ''}>${s}</option>`
       ).join('')}
@@ -7486,7 +7545,7 @@ function renderSeasonalAdmin() {
         <span class="seas-status" id="seasstatus-${m.id}" style="background:${meta[1]}">${meta[0]}</span>
         <input type="text" value="${escVal(m.title)}" placeholder="Title"
           onchange="seasonalUpdate('${m.id}','title',this.value)"
-          style="flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:15px;color:var(--brown)">
+          style="flex:1;font-family:'Fraunces','Playfair Display',Georgia,serif;font-weight:700;font-size:15px;color:var(--brown)">
         <button onclick="deleteSeasonalMoment('${m.id}')"
           style="background:transparent;color:#c0392b;border:1px solid #c0392b;border-radius:5px;padding:5px 11px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;flex-shrink:0">Delete</button>
       </div>
@@ -7641,7 +7700,7 @@ function renderManageItinerariesHtml() {
     const n = liveStops.filter(s => s.itinId === it.id).length;
     return `<div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid #e6ddc9;border-radius:9px;margin-bottom:10px;background:#fff">
       <div style="flex:1;min-width:0">
-        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--brown)">${escVal(it.name)}</div>
+        <div style="font-family:'Fraunces','Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:var(--brown)">${escVal(it.name)}</div>
         <div style="font-size:11.5px;color:var(--slate-soft);margin-top:2px">${escVal(it.duration || '')}${it.duration ? ' · ' : ''}${n} stop${n !== 1 ? 's' : ''}${it.description ? ' · ' + escVal(it.description) : ''}</div>
       </div>
       <button class="btn-add-row" style="flex-shrink:0" onclick="manageEditItinerary('${it.id}')"
