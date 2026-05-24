@@ -1481,6 +1481,19 @@
 
   /* ── Upcoming Events — List/Calendar view ─────────────────────────── */
   .events-view-toggle { display: flex; gap: 6px; margin-bottom: 16px; }
+  .events-count {
+    font-size: 13px; color: var(--slate);
+    margin: -8px 0 14px; padding: 8px 12px;
+    background: var(--fog); border-left: 3px solid var(--gold); border-radius: 3px;
+    display: none;
+  }
+  .events-count.show { display: block; }
+  .events-count strong { color: var(--brown); font-weight: 600; }
+  .events-count .ec-chip {
+    display: inline-block; margin: 0 2px; padding: 1px 8px;
+    background: #fff; border: 1px solid var(--rule); border-radius: 10px;
+    font-size: 11px; color: var(--brown);
+  }
   .ev-view-btn {
     font-family: 'Josefin Sans', sans-serif;
     font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
@@ -1857,6 +1870,7 @@
       <button id="evViewList" class="ev-view-btn active" onclick="setEventsView('list')" title="See events as a scrollable list">☰ List</button>
       <button id="evViewCal" class="ev-view-btn" onclick="setEventsView('calendar')" title="See events laid out on a month calendar">▦ Calendar</button>
     </div>
+    <div id="eventsCount" class="events-count"></div>
     <div id="eventsGrid" class="events-grid"></div>
     <div id="eventsCalendar" style="display:none"></div>
   </div>
@@ -3786,6 +3800,61 @@ async function _loadEventsCache() {
   }
 }
 
+// Build the human-readable "Showing N events · <active filters>" badge that
+// sits above the Events grid + calendar. Hides itself when no filter is
+// active (so the badge only shows up to confirm a filter actually narrowed
+// the result). Counts consolidated cards, since that's what the visitor sees.
+function _renderEventsCount(shownCount, totalUnfiltered) {
+  const el = document.getElementById('eventsCount');
+  if (!el) return;
+
+  const dateFrom = (typeof visitorDateFrom !== 'undefined') ? visitorDateFrom : '';
+  const dateTo   = (typeof visitorDateTo   !== 'undefined') ? visitorDateTo   : '';
+  const q        = (searchQuery || '').trim();
+  const areaVal  = (document.getElementById('filterArea')?.value || '').trim();
+  const themes   = (typeof selectedThemes !== 'undefined') ? [...selectedThemes] : [];
+
+  const hasFilter = !!(dateFrom || dateTo || q || areaVal || themes.length);
+  if (!hasFilter) { el.classList.remove('show'); el.innerHTML = ''; return; }
+
+  // Date range label: prefer a friendly preset name when the range matches one.
+  const today = _localISODate();
+  let dateLabel = '';
+  if (dateFrom && dateFrom === dateTo && dateFrom === today) {
+    dateLabel = 'today';
+  } else if (dateFrom && dateTo) {
+    const span = (new Date(dateTo) - new Date(dateFrom)) / 86400000;
+    if (span <= 1.5)      dateLabel = 'this weekend';
+    else if (span <= 6.5) dateLabel = 'this week';
+    else {
+      const fmt = s => new Date(s + 'T12:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      dateLabel = `${fmt(dateFrom)} – ${fmt(dateTo)}`;
+    }
+  } else if (dateFrom) {
+    dateLabel = `from ${dateFrom}`;
+  } else if (dateTo) {
+    dateLabel = `through ${dateTo}`;
+  }
+
+  const chips = [];
+  if (dateLabel) chips.push(`<span class="ec-chip">📅 ${dateLabel}</span>`);
+  if (areaVal)   chips.push(`<span class="ec-chip">📍 ${areaVal}</span>`);
+  if (themes.length) {
+    const names = themes.map(id => {
+      const t = (typeof THEMES !== 'undefined') ? THEMES.find(x => x.id === id) : null;
+      return t ? t.name : id;
+    });
+    chips.push(`<span class="ec-chip">${names.join(' + ')}</span>`);
+  }
+  if (q) chips.push(`<span class="ec-chip">🔎 "${q.replace(/</g, '&lt;')}"</span>`);
+
+  const noun = shownCount === 1 ? 'event' : 'events';
+  const ofTotal = (totalUnfiltered && totalUnfiltered > shownCount)
+    ? ` <span style="opacity:0.65">of ${totalUnfiltered}</span>` : '';
+  el.innerHTML = `<strong>${shownCount}</strong> ${noun}${ofTotal} ${chips.join(' ')}`;
+  el.classList.add('show');
+}
+
 async function renderEvents() {
   const themeTags  = getActiveThemeTags();
   const dateFrom   = typeof visitorDateFrom !== 'undefined' ? visitorDateFrom : '';
@@ -3803,6 +3872,8 @@ async function renderEvents() {
   // Consolidate recurring series (Lavender Glow, weekly markets, etc.) into
   // one card each — list-view only; the calendar still dots each day.
   const evts = _consolidateSeries(_eventsForView());
+  // Unfiltered count is what's in the cache — gives the visitor an "of N total" anchor.
+  _renderEventsCount(evts.length, (_eventsCache || []).length);
 
   // Highlight the active preset button
   ['vqBtnAll','vqBtnToday','vqBtnWeekend','vqBtnWeek'].forEach(id => {
@@ -4140,6 +4211,9 @@ async function renderEventsCalendar() {
   await _loadEventsCache();
 
   const evts = _eventsForView();   // already date + vibe filtered, same as List
+  // Calendar view shows raw rows (each day dotted), so the count badge should
+  // also reflect the raw filtered count — not the consolidated count.
+  _renderEventsCount(evts.length, (_eventsCache || []).length);
   const vF = (typeof visitorDateFrom !== 'undefined' && visitorDateFrom) ? visitorDateFrom : '';
   const vT = (typeof visitorDateTo   !== 'undefined' && visitorDateTo)   ? visitorDateTo   : '';
 
