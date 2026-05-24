@@ -1708,13 +1708,33 @@
   .cal-cell.today .cal-daynum { background: var(--gold); color: #fff; }
   .cal-chip {
     font-size: 9.5px; font-weight: 600; color: #fff;
-    padding: 3px 6px; border-radius: 3px;
-    /* Wrap long titles so the whole event name reads inside the day
-       cell — no more "Mountain Stream Meditation: Open T…" ellipses. */
+    padding: 3px 4px; border-radius: 4px;
+    line-height: 1.22;
+    display: flex; align-items: stretch; gap: 5px;
+    min-height: 26px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+  }
+  .cal-chip-thumb {
+    flex: 0 0 26px;
+    width: 26px; height: 26px;
+    object-fit: cover; border-radius: 3px;
+    background: rgba(0,0,0,0.15);
+  }
+  .cal-chip-body {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .cal-chip-name {
     white-space: normal;
     word-break: break-word;
     overflow-wrap: anywhere;
-    line-height: 1.22;
+    line-height: 1.18;
+  }
+  .cal-chip-time {
+    font-size: 8.5px;
+    font-weight: 400;
+    opacity: 0.85;
+    margin-top: 1px;
   }
   .cal-more { font-size: 9px; color: var(--slate-soft); font-weight: 600; padding-left: 3px; }
   .cal-daypanel { margin-top: 20px; border-top: 2px solid var(--gold); padding-top: 14px; }
@@ -1743,7 +1763,9 @@
   }
   @media (max-width: 640px) {
     .cal-cell { min-height: 72px; }
-    .cal-chip { font-size: 8.5px; }
+    .cal-chip { font-size: 8.5px; gap: 3px; padding: 2px 3px; min-height: 22px; }
+    .cal-chip-thumb { display: none; }   /* drop thumbnail on tight screens */
+    .cal-chip-time { display: none; }
     .cal-evrow-when { flex-basis: 70px; }
   }
 
@@ -4001,10 +4023,81 @@ function _eventVisual(ev) {
   return ['📅', '#C9A84C', '#E8C96A']; // default — gold
 }
 
-// Produce the placeholder block HTML when an event has no image
+// Curated category photography for event placeholders (idea #12b) and the
+// calendar chip thumbnails (idea #12). Replaces the emoji-only fallback
+// with a real photo keyed to the event's primary tag so cards stop reading
+// as stubs. Unsplash URLs sized for the largest consumer (event hero ~180px);
+// browsers will scale + cache.
+const _EVENT_TYPE_PHOTO = {
+  'Music':        'https://images.unsplash.com/photo-1501612780327-45045538702b?w=600&h=380&fit=crop',
+  'Theater':      'https://images.unsplash.com/photo-1503095396549-807759245b35?w=600&h=380&fit=crop',
+  'Film':         'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&h=380&fit=crop',
+  'Dance':        'https://images.unsplash.com/photo-1547153760-18fc86324498?w=600&h=380&fit=crop',
+  'Lecture':      'https://images.unsplash.com/photo-1492538368677-f6e0afe31dcc?w=600&h=380&fit=crop',
+  'Art':          'https://images.unsplash.com/photo-1577083552782-be17e0e83a48?w=600&h=380&fit=crop',
+  'Artistic':     'https://images.unsplash.com/photo-1577083552782-be17e0e83a48?w=600&h=380&fit=crop',
+  'Workshop':     'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=380&fit=crop',
+  'Hands-on':     'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=380&fit=crop',
+  'Craft':        'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600&h=380&fit=crop',
+  'Festival':     'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&h=380&fit=crop',
+  'Holiday':      'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=600&h=380&fit=crop',
+  'Hiking':       'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=380&fit=crop',
+  'Biking':       'https://images.unsplash.com/photo-1532465473771-c66b76e63f5c?w=600&h=380&fit=crop',
+  'Running':      'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&h=380&fit=crop',
+  'Swimming':     'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&h=380&fit=crop',
+  'Fishing':      'https://images.unsplash.com/photo-1471880876767-8ee04425d36c?w=600&h=380&fit=crop',
+  'Boating':      'https://images.unsplash.com/photo-1502325966718-85a90488dc29?w=600&h=380&fit=crop',
+  'Sport':        'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=380&fit=crop',
+  'Active':       'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=380&fit=crop',
+  'Outdoor':      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=380&fit=crop',
+  'Nature':       'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=600&h=380&fit=crop',
+  'Scenic':       'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=600&h=380&fit=crop',
+  'Environment':  'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&h=380&fit=crop',
+  'Garden':       'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=380&fit=crop',
+  'Wellness':     'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&h=380&fit=crop',
+  'Spiritual':    'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&h=380&fit=crop',
+  'Restorative':  'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=600&h=380&fit=crop',
+  'Family':       'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=380&fit=crop',
+  'Community':    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=380&fit=crop',
+  'Social':       'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=380&fit=crop',
+  'Historic':     'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=600&h=380&fit=crop',
+  'Gold Rush':    'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=600&h=380&fit=crop',
+  'Food & Drink': 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=380&fit=crop',
+  'Foodie':       'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=380&fit=crop',
+  'Market':       'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&h=380&fit=crop',
+  'Fundraiser':   'https://images.unsplash.com/photo-1561489413-985b06da5bee?w=600&h=380&fit=crop',
+  'Romantic':     'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=380&fit=crop',
+  '__default':    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=380&fit=crop',
+};
+
+// Resolve a category photo for an event by walking its tags. Returns the
+// '__default' (foothills) when nothing matches. Excludes events that
+// already carry their own image (caller checks that first to avoid
+// wasting a fetch the real <img> would cover anyway).
+function _eventCategoryPhoto(ev) {
+  const tags = ev.tags || [];
+  for (const t of tags) {
+    if (_EVENT_TYPE_PHOTO[t]) return _EVENT_TYPE_PHOTO[t];
+  }
+  return _EVENT_TYPE_PHOTO['__default'];
+}
+
+// Produce the placeholder block HTML when an event has no image. If the
+// event has no `image` URL, we paint a category-keyed photo as the
+// background behind a darkening gradient + the emoji badge — so cards
+// without their own photography read as editorial rather than as stubs.
 function _eventPlaceholder(ev, height = 100) {
   const [emoji, c1, c2] = _eventVisual(ev);
-  return `<div style="background:linear-gradient(135deg, ${c1} 0%, ${c2} 100%);height:${height}px;display:flex;align-items:center;justify-content:center"><span style="font-size:${Math.round(height*0.45)}px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))">${emoji}</span></div>`;
+  if (ev && ev.image) {
+    // Real image will cover this; keep the cheap gradient as the layer
+    // behind it (used as a fallback if the real image errors out).
+    return `<div style="background:linear-gradient(135deg, ${c1} 0%, ${c2} 100%);height:${height}px;display:flex;align-items:center;justify-content:center"><span style="font-size:${Math.round(height*0.45)}px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))">${emoji}</span></div>`;
+  }
+  const photo = _eventCategoryPhoto(ev);
+  return `<div style="position:relative;height:${height}px;background:url('${photo}') center/cover, linear-gradient(135deg, ${c1} 0%, ${c2} 100%);background-size:cover">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(20,12,4,0.10) 0%, rgba(20,12,4,0.55) 100%)"></div>
+    <span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:${Math.round(height*0.36)}px;line-height:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.7));z-index:1">${emoji}</span>
+  </div>`;
 }
 
 function _fmtApiDate(dateStr) {
@@ -4693,7 +4786,15 @@ function _buildCalendarHTML(evts, opts) {
     let chips = '';
     dEvts.slice(0, 3).forEach(ev => {
       const c1 = _eventVisual(ev)[1];
-      chips += `<div class="cal-chip" style="background:${c1}" title="${escVal(ev.name)}">${escVal(ev.name)}</div>`;
+      // Each chip becomes a tiny card: thumbnail + wrapped name + optional
+      // time. Falls back to color-bar mode under 520px (see .cal-chip
+      // mobile styles).
+      const thumb = (ev.image || _eventCategoryPhoto(ev));
+      const thumbHtml = thumb
+        ? `<img class="cal-chip-thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : '';
+      const timeHtml = ev.times ? `<span class="cal-chip-time">${escVal(ev.times)}</span>` : '';
+      chips += `<div class="cal-chip" style="background:${c1}" title="${escVal(ev.name)}">${thumbHtml}<div class="cal-chip-body"><span class="cal-chip-name">${escVal(ev.name)}</span>${timeHtml}</div></div>`;
     });
     if (dEvts.length > 3) chips += `<div class="cal-more">+${dEvts.length - 3} more</div>`;
 
