@@ -4411,12 +4411,31 @@ function _eventsForView() {
     });
   }
   // A keyword search supersedes the vibe filter; otherwise apply the vibe
-  // (falling back to all if nothing matches it).
+  // (falling back to all if nothing matches it). When at least one vibe has
+  // an active pill, the per-vibe pill check tightens the match the same way
+  // the Explore strip + venue grid already do — without it, Active +
+  // Biking would still surface outdoor music / oil-painting / markets
+  // because Active's tag set is broad ("Scenic","Outdoor","Nature",…) and
+  // those events ride along.
   if (q) {
     evts = evts.filter(_matchesSearch);
-  } else if (themeTags) {
-    const themed = evts.filter(e => e.tags.some(t => themeTags.has(t.toLowerCase())));
-    if (themed.length > 0) evts = themed;
+  } else if (selectedThemes && selectedThemes.size > 0 && themeTags) {
+    // Two-step narrowing so an active pill ALWAYS tightens, even when it
+    // matches nothing — better to show "0 events" honestly than fall back
+    // to a flood of unrelated tagged events ("Active+Biking" surfacing
+    // outdoor markets, meetings, oil-painting workshops).
+    evts = evts.filter(e => {
+      return [...selectedThemes].some(vibeId => {
+        const vibe = THEMES.find(t => t.id === vibeId);
+        if (!vibe) return false;
+        const vibeTagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
+        const tagMatch = (e.tags || []).some(t => vibeTagSet.has(t.toLowerCase()));
+        if (!tagMatch) return false;
+        const pillDefs = (typeof _vibePillDefsFor === 'function') ? _vibePillDefsFor(vibeId) : [];
+        if (pillDefs.length === 0) return true;
+        return pillDefs.some(pd => pd.match(e));
+      });
+    });
   }
   return [...evts].sort((a, b) => (a.dateStart || '9999').localeCompare(b.dateStart || '9999'));
 }
