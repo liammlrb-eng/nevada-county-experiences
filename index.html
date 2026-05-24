@@ -2968,8 +2968,9 @@ function toggleTheme(id) {
     selectedThemes.delete(id);
     // Drop the active pill only if it belonged to the vibe just deselected.
     // Pills on other still-selected vibes remain active.
-    const ap = (typeof _activeVibePillParts === 'function') ? _activeVibePillParts() : null;
-    if (ap && ap.vibeId === id) activeVibePill = null;
+    // Drop the active pill only if it belonged to the vibe just deselected.
+    // Pills on other still-selected vibes remain active.
+    delete activeVibePills[id];
   } else {
     selectedThemes.add(id);   // multi-select: OR logic between vibes
   }
@@ -3054,7 +3055,7 @@ function _seasonalGo(id) {
     if (a.type === 'vibe') {
       selectedThemes.clear();
       selectedThemes.add(a.value);
-      activeVibePill = null;
+      activeVibePills = {};
       renderThemes();
       renderActiveFilters();
       if (typeof renderVibePills === 'function') renderVibePills();
@@ -3248,13 +3249,23 @@ function renderExperiences() {
     // Keyword search — matches event name, venue, tags and area.
     if (q) candidates = candidates.filter(_matchesSearch);
 
-    // Vibe-pill filter (Foodie → Markets, Active → Hiking, etc.)
-    // Works regardless of how many vibes are selected — the pill identifies
-    // its owning vibe via the compound key, so narrowing one vibe doesn't
-    // hide the others.
-    if (!q && activeVibePill) {
-      const vibeDef = _activeVibePillDef();
-      if (vibeDef) candidates = candidates.filter(vibeDef.match);
+    // Vibe-pill filter — per-vibe with OR-union semantics. Each selected
+    // vibe contributes its own (tag-match AND optional pill-match), and an
+    // item passes if at least one vibe's contribution matches. This lets
+    // "Foodie 🍷 Wineries + Music 🎵 Concert Halls" return wineries AND
+    // concert halls rather than the intersection (which would be empty).
+    if (!q && _anyVibePillActive() && selectedThemes.size > 0) {
+      candidates = candidates.filter(c => {
+        return [...selectedThemes].some(vibeId => {
+          const vibe = THEMES.find(t => t.id === vibeId);
+          if (!vibe) return false;
+          const vibeTagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
+          const tagMatch = (c.tags || []).some(t => vibeTagSet.has(t.toLowerCase()));
+          if (!tagMatch) return false;
+          const pillDef = _vibePillDefFor(vibeId);
+          return pillDef ? pillDef.match(c) : true;
+        });
+      });
     }
 
     // Consolidate recurring/multi-day series so the strip + count don't
@@ -3478,10 +3489,14 @@ function renderActiveFilters() {
 
 function clearAllFilters() {
   selectedThemes.clear();
+  activeVibePills = {};
+  activeSubPill = null;
   document.getElementById('filterArea').value = '';
   document.getElementById('filterType').value = '';
   _visClearDate();    // resets date state + re-renders events
   renderThemes();
+  if (typeof renderVibePills === 'function') renderVibePills();
+  if (typeof renderSubPills === 'function')  renderSubPills();
   renderActiveFilters();
   renderExperiences();
 }
@@ -5348,7 +5363,7 @@ function findLodging() {
   const hadVibes = selectedThemes.size > 0;
   selectedThemes.clear();
   activeSubPill = null;
-  activeVibePill = null;
+  activeVibePills = {};
   // Set the Category filter to Lodging
   const sel = document.getElementById('filterType');
   if (sel) sel.value = 'Lodging';
@@ -5562,8 +5577,15 @@ async function saveToStorage() {
 // Patch all functions that read EXPERIENCES to use liveExperiences instead
 // We override the filter function to use liveExperiences
 // ── VIBE-LEVEL SUB-PILLS ─────────────────────────────────────────────
-// When a single vibe is selected, show a row of pills to narrow within
-// that vibe — e.g. Foodie → Restaurants / Markets / Wineries / Bakeries.
+// Per-vibe pill state. Each selected vibe can independently activate ONE
+// pill, and the filter result is the OR-union across vibes:
+//   "Foodie 🍷 wineries OR Music 🎵 concert halls" — both rows visible,
+//   both narrowings active, results union.
+// Shape: { vibeId: pillId, ... }
+let activeVibePills = {};
+// Compatibility shim: keep the old single-key name in scope for any
+// downstream code that still references it (legacy `activeVibePill`
+// reads/writes are gradually being removed). Always reflects null now.
 let activeVibePill = null;
 
 const VIBE_PILLS = {
@@ -5649,21 +5671,27 @@ const VIBE_PILLS = {
   ],
 };
 
-// Vibe-pill compound key model: activeVibePill is stored as "vibeId|pillId"
-// (or null). This lets at most one narrowing be active across all selected
-// vibes while still disambiguating pills whose IDs collide across vibes
-// (e.g. multiple vibes could declare a 'holiday' pill).
-function _vibePillKey(vibeId, pillId) { return vibeId + '|' + pillId; }
+// Per-vibe pill helpers. Each selected vibe can independently activate at
+// most one pill; the filter at the call site composes them as an OR-union
+// across vibes (see renderExperiences / filterExperiences).
+function _vibePillIdFor(vibeId)  { return activeVibePills[vibeId] || null; }
+function _vibePillDefFor(vibeId) {
+  const pillId = _vibePillIdFor(vibeId);
+  if (!pillId) return null;
+  return (VIBE_PILLS[vibeId] || []).find(p => p.id === pillId) || null;
+}
+function _anyVibePillActive() { return Object.keys(activeVibePills).length > 0; }
+// Compatibility shims for callers that still ask for "the" active pill.
+// They get the first vibe's active pill, if any — good enough for legacy
+// places that aren't multi-pill-aware yet (e.g. renderActiveFilters chip).
 function _activeVibePillParts() {
-  if (!activeVibePill) return null;
-  const [vibeId, pillId] = activeVibePill.split('|');
-  if (!vibeId || !pillId) return null;
-  return { vibeId, pillId };
+  const vid = Object.keys(activeVibePills)[0];
+  if (!vid) return null;
+  return { vibeId: vid, pillId: activeVibePills[vid] };
 }
 function _activeVibePillDef() {
   const p = _activeVibePillParts();
-  if (!p) return null;
-  return (VIBE_PILLS[p.vibeId] || []).find(x => x.id === p.pillId) || null;
+  return p ? (VIBE_PILLS[p.vibeId] || []).find(x => x.id === p.pillId) || null : null;
 }
 
 function renderVibePills() {
@@ -5675,13 +5703,14 @@ function renderVibePills() {
   if (vibesWithPills.length === 0) {
     row.style.display = 'none';
     row.innerHTML = '';
-    activeVibePill = null;
+    activeVibePills = {};
     return;
   }
 
-  // Drop stale active pill if its owning vibe is no longer selected.
-  const ap = _activeVibePillParts();
-  if (ap && !selectedThemes.has(ap.vibeId)) activeVibePill = null;
+  // Sweep pills whose owning vibe is no longer selected.
+  for (const vid of Object.keys(activeVibePills)) {
+    if (!selectedThemes.has(vid)) delete activeVibePills[vid];
+  }
 
   row.style.display = 'flex';
   row.style.flexDirection = 'column';
@@ -5689,14 +5718,15 @@ function renderVibePills() {
   row.style.gap          = '8px';
 
   row.innerHTML = vibesWithPills.map(vibeId => {
-    const pills    = VIBE_PILLS[vibeId];
-    const vibeName = (THEMES.find(t => t.id === vibeId) || {}).name || vibeId;
+    const pills      = VIBE_PILLS[vibeId];
+    const vibeName   = (THEMES.find(t => t.id === vibeId) || {}).name || vibeId;
+    const activePill = _vibePillIdFor(vibeId);
     const pillBtns = pills.map(p => {
-      const on = activeVibePill === _vibePillKey(vibeId, p.id);
+      const on = activePill === p.id;
       return `<button onclick="toggleVibePill('${vibeId}','${p.id}')" style="font-size:11px;padding:5px 12px;border-radius:14px;border:1.5px solid ${on?'var(--gold)':'#d4c9b0'};background:${on?'var(--gold)':'transparent'};color:${on?'#fff':'var(--slate)'};cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:0.04em;transition:all 0.15s">${p.label}</button>`;
     }).join('');
-    const clear = (ap && ap.vibeId === vibeId)
-      ? `<button onclick="toggleVibePill(null)" style="font-size:11px;padding:5px 10px;border:none;background:transparent;color:#999;cursor:pointer;font-family:inherit">Clear ✕</button>`
+    const clear = activePill
+      ? `<button onclick="toggleVibePill('${vibeId}', null)" style="font-size:11px;padding:5px 10px;border:none;background:transparent;color:#999;cursor:pointer;font-family:inherit">Clear ✕</button>`
       : '';
     return `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
       <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--slate);font-weight:600;margin-right:6px">Narrow ${vibeName}:</span>
@@ -5705,15 +5735,17 @@ function renderVibePills() {
   }).join('');
 }
 
-// Selecting a different vibe's pill replaces whichever was previously active
-// (single-active model — keeps the filter simple to reason about).
-// Pass (null) or (null,null) to clear.
+// Each vibe maintains its own active pill (or none). Toggling the same
+// pill clears it; clicking a different pill on the same vibe replaces it.
+// Pass (vibeId, null) to clear that vibe's pill explicitly.
 function toggleVibePill(vibeId, pillId) {
-  if (!vibeId || !pillId) {
-    activeVibePill = null;
+  if (!vibeId) return;                                  // ignore stray clicks
+  if (!pillId) {
+    delete activeVibePills[vibeId];
+  } else if (activeVibePills[vibeId] === pillId) {
+    delete activeVibePills[vibeId];                     // toggle off
   } else {
-    const key = _vibePillKey(vibeId, pillId);
-    activeVibePill = (activeVibePill === key) ? null : key;
+    activeVibePills[vibeId] = pillId;                   // set / replace
   }
   renderVibePills();
   renderExperiences();
@@ -6247,11 +6279,6 @@ function filterExperiences() {
   const typeRaw = document.getElementById('filterType').value;
   const subPillDef = (SUB_PILLS[typeRaw] || []).find(p => p.id === activeSubPill);
 
-  // Vibe-pill matcher (e.g. Foodie > Markets) — pill identifies its owning
-  // vibe via the compound key, so it applies regardless of how many vibes
-  // are selected.
-  const vibePillDef = activeVibePill ? _activeVibePillDef() : null;
-
   return liveExperiences.filter(e => {
     // A keyword search is a precise intent — it supersedes the coarse vibe
     // and category filters (which would otherwise hide a valid match). The
@@ -6260,7 +6287,6 @@ function filterExperiences() {
     if (area && !e.area.toLowerCase().includes(area)) return false;
     if (!q && typeFilter && e.type.toLowerCase() !== typeFilter) return false;
     if (!q && subPillDef && !subPillDef.match(e)) return false;
-    if (!q && vibePillDef && !vibePillDef.match(e)) return false;
 
     const expSeason = (e.season || 'Year-Round');
 
@@ -6277,25 +6303,25 @@ function filterExperiences() {
     }
 
     if (!q && themeTags) {
-      // When the user clicks a specific vibe-pill (🍷 Wineries, 🏡 B&Bs, etc.)
-      // the pill IS the filter — bypass the broader theme-tag check and the
-      // orthogonal-category exclusions. They explicitly opted into this slice.
-      const pillMatched = vibePillDef && vibePillDef.match(e);
-      // Lodging is orthogonal to vibes — a B&B isn't an "arts" or "foodie"
-      // experience, it's simply where you sleep. When the visitor explicitly
-      // picks the Lodging category, show every stay in the area regardless of
-      // the active vibe instead of AND-combining the two (which matches
-      // nothing, since lodgings don't carry vibe tags).
+      // Per-vibe OR-union: an experience passes if at least one selected
+      // vibe's (tag-match AND its active pill, if any) matches.
       const lodgingOptIn = typeFilter === 'lodging';
-      if (!pillMatched && !lodgingOptIn) {
-        const match = e.tags.some(tag => themeTags.has(tag.toLowerCase()));
-        if (!match) return false;
-        // Vibe-active grids exclude lodging — stays are orthogonal and have
-        // the 🏠 Lodging tile / Find Lodging CTA.
+      const passes = [...selectedThemes].some(vibeId => {
+        const vibe = THEMES.find(t => t.id === vibeId);
+        if (!vibe) return false;
+        const vibeTagSet = new Set((vibe.tags || []).map(t => t.toLowerCase()));
+        const tagMatch = (e.tags || []).some(t => vibeTagSet.has(t.toLowerCase()));
+        if (!tagMatch) return false;
+        const pillDef = _vibePillDefFor(vibeId);
+        return pillDef ? pillDef.match(e) : true;
+      });
+      if (!passes && !lodgingOptIn) return false;
+      // Once we're past the per-vibe pass, keep the legacy "stays are
+      // orthogonal to mood vibes" + "wineries only with Foodie/Relaxed"
+      // guards so unrelated lodgings / wineries don't bleed into vibes.
+      if (!lodgingOptIn) {
         const t = (e.type || '').toLowerCase();
         if (t === 'lodging' && typeFilter !== 'lodging') return false;
-        // Wineries / tasting rooms belong in Foodie and Relaxed — they bleed
-        // into Active via Scenic and Family via Romantic tags otherwise.
         const wineryFriendly = selectedThemes.has('foodie') || selectedThemes.has('relaxed');
         if ((t === 'winery' || t === 'tasting room') && !wineryFriendly && typeFilter !== t) return false;
       }
