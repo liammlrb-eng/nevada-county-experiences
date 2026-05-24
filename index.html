@@ -2627,20 +2627,26 @@ function saveAll() {
   } catch(e) { console.warn('Could not save:', e); }
 }
 
+// `weekdays` is the recurrence filter for events that span weeks/months
+// but only happen on specific days of the week. 0=Sun, 1=Mon, … 6=Sat.
+// Without it, an event with dateStart='2026-04-11' / dateEnd='2026-12-19'
+// would match every "Today" filter for 8 months (the farmers-market bug).
+// Continuous multi-day festivals (Bluegrass, Fair, etc.) omit the field
+// so the original range-overlap behavior applies.
 const EVENTS = [
-  { name: 'Thursday Night Market', venue: 'Downtown Grass Valley', dates: 'June 11, 18, 25 & July 2, 9, 2026', times: '6:00–9:00 PM', area: 'Grass Valley', tags: ['Artistic','Music','Social'], url: 'https://downtowngrassvalley.com/gvda-events/2026-thursday-night-market/', dateStart: '2026-06-11', dateEnd: '2026-07-09', image: 'https://downtowngrassvalley.com/wp-content/uploads/2026/01/2026-TNM-Facebook-Event-Header-1024x544.jpg' },
+  { name: 'Thursday Night Market', venue: 'Downtown Grass Valley', dates: 'June 11, 18, 25 & July 2, 9, 2026', times: '6:00–9:00 PM', area: 'Grass Valley', tags: ['Artistic','Music','Social'], url: 'https://downtowngrassvalley.com/gvda-events/2026-thursday-night-market/', dateStart: '2026-06-11', dateEnd: '2026-07-09', weekdays: [4], image: 'https://downtowngrassvalley.com/wp-content/uploads/2026/01/2026-TNM-Facebook-Event-Header-1024x544.jpg' },
   { name: 'Nevada City Film Festival', venue: 'Nevada Theatre & outdoor venues', dates: 'June–July 2026 (annual)', times: 'Lawn games from 7:30 PM; screening at sunset ~8:30 PM', area: 'Nevada City', tags: ['Film','Artistic','Social'], url: 'https://nevadacityfilmfestival.com/', dateStart: '2026-06-01', dateEnd: '2026-07-31', image: 'https://i0.wp.com/nevadacityfilmfestival.com/wp-content/uploads/2022/03/NCFF25_Post-scaled.png?fit=800%2C1000&ssl=1' },
   { name: 'Music in the Mountains', venue: 'Center for the Arts & area venues', dates: 'June 2026 (annual)', times: 'Various; check musicinthemountains.org', area: 'Grass Valley', tags: ['Music','Artistic','Cultural'], url: 'https://musicinthemountains.org/', dateStart: '2026-06-01', dateEnd: '2026-06-30', image: 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=600&h=300&fit=crop' },
-  { name: 'First Friday Art Walk – Nevada City', venue: 'Downtown Nevada City', dates: 'First Friday of June, July & August 2026', times: '6:00–9:00 PM', area: 'Nevada City', tags: ['Artistic','Music','Social'], url: 'https://www.nevadacitychamber.com/nevada-city-events/first-friday-artwalks/', dateStart: '2026-06-05', dateEnd: '2026-08-07', image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&h=300&fit=crop' },
+  { name: 'First Friday Art Walk – Nevada City', venue: 'Downtown Nevada City', dates: 'First Friday of June, July & August 2026', times: '6:00–9:00 PM', area: 'Nevada City', tags: ['Artistic','Music','Social'], url: 'https://www.nevadacitychamber.com/nevada-city-events/first-friday-artwalks/', dateStart: '2026-06-05', dateEnd: '2026-08-07', weekdays: [5], image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&h=300&fit=crop' },
   { name: 'Fathers Day Bluegrass Festival', venue: 'Nevada County Fairgrounds', dates: 'June 18–21, 2026', times: 'Multi-day camping festival', area: 'Grass Valley', tags: ['Music','Social','Family','Festival'], url: 'https://fathersdayfestival.com/', dateStart: '2026-06-18', dateEnd: '2026-06-21', image: 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=600&h=300&fit=crop' },
   { name: 'High Sierra Music Festival', venue: 'Nevada County Fairgrounds', dates: 'July 2–5, 2026', times: 'Festival schedule varies', area: 'Grass Valley', tags: ['Music','Social','Destination'], url: 'https://highsierramusic.com/', dateStart: '2026-07-02', dateEnd: '2026-07-05', image: 'https://images.squarespace-cdn.com/content/v1/6373a71c207de703859e0fc1/ef183a30-7026-435f-858d-283fd2d36b5d/HSMF_website_middle.jpg' },
-  { name: 'Wednesday Night Concerts in Nevada City', venue: 'Downtown Nevada City', dates: 'Wednesdays in July 2026', times: '6:00–9:00 PM (street closures)', area: 'Nevada City', tags: ['Music','Social','Family'], url: 'https://www.nevadacitychamber.com/', dateStart: '2026-07-01', dateEnd: '2026-07-29', image: 'https://www.nevadacitychamber.com/wp-content/uploads/2025/01/GoldCountryPhotos-166-1-1-scaled.jpg' },
-  { name: 'Nevada City Farmers Market', venue: 'Union Street', dates: 'Every Saturday Apr 11–Dec 19, 2026', times: '8:30 AM–1:00 PM', area: 'Nevada City', tags: ['Foodie','Family','Social'], url: 'https://www.ncfarmersmarket.org/', dateStart: '2026-04-11', dateEnd: '2026-12-19', image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=300&fit=crop' },
-  { name: 'Grass Valley Farmers Market', venue: 'Pine Creek Shopping Center', dates: 'Saturdays Apr 18–Nov 21 & Tuesdays May 5–Sep 22, 2026', times: 'Sat 8–12:30 PM; Tue 8:30–1 PM', area: 'Grass Valley', tags: ['Foodie','Local'], url: 'https://gvfarmersmarket.org/locations/', dateStart: '2026-04-18', dateEnd: '2026-11-21', image: 'https://gvfarmersmarket.org/wp-content/uploads/2023/10/farmersmarketbooths-819x1024.jpeg' },
+  { name: 'Wednesday Night Concerts in Nevada City', venue: 'Downtown Nevada City', dates: 'Wednesdays in July 2026', times: '6:00–9:00 PM (street closures)', area: 'Nevada City', tags: ['Music','Social','Family'], url: 'https://www.nevadacitychamber.com/', dateStart: '2026-07-01', dateEnd: '2026-07-29', weekdays: [3], image: 'https://www.nevadacitychamber.com/wp-content/uploads/2025/01/GoldCountryPhotos-166-1-1-scaled.jpg' },
+  { name: 'Nevada City Farmers Market', venue: 'Union Street', dates: 'Every Saturday Apr 11–Dec 19, 2026', times: '8:30 AM–1:00 PM', area: 'Nevada City', tags: ['Foodie','Family','Social'], url: 'https://www.ncfarmersmarket.org/', dateStart: '2026-04-11', dateEnd: '2026-12-19', weekdays: [6], image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=300&fit=crop' },
+  { name: 'Grass Valley Farmers Market', venue: 'Pine Creek Shopping Center', dates: 'Saturdays Apr 18–Nov 21 & Tuesdays May 5–Sep 22, 2026', times: 'Sat 8–12:30 PM; Tue 8:30–1 PM', area: 'Grass Valley', tags: ['Foodie','Local'], url: 'https://gvfarmersmarket.org/locations/', dateStart: '2026-04-18', dateEnd: '2026-11-21', weekdays: [2, 6], image: 'https://gvfarmersmarket.org/wp-content/uploads/2023/10/farmersmarketbooths-819x1024.jpeg' },
   { name: 'Nevada County Fair', venue: 'Nevada County Fairgrounds', dates: 'August 12–16, 2026', times: 'Daily schedules TBD', area: 'Grass Valley', tags: ['Family','Classic','Social'], url: 'https://www.nevadacountyfair.com/p/daily-schedules/page', dateStart: '2026-08-12', dateEnd: '2026-08-16', image: 'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?w=600&h=300&fit=crop' },
   { name: 'Draft Horse Classic & Harvest Fair', venue: 'Nevada County Fairgrounds', dates: 'September 17–20, 2026', times: 'Arena performances begin Sep 17 evening', area: 'Grass Valley', tags: ['Rustic','Family','Classic'], url: 'https://www.nevadacountyfair.com/p/draft-horse-classic', dateStart: '2026-09-17', dateEnd: '2026-09-20', image: 'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=600&h=300&fit=crop' },
-  { name: 'Cornish Christmas', venue: 'Downtown Grass Valley', dates: 'Select Fridays after Thanksgiving through Dec 18, 2026', times: 'Evening hours ~6–9 PM', area: 'Grass Valley', tags: ['Historic','Family','Seasonal'], url: 'https://downtowngrassvalley.com/gvda-events/58th-annual-cornish-christmas-2026/', dateStart: '2026-11-27', dateEnd: '2026-12-18', image: 'https://downtowngrassvalley.com/wp-content/uploads/2026/01/58TH-ANNUAL-CORNISH-CHRISTMAS-791x1024.jpg' },
-  { name: 'Victorian Christmas', venue: 'Downtown Nevada City', dates: 'December 2026', times: 'Sundays 1:30–6 PM & Wednesdays 5–9 PM', area: 'Nevada City', tags: ['Historic','Romantic','Seasonal'], url: 'https://gonevadacounty.com/victorian-christmas/', dateStart: '2026-12-01', dateEnd: '2026-12-31', image: 'https://gonevadacounty.com/wp-content/uploads/2025/11/victorian_kialjames-4-1200x800.jpg' },
+  { name: 'Cornish Christmas', venue: 'Downtown Grass Valley', dates: 'Select Fridays after Thanksgiving through Dec 18, 2026', times: 'Evening hours ~6–9 PM', area: 'Grass Valley', tags: ['Historic','Family','Seasonal'], url: 'https://downtowngrassvalley.com/gvda-events/58th-annual-cornish-christmas-2026/', dateStart: '2026-11-27', dateEnd: '2026-12-18', weekdays: [5], image: 'https://downtowngrassvalley.com/wp-content/uploads/2026/01/58TH-ANNUAL-CORNISH-CHRISTMAS-791x1024.jpg' },
+  { name: 'Victorian Christmas', venue: 'Downtown Nevada City', dates: 'December 2026', times: 'Sundays 1:30–6 PM & Wednesdays 5–9 PM', area: 'Nevada City', tags: ['Historic','Romantic','Seasonal'], url: 'https://gonevadacounty.com/victorian-christmas/', dateStart: '2026-12-01', dateEnd: '2026-12-31', weekdays: [0, 3], image: 'https://gonevadacounty.com/wp-content/uploads/2025/11/victorian_kialjames-4-1200x800.jpg' },
 ];
 
 let selectedThemes = new Set();
@@ -4096,14 +4102,37 @@ function _eventsForView() {
   const q         = (searchQuery || '').trim();
   let evts = _eventsCache || EVENTS;
 
-  // Date-range filter — an event matches if its span overlaps [from, to].
+  // Date-range filter — an event matches if its span overlaps [from, to],
+  // AND (for recurring events) if at least one day of the requested window
+  // matches the event's weekly pattern. ev.weekdays is an array of 0-6
+  // (0=Sun … 6=Sat). Events without weekdays are treated as continuous
+  // spans, the way multi-day festivals should be.
   if (dateFrom || dateTo) {
+    const DAY = 86400000;
     evts = evts.filter(ev => {
       const s = ev.dateStart || '';
       const e = ev.dateEnd || ev.dateStart || '';
       if (!s) return true;                       // undated → always include
       if (dateFrom && e < dateFrom) return false;
       if (dateTo   && s > dateTo)   return false;
+      // Weekday recurrence — only happens on these days within the span.
+      if (Array.isArray(ev.weekdays) && ev.weekdays.length) {
+        const wantSet = new Set(ev.weekdays);
+        const winStartStr = (dateFrom && dateFrom > s) ? dateFrom : s;
+        const winEndStr   = (dateTo   && dateTo   < e) ? dateTo   : e;
+        if (winEndStr < winStartStr) return false;
+        let cur = new Date(winStartStr + 'T12:00:00');
+        const end = new Date(winEndStr   + 'T12:00:00');
+        // Window cap — these events never have ranges longer than a couple
+        // months, so 7 iterations are enough to cover a single requested week.
+        let safety = 0;
+        while (cur <= end && safety < 64) {
+          if (wantSet.has(cur.getDay())) return true;
+          cur = new Date(cur.getTime() + DAY);
+          safety++;
+        }
+        return false;
+      }
       return true;
     });
   }
