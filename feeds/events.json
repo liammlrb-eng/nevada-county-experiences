@@ -1,301 +1,11 @@
 {
   "feed": "Nevada County Experience — Events",
   "homepage": "https://liammlrb-eng.github.io/nevada-county-experiences/",
-  "generated_at": "2026-05-22T22:01:30Z",
-  "count": 1162,
+  "generated_at": "2026-05-24T03:40:00Z",
+  "count": 1130,
   "license": "CC BY 4.0 — attribution required",
   "attribution": "Nevada County Experience — https://liammlrb-eng.github.io/nevada-county-experiences/",
   "events": [
-    {
-      "id": "4a9000b1a2a0",
-      "title": "Dub Creative Ft. Special Guests Simrit, Ishence, Jah Walks & DJ Javadi",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "9:00 PM",
-      "end_time": "",
-      "venue": "Crazy Horse Saloon",
-      "area": "Nevada City",
-      "category": "Music event",
-      "tags": [],
-      "description": "$20 – $25 · Emerging out of Grass Valley and Nevada City, Dub Creative embody a fresh, cutting-edge sound, melding roots reggae, world music, and R&B influences. They are known for their hypnotic, deep-pocket groove woven together with the transcendently evocative vocals. This project features rotating members who’ve recorded and toured with countless roots reggae legends over the decades. These include gu...",
-      "url": "https://crazyhorsenc.com/show/dub-creative-ft-special-guests-simrit-purity-attack-dj-javadi/",
-      "image": "https://crazyhorsenc.com/wp-content/uploads/2026/04/dubcreativeportrait-e1778788211285.jpeg",
-      "source": "Crazy Horse Saloon"
-    },
-    {
-      "id": "4020aa94c630",
-      "title": "Fabricate a Stone Ring",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "10:30am",
-      "end_time": "4:00pm",
-      "venue": "Wolf Craft Collective",
-      "area": "Nevada City",
-      "category": "Workshop",
-      "tags": [
-        "Workshop"
-      ],
-      "description": "Spend the day fabricating your own sterling silver, bezel-set stone ring! We will demonstrate and walk you through each step of the process of transforming silver sheet, wire and stone into a wearable piece of art. At the end of the day, you'll leave with a one of a kind ring, made with your own two hands. We will provide an assortment of pre-cut cabochon stones for you to choose from, or you c...",
-      "url": "https://wolfcraftcollective.com/products/fabricate-a-stone-ring-friday-may-22-10-30am-4pm",
-      "image": "https://cdn.shopify.com/s/files/1/0550/0810/0608/files/E2E2252F-92E6-40B4-A2A9-B55E6A94F9E8_1_105_c.jpg?v=1769053176",
-      "source": "Wolf Craft Collective"
-    },
-    {
-      "id": "0dece50385aa",
-      "title": "Floralia",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "11:00 AM",
-      "end_time": "5:00 PM",
-      "venue": "Seven Stars Gallery",
-      "area": "Nevada City",
-      "category": "Art event",
-      "tags": [
-        "Art"
-      ],
-      "description": "Beautiful floral-themed artwork by a bevy of talented, local artists adorns the walls of the Seven Stars Gallery for the month of May.  Artist reception takes place on Friday, May 8th from 6-8 pm and includes a “fancy hat” contest.",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d202349878",
-      "image": "https://www.trumba.com/i/DgDt5W54MppN8NgyKTVw3ma7.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "f7e21f4992e0",
-      "title": "JOHNNY CASH COVER",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "8:00 PM",
-      "end_time": "11:00 PM",
-      "venue": "Golden Era Lounge",
-      "area": "Nevada City",
-      "category": "Music event",
-      "tags": [],
-      "description": "",
-      "url": "https://www.goldeneralounge.com/events/johnny-cash-cover",
-      "image": "https://static1.squarespace.com/static/60c2861e0fba10467f8e070d/60c30937ce2ea26a03580266/69f10565bb0092022eaa4482/1777403291372/",
-      "source": "Golden Era Lounge"
-    },
-    {
-      "id": "748b78d4dcfd",
-      "title": "Johnny Mojo Band with Friends at Wild Eye Pub",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "6:30 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "The Wild Eye is super excited to welcome the Jonny Mojo Band (and friends) from 6:30 – 9:30 pm on Friday, May 22nd! Jonny will be joined by: Shelby Snow, […]The postJohnny Mojo Band with Friends at Wild Eye Pubappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/johnny-mojo-band-with-friends-at-wild-eye-pub/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "69007bdc921b",
-      "title": "Live Music with Bob Log III at Alibi Truckee",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "8:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "When Bob Log III was a child, he lost his left hand in a boating accident.  It was soon replaced with a monkey paw, and a new guitar style was […]The postLive Music with Bob Log III at Alibi Truckeeappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/live-music-with-bob-log-iii-at-alibi-truckee/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "f4b087771cb0",
-      "title": "Living in Love at Elixart",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "8:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Workshop"
-      ],
-      "description": "A sweet and soulful couple from Shasta brings their grooves to the Elixart stage for a night of sweet tunes and soulful singing in the classic folky/hippy/singer/songwriter vein. Although they […]The postLiving in Love at Elixartappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/living-in-love-at-elixart/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "a21306534a26",
-      "title": "Mountain Stream Meditation: Weekly “Room to Breathe” Recovery Sangha",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "6:30 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Wellness"
-      ],
-      "description": "The Buddha taught that due to craving, greed, anger, and confusion, the mind may be a source of great suffering.  Room to Breathe is a peer-led, in-person weekly recovery sangha […]The postMountain Stream Meditation: Weekly “Room to Breathe” Recovery Sanghaappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/mountain-stream-meditation-weekly-room-to-breathe-recovery-sangha/2026-05-22/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "816c3e27b29a",
-      "title": "Mountain Stream Meditation: “Open Temple Fridays”",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "11:30 AM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Wellness"
-      ],
-      "description": "Each Friday, Mountain Stream Meditation in Nevada City opens the doors from 11:30 am to 1:00 pm for Open Temple Fridays as follows: – The center is open from 11:30 […]The postMountain Stream Meditation: “Open Temple Fridays”appeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/mountain-stream-meditation-open-temple-fridays/2026-05-22/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "40adac7930e4",
-      "title": "Nevada Union Theatre Society Presents: “Lost Girl”",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Discover the fierce and imaginative world of Lost Girl from 7:00 – 9:00 pm over two weekends: Thursday, May 21st through Saturday, May 23rd; also Thursday, May 28th and Friday, […]The postNevada Union Theatre Society Presents: “Lost Girl”appeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/nevada-union-theatre-society-presents-lost-girl/2026-05-22/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "888c3e8d1ede",
-      "title": "Rashomon",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "7:00 PM",
-      "end_time": "9:00 PM",
-      "venue": "Nevada Theatre",
-      "area": "Nevada City",
-      "category": "Theatre",
-      "tags": [
-        "Theater",
-        "Sport"
-      ],
-      "description": "Community Asian Theatre of the Sierra presents Rashomon, a play that explores the notions of truth and justice – a “who done it?” in medieval Japan -- challenging perceptions of eye witnesses. Based on stories by Ryunosuke Akutagawa, the play is written by Michael Kanin and Fay Kanin and directed by Sonny Alforque. There are sword fights, rain on stage, taiko percussion, and more, transporting ...",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d195740961",
-      "image": "https://www.trumba.com/i/DgB2coLosDzB2UGKqQFwk4fT.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "1a82bed4a716",
-      "title": "Spring 2026 Strawberry Music Festival",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "8:00 AM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Festival"
-      ],
-      "description": "Featuring: Bill Kirchen Band with Nina Gerber, Della Mae, Las Cafeteras, Darrell Scott String Band feat. Rob Ickes, Crying Uncle Bluegrass Band, Mr Sun, Abby Posner & The Big Fall, […]The postSpring 2026 Strawberry Music Festivalappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/spring-2026-strawberry-music-festival/2026-05-22/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "ae609ee812b0",
-      "title": "The Kirtan Experience at the Miners Foundry",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "6:30 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Dance"
-      ],
-      "description": "Let your heart soar in a joyful immersion in music, mantras, and dance from 6:30 – 8:30 pm on Thursday, May 21st and Friday, May 22nd at the Miners Foundry […]The postThe Kirtan Experience at the Miners Foundryappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/the-kirtan-experience-at-the-miners-foundry/2026-05-22/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "ab33c08b2cc5",
-      "title": "Third Annual Honey Hills Music Fest: Five Nights, Five Venues in Nevada County",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "6:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Festival"
-      ],
-      "description": "The Honey Hills Fest is returning for its third year.  Nestled in the foothills and natural beauty of Nevada County, this five show celebration brings together 15 women/fem-fronted music projects, […]The postThird Annual Honey Hills Music Fest: Five Nights, Five Venues in Nevada Countyappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/third-annual-honey-hills-music-fest-five-nights-five-venues-in-nevada-county-2026-05-22/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "051b6635bdc1",
-      "title": "Three Times Through Entertains on the Patio at Tofanelli’s Bistro",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "5:30 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Theater"
-      ],
-      "description": "People ask us, “What is that instrument?  And did you just mash-up a Rolling Stones song with an Irish jig?” Playing unique instruments, we are a kinda Celtic quartet re-imagining […]The postThree Times Through Entertains on the Patio at Tofanelli’s Bistroappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/three-times-through-entertains-on-the-patio-at-tofanellis-bistro/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "d020742f1533",
-      "title": "“All About the Birds: Art Quilts and Collage” by Sandra Poteet at the Nevada City Winery Gallery",
-      "date": "2026-05-22",
-      "end_date": "2026-05-22",
-      "time": "12:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Art",
-        "Food & Drink"
-      ],
-      "description": "Please come see the re-purposed fiber and mixed media exhibition, All About the Birds: Art Quilts and Collage by Sandra Poteet from Wednesday, May 20th through Sunday, June 29th at […]The post“All About the Birds: Art Quilts and Collage” by Sandra Poteet at the Nevada City Winery Galleryappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/all-about-the-birds-art-quilts-and-collage-by-sandra-poteet-at-the-nevada-city-winery-gallery/2026-05-22/",
-      "image": "",
-      "source": "KVMR"
-    },
     {
       "id": "85cea3fc371e",
       "title": "Alibi Truckee: Surf Rock Dinner Vibes Saturdays with Matt Welker",
@@ -971,24 +681,6 @@
       ],
       "description": "Please come see the re-purposed fiber and mixed media exhibition, All About the Birds: Art Quilts and Collage by Sandra Poteet from Wednesday, May 20th through Sunday, June 29th at […]The post“All About the Birds: Art Quilts and Collage” by Sandra Poteet at the Nevada City Winery Galleryappeared first onKVMR Community Radio.",
       "url": "https://www.kvmr.org/kvmr-event/all-about-the-birds-art-quilts-and-collage-by-sandra-poteet-at-the-nevada-city-winery-gallery/2026-05-24/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "4eef4c2c768a",
-      "title": "“Hello May Market” in Chico",
-      "date": "2026-05-24",
-      "end_date": "2026-05-24",
-      "time": "12:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Market"
-      ],
-      "description": "Lassen Cider, in collaboration with Your Local Marketplace, is thrilled to announce our Hello May Market event from 11:00 am to 4:00 pm on Sunday, May 24th at the Lassen […]The post“Hello May Market” in Chicoappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/hello-may-market-in-chico/",
       "image": "",
       "source": "KVMR"
     },
@@ -4015,24 +3707,6 @@
       ],
       "description": "People ask us, “What is that instrument?  And did you just mash-up a Rolling Stones song with an Irish jig?” Playing unique instruments, we are a kinda Celtic quartet re-imagining […]The postThree Times Through Returns to Tofanelli’s Bistroappeared first onKVMR Community Radio.",
       "url": "https://www.kvmr.org/kvmr-event/three-times-through-returns-to-tofanellis-bistro/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "846e508a3a1e",
-      "title": "Tiffani Shiro Trio in Coloma/Lotus",
-      "date": "2026-06-05",
-      "end_date": "2026-06-05",
-      "time": "6:30 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "Tiffani Shiro is a soulful songstress, bringing an eclectic mix of music while performing multiple genres throughout the evening. Also featuring Tom Gunterman on his six-string electric violin, and Rick […]The postTiffani Shiro Trio in Coloma/Lotusappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/tiffani-shiro-trio-in-coloma-lotus/2026-06-05/",
       "image": "",
       "source": "KVMR"
     },
@@ -9762,24 +9436,6 @@
       "source": "KVMR"
     },
     {
-      "id": "73c723a20c2a",
-      "title": "Lydia Pense and Cold Blood: Soul/Funk at Sutter Creek Theatre",
-      "date": "2026-06-27",
-      "end_date": "2026-06-27",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Doors open at 6:30 pm, the show starts at 7:00.  Open seating; beer and wine available for purchase. Lydia Pense and Cold Blood debuted when the Fillmore was at its […]The postLydia Pense and Cold Blood: Soul/Funk at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/lydia-pense-and-cold-blood-soul-funk-at-sutter-creek-theatre/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "bb734af65882",
       "title": "Nevada County Playwrights Collective Performance",
       "date": "2026-06-27",
@@ -9871,24 +9527,6 @@
       ],
       "description": "Celebrate over 30 years of magical gatherings at Black Oak Ranch with Ten Mile Creek Revival, continuing the legacy of the beloved Kate Wolf Music Festival.  Enjoy live music, creekside […]The postTen Mile Creek Revival 2026appeared first onKVMR Community Radio.",
       "url": "https://www.kvmr.org/kvmr-event/ten-mile-creek-revival-2026/2026-06-27/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "ebd5bdf2480b",
-      "title": "Tiffani Shiro Trio in Placerville",
-      "date": "2026-06-27",
-      "end_date": "2026-06-27",
-      "time": "6:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "Tiffani Shiro is a soulful songstress, bringing an eclectic mix of music while performing multiple genres throughout the evening.  Also featuring Tom Gunterman on his six-string electric violin, and Rick Dugan […]The postTiffani Shiro Trio in Placervilleappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/tiffani-shiro-trio-in-placerville/2026-06-27/",
       "image": "",
       "source": "KVMR"
     },
@@ -12497,24 +12135,6 @@
       "source": "KVMR"
     },
     {
-      "id": "861a5ee343e9",
-      "title": "“Rock This Country”: the Shania Twain Experience at Sutter Creek Theatre",
-      "date": "2026-07-17",
-      "end_date": "2026-07-17",
-      "time": "8:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Doors open at 7:30 pm, and the show starts at 8:00.  Open seating; beer and wine available for purchase. Join Rock This Country, a tribute to Shania Twain for a […]The post“Rock This Country”: the Shania Twain Experience at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/rock-this-country-the-shania-twain-experience-at-sutter-creek-theatre/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "0ba837898847",
       "title": "Cars and coffee grass valley",
       "date": "2026-07-18",
@@ -13976,24 +13596,6 @@
       "source": "Center for the Arts"
     },
     {
-      "id": "dedc03e1b85b",
-      "title": "Twisted Gypsy: Reinventing Fleetwood Mac at Sutter Creek Theatre",
-      "date": "2026-07-31",
-      "end_date": "2026-07-31",
-      "time": "8:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Doors open at 7:30 pm, and the show starts at 8:00.  Open seating; beer and wine available for purchase. Twisted Gypsy celebrates and reinvents the timeless music of the legendary […]The postTwisted Gypsy: Reinventing Fleetwood Mac at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/twisted-gypsy-reinventing-fleetwood-mac/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "ef3c829178b6",
       "title": "“The Lightning Thief: The Percy Jackson Musical” at the Center for the Arts",
       "date": "2026-07-31",
@@ -14670,24 +14272,6 @@
       "source": "NCAC Calendar"
     },
     {
-      "id": "a530849f0b5a",
-      "title": "Shane Dwight: New Album Release Show at Sutter Creek Theatre",
-      "date": "2026-08-08",
-      "end_date": "2026-08-08",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Doors open at 6:30 pm, the show starts at 7:00.  Open seating; beer and wine available for purchase. New album release for Life of the Party!  This will be a […]The postShane Dwight: New Album Release Show at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/shane-dwight-new-album-release-show-at-sutter-creek-theatre/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "56b31bedc0e5",
       "title": "Corinne Bailey Rae",
       "date": "2026-08-09",
@@ -15272,43 +14856,6 @@
       "source": "KVMR"
     },
     {
-      "id": "8c173626871a",
-      "title": "The Blues Project: Celebrating the Release of “Live 2025” at Sutter Creek Theatre",
-      "date": "2026-08-15",
-      "end_date": "2026-08-15",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Theater"
-      ],
-      "description": "Doors open at 6:30 pm, the show starts at 7:00.  Open seating; beer and wine available for purchase. The Blues Project is releasing their first new album in FIVE decades!  […]The postThe Blues Project: Celebrating the Release of “Live 2025” at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/the-blues-project-celebrating-the-release-of-live-2025-at-sutter-creek-theatre/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "1af44d8062a5",
-      "title": "Tiffani Shiro Trio in Placerville",
-      "date": "2026-08-15",
-      "end_date": "2026-08-15",
-      "time": "6:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "Tiffani Shiro is a soulful songstress, bringing an eclectic mix of music while performing multiple genres throughout the evening.  Also featuring Tom Gunterman on his six-string electric violin, and Rick Dugan […]The postTiffani Shiro Trio in Placervilleappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/tiffani-shiro-trio-in-placerville/2026-08-15/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "83a2566ce3fd",
       "title": "Music-Assisted Mindful Movement with Catherine Scholz at Inner Path",
       "date": "2026-08-16",
@@ -15713,25 +15260,6 @@
       "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d191631931",
       "image": "https://www.trumba.com/i/DgBKEBX2ZTHqcQNSaCHgCme2.jpg",
       "source": "NCAC Calendar"
-    },
-    {
-      "id": "1c915fbecab5",
-      "title": "Davy Knowles Band: Modern Blues Guitar at Sutter Creek Theatre",
-      "date": "2026-08-22",
-      "end_date": "2026-08-22",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Theater"
-      ],
-      "description": "Doors open at 6:30 pm, the show starts at 7:00.  Open seating, beer and wine available for purchase. Whether playing acoustic, mandolin, national steel, or screaming electric guitar, Davy Knowles […]The postDavy Knowles Band: Modern Blues Guitar at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/davy-knowles-band-modern-blues-guitar-at-sutter-creek-theatre/",
-      "image": "",
-      "source": "KVMR"
     },
     {
       "id": "c03c54897247",
@@ -16140,24 +15668,6 @@
       "source": "NCAC Calendar"
     },
     {
-      "id": "2716176bafa9",
-      "title": "Britain’s Finest: The Beatles Experience at Sutter Creek Theatre",
-      "date": "2026-08-28",
-      "end_date": "2026-08-28",
-      "time": "8:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Doors open at 7:30 pm, the show starts at 8:00.  Open seating; beer and wine available for purchase. This is a Friday show and back by popular demand!  Don’t wait, […]The postBritain’s Finest: The Beatles Experience at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/britains-finest-the-beatles-experience-at-sutter-creek-theatre/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "4844758de828",
       "title": "Lavender Glow | Queer Art & Our Shared History",
       "date": "2026-08-28",
@@ -16455,24 +15965,6 @@
       "source": "KVMR"
     },
     {
-      "id": "3202b24d2f54",
-      "title": "Tiffani Shiro Trio in Coloma/Lotus",
-      "date": "2026-09-04",
-      "end_date": "2026-09-04",
-      "time": "6:30 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "Tiffani Shiro is a soulful songstress, bringing an eclectic mix of music while performing multiple genres throughout the evening. Also featuring Tom Gunterman on his six-string electric violin, and Rick […]The postTiffani Shiro Trio in Coloma/Lotusappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/tiffani-shiro-trio-in-coloma-lotus/2026-09-04/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "955a7916e250",
       "title": "Cars and coffee grass valley",
       "date": "2026-09-05",
@@ -16733,25 +16225,6 @@
       "source": "KVMR"
     },
     {
-      "id": "f2d7a750ce87",
-      "title": "Boys of Summer: the Eagles Experience at Sutter Creek Theatre",
-      "date": "2026-09-12",
-      "end_date": "2026-09-12",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater",
-        "Hands-on"
-      ],
-      "description": "Doors open at 6:30 pm, the show starts at 7:00.  Open seating; beer and wine available for purchase. Don’t wait – this show sells out! These guys authentically re-create the […]The postBoys of Summer: the Eagles Experience at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/boys-of-summer-the-eagles-experience-at-sutter-creek-theatre/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
       "id": "79cdb6368193",
       "title": "Cars and coffee grass valley",
       "date": "2026-09-12",
@@ -16990,25 +16463,6 @@
       ],
       "description": "Each Friday, Mountain Stream Meditation in Nevada City opens the doors from 11:30 am to 1:00 pm for Open Temple Fridays as follows: – The center is open from 11:30 […]The postMountain Stream Meditation: “Open Temple Fridays”appeared first onKVMR Community Radio.",
       "url": "https://www.kvmr.org/kvmr-event/mountain-stream-meditation-open-temple-fridays/2026-09-18/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "977d1008745c",
-      "title": "The Kings of Queen: Tribute to Queen at Sutter Creek Theatre",
-      "date": "2026-09-18",
-      "end_date": "2026-09-18",
-      "time": "8:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Theater"
-      ],
-      "description": "Doors open at 7:30 pm, the show starts at 8:00.  Open seating; beer and wine available for purchase. The Kings of Queen are the hottest Queen tribute band in the […]The postThe Kings of Queen: Tribute to Queen at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/the-kings-of-queen-tribute-to-queen-at-sutter-creek-theatre/",
       "image": "",
       "source": "KVMR"
     },
@@ -17364,24 +16818,6 @@
       ],
       "description": "Solar isn’t just about panels on your roof, though we do love catching the sunlight.  It is about taking control of your energy, becoming more resilient, and building community.  That […]The post“Sunlight to Socket Salon”: a Free Monthly Gathering for Local Solar System Ownersappeared first onKVMR Community Radio.",
       "url": "https://www.kvmr.org/kvmr-event/sunlight-to-socket-salon-a-free-monthly-gathering-for-local-solar-system-owners/2026-09-26/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "53266dbad57c",
-      "title": "“Wild Night: a Van Morrison Tribute” with Horns at Sutter Creek Theatre",
-      "date": "2026-09-26",
-      "end_date": "2026-09-26",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Doors open at 6:30 pm, the show starts at 7:00.  Open seating, beer and wine available for purchase. Wild Night: a Van Morrison Tribute was founded in 2019 by the […]The post“Wild Night: a Van Morrison Tribute” with Horns at Sutter Creek Theatreappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/wild-night-a-van-morrison-tribute-with-horns-at-sutter-creek-theatre/",
       "image": "",
       "source": "KVMR"
     },
@@ -18386,24 +17822,6 @@
       "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d191631940",
       "image": "https://www.trumba.com/i/DgBKEBX2ZTHqcQNSaCHgCme2.jpg",
       "source": "NCAC Calendar"
-    },
-    {
-      "id": "0829908013ca",
-      "title": "Tiffani Shiro Trio in Placerville",
-      "date": "2026-10-24",
-      "end_date": "2026-10-24",
-      "time": "6:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "Tiffani Shiro is a soulful songstress, bringing an eclectic mix of music while performing multiple genres throughout the evening.  Also featuring Tom Gunterman on his six-string electric violin, and Rick Dugan […]The postTiffani Shiro Trio in Placervilleappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/tiffani-shiro-trio-in-placerville/2026-10-24/",
-      "image": "",
-      "source": "KVMR"
     },
     {
       "id": "a70a17c7b705",

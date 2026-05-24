@@ -43,15 +43,34 @@ _LOCAL_PLACES = {
     "briarpatch", "broad street", "downtown nevada", "downtown grass",
 }
 
-# If these appear in location, title, or description and nothing local matches, skip
+# If these appear in title or location with a word-boundary match, skip.
+# Description is NOT scanned because it surfaces band-bio mentions / tour-stop
+# references that aren't where THIS event happens (e.g. "One Riddim Band at
+# Elixart" with Chico in the band bio is a Nevada-City event, not Chico).
 _DISTANT_PLACES = {
+    # Sacramento basin
     "sacramento", "san francisco", "oakland", "berkeley", "san jose",
     "reno", "tahoe city", "south lake tahoe", "los angeles", "portland",
     "seattle", "phoenix", "stockton", "modesto", "fresno", "davis",
-    # Sacramento venues that show up in KVMR calendar
+    "folsom", "elk grove", "roseville", "rocklin", "lincoln",
+    # Sacramento / Bay venues that show up in KVMR calendar
     "capital stage", "r street", "harris center", "crocker art",
     "music circus", "sacramento state", "sac state",
-    "folsom", "elk grove", "roseville", "rocklin", "lincoln",
+    # North-state foothills outside Nevada County
+    "chico", "oroville", "paradise", "quincy", "downieville",
+    "marysville", "yuba city", "beale air",
+    # Amador / El Dorado (south of Nevada County)
+    "sutter creek", "jackson square", "plymouth", "ione",
+    "placerville", "coloma", "lotus", "cameron park", "shingle springs",
+    "el dorado hills",
+    # Wine country / coast
+    "napa", "sonoma", "calistoga", "healdsburg", "santa rosa",
+    "vacaville", "fairfield", "vallejo",
+    # Eastern Sierra / Nevada
+    "carson city", "minden", "gardnerville", "incline village",
+    "kings beach", "crystal bay", "mammoth", "bishop",
+    # Far north
+    "redding", "red bluff", "weaverville", "mount shasta",
 }
 
 _DATE_FROM_URL_RE = re.compile(r'/(\d{4})-(\d{2})-(\d{2})/')
@@ -81,34 +100,36 @@ def _extract_event_date(item) -> str:
     return ""
 
 
+_LOCAL_RE   = re.compile(
+    r"\b(?:" + "|".join(re.escape(p) for p in _LOCAL_PLACES) + r")\b",
+    re.I,
+)
+_DISTANT_RE = re.compile(
+    r"\b(?:" + "|".join(re.escape(p) for p in _DISTANT_PLACES) + r")\b",
+    re.I,
+)
+
+
 def _is_local(title: str, location: str, description: str) -> bool:
     """
     Return True if the event appears to be in Nevada County.
 
     Strategy:
-    - The KVMR RSS description footer always contains "KVMR Community Radio" so
-      we cannot use "kvmr" as a local-place signal — it's on every item.
-    - We check title first (most reliable), then the first 300 chars of description
-      (the actual event text, before the "appeared first on..." footer).
-    - Any explicit distant venue/city in those texts → reject.
-    - Any explicit local place → accept.
+    - We only scan title + location. Description is intentionally skipped:
+      KVMR bios often name bands' home towns ("Chico-based ...") or tour
+      stops, which falsely match against distant cities when the event
+      itself is local.
+    - Matches use word boundaries so "chico" no longer collides with the
+      legit Nevada County community "Chicago Park".
+    - Any explicit distant match in title/location → reject.
+    - Any explicit local match in title/location → accept.
     - No geographic signal → assume local (most KVMR events are Nevada County).
     """
-    # Use title + location + only the first 300 chars of description
-    # (avoids matching the "appeared first on KVMR" footer)
-    desc_head = description[:300] if description else ""
-    combined = " ".join([title, location, desc_head]).lower()
-
-    # Explicit distant match (checked first on combined text) → reject
-    for place in _DISTANT_PLACES:
-        if place in combined:
-            return False
-
-    # Explicit local match → accept
-    for place in _LOCAL_PLACES:
-        if place in combined:
-            return True
-
+    text = (title or "") + " " + (location or "")
+    if _DISTANT_RE.search(text):
+        return False
+    if _LOCAL_RE.search(text):
+        return True
     return True   # no geographic signal → assume local KVMR event
 
 

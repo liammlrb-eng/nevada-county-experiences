@@ -1,7 +1,7 @@
 {
   "feed": "Nevada County Experience — Curated Venues & Experiences",
   "homepage": "https://liammlrb-eng.github.io/nevada-county-experiences/",
-  "generated_at": "2026-05-22T22:01:30Z",
+  "generated_at": "2026-05-24T03:40:00Z",
   "count": 170,
   "license": "CC BY 4.0 — attribution required",
   "attribution": "Nevada County Experience — https://liammlrb-eng.github.io/nevada-county-experiences/",
@@ -3384,7 +3384,7 @@
       "directions": "https://maps.google.com/?q=Broad+St+Nevada+City+CA",
       "lat": 39.2617,
       "lng": -121.0178,
-      "season": "Holiday",
+      "season": "Winter",
       "icon": "🎉",
       "photo": "https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=400&h=260&fit=crop"
     },
