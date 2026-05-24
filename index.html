@@ -3058,8 +3058,6 @@ function toggleTheme(id) {
     selectedThemes.delete(id);
     // Drop the active pill only if it belonged to the vibe just deselected.
     // Pills on other still-selected vibes remain active.
-    // Drop the active pill only if it belonged to the vibe just deselected.
-    // Pills on other still-selected vibes remain active.
     delete activeVibePills[id];
   } else {
     selectedThemes.add(id);   // multi-select: OR logic between vibes
@@ -6175,7 +6173,13 @@ function toggleVibePill(vibeId, pillId) {
     else                  activeVibePills[vibeId] = arr;
   }
   renderVibePills();
-  renderExperiences();
+  // Refresh EVERY grid that's currently visible so a pill click visibly
+  // re-filters whether the user is on Venues (#expGrid), Events
+  // (#eventsGrid), or Calendar (#eventsCalendar). Previously only
+  // renderExperiences was called, so toggling a pill in Events mode
+  // silently re-filtered a hidden grid and looked broken.
+  if (typeof _renderActiveGrids === 'function') _renderActiveGrids();
+  else { renderExperiences(); if (showUpcomingEvents) renderEventsView(); }
   renderActiveFilters();
 }
 
