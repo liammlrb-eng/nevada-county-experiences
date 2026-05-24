@@ -2966,11 +2966,13 @@ function renderThemes() {
 function toggleTheme(id) {
   if (selectedThemes.has(id)) {
     selectedThemes.delete(id);
+    // Drop the active pill only if it belonged to the vibe just deselected.
+    // Pills on other still-selected vibes remain active.
+    const ap = (typeof _activeVibePillParts === 'function') ? _activeVibePillParts() : null;
+    if (ap && ap.vibeId === id) activeVibePill = null;
   } else {
     selectedThemes.add(id);   // multi-select: OR logic between vibes
   }
-  // Reset vibe-pill when vibe selection changes (it's tied to the active vibe)
-  activeVibePill = null;
   renderThemes();
   renderActiveFilters();
   if (typeof renderVibePills === 'function') renderVibePills();
@@ -3247,9 +3249,11 @@ function renderExperiences() {
     if (q) candidates = candidates.filter(_matchesSearch);
 
     // Vibe-pill filter (Foodie → Markets, Active → Hiking, etc.)
-    if (!q && selectedThemes.size === 1 && activeVibePill) {
-      const vibeId = [...selectedThemes][0];
-      const vibeDef = (VIBE_PILLS[vibeId] || []).find(p => p.id === activeVibePill);
+    // Works regardless of how many vibes are selected — the pill identifies
+    // its owning vibe via the compound key, so narrowing one vibe doesn't
+    // hide the others.
+    if (!q && activeVibePill) {
+      const vibeDef = _activeVibePillDef();
       if (vibeDef) candidates = candidates.filter(vibeDef.match);
     }
 
@@ -5645,37 +5649,72 @@ const VIBE_PILLS = {
   ],
 };
 
+// Vibe-pill compound key model: activeVibePill is stored as "vibeId|pillId"
+// (or null). This lets at most one narrowing be active across all selected
+// vibes while still disambiguating pills whose IDs collide across vibes
+// (e.g. multiple vibes could declare a 'holiday' pill).
+function _vibePillKey(vibeId, pillId) { return vibeId + '|' + pillId; }
+function _activeVibePillParts() {
+  if (!activeVibePill) return null;
+  const [vibeId, pillId] = activeVibePill.split('|');
+  if (!vibeId || !pillId) return null;
+  return { vibeId, pillId };
+}
+function _activeVibePillDef() {
+  const p = _activeVibePillParts();
+  if (!p) return null;
+  return (VIBE_PILLS[p.vibeId] || []).find(x => x.id === p.pillId) || null;
+}
+
 function renderVibePills() {
   const row = document.getElementById('vibePillsRow');
   if (!row) return;
-  // Only show pills when exactly ONE vibe is selected — avoids confusion
-  if (selectedThemes.size !== 1) {
+  // Show one row per selected vibe that has narrowing pills defined.
+  // 0 vibes -> hidden. 1+ vibes -> labeled rows stacked.
+  const vibesWithPills = [...selectedThemes].filter(vid => (VIBE_PILLS[vid] || []).length);
+  if (vibesWithPills.length === 0) {
     row.style.display = 'none';
     row.innerHTML = '';
     activeVibePill = null;
     return;
   }
-  const vibeId = [...selectedThemes][0];
-  const pills = VIBE_PILLS[vibeId];
-  if (!pills) {
-    row.style.display = 'none';
-    row.innerHTML = '';
-    activeVibePill = null;
-    return;
-  }
-  const vibeName = (THEMES.find(t => t.id === vibeId) || {}).name || vibeId;
+
+  // Drop stale active pill if its owning vibe is no longer selected.
+  const ap = _activeVibePillParts();
+  if (ap && !selectedThemes.has(ap.vibeId)) activeVibePill = null;
+
   row.style.display = 'flex';
-  row.innerHTML =
-    `<span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--slate);font-weight:600;margin-right:6px">Narrow ${vibeName}:</span>` +
-    pills.map(p => {
-      const on = activeVibePill === p.id;
-      return `<button onclick="toggleVibePill('${p.id}')" style="font-size:11px;padding:5px 12px;border-radius:14px;border:1.5px solid ${on?'var(--gold)':'#d4c9b0'};background:${on?'var(--gold)':'transparent'};color:${on?'#fff':'var(--slate)'};cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:0.04em;transition:all 0.15s">${p.label}</button>`;
-    }).join('') +
-    (activeVibePill ? `<button onclick="toggleVibePill(null)" style="font-size:11px;padding:5px 10px;border:none;background:transparent;color:#999;cursor:pointer;font-family:inherit">Clear ✕</button>` : '');
+  row.style.flexDirection = 'column';
+  row.style.alignItems   = 'stretch';
+  row.style.gap          = '8px';
+
+  row.innerHTML = vibesWithPills.map(vibeId => {
+    const pills    = VIBE_PILLS[vibeId];
+    const vibeName = (THEMES.find(t => t.id === vibeId) || {}).name || vibeId;
+    const pillBtns = pills.map(p => {
+      const on = activeVibePill === _vibePillKey(vibeId, p.id);
+      return `<button onclick="toggleVibePill('${vibeId}','${p.id}')" style="font-size:11px;padding:5px 12px;border-radius:14px;border:1.5px solid ${on?'var(--gold)':'#d4c9b0'};background:${on?'var(--gold)':'transparent'};color:${on?'#fff':'var(--slate)'};cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:0.04em;transition:all 0.15s">${p.label}</button>`;
+    }).join('');
+    const clear = (ap && ap.vibeId === vibeId)
+      ? `<button onclick="toggleVibePill(null)" style="font-size:11px;padding:5px 10px;border:none;background:transparent;color:#999;cursor:pointer;font-family:inherit">Clear ✕</button>`
+      : '';
+    return `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+      <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--slate);font-weight:600;margin-right:6px">Narrow ${vibeName}:</span>
+      ${pillBtns}${clear}
+    </div>`;
+  }).join('');
 }
 
-function toggleVibePill(id) {
-  activeVibePill = (activeVibePill === id) ? null : id;
+// Selecting a different vibe's pill replaces whichever was previously active
+// (single-active model — keeps the filter simple to reason about).
+// Pass (null) or (null,null) to clear.
+function toggleVibePill(vibeId, pillId) {
+  if (!vibeId || !pillId) {
+    activeVibePill = null;
+  } else {
+    const key = _vibePillKey(vibeId, pillId);
+    activeVibePill = (activeVibePill === key) ? null : key;
+  }
   renderVibePills();
   renderExperiences();
   renderActiveFilters();
@@ -6208,12 +6247,10 @@ function filterExperiences() {
   const typeRaw = document.getElementById('filterType').value;
   const subPillDef = (SUB_PILLS[typeRaw] || []).find(p => p.id === activeSubPill);
 
-  // Vibe-pill matcher (e.g. Foodie > Markets) — only when 1 vibe selected
-  let vibePillDef = null;
-  if (selectedThemes.size === 1 && activeVibePill) {
-    const vibeId = [...selectedThemes][0];
-    vibePillDef = (VIBE_PILLS[vibeId] || []).find(p => p.id === activeVibePill);
-  }
+  // Vibe-pill matcher (e.g. Foodie > Markets) — pill identifies its owning
+  // vibe via the compound key, so it applies regardless of how many vibes
+  // are selected.
+  const vibePillDef = activeVibePill ? _activeVibePillDef() : null;
 
   return liveExperiences.filter(e => {
     // A keyword search is a precise intent — it supersedes the coarse vibe
