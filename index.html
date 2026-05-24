@@ -1612,8 +1612,23 @@
   }
   .bm-cal-btn[hidden] { display: none; }
 
-  /* The "In Season" pill — same shape as the calendar pill but with a
-     leaf-green active state so seasonal vs. view modes read distinctly. */
+  /* Editorial filter row — sits directly under the browse-mode row.
+     Each pill is an OR-additive curated slice (In Season, Local Guides,
+     Just Added, Favorites). Forest-green active state across all four
+     so they read as one category-of-control distinct from the gold
+     calendar view toggle. */
+  .editorial-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin: -8px 0 20px;
+  }
+  .ed-pill.active {
+    background: var(--forest); color: #fff; border-color: var(--forest);
+  }
+  .ed-pill[disabled] {
+    opacity: 0.55; cursor: not-allowed;
+  }
+  /* Legacy seasonal class kept so older callsites that toggle it still
+     get a reasonable highlight. */
   .bm-seasonal-btn.active {
     background: var(--forest); color: #fff; border-color: var(--forest);
   }
@@ -1958,6 +1973,29 @@
     <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">⚙ Manage Database</button>
   </div>
 
+  <!-- Browse-mode toggle promoted out of the Explore tab body so it's the
+       first decision the visitor makes — sits between the tabs and the
+       fine-grained filters. Default = Both. -->
+  <div class="browse-mode-row">
+    <span class="browse-mode-label">Looking for:</span>
+    <div class="browse-mode-toggle" role="tablist" aria-label="What to show">
+      <button id="bmVenues" type="button" class="bm-btn"        onclick="setBrowseMode('venues')"  title="Just places — restaurants, lodging, museums, parks">🏠 Venues</button>
+      <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
+      <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
+    </div>
+    <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
+  </div>
+
+  <!-- Editorial / curated slices. Each pill is an additive filter — OR-union
+       across active pills. Empty data is OK; the catalog will fill in. -->
+  <div class="editorial-row">
+    <span class="browse-mode-label">Showing:</span>
+    <button id="edInseason"    type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('inseason')"    title="Filter to what's happening this season">🌿 In Season</button>
+    <button id="edLocalGuides" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — Terry McAteer's tours, Hank Meals' hikes, the disc-golf pro">🧑‍🏫 Local Guides</button>
+    <button id="edJustAdded"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('justadded')"   title="Venues and events added recently">🆕 Just Added</button>
+    <button id="edFavorites"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('favorites')"   title="Only items you've saved to My Itinerary">❤ Favorites</button>
+  </div>
+
   <!-- Condensed search + filter bar — search, area, category and dates on one line -->
   <div class="filter-bar">
     <div class="search-field" data-tip="Search for any craft, activity, venue or event — try “blacksmithing”, “wine tasting”, “live music” or “Cornish Christmas”, then press Find. Synonyms are built in, so “metalsmith” also finds a studio listed as “blacksmithing”.">
@@ -2017,20 +2055,9 @@
   <hr class="section-sep">
 
   <div id="tab-experiences" class="tab-panel active">
-    <!-- Prominent browse-mode toggle — visitors set their intent first,
-         everything below narrows from there. Default = Both.
-         Calendar view button to the right; only relevant when events are
-         visible (mode = events or both). -->
-    <div class="browse-mode-row">
-      <span class="browse-mode-label">Looking for:</span>
-      <div class="browse-mode-toggle" role="tablist" aria-label="What to show">
-        <button id="bmVenues" type="button" class="bm-btn"        onclick="setBrowseMode('venues')"  title="Just places — restaurants, lodging, museums, parks">🏠 Venues</button>
-        <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
-        <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
-      </div>
-      <button id="bmSeasonal" type="button" class="bm-cal-btn bm-seasonal-btn" onclick="toggleSeasonal()" title="Filter to what's happening right now">🌿 In Season</button>
-      <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
-    </div>
+    <!-- Browse-mode toggle + editorial row live ABOVE the filter bar now
+         (see top of this section). Explore body keeps just the result
+         surfaces. -->
     <div id="activeFilterBar" style="display:none"></div>
     <div id="resultsCount" class="results-count"></div>
     <div id="eventsCount" class="events-count"></div>
@@ -3303,13 +3330,58 @@ let showPlaces         = true;
 // flags above + the highlight state on the mode toggle buttons.
 let browseMode = 'both';
 
-// "In Season" prominent toggle in the browse-mode row. When on, filters
-// BOTH venues (by their `season` field) and events (by date falling in
-// the current season window — plus the upcoming season if we're within
-// ~4 weeks of the transition). Seasonal events are the biggest driver
-// of county tourism, so this filter sits next to the mode toggle, not
-// buried under a vibe.
+// Editorial filter pills — additive (OR-union). Multi-select set of pill
+// ids: 'inseason', 'localguides', 'justadded', 'favorites'. seasonalActive
+// is kept as a legacy alias that mirrors the inseason pill so older filter
+// callsites don't need to change.
+let activeEditorialPills = new Set();
 let seasonalActive = false;
+
+function isEditorialActive(id) { return activeEditorialPills.has(id); }
+function _anyEditorialActive() { return activeEditorialPills.size > 0; }
+
+// Just-Added window: items added within the last 30 days. For events we
+// key off the scraper's `scraped_at` field. Venues will need an
+// `added_at` field on EXPERIENCES — not yet present, so the pill matches
+// no venues today (graceful empty until backfilled).
+const _JUST_ADDED_DAYS = 30;
+
+function _matchesEditorial(item, kind /* 'event'|'venue' */) {
+  for (const pid of activeEditorialPills) {
+    if (pid === 'inseason') {
+      const w = _currentSeasonalWindow();
+      if (kind === 'event') {
+        const s = item.dateStart || '';
+        if (s && s >= w.startIso && s <= w.endIso) return true;
+      } else {
+        const sea = (item.season || 'Year-Round');
+        if (sea === 'Year-Round') return true;
+        const parts = sea.toLowerCase().split(',').map(s => s.trim());
+        if (parts.some(s => w.seasons.has(s))) return true;
+      }
+    } else if (pid === 'localguides') {
+      const tags = (item.tags || []).map(t => t.toLowerCase());
+      if (tags.includes('guide') || tags.includes('local guide')) return true;
+      const name = ((item.name || '') + ' ' + (item.sub || '') + ' ' + (item.notes || '')).toLowerCase();
+      if (/\bguide(d|s)?\b|walking tour|led by/.test(name)) return true;
+    } else if (pid === 'justadded') {
+      if (kind === 'event' && item._scrapedAt) {
+        const days = (Date.now() - new Date(item._scrapedAt).getTime()) / 86400000;
+        if (days <= _JUST_ADDED_DAYS) return true;
+      } else if (kind === 'venue' && item.added_at) {
+        const days = (Date.now() - new Date(item.added_at).getTime()) / 86400000;
+        if (days <= _JUST_ADDED_DAYS) return true;
+      }
+    } else if (pid === 'favorites') {
+      if (kind === 'event') {
+        if (item.scraperId && myList.has('evt_' + item.scraperId)) return true;
+      } else {
+        if (myList.has(item.id)) return true;
+      }
+    }
+  }
+  return false;
+}
 
 // Compute the active "in season" window — today through end of current
 // season, with the upcoming season included if we're near the transition.
@@ -3346,25 +3418,55 @@ function _currentSeasonalWindow() {
   };
 }
 
-function toggleSeasonal() {
-  seasonalActive = !seasonalActive;
-  _renderSeasonalBtn();
+// Toggle a single editorial pill. OR-union semantics — pills add to a set,
+// re-rendering everything that's filterable.
+function toggleEditorial(id) {
+  if (activeEditorialPills.has(id)) activeEditorialPills.delete(id);
+  else activeEditorialPills.add(id);
+  seasonalActive = activeEditorialPills.has('inseason');     // legacy alias
+  _renderEditorialPills();
   renderExperiences();
   if (showUpcomingEvents) renderEventsView();
   if (typeof renderActiveFilters === 'function') renderActiveFilters();
 }
 
-function _renderSeasonalBtn() {
-  const btn = document.getElementById('bmSeasonal');
-  if (!btn) return;
-  const w = _currentSeasonalWindow();
-  const cap = w.label.replace(/\b\w/g, c => c.toUpperCase());
-  btn.classList.toggle('active', seasonalActive);
-  btn.innerHTML = `${w.icon} ${seasonalActive ? cap : 'In Season'}`;
-  btn.title = seasonalActive
-    ? `Showing things happening this ${w.label}. Click to clear.`
-    : `Filter to what's happening right now (${w.label})`;
+// Legacy shim — anything still calling toggleSeasonal() routes through
+// the new editorial-pill flow.
+function toggleSeasonal() { toggleEditorial('inseason'); }
+
+// Paint every editorial pill's active state + (for In Season) refresh its
+// season-aware label.
+function _renderEditorialPills() {
+  // In Season — adaptive label
+  const seas = document.getElementById('edInseason');
+  if (seas) {
+    const w = _currentSeasonalWindow();
+    const cap = w.label.replace(/\b\w/g, c => c.toUpperCase());
+    seas.classList.toggle('active', activeEditorialPills.has('inseason'));
+    seas.innerHTML = activeEditorialPills.has('inseason')
+      ? `${w.icon} ${cap}`
+      : `${w.icon} In Season`;
+    seas.title = activeEditorialPills.has('inseason')
+      ? `Showing things happening this ${w.label}. Click to clear.`
+      : `Filter to what's happening right now (${w.label})`;
+  }
+  for (const [id, elId] of [
+    ['localguides','edLocalGuides'],
+    ['justadded',  'edJustAdded'],
+    ['favorites',  'edFavorites'],
+  ]) {
+    const b = document.getElementById(elId);
+    if (b) b.classList.toggle('active', activeEditorialPills.has(id));
+  }
+  // Legacy seasonal button (no longer rendered in the layout but kept for
+  // any code path that still queries it).
+  const legacy = document.getElementById('bmSeasonal');
+  if (legacy) legacy.classList.toggle('active', activeEditorialPills.has('inseason'));
 }
+
+// Legacy alias — anywhere we used to call _renderSeasonalBtn() now repaints
+// every editorial pill instead.
+function _renderSeasonalBtn() { _renderEditorialPills(); }
 
 function toggleEventsInGrid() {
   showUpcomingEvents = !showUpcomingEvents;
@@ -4244,6 +4346,7 @@ async function _loadEventsCache() {
           url:       ev.url || '',
           image:     ev.image || '',
           source:    ev.source || '',
+          _scrapedAt: ev.scraped_at || '',   // keep so the Just-Added editorial pill can match
         };
       });
     _eventsCacheTime = Date.now();
@@ -4620,15 +4723,12 @@ function _eventsForView() {
   const q         = (searchQuery || '').trim();
   let evts = _eventsCache || EVENTS;
 
-  // "In Season" toggle — filter events whose start date falls inside the
-  // current (and near-transition: next) season window.
-  if (seasonalActive) {
-    const w = _currentSeasonalWindow();
-    evts = evts.filter(ev => {
-      const s = ev.dateStart || '';
-      if (!s) return false;
-      return s >= w.startIso && s <= w.endIso;
-    });
+  // Editorial pills — additive (OR-union). When any are active, an event
+  // must match at least one. Active pills include "In Season" (season
+  // window), "Local Guides" (tag/regex), "Just Added" (scraped within
+  // ~30 days), and "Favorites" (in myList).
+  if (_anyEditorialActive()) {
+    evts = evts.filter(ev => _matchesEditorial(ev, 'event'));
   }
 
   // Date-range filter — an event matches if its span overlaps [from, to],
@@ -6942,9 +7042,6 @@ function filterExperiences() {
   const dateFrom = typeof visitorDateFrom !== 'undefined' ? visitorDateFrom : '';
   const visitSeasons = _visitSeasons(dateFrom);
 
-  // "In Season" toggle overlays the visit-derived season window.
-  const seasonalWindow = seasonalActive ? _currentSeasonalWindow() : null;
-
   // Active vibes including the Stays pseudo-vibe (when its tile is on).
   const activeIds = _activeVibeIds();
   const lodgingOptIn = staysActive;
@@ -6964,11 +7061,9 @@ function filterExperiences() {
       if (!parts.some(s => visitSeasons.has(s))) return false;
     }
 
-    // "In Season" toggle: current+next season window.
-    if (seasonalWindow && expSeason !== 'Year-Round') {
-      const parts = expSeason.toLowerCase().split(',').map(s => s.trim());
-      if (!parts.some(s => seasonalWindow.seasons.has(s))) return false;
-    }
+    // Editorial pills (OR-union). If any are active, the venue must match
+    // at least one of them. Same shape as the events filter.
+    if (_anyEditorialActive() && !_matchesEditorial(e, 'venue')) return false;
 
     if (!q && activeIds.length > 0) {
       // Per-vibe OR-union: an experience passes if at least one active vibe's
@@ -8716,8 +8811,8 @@ _loadMyList();
 updateFab();
 // Load admin data (experiences, itineraries) from storage; fall back to defaults
 loadFromStorage();
-// Paint the In-Season button label with the current season once boot is done.
-if (typeof _renderSeasonalBtn === 'function') _renderSeasonalBtn();
+// Paint the editorial pill row (label + active states) once boot is done.
+if (typeof _renderEditorialPills === 'function') _renderEditorialPills();
 </script>
 </body>
 </html>
