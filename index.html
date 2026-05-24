@@ -1538,6 +1538,36 @@
   }
 
   /* ── Upcoming Events — List/Calendar view ─────────────────────────── */
+  /* Browse-mode toggle — first decision on the page after vibes. Big, gold-accented, default-Both. */
+  .browse-mode-row {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin: 4px 0 20px;
+  }
+  .browse-mode-label {
+    font-size: 11px; letter-spacing: 0.28em; color: var(--slate);
+    text-transform: uppercase; font-weight: 600;
+  }
+  .browse-mode-toggle {
+    display: inline-flex; gap: 0;
+    background: var(--fog); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 4px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .bm-btn {
+    border: none; background: transparent;
+    color: var(--slate); cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    padding: 8px 18px; border-radius: 999px;
+    letter-spacing: 0.04em;
+    transition: all 0.18s ease;
+  }
+  .bm-btn:hover { color: var(--brown); }
+  .bm-btn.active {
+    background: var(--brown); color: var(--cream);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+  .bm-btn.active:hover { color: var(--cream); }
+
   .events-view-toggle { display: flex; gap: 6px; margin-bottom: 16px; }
   .events-count {
     font-size: 13px; color: var(--slate);
@@ -1911,6 +1941,16 @@
   <hr class="section-sep">
 
   <div id="tab-experiences" class="tab-panel active">
+    <!-- Prominent browse-mode toggle — visitors set their intent first,
+         everything below narrows from there. Default = Both. -->
+    <div class="browse-mode-row">
+      <span class="browse-mode-label">Looking for:</span>
+      <div class="browse-mode-toggle" role="tablist" aria-label="What to show">
+        <button id="bmVenues" type="button" class="bm-btn"        onclick="setBrowseMode('venues')"  title="Just places — restaurants, lodging, museums, parks">🏠 Venues</button>
+        <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
+        <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
+      </div>
+    </div>
     <div id="activeFilterBar" style="display:none"></div>
     <div id="resultsCount" class="results-count"></div>
     <div id="expGrid" class="exp-grid"></div>
@@ -3152,15 +3192,48 @@ function renderSeasonalBand() {
 let showUpcomingEvents = true;
 // Whether to include places (static catalog) in the grid (default: on)
 let showPlaces         = true;
+// Top-level browse intent ('venues' | 'events' | 'both'). Drives the two
+// flags above + the highlight state on the mode toggle buttons.
+let browseMode = 'both';
 
 function toggleEventsInGrid() {
   showUpcomingEvents = !showUpcomingEvents;
+  // Stay in sync with the prominent browse-mode toggle.
+  _syncBrowseModeFromFlags();
   renderExperiences();
 }
 
 function togglePlacesInGrid() {
   showPlaces = !showPlaces;
+  _syncBrowseModeFromFlags();
   renderExperiences();
+}
+
+function setBrowseMode(mode) {
+  browseMode = (mode === 'venues' || mode === 'events') ? mode : 'both';
+  showPlaces         = (browseMode === 'venues' || browseMode === 'both');
+  showUpcomingEvents = (browseMode === 'events' || browseMode === 'both');
+  _renderBrowseModeToggle();
+  renderExperiences();
+}
+
+function _syncBrowseModeFromFlags() {
+  // Map current showPlaces / showUpcomingEvents back to a mode label so the
+  // toggle buttons reflect reality after inline pill toggles fire.
+  if (showPlaces && showUpcomingEvents) browseMode = 'both';
+  else if (showPlaces)                  browseMode = 'venues';
+  else if (showUpcomingEvents)          browseMode = 'events';
+  else                                  browseMode = 'both';   // both off → reset to default
+  _renderBrowseModeToggle();
+}
+
+function _renderBrowseModeToggle() {
+  const map = { venues: 'bmVenues', events: 'bmEvents', both: 'bmBoth' };
+  for (const m of Object.values(map)) {
+    const b = document.getElementById(m); if (b) b.classList.remove('active');
+  }
+  const target = document.getElementById(map[browseMode] || 'bmBoth');
+  if (target) target.classList.add('active');
 }
 
 function renderExperiences() {
