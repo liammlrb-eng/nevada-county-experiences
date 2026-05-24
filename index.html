@@ -4248,16 +4248,17 @@ function _eventFallbackVenues() {
 
   const phrase = leadPill.fallbackLabel || (leadPill.label.replace(/^[^\w]+\s*/, '').toLowerCase()) || 'related places';
   const pillLabel = leadPill.label;
+  // Banner noun: pill label minus leading emoji and any trailing
+  // "Festivals" / "Events" suffix so we don't read "music festivals events".
+  const pillNoun = pillLabel
+    .replace(/^[^\w]+\s*/, '')
+    .replace(/\s*festivals?\s*$/i, '')
+    .replace(/\s*events?\s*$/i, '')
+    .toLowerCase();
   const dateFrom = (typeof visitorDateFrom !== 'undefined') ? visitorDateFrom : '';
   const dateTo   = (typeof visitorDateTo   !== 'undefined') ? visitorDateTo   : '';
-  let windowPhrase = 'in this window';
-  const today = _localISODate();
-  if (dateFrom && dateFrom === dateTo && dateFrom === today)        windowPhrase = 'today';
-  else if (dateFrom && dateTo) {
-    const span = (new Date(dateTo) - new Date(dateFrom)) / 86400000;
-    if (span <= 1.5)      windowPhrase = 'this weekend';
-    else if (span <= 6.5) windowPhrase = 'this week';
-  }
+  const hasDateFilter = !!(dateFrom || dateTo);
+  const datePhrase = hasDateFilter ? 'during these dates' : 'scheduled';
   const teaserNames = venues.slice(0, 3).map(v => v.name).join(', ');
   const moreCount = venues.length - 3;
   const cards = venues.map(v => {
@@ -4283,7 +4284,7 @@ function _eventFallbackVenues() {
     <div class="evt-fallback-banner" style="grid-column:1/-1">
       <div class="evt-fallback-icon">🌲</div>
       <div class="evt-fallback-body">
-        <div class="evt-fallback-line1">No ${pillLabel.replace(/^[^\w]+\s*/, '').toLowerCase()} ${windowPhrase}.</div>
+        <div class="evt-fallback-line1">No ${pillNoun} events ${datePhrase}.</div>
         <div class="evt-fallback-line2">Here are <strong>${venues.length}</strong> ${phrase}${teaserNames ? ` — ${teaserNames.replace(/</g,'&lt;')}${moreCount > 0 ? ` and ${moreCount} more` : ''}` : ''}.</div>
         <div class="evt-fallback-cta">
           <button onclick="setBrowseMode('venues')" class="evt-fallback-go">View all ${phrase} →</button>
