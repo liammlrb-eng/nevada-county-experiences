@@ -10510,6 +10510,70 @@ function runQAScan() {
     });
   });
 
+  // ── 5a. Pill override audit ──────────────────────────────────────
+  // Track every venue that carries a pill_in override and flag two
+  // states worth admin attention:
+  //   • Stale: the override is no longer needed because the regex
+  //     now catches the venue on its own. Safe to remove.
+  //   • Unresolvable: the override references a pill that no longer
+  //     exists in VIBE_PILLS (renamed or deleted). Either rename or
+  //     remove the override.
+  const allPillIds = new Set();
+  const pillById = {};
+  if (typeof VIBE_PILLS === 'object') {
+    for (const [vibeId, pills] of Object.entries(VIBE_PILLS)) {
+      (pills || []).forEach(p => {
+        allPillIds.add(`${vibeId}/${p.id}`);
+        allPillIds.add(p.id);                 // accept bare-id form
+        pillById[`${vibeId}/${p.id}`] = { vibe: vibeId, pill: p };
+        if (!pillById[p.id]) pillById[p.id] = { vibe: vibeId, pill: p };
+      });
+    }
+  }
+
+  let totalOverrides = 0;
+  const staleOverrides = [];
+  const unresolvableOverrides = [];
+  venues.forEach(v => {
+    const ovr = Array.isArray(v.pill_in) ? v.pill_in : [];
+    if (!ovr.length) return;
+    totalOverrides += ovr.length;
+    ovr.forEach(token => {
+      if (!allPillIds.has(token)) {
+        unresolvableOverrides.push(`  · id ${v.id}  ${v.name}  →  "${token}" (no such pill)`);
+        return;
+      }
+      const ref = pillById[token];
+      if (!ref) return;
+      // Stale = the regex already matches this venue, so the override
+      // is doing no work. Safe to remove.
+      let regexHit = false;
+      try { regexHit = !!ref.pill.match(v); } catch (_) {}
+      if (regexHit) {
+        staleOverrides.push(`  · id ${v.id}  ${v.name}  →  ${token}  (regex now catches this — override redundant)`);
+      }
+    });
+  });
+  if (unresolvableOverrides.length) {
+    findings.warning.push({
+      type: 'unresolvable_override',
+      title: `${unresolvableOverrides.length} pill_in override(s) reference unknown pills`,
+      detail: unresolvableOverrides.slice(0, 10).join('\n') +
+        (unresolvableOverrides.length > 10 ? `\n  …and ${unresolvableOverrides.length - 10} more` : ''),
+      ids: [],
+    });
+  }
+  if (staleOverrides.length) {
+    findings.info.push({
+      type: 'stale_override',
+      title: `${staleOverrides.length} pill_in override(s) are now redundant`,
+      detail: staleOverrides.slice(0, 10).join('\n') +
+        (staleOverrides.length > 10 ? `\n  …and ${staleOverrides.length - 10} more` : '') +
+        '\n  These can be removed without affecting filter results — the regex has caught up.',
+      ids: [],
+    });
+  }
+
   // ── 5. Tag orphans ────────────────────────────────────────────────
   const allTags = new Set();
   venues.forEach(v => (v.tags || []).forEach(t => allTags.add(String(t).toLowerCase())));
@@ -10564,6 +10628,8 @@ function runQAScan() {
     pills_scanned:  pillStats.length,
     pills_empty:    pillStats.filter(p => p.hits === 0).length,
     pills_with_suspicious: pillStats.filter(p => p.suspicious > 0).length,
+    total_overrides: totalOverrides,
+    stale_overrides: staleOverrides.length,
     total_critical: findings.critical.length,
     total_warning:  findings.warning.length,
     total_info:     findings.info.length,
@@ -10647,6 +10713,7 @@ function _qaRenderReport(f) {
       <span><strong>${s.venues_scanned}</strong> venues</span>
       <span><strong>${s.events_scanned}</strong> events</span>
       <span><strong>${s.pills_scanned}</strong> pills scanned</span>
+      <span title="Admin pill_in overrides force-include venues into pills the regex misses"><strong>${s.total_overrides}</strong> overrides${s.stale_overrides ? ` <span style="color:#888">(${s.stale_overrides} stale)</span>` : ''}</span>
       <span style="color:${s.total_critical>0?'#C0392B':'#888'}"><strong>${s.total_critical}</strong> critical</span>
       <span style="color:${s.total_warning>0?'#B8941A':'#888'}"><strong>${s.total_warning}</strong> warning</span>
       <span style="color:#888"><strong>${s.total_info}</strong> info</span>
