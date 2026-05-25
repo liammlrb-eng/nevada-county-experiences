@@ -2194,7 +2194,13 @@
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
     margin: 44px 0 4px;
   }
-  .filter-bar .search-field { flex: 1 1 150px; min-width: 140px; }
+  /* Search field stays small + left-justified on the filter bar — it
+     was growing flex:1 and dominating the row, which made the dates +
+     quick buttons feel crammed on the right. Now it's a fixed-width
+     control, the Find button rides alongside it, and the *date block
+     starts after a flex-gap* so visitors see a clear "search ⏐ dates"
+     separation instead of one continuous strip. */
+  .filter-bar .search-field { flex: 0 0 220px; min-width: 160px; }
   .filter-bar select,
   .filter-bar .fb-date {
     height: 46px;
@@ -2206,8 +2212,14 @@
   .filter-bar select:focus,
   .filter-bar .fb-date:focus { outline: none; border-color: var(--gold); }
   .filter-bar .fb-date { width: 138px; cursor: text; }
-  /* Right-justified so the quick-date buttons sit under the date pickers */
-  .date-quick-group { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
+  /* Push the date pickers (and everything after them) to the right of the
+     filter bar so there's breathing room between the search/Find pair on
+     the left and the calendar-filter group on the right. */
+  .filter-bar #filterDateFrom { margin-left: 24px; }
+  /* Quick-date buttons sit immediately after the date pickers — the
+     wrapping date-quick-group used to have margin-left:auto which created
+     an extra unwanted gap now that #filterDateFrom carries the spacing. */
+  .date-quick-group { display: flex; flex-wrap: wrap; gap: 4px; }
 
   /* ── Help · field tips ────────────────────────────────────────────── */
   [data-tip] { position: relative; }
