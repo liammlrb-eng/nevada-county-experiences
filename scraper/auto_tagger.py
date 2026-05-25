@@ -97,13 +97,10 @@ _TAG_RULES: list[tuple[str, list[str]]] = [
                          "marketplace"]),
 
     # ── Garden & Plants ──────────────────────────────────────────────────────
-    # Bare "wildflower" removed — matched paintings and landscape art whose
-    # subject was a wildflower-filled scene. "wildflower walk" still
-    # catches docent-led garden / nature walks.
     ("Garden",          ["plant sale", "garden tour", "garden workshop",
                          "garden club", "master gardener", "herbal medicine",
                          "remedy garden", "butterfly garden", "wildflower walk",
-                         "botanical garden", "garden of remembrance",
+                         "wildflower", "botanical", "garden of remembrance",
                          "calscape", "horticulture"]),
 
     # ── Family & Kids ─────────────────────────────────────────────────────────
@@ -124,10 +121,8 @@ _TAG_RULES: list[tuple[str, list[str]]] = [
                          "author reading", "book club", "book signing"]),
 
     # ── Nature & Outdoors ─────────────────────────────────────────────────────
-    # Bare "wildflower" removed for the same reason as in Garden —
-    # paintings / poetry mentioning wildflowers shouldn't be tagged Nature.
     ("Nature",          ["hike", "hiking", "nature walk", "trail", "birding",
-                         "bird walk", "wildflower walk", "wildlife", "conservation",
+                         "bird walk", "wildflower", "wildlife", "conservation",
                          "stewardship", "river restoration", "watershed",
                          "forest", "botanical", "garden tour",
                          "star gazing", "stargazing", "astronomy",
