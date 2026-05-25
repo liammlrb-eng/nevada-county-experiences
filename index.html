@@ -1131,6 +1131,28 @@
     letter-spacing: 0.03em;
   }
   .results-count strong { color: var(--gold); }
+  /* Counts + Calendar toggle, side by side directly above the grid.
+     The counts cluster keeps its own internal stacking (places line on
+     top, events line under it) and the toggle floats to the right. */
+  .results-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .results-row .results-counts {
+    display: flex; flex-direction: column;
+    gap: 2px; flex: 1;
+  }
+  /* Inside the row, the counts already have margin-bottom from their
+     own class — strip it so the row's gap controls spacing. */
+  .results-row .results-count,
+  .results-row .events-count { margin-bottom: 0; }
+  /* Calendar toggle in its new home: visible bm-cal-btn styling
+     is already defined elsewhere; just make sure it doesn't shrink. */
+  .results-row .bm-cal-btn { flex-shrink: 0; align-self: flex-start; }
   /* ACTIVE FILTER CHIPS */
   .filter-chip-bar {
     display: flex;
@@ -2391,14 +2413,17 @@
     left: 6px; top: calc(100% + 14px);
     background: #fff8e8;
     color: #1f1a14;
-    border: 2.5px solid #1f1a14;
+    border: 2px solid #1f1a14;
     border-radius: 14px;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px; font-weight: 500; line-height: 1.5;
     letter-spacing: 0.01em;
     padding: 10px 14px;
     width: max-content; max-width: 280px;
-    box-shadow: 4px 4px 0 #1f1a14;
+    /* Soft offset shadow — kept the hard-edge comic-book direction
+       but pulled the offset in and dropped to 30% opacity so the
+       bubbles no longer dominate the surrounding UI. */
+    box-shadow: 2px 2px 0 rgba(31,26,20,0.30);
     transform: rotate(-1deg);
     z-index: 200; pointer-events: none;
     animation: tipPopIn 0.16s ease-out;
@@ -2415,8 +2440,8 @@
     left: 22px; top: calc(100% + 9px);
     width: 14px; height: 14px;
     background: #fff8e8;
-    border-left: 2.5px solid #1f1a14;
-    border-top:  2.5px solid #1f1a14;
+    border-left: 2px solid #1f1a14;
+    border-top:  2px solid #1f1a14;
     transform: rotate(45deg);
     z-index: 201; pointer-events: none;
     animation: tailPopIn 0.16s ease-out;
@@ -2696,7 +2721,10 @@
         </button>
       </div>
     </div>
-    <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
+    <!-- (Calendar toggle moved out of the filter bar — it now lives
+         in the results row directly above the grid, paired with the
+         X places / Y events counts, so it sits where the visitor
+         actually decides "list vs calendar".) -->
   </div>
   <div id="subPillsRow" style="display:none;margin:2px 0 14px;padding-top:10px;border-top:1px dashed #e0d8c8;flex-wrap:wrap;gap:6px;align-items:center"></div>
 
@@ -2714,8 +2742,18 @@
          (see top of this section). Explore body keeps just the result
          surfaces. -->
     <div id="activeFilterBar" style="display:none"></div>
-    <div id="resultsCount" class="results-count"></div>
-    <div id="eventsCount" class="events-count"></div>
+    <!-- Results-row: places + events counts on the left, the Calendar
+         toggle on the right. Sits directly above the grid so the
+         visitor sees the toggle right where it changes the view. -->
+    <div class="results-row">
+      <div class="results-counts">
+        <div id="resultsCount" class="results-count"></div>
+        <div id="eventsCount" class="events-count"></div>
+      </div>
+      <button id="bmCalendar" type="button" class="bm-cal-btn"
+              onclick="toggleCalendarView()"
+              title="Switch between list and calendar view">▦ Calendar</button>
+    </div>
     <div id="expGrid"        class="exp-grid"></div>
     <div id="eventsGrid"     class="events-grid" style="display:none"></div>
     <div id="eventsCalendar"                       style="display:none"></div>
@@ -7067,6 +7105,64 @@ document.addEventListener('keydown', function (e) {
   const ov = document.getElementById('trailMapOverlay');
   if (ov && ov.classList.contains('open')) closeTrailMap();
 });
+
+// ── Tooltip shim — turn every `title=` into a speech bubble ──────────────
+// The CSS speech-bubble treatment only fires for [data-tip] elements. Lots
+// of buttons across the app use the native `title=` attribute, which the
+// browser still renders as its OS-default little floating box on top of
+// (or instead of) our bubble. Convert all titles to data-tip + aria-label
+// so:
+//   • the speech-bubble style fires for every hover-helpable element
+//   • native browser tooltips never show (we strip the original title)
+//   • accessibility is preserved via aria-label (screen readers still read it)
+//
+// Re-runs on dynamically-added DOM nodes (cards rendered into the grids,
+// modal content, etc.) via a MutationObserver — so newly-rendered buttons
+// inherit the same treatment without per-render boilerplate.
+function _convertTitlesToTips(root) {
+  const els = (root === document)
+    ? document.querySelectorAll('[title]')
+    : (root.querySelectorAll ? root.querySelectorAll('[title]') : []);
+  els.forEach(el => {
+    // Skip elements where native title is semantically meaningful (image alt
+    // hints, the <title> head element). Also skip if we already converted.
+    const tag = el.tagName;
+    if (tag === 'TITLE' || tag === 'IMG') return;
+    if (el.dataset.tip) return;
+    const t = el.getAttribute('title');
+    if (!t || !t.trim()) return;
+    el.setAttribute('data-tip', t);
+    if (!el.hasAttribute('aria-label')) {
+      el.setAttribute('aria-label', t);
+    }
+    el.removeAttribute('title');
+  });
+  // Also handle the root itself, since querySelectorAll only descends.
+  if (root && root.nodeType === 1 && root.hasAttribute && root.hasAttribute('title')) {
+    const fakeRoot = { querySelectorAll: () => [root] };
+    _convertTitlesToTips(fakeRoot);
+  }
+}
+
+(function _initTooltipShim() {
+  const run = () => {
+    _convertTitlesToTips(document);
+    // Watch for new nodes added later (dynamic card grids, modals, etc.).
+    const obs = new MutationObserver(muts => {
+      muts.forEach(m => {
+        m.addedNodes.forEach(n => {
+          if (n.nodeType === 1) _convertTitlesToTips(n);
+        });
+      });
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();
 
 function clearAll() {
   if (confirm('Clear your entire itinerary list?')) {
