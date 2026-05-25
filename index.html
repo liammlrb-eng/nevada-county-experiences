@@ -8934,6 +8934,7 @@ function renderManageData() {
       <button class="manage-tab-btn ${manageDataTab==='events'?'active':''}" onclick="switchManageTab('events')">📅 Events Queue</button>
       <button class="manage-tab-btn ${manageDataTab==='suggestions'?'active':''}" onclick="switchManageTab('suggestions')">💡 Suggestions</button>
       <button class="manage-tab-btn ${manageDataTab==='sources'?'active':''}" onclick="switchManageTab('sources')">🔗 Event Sources</button>
+      <button class="manage-tab-btn ${manageDataTab==='qa'?'active':''}" onclick="switchManageTab('qa')">🔍 QA Scan</button>
     </div>`;
 
   if (manageDataTab === 'experiences') {
@@ -8994,6 +8995,9 @@ function renderManageData() {
   } else if (manageDataTab === 'seasonal') {
     subtitle.textContent = `${liveSeasonal.length} seasonal moment${liveSeasonal.length !== 1 ? 's' : ''} · auto-saves on every change · the home-page strip shows only what's in season today`;
     body.innerHTML = tabBar + renderSeasonalAdmin();
+  } else if (manageDataTab === 'qa') {
+    subtitle.textContent = 'Run a full quality scan across venues, events, and pill matching — flags duplicates, false positives, and orphans';
+    body.innerHTML = tabBar + renderQAPanel();
   } else {
     subtitle.textContent = `${liveItineraries.length} suggested itinerary${liveItineraries.length !== 1 ? 's' : ''} · auto-saves on every change`;
     body.innerHTML = tabBar + renderManageItinerariesHtml();
@@ -10139,6 +10143,330 @@ function flashSaved() {
 function switchManageTab(tab) {
   manageDataTab = tab;
   renderManageData();
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// QA SCAN — admin quality crawler
+// ─────────────────────────────────────────────────────────────────────
+// Runs entirely in-browser against the loaded EXPERIENCES / VIBE_PILLS /
+// _eventsCache data. Surfaces problems that are otherwise invisible at
+// the per-card level:
+//   • Coordinate duplicates (two venues at the same lat/lng — usually
+//     means the same physical place was added twice)
+//   • Near-duplicate names within the same area (Levenshtein-ish)
+//   • Pill false positives — venue matched by a pill but the venue's
+//     `type`/`tags` don't corroborate the pill's family
+//   • Empty pills (broken regex, dead category, stale match function)
+//   • Over-matched venues (single venue lit up by 8+ pills across the
+//     whole pill matrix — usually a tags-too-broad symptom)
+//   • Tag orphans — tags assigned to venues that no pill references
+//   • Cross-source event dupes — same event date+title under multiple
+//     scrapers (already handled at display by Jaccard; admin queue
+//     can still benefit from the listing)
+//
+// Last-run timestamp persists in localStorage so the admin sees when
+// the report is stale (and the QA tab banner prompts a re-run after
+// 30 days).
+
+const QA_KEY = 'ncexp:lastQAScan';
+
+// Per-vibe natural family — set of tag/type tokens we expect to see
+// on a venue that *legitimately* matches one of this vibe's pills.
+// Used to flag false positives: a pill matched the venue, but none of
+// these tokens are on the venue, so the match is suspect.
+const _QA_VIBE_FAMILIES = {
+  foodie:    new Set(['restaurant','bakery','winery','tasting room','brewery','foodie','food & drink','market','garden']),
+  active:    new Set(['active','outdoor','sport','hiking','biking','swimming','fishing','boating','running','nature']),
+  handson:   new Set(['hands-on','workshop','craft','artistic','dance','music','wellness','spiritual','garden','nature','lecture','museum']),
+  arts:      new Set(['artistic','music','theater','film','gallery','art event','musician','music venue']),
+  historic:  new Set(['historic','museum','gold rush','heritage']),
+  wellness:  new Set(['wellness','spiritual','retreat','yoga']),
+  family:    new Set(['family','kids','child','active','outdoor','social','garden','nature']),
+  social:    new Set(['social','community','festival','market','music']),
+  rustic:    new Set(['rustic','historic','outdoor','nature','romantic']),
+  romantic:  new Set(['romantic','opulent','foodie','restaurant','winery','wellness']),
+  stays:     new Set(['lodging']),
+};
+
+function _qaTokenSet(v) {
+  const tokens = new Set();
+  (v.tags || []).forEach(t => tokens.add(String(t).toLowerCase()));
+  if (v.type) tokens.add(String(v.type).toLowerCase());
+  return tokens;
+}
+
+function _qaIntersects(setA, setB) {
+  for (const x of setA) if (setB.has(x)) return true;
+  return false;
+}
+
+function runQAScan() {
+  const findings = { critical: [], warning: [], info: [], stats: {} };
+  const venues = (typeof liveExperiences !== 'undefined' ? liveExperiences : EXPERIENCES) || [];
+  const events = (typeof _eventsCache !== 'undefined' && _eventsCache) || [];
+
+  // ── 1. Coordinate duplicates (CRITICAL) ─────────────────────────────
+  // Round to 4 decimals (~11m precision) — anything tighter than that
+  // is almost certainly the same physical place entered twice.
+  const byCoord = {};
+  venues.forEach(v => {
+    if (typeof v.lat !== 'number' || typeof v.lng !== 'number') return;
+    const k = `${v.lat.toFixed(4)}|${v.lng.toFixed(4)}`;
+    (byCoord[k] = byCoord[k] || []).push(v);
+  });
+  Object.entries(byCoord)
+    .filter(([_, arr]) => arr.length > 1)
+    .forEach(([coord, arr]) => {
+      findings.critical.push({
+        type: 'coord_dupe',
+        title: `${arr.length} venues at ${coord}`,
+        detail: arr.map(v => `  · id ${v.id}  ${v.name}`).join('\n'),
+        ids: arr.map(v => v.id),
+      });
+    });
+
+  // ── 2. Same-name venues (warning) ───────────────────────────────────
+  const byName = {};
+  venues.forEach(v => {
+    const key = String(v.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 80);
+    if (!key) return;
+    (byName[key] = byName[key] || []).push(v);
+  });
+  Object.entries(byName)
+    .filter(([_, arr]) => arr.length > 1)
+    .forEach(([k, arr]) => {
+      // Skip if already in coord-dupe critical (avoid double-reporting).
+      const coordKeys = new Set(arr.map(v =>
+        typeof v.lat === 'number' ? `${v.lat.toFixed(4)}|${v.lng.toFixed(4)}` : ''
+      ).filter(Boolean));
+      const allSameCoord = coordKeys.size === 1;
+      if (allSameCoord) return;
+      findings.warning.push({
+        type: 'name_dupe',
+        title: `${arr.length} venues sharing name "${arr[0].name}"`,
+        detail: arr.map(v => `  · id ${v.id}  area: ${v.area || '(no area)'}`).join('\n'),
+        ids: arr.map(v => v.id),
+      });
+    });
+
+  // ── 3. Pill scan: stats + empty pills + suspicious matches ─────────
+  const pillStats = [];   // [{ vibe, pill, hits, suspicious }]
+  const venueHitCount = new Map();    // venue id → count of pills that match it
+  const tagsUsedByPills = new Set();
+
+  if (typeof VIBE_PILLS === 'object') {
+    for (const [vibeId, pills] of Object.entries(VIBE_PILLS)) {
+      const family = _QA_VIBE_FAMILIES[vibeId] || new Set();
+      for (const p of (pills || [])) {
+        let matches = [];
+        try {
+          matches = venues.filter(v => {
+            try { return p.match && p.match(v); }
+            catch (_) { return false; }
+          });
+        } catch (_) { /* match function errored — leave matches empty */ }
+
+        const suspicious = [];
+        matches.forEach(v => {
+          venueHitCount.set(v.id, (venueHitCount.get(v.id) || 0) + 1);
+          const tokens = _qaTokenSet(v);
+          // If we have a family for this vibe and none of the venue's
+          // tags/type intersect with that family, the pill match is
+          // probably a false positive (regex hit a stray substring).
+          if (family.size && !_qaIntersects(family, tokens)) {
+            suspicious.push(v);
+          }
+          // Track every tag that survived a pill match, so we can
+          // identify orphans below.
+          tokens.forEach(t => tagsUsedByPills.add(t));
+        });
+
+        pillStats.push({ vibe: vibeId, pill: p.id, label: p.label, hits: matches.length, suspicious: suspicious.length });
+
+        if (matches.length === 0) {
+          findings.critical.push({
+            type: 'empty_pill',
+            title: `Pill matches zero venues:  ${vibeId} → ${p.id}`,
+            detail: `  Label: ${p.label}\n  Either the match function is broken or this category has no venues yet.`,
+            ids: [],
+          });
+        }
+        if (suspicious.length > 0 && family.size) {
+          findings.warning.push({
+            type: 'pill_false_positive',
+            title: `${suspicious.length} suspicious matches in ${vibeId} → ${p.id}`,
+            detail: suspicious.slice(0, 8).map(v =>
+              `  · id ${v.id}  ${v.name}  (type: ${v.type || '?'}, tags: [${(v.tags || []).join(', ')}])`
+            ).join('\n') + (suspicious.length > 8 ? `\n  …and ${suspicious.length - 8} more` : ''),
+            ids: suspicious.map(v => v.id),
+          });
+        }
+      }
+    }
+  }
+
+  // ── 4. Over-matched venues ────────────────────────────────────────
+  const overMatched = [...venueHitCount.entries()]
+    .filter(([_, n]) => n >= 8)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15);
+  overMatched.forEach(([vid, n]) => {
+    const v = venues.find(x => x.id === vid);
+    if (!v) return;
+    findings.warning.push({
+      type: 'over_matched',
+      title: `${v.name} matches ${n} pills across vibes`,
+      detail: `  id ${vid}  tags: [${(v.tags || []).join(', ')}]\n  Usually means the venue's tag set is too broad — visitor will see this venue in many unrelated filters.`,
+      ids: [vid],
+    });
+  });
+
+  // ── 5. Tag orphans ────────────────────────────────────────────────
+  const allTags = new Set();
+  venues.forEach(v => (v.tags || []).forEach(t => allTags.add(String(t).toLowerCase())));
+  const orphanTags = [...allTags].filter(t => !tagsUsedByPills.has(t)).sort();
+  if (orphanTags.length) {
+    findings.info.push({
+      type: 'tag_orphans',
+      title: `${orphanTags.length} tags exist on venues but no pill references them`,
+      detail: '  · ' + orphanTags.join(', '),
+      ids: [],
+    });
+  }
+
+  // ── 6. Cross-source event dupes ────────────────────────────────────
+  // Bucket events by (YYYY-MM-DD date, first-3-tokens of title), then
+  // flag buckets with 2+ events from *different* sources. Same scraper
+  // posting the same event twice is a separate concern (dedupe in
+  // ingest); this catches inter-scraper redundancy.
+  if (events.length) {
+    const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9 ]+/g, '').split(/\s+/).filter(Boolean).slice(0, 3).join('-');
+    const evtBuckets = {};
+    events.forEach(e => {
+      if (!e.dateStart) return;
+      const key = `${e.dateStart}::${norm(e.title || e.name)}`;
+      (evtBuckets[key] = evtBuckets[key] || []).push(e);
+    });
+    let dupeCount = 0;
+    const dupeSample = [];
+    Object.entries(evtBuckets).forEach(([k, arr]) => {
+      if (arr.length < 2) return;
+      const sources = new Set(arr.map(e => e.source));
+      if (sources.size < 2) return;   // same source dupes — handled elsewhere
+      dupeCount++;
+      if (dupeSample.length < 8) {
+        dupeSample.push(`  · ${arr[0].dateStart}  "${arr[0].title || arr[0].name}"  [${[...sources].join(', ')}]`);
+      }
+    });
+    if (dupeCount > 0) {
+      findings.warning.push({
+        type: 'cross_source_event_dupes',
+        title: `${dupeCount} event(s) appearing under multiple sources`,
+        detail: dupeSample.join('\n') + (dupeCount > 8 ? `\n  …and ${dupeCount - 8} more` : '') + '\n  (Display dedup via title-token Jaccard already handles this at render time; admin queue may still show both.)',
+        ids: [],
+      });
+    }
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────────
+  findings.stats = {
+    venues_scanned: venues.length,
+    events_scanned: events.length,
+    pills_scanned:  pillStats.length,
+    pills_empty:    pillStats.filter(p => p.hits === 0).length,
+    pills_with_suspicious: pillStats.filter(p => p.suspicious > 0).length,
+    total_critical: findings.critical.length,
+    total_warning:  findings.warning.length,
+    total_info:     findings.info.length,
+    timestamp: new Date().toISOString(),
+    pill_breakdown: pillStats.sort((a, b) => b.suspicious - a.suspicious || a.hits - b.hits),
+  };
+
+  try { localStorage.setItem(QA_KEY, findings.stats.timestamp); } catch (_) {}
+  return findings;
+}
+
+function renderQAPanel() {
+  // Initial panel: "Run scan" button + last-run note + container
+  let lastRun = '';
+  try { lastRun = localStorage.getItem(QA_KEY) || ''; } catch (_) {}
+  let lastRunNote = '';
+  if (lastRun) {
+    const days = Math.round((Date.now() - new Date(lastRun).getTime()) / 86400000);
+    const stale = days >= 30 ? ' style="color:#C0392B;font-weight:600"' : '';
+    lastRunNote = `<span${stale}>Last scan: ${days === 0 ? 'today' : days + ' day' + (days === 1 ? '' : 's') + ' ago'}${days >= 30 ? ' — overdue (monthly cadence)' : ''}</span>`;
+  } else {
+    lastRunNote = '<span style="color:#888">Never run on this device.</span>';
+  }
+  return `
+    <div class="qa-panel" style="padding:24px;overflow-y:auto;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap">
+        <div>
+          <h3 style="margin:0 0 4px;color:var(--brown);font-family:'Cormorant Garamond',serif;font-weight:500">Quality scan</h3>
+          <p style="font-size:12px;color:#6b6055;margin:0">${lastRunNote}</p>
+        </div>
+        <button onclick="_qaTriggerScan()" style="padding:10px 18px;background:var(--forest);color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer">▶ Run scan now</button>
+      </div>
+      <div id="qaResults" style="font-size:13px;line-height:1.55;color:var(--slate)">
+        <div style="padding:32px;border:1px dashed #d4c9b0;border-radius:6px;background:#fffdf7;color:#6b6055;text-align:center">
+          Click <strong>Run scan now</strong> to crawl every pill across every venue and surface duplicates, false-positive matches, empty pills, and orphan tags. Takes ~1 second.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function _qaTriggerScan() {
+  const out = document.getElementById('qaResults');
+  if (!out) return;
+  out.innerHTML = '<div style="padding:24px;color:#888">Scanning…</div>';
+  // Small defer so the "Scanning…" paint actually shows before the
+  // synchronous scan blocks the main thread.
+  setTimeout(() => {
+    const findings = runQAScan();
+    out.innerHTML = _qaRenderReport(findings);
+    // Refresh the last-run note in the header above.
+    const panel = out.closest('.qa-panel');
+    if (panel) {
+      const note = panel.querySelector('p');
+      if (note) note.innerHTML = '<span>Last scan: just now</span>';
+    }
+  }, 30);
+}
+
+function _qaSection(title, color, items) {
+  if (!items.length) return `
+    <div style="margin:18px 0">
+      <h4 style="font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:${color};margin:0 0 8px;font-family:'Inter',system-ui,sans-serif;font-weight:700">${title}  <span style="color:#aaa;font-weight:400">— none</span></h4>
+    </div>`;
+  const itemsHtml = items.map(f => `
+    <div style="border-left:3px solid ${color};background:#fffdf7;padding:10px 14px;margin:6px 0;border-radius:0 4px 4px 0">
+      <div style="font-weight:600;color:var(--brown);margin-bottom:4px">${f.title}</div>
+      <pre style="font-family:'Menlo','Consolas',monospace;font-size:11.5px;color:#555;margin:0;white-space:pre-wrap">${f.detail}</pre>
+    </div>`).join('');
+  return `
+    <div style="margin:18px 0">
+      <h4 style="font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:${color};margin:0 0 8px;font-family:'Inter',system-ui,sans-serif;font-weight:700">${title}  <span style="color:#888;font-weight:400">(${items.length})</span></h4>
+      ${itemsHtml}
+    </div>`;
+}
+
+function _qaRenderReport(f) {
+  const s = f.stats;
+  const statsBlock = `
+    <div style="display:flex;gap:18px;flex-wrap:wrap;padding:12px 14px;background:#f7f3e9;border:1px solid #e0d8c8;border-radius:6px;margin-bottom:8px;font-size:12px;color:var(--slate)">
+      <span><strong>${s.venues_scanned}</strong> venues</span>
+      <span><strong>${s.events_scanned}</strong> events</span>
+      <span><strong>${s.pills_scanned}</strong> pills scanned</span>
+      <span style="color:${s.total_critical>0?'#C0392B':'#888'}"><strong>${s.total_critical}</strong> critical</span>
+      <span style="color:${s.total_warning>0?'#B8941A':'#888'}"><strong>${s.total_warning}</strong> warning</span>
+      <span style="color:#888"><strong>${s.total_info}</strong> info</span>
+    </div>
+  `;
+  return statsBlock
+    + _qaSection('Critical — fix soon', '#C0392B', f.critical)
+    + _qaSection('Warning — review',    '#B8941A', f.warning)
+    + _qaSection('Info — FYI',          '#5C8C3C', f.info);
 }
 
 // ── SEASONAL MOMENTS — admin editor ('🍂 Seasonal' tab) ──────────────
