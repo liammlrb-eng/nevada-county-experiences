@@ -5010,7 +5010,9 @@ function renderExperiences() {
             if (!_vibeBaseMatch(vibeId, c)) return false;
             const pillDefs = _vibePillDefsFor(vibeId);
             if (pillDefs.length === 0) return true;          // vibe with no narrowing
-            return pillDefs.some(pd => pd.match(c));         // OR within the vibe
+            // Pill membership honours per-venue overrides (pill_in) so an
+            // admin can include a venue the regex missed without code edits.
+            return pillDefs.some(pd => pillMatches(pd, c, vibeId));
           });
         });
       }
@@ -6147,7 +6149,7 @@ function _eventsForView() {
         if (!tagMatch) return false;
         const pillDefs = (typeof _vibePillDefsFor === 'function') ? _vibePillDefsFor(vibeId) : [];
         if (pillDefs.length === 0) return true;
-        return pillDefs.some(pd => pd.match(e));
+        return pillDefs.some(pd => pillMatches(pd, e, vibeId));
       });
     });
   }
@@ -8271,6 +8273,31 @@ function renderVibePills() {
   }).join('');
 }
 
+// ── Pill membership: regex match + manual overrides ──────────────────
+// A venue belongs to a pill if EITHER:
+//   1) the pill's regex/predicate match function returns true, OR
+//   2) the venue's pill_in array explicitly includes the compound
+//      "vibeId/pillId" tag for this pill (admin override)
+//
+// This lets admins surgically include venues the regex misses (the slow-
+// drift problem — new venue names the existing regex can't catch) without
+// having to evolve the regex itself. False negatives become a one-row
+// admin edit instead of a code change.
+//
+// Token format: "vibeId/pillId" (e.g. "active/hiking", "foodie/wineries").
+// Compound key avoids ambiguity if pill IDs ever collide across vibes.
+function pillMatches(pillDef, venue, vibeId) {
+  if (!pillDef || !venue) return false;
+  const ovr = Array.isArray(venue.pill_in) ? venue.pill_in : null;
+  if (ovr && vibeId && ovr.includes(`${vibeId}/${pillDef.id}`)) return true;
+  // Also accept legacy bare pill IDs (no vibe prefix) for forward-compat
+  // with admin edits that omit the vibe slug. Pill IDs are unique by
+  // convention across vibes; if an admin types "hiking" we treat it as
+  // an override for whichever pill bears that id.
+  if (ovr && ovr.includes(pillDef.id)) return true;
+  try { return !!pillDef.match(venue); } catch (_) { return false; }
+}
+
 // Convenience predicate — true when the visitor has narrowed Active vibe
 // with Hiking or Biking pill. Used by the card renderer to decide whether
 // to surface a Trail Map button on each card (real trail geometry lives
@@ -8863,7 +8890,7 @@ function filterExperiences() {
         if (!_vibeBaseMatch(vibeId, e)) return false;
         const pillDefs = _vibePillDefsFor(vibeId);
         if (pillDefs.length === 0) return true;
-        return pillDefs.some(pd => pd.match(e));
+        return pillDefs.some(pd => pillMatches(pd, e, vibeId));
       });
       if (!passes) return false;
       // Mood vibes shouldn't surface lodging / wineries unless explicitly
