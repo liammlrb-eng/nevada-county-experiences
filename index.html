@@ -1427,12 +1427,26 @@
   .trail-legend-row .tl-len  { color: #6b6055; font-size: 11px; }
   .trail-legend-row.off { opacity: 0.35; }
   .trail-legend-row:hover { color: var(--rust); }
-  /* Trailhead marker — small black-outlined dot keyed by trail color. */
+  /* Trailhead marker — small black-outlined dot keyed by trail color.
+     Animates scale + halo when the corresponding legend row is hovered
+     so the visitor can spot at a glance which marker maps to which
+     trail name. */
   .trail-marker {
     width: 14px; height: 14px;
     border-radius: 50%;
     border: 2.5px solid #1f1a14;
     box-shadow: 1px 1px 0 #1f1a14;
+    transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+  }
+  .trail-marker.is-highlighted {
+    transform: scale(1.45);
+    /* Inner shadow keeps the comic outline; outer halo (semi-opaque
+       cream against the map tiles) draws the eye without picking a
+       hard color that would clash with the trail's own swatch. */
+    box-shadow:
+      1px 1px 0 #1f1a14,
+      0 0 0 5px rgba(255,248,232,0.85),
+      0 0 0 6.5px rgba(31,26,20,0.45);
   }
   /* Trail popup styling (Leaflet's built-in popup, with our palette). */
   .trail-popup .leaflet-popup-content-wrapper {
@@ -7074,7 +7088,10 @@ function _renderTrailLegend(trailById, features) {
     if (!meta) return '';
     const miles = (meta.distance_mi || f.properties?.length_miles || 0).toFixed(1);
     return `
-      <div class="trail-legend-row" data-trail-id="${meta.id}" onclick="_toggleTrailLayer('${meta.id}', this)">
+      <div class="trail-legend-row" data-trail-id="${meta.id}"
+           onclick="_toggleTrailLayer('${meta.id}', this)"
+           onmouseenter="_highlightTrail('${meta.id}', true)"
+           onmouseleave="_highlightTrail('${meta.id}', false)">
         <span class="tl-swatch" style="background:${meta.color}"></span>
         <span class="tl-name">${meta.name}</span>
         <span class="tl-len">${miles} mi</span>
@@ -7096,6 +7113,37 @@ function _toggleTrailLayer(id, rowEl) {
   } else {
     layers.polyline.addTo(_trailMap);
     if (layers.marker) layers.marker.addTo(_trailMap);
+  }
+}
+
+// Light up a trail's polyline + trailhead marker when the visitor hovers
+// its row in the legend — mirrors the text-color hover so the connection
+// between legend row and map element is unambiguous. Reverts when the
+// hover leaves. Guards against trails that are currently toggled off
+// (no layer on the map) so we don't try to restyle removed objects.
+function _highlightTrail(id, on) {
+  const layers = _trailLayers[id];
+  if (!layers || !_trailMap) return;
+
+  // Polyline — bump weight + opacity, and bring it to the front so it's
+  // not occluded by overlapping trails (Pioneer Trail crosses several).
+  if (layers.polyline && _trailMap.hasLayer(layers.polyline)) {
+    layers.polyline.setStyle({
+      weight:  on ? 7   : 4,
+      opacity: on ? 1.0 : 0.85,
+    });
+    if (on) layers.polyline.bringToFront();
+  }
+
+  // Marker — toggle a CSS class on the inner trail-marker dot so it
+  // pulses + adds a soft ring. The marker's outer element is Leaflet's
+  // own div; the styled dot is a child we control.
+  if (layers.marker) {
+    const el = layers.marker.getElement();
+    if (el) {
+      const dot = el.querySelector('.trail-marker');
+      if (dot) dot.classList.toggle('is-highlighted', on);
+    }
   }
 }
 
