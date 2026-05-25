@@ -1,8 +1,8 @@
 {
   "feed": "Nevada County Experience — Curated Venues & Experiences",
   "homepage": "https://liammlrb-eng.github.io/nevada-county-experiences/",
-  "generated_at": "2026-05-25T02:50:46Z",
-  "count": 192,
+  "generated_at": "2026-05-25T05:55:02Z",
+  "count": 193,
   "license": "CC BY 4.0 — attribution required",
   "attribution": "Nevada County Experience — https://liammlrb-eng.github.io/nevada-county-experiences/",
   "venues": [
@@ -348,23 +348,24 @@
     },
     {
       "id": 55,
-      "name": "Nevada City Smartphone Walking Tour",
-      "blurb": "90-minute self-guided historic downtown audio tour",
+      "name": "Nevada City Audio Walking Tour",
+      "blurb": "Self-guided audio tour of the Historic District (Stqry)",
       "area": "Nevada City",
       "type": "Activity",
       "tags": [
         "Historic",
         "Gold Rush",
-        "Family"
+        "Family",
+        "Guide"
       ],
       "hours": "Any time; self-guided",
-      "notes": "Covers architecture & stories from 1850–1970s; free or low-cost",
-      "url": "https://gonevadacounty.com/things-to-do-nevada-city/",
-      "directions": "https://maps.google.com/?q=Nevada+City+Chamber+of+Commerce+CA",
+      "notes": "Free audio-guided tour from the Grass Valley / Nevada City Cultural Districts — open the link on your phone and walk Broad Street, Pine, and Commercial at your own pace.",
+      "url": "https://gvncculturedistricts.stqry.app/en/tour/29298",
+      "directions": "https://maps.google.com/?q=Nevada+City+CA+Downtown",
       "lat": 39.2617,
       "lng": -121.0178,
       "season": "Year-Round",
-      "icon": "🚶",
+      "icon": "🎧",
       "photo": "https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop"
     },
     {
@@ -4051,6 +4052,28 @@
       "season": "Year-Round",
       "icon": "🎵",
       "photo": "https://images.unsplash.com/photo-1535992165812-68d1861aa71e?w=400&h=260&fit=crop"
+    },
+    {
+      "id": 222,
+      "name": "Crush",
+      "blurb": "Tightly curated boutique on Broad Street",
+      "area": "Nevada City",
+      "type": "Shop",
+      "tags": [
+        "Shopping",
+        "Boutique",
+        "Gifts",
+        "Local"
+      ],
+      "hours": "Check storefront for current hours",
+      "notes": "Broad Street, Nevada City — small footprint, amazing curated stuff. The kind of shop where everything on the table is there for a reason; apparel, accessories, gifts, home pieces hand-picked with a clear point of view.",
+      "url": "https://www.nevadacitychamber.com/",
+      "directions": "https://maps.google.com/?q=Crush+Broad+St+Nevada+City+CA",
+      "lat": 39.2618,
+      "lng": -121.0162,
+      "season": "Year-Round",
+      "icon": "🛍",
+      "photo": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=260&fit=crop"
     }
   ]
 }

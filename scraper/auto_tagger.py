@@ -52,6 +52,18 @@ _TAG_RULES: list[tuple[str, list[str]]] = [
                          "at the center for the arts", "at the miners foundry",
                          "at the nevada theatre", "at bunce", "at barmhaus",
                          "at alibi", "at 5 mile house", "at the stone house",
+                         # NevadaCity.Rocks venue coverage — "Artist at Venue"
+                         # is the dominant title pattern there, and every
+                         # listing on that site is by definition live music.
+                         "at friar tucks", "at friar tuck", "at the national",
+                         "at national hotel", "at crazy horse",
+                         "at grass valley brewery", "at five-mile house",
+                         "at five mile house", "at uncle sonnys",
+                         "at uncle sonny", "at seven stars",
+                         "at smoked owl", "at gold vibe", "at the smoked owl",
+                         "at golden era", "at nevada city winery",
+                         "at miners harmony", "at odd fellows",
+                         "at the holbrooke", "at lola",
                          # Music industry signals
                          "rhythm kings", "song contest", "records presents"]),
 
