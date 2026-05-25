@@ -2239,13 +2239,20 @@
   .filter-bar select:focus,
   .filter-bar .fb-date:focus { outline: none; border-color: var(--gold); }
   .filter-bar .fb-date { width: 138px; cursor: text; }
-  /* Push the date pickers (and everything after them) to the right of the
-     filter bar so there's breathing room between the search/Find pair on
-     the left and the calendar-filter group on the right. */
-  .filter-bar #filterDateFrom { margin-left: 24px; }
-  /* Quick-date buttons sit immediately after the date pickers — the
-     wrapping date-quick-group used to have margin-left:auto which created
-     an extra unwanted gap now that #filterDateFrom carries the spacing. */
+  /* The date-block stacks the date inputs over the duration quick buttons
+     so the quick buttons read as a sub-control of the date pickers. The
+     24px left margin (formerly on #filterDateFrom) lives here now so the
+     entire calendar-filter group breathes apart from search/Find. */
+  .filter-bar .date-block {
+    display: flex; flex-direction: column;
+    gap: 6px;
+    margin-left: 24px;
+  }
+  .filter-bar .date-block .date-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  /* Quick-date buttons (All / Today / Weekend / Week) sit on a row of
+     their own under the date inputs. */
   .date-quick-group { display: flex; flex-wrap: wrap; gap: 4px; }
 
   /* ── Help · field tips ────────────────────────────────────────────── */
@@ -2439,16 +2446,24 @@
       <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:none" title="Clear search" aria-label="Clear search">✕</button>
     </div>
     <button class="search-go" onclick="runSearch()">Find</button>
-    <input type="date" id="filterDateFrom" class="fb-date" title="Visit start date"
-      onchange="visitorDateFrom=this.value;if(visitorDateTo&&visitorDateTo<visitorDateFrom){visitorDateTo=visitorDateFrom;var t=document.getElementById('filterDateTo');if(t)t.value=visitorDateTo;}_visApplyDate()">
-    <span style="color:#bbb;flex-shrink:0">–</span>
-    <input type="date" id="filterDateTo" class="fb-date" title="Visit end date"
-      onchange="visitorDateTo=this.value;if(visitorDateFrom&&visitorDateFrom>visitorDateTo){visitorDateFrom=visitorDateTo;var f=document.getElementById('filterDateFrom');if(f)f.value=visitorDateFrom;}_visApplyDate()">
-    <div class="date-quick-group">
-      <button class="date-quick-btn active" id="vqBtnAll"     onclick="_visSetAll()"     title="Show all upcoming dates">All</button>
-      <button class="date-quick-btn"        id="vqBtnToday"   onclick="_visSetToday()"   title="Today only">Today</button>
-      <button class="date-quick-btn"        id="vqBtnWeekend" onclick="_visSetWeekend()" title="This coming Saturday and Sunday">Weekend</button>
-      <button class="date-quick-btn"        id="vqBtnWeek"    onclick="_visSetWeek()"    title="The next 7 days">Week</button>
+    <!-- date-block stacks the from/to inputs over the duration quick
+         buttons (All / Today / Weekend / Week) so the quick buttons read
+         as a sub-control of the date pickers rather than as siblings on
+         the same row. -->
+    <div class="date-block">
+      <div class="date-row">
+        <input type="date" id="filterDateFrom" class="fb-date" title="Visit start date"
+          onchange="visitorDateFrom=this.value;if(visitorDateTo&&visitorDateTo<visitorDateFrom){visitorDateTo=visitorDateFrom;var t=document.getElementById('filterDateTo');if(t)t.value=visitorDateTo;}_visApplyDate()">
+        <span style="color:#bbb;flex-shrink:0">–</span>
+        <input type="date" id="filterDateTo" class="fb-date" title="Visit end date"
+          onchange="visitorDateTo=this.value;if(visitorDateFrom&&visitorDateFrom>visitorDateTo){visitorDateFrom=visitorDateTo;var f=document.getElementById('filterDateFrom');if(f)f.value=visitorDateFrom;}_visApplyDate()">
+      </div>
+      <div class="date-quick-group">
+        <button class="date-quick-btn active" id="vqBtnAll"     onclick="_visSetAll()"     title="Show all upcoming dates">All</button>
+        <button class="date-quick-btn"        id="vqBtnToday"   onclick="_visSetToday()"   title="Today only">Today</button>
+        <button class="date-quick-btn"        id="vqBtnWeekend" onclick="_visSetWeekend()" title="This coming Saturday and Sunday">Weekend</button>
+        <button class="date-quick-btn"        id="vqBtnWeek"    onclick="_visSetWeek()"    title="The next 7 days">Week</button>
+      </div>
     </div>
     <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
   </div>
