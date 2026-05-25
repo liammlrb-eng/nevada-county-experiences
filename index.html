@@ -3005,6 +3005,72 @@
     .em-feature { grid-row: auto; min-height: 280px; }
   }
 
+  /* ── UI-V2 SECTION-BREAK BANNER ─────────────────────────────────
+     Full-bleed landscape photo between the editorial spread and the
+     functional zone. Hidden on default UI, revealed on body.ui-v2. */
+  .v2-only { display: none; }
+  body.ui-v2 .v2-only { display: block; }
+  .section-banner {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);   /* break out of body padding */
+    height: 200px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .section-banner-img {
+    position: absolute; inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=2400&h=400&fit=crop');
+    background-size: cover;
+    background-position: center 65%;     /* favor the bottom of the photo */
+    filter: brightness(0.78) saturate(1.05);
+    /* Very subtle, very slow Ken-Burns so the banner doesn't feel
+       totally still without competing with the hero's faster rotation. */
+    animation: bannerPan 32s ease-in-out infinite alternate;
+  }
+  @keyframes bannerPan {
+    0%   { transform: scale(1.02) translateX(0); }
+    100% { transform: scale(1.06) translateX(-1.5%); }
+  }
+  /* Edge-darken so the caption stays legible regardless of which
+     photo lands here. */
+  .section-banner::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+      rgba(31,26,20,0.20) 0%,
+      rgba(31,26,20,0.10) 40%,
+      rgba(31,26,20,0.30) 100%);
+    pointer-events: none;
+  }
+  .section-banner-caption {
+    position: absolute;
+    left: clamp(20px, 6vw, 80px);
+    bottom: 22px;
+    display: flex; flex-direction: column;
+    color: #fff;
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .section-banner-caption .sb-kicker {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(20px, 2.2vw, 28px);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .section-banner-caption .sb-tagline {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+  }
+  @media (max-width: 768px) {
+    .section-banner { height: 140px; margin-bottom: 16px; }
+    .section-banner-caption { bottom: 14px; }
+    .section-banner-caption .sb-tagline { letter-spacing: 0.12em; font-size: 10px; }
+  }
+
   /* ── UI-V2 BIGGER CARDS ─────────────────────────────────────────
      Pump up the card photo height + give each card more horizontal
      room so the grid reads as a magazine layout instead of a dense
@@ -3219,6 +3285,18 @@
        cards on the right. Only renders when body.ui-v2 is on; rendered
        by _renderEditorialMagazine(). -->
   <div class="editorial-magazine" id="editorialMagazine"></div>
+</div>
+
+<!-- UI-V2 SECTION-BREAK BANNER — full-bleed landscape photo between
+     the editorial spread and the functional nav/filter area. Gives the
+     page rhythm: editorial moment → visual pause → functional zone.
+     Hidden on default UI. -->
+<div class="section-banner v2-only" aria-hidden="true">
+  <div class="section-banner-img"></div>
+  <div class="section-banner-caption">
+    <span class="sb-kicker">Western Nevada County</span>
+    <span class="sb-tagline">Nevada City · Grass Valley · Penn Valley · North San Juan</span>
+  </div>
 </div>
 
 
