@@ -3660,6 +3660,7 @@ function setBrowseMode(mode) {
   _renderBrowseModeToggle();
   _applyBrowseModeVisibility();
   _renderActiveGrids();
+  if (typeof renderActiveFilters === 'function') renderActiveFilters();
 }
 
 // Flip between list and calendar within whatever mode is active.
@@ -4021,6 +4022,16 @@ function isHighlightTag(tag) {
 function renderActiveFilters() {
   const bar = document.getElementById('activeFilterBar');
   const chips = [];
+
+  // Browse-mode chip — shown when narrowed to venues or events; default
+  // 'both' is implicit and stays unchipped. Reminds the visitor they've
+  // hidden one of the two streams.
+  if (typeof browseMode !== 'undefined' && browseMode !== 'both') {
+    const lbl = browseMode === 'venues' ? '🏠 Venues only' : '📅 Events only';
+    chips.push(
+      `<span class="filter-chip chip-meta">${lbl}<span class="filter-chip-x" onclick="setBrowseMode('both')">✕</span></span>`
+    );
+  }
 
   // Search chip
   const sq = (searchQuery || '').trim();
@@ -6994,7 +7005,7 @@ function renderTripBuilderForm() {
 
       <div class="tb-section" data-tip="Tailors everything — family favors kid-friendly spots, couple favors romantic, older favors gentle.">
         <div class="tb-label">Who's coming?</div>
-        <div class="tb-pills" id="tbGroup">${pillRow('tbGroup', [{v:'family',l:'Young family'},{v:'couple',l:'Couple'},{v:'friends',l:'Friends'},{v:'solo',l:'Solo'},{v:'older',l:'Older / multi-gen'}], '')}</div>
+        <div class="tb-pills" id="tbGroup">${pillRow('tbGroup', [{v:'family',l:'Family'},{v:'couple',l:'Couple'},{v:'friends',l:'Friends'},{v:'solo',l:'Solo'},{v:'older',l:'55+'}], '')}</div>
       </div>
 
       <div class="tb-row">
