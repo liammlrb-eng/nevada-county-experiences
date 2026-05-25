@@ -229,6 +229,18 @@
     margin-top: 1px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
+  /* Active pill names rendered inline after the vibe name when the
+     visitor has narrowed a vibe with sub-pills. Slightly smaller and
+     in the gold accent so they read as a sub-element of the name. */
+  .theme-pill-inline {
+    margin-left: 6px;
+    font-size: 9.5px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+  }
   .theme-check {
     position: absolute;
     top: 7px; right: 8px;
@@ -543,6 +555,21 @@
     transition: all 0.18s;
   }
   .btn-visit:hover { border-color: var(--slate); color: var(--dark); }
+  /* Trail Map button variant — only rendered on venue cards when the
+     visitor has narrowed Active vibe with Hiking or Biking. Forest
+     accent + filled background so it reads as the contextual action,
+     not a sibling of the Website link. */
+  .btn-visit.btn-trailmap {
+    background: var(--forest);
+    color: #fff;
+    border-color: var(--forest);
+    font-weight: 600;
+  }
+  .btn-visit.btn-trailmap:hover {
+    background: var(--brown);
+    border-color: var(--brown);
+    color: #fff;
+  }
 
   /* Google Maps style location pin button */
   .btn-pin {
@@ -4248,17 +4275,33 @@ function getActiveThemeTags() {
 
 function renderThemes() {
   const grid = document.getElementById('themesGrid');
-  const themeCards = THEMES.map(t => `
+  const themeCards = THEMES.map(t => {
+    // When the visitor has narrowed a vibe with sub-pills (e.g. Active →
+    // Hiking + Biking), surface those pill names inline beside the vibe
+    // name so the tile shows the *current* narrowing at a glance — no
+    // need to scroll down to the pill row to remember what's active.
+    const activePillIds = _vibePillIdsFor(t.id) || [];
+    const pillDefs = (VIBE_PILLS[t.id] || []).filter(p => activePillIds.includes(p.id));
+    const pillNames = pillDefs.map(p => {
+      // Strip the emoji prefix from the pill label; we want plain words
+      // on the tile, not a row of icons.
+      return p.label.replace(/^[\p{Emoji}\p{Extended_Pictographic}\s]*/u, '').trim();
+    }).filter(Boolean);
+    const pillInline = pillNames.length
+      ? `<span class="theme-pill-inline">· ${pillNames.join(' · ')}</span>`
+      : '';
+    return `
     <div class="theme-card ${selectedThemes.has(t.id) ? 'selected' : ''}" onclick="toggleTheme('${t.id}')">
       <img src="${t.photo}" alt="${t.name}" loading="lazy">
       <div class="theme-card-overlay"></div>
       <div class="theme-check">✓</div>
       <div class="theme-card-label">
-        <span class="theme-name">${t.name}</span>
+        <span class="theme-name">${t.name}${pillInline}</span>
         <span class="theme-tagline">${t.tagline}</span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
   // Stays tile — not a vibe; pitched-roof silhouette signals "different kind
   // of thing." Click runs the existing findLodging() flow (clears vibes, sets
   // Category=Lodging, scrolls to grid).
@@ -5032,6 +5075,10 @@ function renderExperiences() {
   }
 
   // ── Experience card template ─────────────────────────────────────────────
+  // When the visitor has narrowed Active vibe with Hiking or Biking pill,
+  // surface a Trail Map button on every card so they can pop the curated
+  // map of real trail geometry directly from the card row.
+  const trailLinkActive = _isHikingOrBikingActive();
   const cardHtml = (e) => {
     const added = myList.has(e.id);
     return `
@@ -5062,6 +5109,7 @@ function renderExperiences() {
           <button class="btn-add ${added ? 'added-btn' : ''}" onclick="toggleList(${e.id})">
             ${added ? '✓ Added' : '+ Add to My List'}
           </button>
+          ${trailLinkActive ? `<button class="btn-visit btn-trailmap" onclick="event.stopPropagation();openTrailMap()" title="Open the Trail Map to see routes">▦ Trail Map</button>` : ''}
           <a class="btn-visit" href="${e.url}" target="_blank">Website ↗</a>
           <a class="btn-pin" href="${e.directions}" target="_blank" title="Open in Google Maps" aria-label="Directions">
             <svg viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg">
@@ -8214,6 +8262,15 @@ function renderVibePills() {
   }).join('');
 }
 
+// Convenience predicate — true when the visitor has narrowed Active vibe
+// with Hiking or Biking pill. Used by the card renderer to decide whether
+// to surface a Trail Map button on each card (real trail geometry lives
+// in /data/trails.geojson and renders via the Trail Map modal).
+function _isHikingOrBikingActive() {
+  const active = activeVibePills['active'];
+  return Array.isArray(active) && (active.includes('hiking') || active.includes('biking'));
+}
+
 // Multi-select pills per vibe. Clicking adds the pill to that vibe's
 // active list (OR within the vibe); clicking the same pill again removes
 // it. Pass (vibeId, null) to clear all of that vibe's pills.
@@ -8230,6 +8287,9 @@ function toggleVibePill(vibeId, pillId) {
     else                  activeVibePills[vibeId] = arr;
   }
   renderVibePills();
+  // Repaint the vibe tiles too — they now surface the active pill names
+  // inline beside the vibe label, so a pill change has to refresh them.
+  renderThemes();
   // Refresh EVERY grid that's currently visible so a pill click visibly
   // re-filters whether the user is on Venues (#expGrid), Events
   // (#eventsGrid), or Calendar (#eventsCalendar). Previously only
