@@ -1627,6 +1627,17 @@
   .ed-pill[disabled] {
     opacity: 0.55; cursor: not-allowed;
   }
+  /* Seasonal-moment shortcut pills — distinguish from the four always-on
+     toggle pills by their gold accent (action, not filter-toggle). */
+  .ed-moment-pill {
+    border-color: var(--gold);
+    color: var(--brown);
+    font-style: italic;
+  }
+  .ed-moment-pill:hover {
+    background: var(--gold); color: #fff;
+  }
+  .ed-seasonal-host { display: contents; }
   /* Legacy seasonal class kept so older callsites that toggle it still
      get a reasonable highlight. */
   .bm-seasonal-btn.active {
@@ -1950,8 +1961,10 @@
   <div class="hero-scroll-cue" aria-hidden="true">▾</div>
 </div>
 
-<!-- IN SEASON NOW — date-driven seasonal spotlight (filled by renderSeasonalBand) -->
-<div id="seasonalBand" class="seasonal-band" style="display:none"></div>
+<!-- Old "In Season Now" photo band removed — its function is now carried
+     by the editorial-row above the tabs. Currently-active SEASONAL_MOMENTS
+     surface as shortcut pills inside that row (see renderSeasonalBand). -->
+
 
 <!-- THEME SELECTOR -->
 <div class="section">
@@ -1986,15 +1999,19 @@
     <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
   </div>
 
-  <!-- Editorial / curated slices. Each pill is an additive filter — OR-union
-       across active pills. Empty data is OK; the catalog will fill in. -->
+  <!-- Editorial / curated slices. Four always-on toggle pills (additive,
+       OR-union) plus a dynamic seasonal-moment "shortcut" or two appended
+       on the right whenever a SEASONAL_MOMENTS entry is active today.
+       Replaces the old "In Season Now" photo band entirely. -->
   <div class="editorial-row">
     <span class="browse-mode-label">Showing:</span>
     <button id="edInseason"    type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('inseason')"    title="Filter to what's happening this season">🌿 In Season</button>
-    <button id="edLocalGuides" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — Terry McAteer's tours, Hank Meals' hikes, the disc-golf pro">🧑‍🏫 Local Guides</button>
+    <button id="edLocalGuides" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
     <button id="edJustAdded"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('justadded')"   title="Venues and events added recently">🆕 Just Added</button>
     <button id="edFavorites"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('favorites')"   title="Only items you've saved to My Itinerary">❤ Favorites</button>
+    <span id="edSeasonalMoments" class="ed-seasonal-host"></span>
   </div>
+
 
   <!-- Condensed search + filter bar — search, area, category and dates on one line -->
   <div class="filter-bar">
@@ -3253,72 +3270,49 @@ function _seasonalGo(id) {
   } catch (e) { console.warn('seasonal go failed', e); }
 }
 
+// Render the top 1–2 currently-active SEASONAL_MOMENTS as shortcut pills
+// inside the editorial row. Replaces the old full-width seasonal-band
+// photo strip with compact, hand-curated "click to filter to this slice"
+// buttons sitting alongside In Season / Local Guides / Just Added /
+// Favorites. Always picks the most urgent moment first (ending → peak →
+// new) and caps at 2 so the row stays readable.
 function renderSeasonalBand() {
-  const band = document.getElementById('seasonalBand');
-  if (!band) return;
+  const host = document.getElementById('edSeasonalMoments');
+  if (!host) return;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Resolve every moment against today; keep the live ones.
   const live = [];
   for (const m of liveSeasonal) {
     const st = _seasonalStatus(m, today);
-    if (st) live.push({ m, status: st.status, date: st.date });
+    if (st && st.status !== 'soon') live.push({ m, status: st.status, date: st.date });
   }
-  if (!live.length) { band.style.display = 'none'; return; }
+  if (!live.length) { host.innerHTML = ''; return; }
 
-  // Active moments first (ending → peak → new, then priority); 'soon' last.
-  // The first card becomes the larger feature — so a "last chance" item, or
-  // otherwise the highest-priority moment in season, leads the strip.
-  const RANK = { ending: 0, peak: 1, new: 2, soon: 9 };
+  const RANK = { ending: 0, peak: 1, new: 2 };
   live.sort((a, b) => {
-    const ga = a.status === 'soon' ? 1 : 0;
-    const gb = b.status === 'soon' ? 1 : 0;
-    if (ga !== gb) return ga - gb;
     if (RANK[a.status] !== RANK[b.status]) return RANK[a.status] - RANK[b.status];
     return (b.m.priority || 0) - (a.m.priority || 0);
   });
 
-  // Band accent tracks the calendar season — the feature visibly changes
-  // with the year before a visitor reads a word.
-  band.style.setProperty('--season-accent', SEASON_ACCENT[_seasonOf(today)]);
-
+  // Compact: name + tiny prefix tag. Cap at 2 so the row stays single-line
+  // on most screens.
   const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const badgeFor = it => {
-    if (it.status === 'ending') return { txt: `⏳ Ends ${fmt(it.date)}`,  bg: '#C0392B' };
-    if (it.status === 'new')    return { txt: '✦ Just started',           bg: '#5C8C3C' };
-    if (it.status === 'soon')   return { txt: `◷ Opens ${fmt(it.date)}`,  bg: '#5A6B7A' };
-    return { txt: '☀ Peak now', bg: 'var(--gold)' };
+  const prefix = it => {
+    if (it.status === 'ending') return `⏳`;
+    if (it.status === 'new')    return `✦`;
+    return `☀`;
   };
-
-  const cards = live.map((it, i) => {
+  const tooltip = it => {
     const m = it.m;
-    const b = badgeFor(it);
-    return `<article class="season-card${i === 0 ? ' feature' : ''}"
-        onclick="_seasonalGo('${m.id}')">
-      <div class="season-photo">
-        <span class="season-badge" style="background:${b.bg}">${b.txt}</span>
-        <img src="${m.photo}" alt="${m.title}" loading="lazy"
-             onerror="this.style.display='none'">
-      </div>
-      <div class="season-body">
-        <div class="season-title">${m.title}</div>
-        <div class="season-blurb">${m.blurb}</div>
-        ${m.insider ? `<div class="season-insider">“${m.insider}”</div>` : ''}
-        <div class="season-go">${m.cta || 'Explore'} →</div>
-      </div>
-    </article>`;
-  }).join('');
-
-  band.innerHTML = `
-    <div class="seasonal-head">
-      <span class="sh-kicker">In Season Now</span>
-      <span class="sh-rule"></span>
-      <span class="sh-sub">what locals would tell you to catch right now</span>
-    </div>
-    <div class="seasonal-scroll">${cards}</div>`;
-  band.style.display = 'block';
+    if (it.status === 'ending') return `${m.title} — ends ${fmt(it.date)}. ${m.blurb || ''}`;
+    if (it.status === 'new')    return `${m.title} — just started. ${m.blurb || ''}`;
+    return `${m.title} — in season now. ${m.blurb || ''}`;
+  };
+  host.innerHTML = live.slice(0, 2).map(it =>
+    `<button type="button" class="bm-cal-btn ed-pill ed-moment-pill" onclick="_seasonalGo('${it.m.id}')" title="${(tooltip(it)||'').replace(/"/g,'&quot;')}">${prefix(it)} ${it.m.title}</button>`
+  ).join('');
 }
 
 
