@@ -6502,7 +6502,17 @@ const VIBE_PILLS = {
   ],
   arts: [
     { id: 'music',       label: '🎵 Music',            fallbackLabel: 'music venues and acts',
-      match: e => (e.tags||[]).includes('Music') || e.type === 'Music venue' || /\bband\b|\bconcert\b|\bdj\b|\bjam\b|\bopen mic\b|bluegrass|jazz|blues|acoustic|symphony|orchestra|choral|karaoke/i.test(e.name + ' ' + (e.sub||''))
+      match: e => {
+        // Don't rely on the bare 'Music' tag — auto_tagger.py adds it to
+        // any event held at a music venue (Nevada Theatre, Center for the
+        // Arts), so film screenings and craft classes there get falsely
+        // tagged. Require either an explicit Music venue type or an
+        // honest music keyword in the title / sub.
+        if (e.type === 'Music venue') return true;
+        const txt = ((e.name||'') + ' ' + (e.sub||'')).toLowerCase();
+        if (/\b(film|cinema|screening|movie|sewing|knit|quilt|paint|drawing|pottery|workshop|class)\b/.test(txt)) return false;
+        return /\bband\b|\bconcert\b|\bdj\b|\bjam\b|open mic|bluegrass|jazz|blues|acoustic|symphony|orchestra|choral|karaoke|\bmusic\b|\bsong\b|fiddle|guitar|\bdrum\b|trio|quartet|quintet|ensemble|rhythm|singer|songwriter|vocal|instrumental/i.test(txt);
+      }
     },
     { id: 'theater',     label: '🎭 Theater',          fallbackLabel: 'theaters to bookmark',  match: e => { const t = (e.name + ' ' + (e.sub||'')).toLowerCase(); return /theat(re|er)|stages|cats\b|community asian/.test(t) && !/cinema/.test(t); } },
     { id: 'cinema',      label: '🎬 Cinema',           fallbackLabel: 'movie theaters',         match: e => /cinema|del oro|onyx|sierra cinemas/i.test(e.name) },
