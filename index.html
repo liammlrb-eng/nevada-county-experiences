@@ -40,6 +40,141 @@
      TODO: rotate the background image by season (spring=wildflowers,
      summer=river, fall=oak leaves, winter=pines). For now the spring
      foothills shot stands in. */
+  /* ── UI-V2 HERO TAKEOVER ───────────────────────────────────────
+     Hidden by default; revealed when body.ui-v2 is set. The
+     existing text-only .hero hides simultaneously so the two
+     don't stack. */
+  .hero-v2 { display: none; }
+  body.ui-v2 .hero        { display: none; }
+  body.ui-v2 .hero-v2 {
+    display: block;
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);          /* break out of body padding */
+    height: 62vh; min-height: 480px;
+    overflow: hidden;
+    color: #fff;
+    background: #1f1a14;                    /* prevents pre-load flash */
+  }
+  .hero-v2-slides {
+    position: absolute; inset: 0;
+  }
+  .hero-v2-slide {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0;
+    transition: opacity 1.4s ease-in-out;
+    /* Ken-Burns: each visible slide slowly zooms 4% so the still
+       image still feels alive. Animation reverses on each cycle so
+       the zoom doesn't pop on re-show. */
+    transform: scale(1);
+    will-change: opacity, transform;
+  }
+  .hero-v2-slide.active {
+    opacity: 1;
+    animation: heroKenBurns 14s ease-out forwards;
+  }
+  @keyframes heroKenBurns {
+    0%   { transform: scale(1.02); }
+    100% { transform: scale(1.10); }
+  }
+  /* Bottom-to-top gradient ensures the headline stays legible no
+     matter how bright the photo is at the bottom edge. */
+  .hero-v2-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+      rgba(31,26,20,0.10) 0%,
+      rgba(31,26,20,0.15) 40%,
+      rgba(31,26,20,0.55) 75%,
+      rgba(31,26,20,0.80) 100%);
+    pointer-events: none;
+  }
+  .hero-v2-content {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 44px clamp(20px, 6vw, 80px);
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .hero-v2-kicker {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 18px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .hero-v2-title {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 76px);
+    line-height: 1.05;
+    color: #fff;
+    margin: 0 0 16px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    max-width: 920px;
+  }
+  .hero-v2-sub {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: clamp(14px, 1.4vw, 17px);
+    color: rgba(255,255,255,0.92);
+    margin: 0 0 26px;
+    max-width: 640px;
+    line-height: 1.5;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+  .hero-v2-cta {
+    display: inline-block;
+    background: rgba(255,255,255,0.95); color: var(--brown);
+    padding: 13px 28px;
+    border-radius: 999px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+    transition: transform 0.18s, background 0.18s;
+  }
+  .hero-v2-cta:hover {
+    background: #fff;
+    transform: translateY(-1px);
+  }
+  /* Mobile: reduce height + scale typography */
+  @media (max-width: 768px) {
+    body.ui-v2 .hero-v2 { height: 56vh; min-height: 380px; }
+    .hero-v2-content { padding: 28px 22px; }
+    .hero-v2-kicker { font-size: 10px; letter-spacing: 0.22em; margin-bottom: 12px; }
+    .hero-v2-cta { padding: 11px 22px; font-size: 11px; }
+  }
+
+  /* Small "preview mode" badge — pinned bottom-right when the v2
+     flag is on. Quietly reminds the operator they're previewing the
+     redesign and offers a one-click escape hatch. */
+  .ui-v2-badge { display: none; }
+  body.ui-v2 .ui-v2-badge {
+    display: flex; align-items: center; gap: 8px;
+    position: fixed; bottom: 18px; left: 18px;
+    background: rgba(31,26,20,0.92); color: #fff;
+    padding: 8px 14px; border-radius: 999px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11px; letter-spacing: 0.06em;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    z-index: 9000;
+    pointer-events: auto;
+  }
+  body.ui-v2 .ui-v2-badge .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 2px rgba(184,148,26,0.35);
+  }
+  body.ui-v2 .ui-v2-badge button {
+    background: transparent; border: none; color: rgba(255,255,255,0.7);
+    font-family: inherit; font-size: 10.5px; cursor: pointer;
+    text-decoration: underline;
+    margin-left: 4px;
+  }
+  body.ui-v2 .ui-v2-badge button:hover { color: #fff; }
+
   .hero {
     position: relative;
     min-height: 62vh;
@@ -2780,12 +2915,49 @@
 </head>
 <body>
 
+<!-- ui-v2 preview badge: only visible when body.ui-v2 is on. Lets the
+     operator see at a glance that they're in the redesign preview and
+     bail out with one click. -->
+<div class="ui-v2-badge" role="status" aria-live="polite">
+  <span class="dot"></span>
+  <span>Preview · new look</span>
+  <button onclick="try{localStorage.removeItem('ncexp:newui')}catch(_){};location.search=location.search.replace(/[?&]newui=\d/,'')||location.pathname">Exit</button>
+</div>
+
 <div class="hero">
   <div class="hero-eyebrow">Nevada City · Grass Valley · Penn Valley · &amp; the Western Foothills</div>
   <h1>Western Nevada County<br><em>Trip Planner</em></h1>
   <div class="gold-rule"></div>
   <p class="hero-sub">Choose your vibe. Build your perfect Gold Country itinerary.</p>
   <div class="hero-scroll-cue" aria-hidden="true">▾</div>
+</div>
+
+<!-- ─── UI-V2 HERO TAKEOVER ────────────────────────────────────────
+     Full-bleed rotating-photo hero shown only when body.ui-v2 is on.
+     Five slides crossfade every ~7 seconds with a slow Ken-Burns
+     scale on each so the page feels alive even when static. Photos
+     are placeholders curated to match Nevada-County mood (foothills,
+     South Yuba canyon, downtown Victorian, live music, oak savanna);
+     the right long-term move is sourcing actual Nevada County
+     photography via the public upload pipeline (memo idea #4).
+     The existing text-only .hero above stays in the DOM as the
+     default-UI fallback. ui-v2 hides one, shows the other. -->
+<div class="hero-v2" id="heroV2">
+  <div class="hero-v2-slides" id="heroV2Slides">
+    <div class="hero-v2-slide active" style="background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1920&h=1200&fit=crop')"></div>
+    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=1200&fit=crop')"></div>
+    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1920&h=1200&fit=crop')"></div>
+    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1485579149621-3123dd979885?w=1920&h=1200&fit=crop')"></div>
+    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&h=1200&fit=crop')"></div>
+    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1920&h=1200&fit=crop')"></div>
+  </div>
+  <div class="hero-v2-gradient" aria-hidden="true"></div>
+  <div class="hero-v2-content">
+    <div class="hero-v2-kicker">Nevada County · California</div>
+    <h1 class="hero-v2-title">Where Gold&nbsp;Rush stories meet wild&nbsp;rivers.</h1>
+    <p class="hero-v2-sub">Curated venues, live events, trail maps, and stories told by the people who live here.</p>
+    <a class="hero-v2-cta" href="#tab-experiences" onclick="document.getElementById('tab-experiences')?.scrollIntoView({behavior:'smooth'});return false;">Start exploring &nbsp;↓</a>
+  </div>
 </div>
 
 <!-- EDITORIAL BAND — sits where the old "In Season Now" photo band did,
@@ -3217,6 +3389,71 @@
 </div>
 
 <script>
+// ─── UI-V2 FEATURE FLAG (visual makeover preview) ─────────────────────────
+// Flip on by adding ?newui=1 to the URL (one-shot) or running
+//   localStorage.setItem('ncexp:newui','1')
+// in the console for a persistent preview on this device. Setting it via
+// query param also persists for the session so reloads keep the new look.
+// Disable: ?newui=0  or  localStorage.removeItem('ncexp:newui')
+//
+// All v2 code paths key off body.ui-v2 (CSS) or the USE_NEW_UI boolean
+// (JS). Keeps the new design behind a flag so chamber/team see the
+// current site by default until we cut over.
+(function _initUiV2Flag() {
+  try {
+    const qp = new URLSearchParams(location.search).get('newui');
+    if (qp === '1') localStorage.setItem('ncexp:newui', '1');
+    if (qp === '0') localStorage.removeItem('ncexp:newui');
+  } catch (_) {}
+  let on = false;
+  try { on = (localStorage.getItem('ncexp:newui') === '1'); } catch (_) {}
+  window.USE_NEW_UI = on;
+  // Apply the body class as soon as the body exists. If the script runs
+  // before <body> parses (it shouldn't — this script lives mid-page —
+  // but defend anyway), defer to DOMContentLoaded.
+  const apply = () => {
+    if (document.body) {
+      document.body.classList.toggle('ui-v2', on);
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.toggle('ui-v2', on);
+      }, { once: true });
+    }
+  };
+  apply();
+})();
+
+// ─── UI-V2 HERO SLIDESHOW ────────────────────────────────────────────────
+// Crossfades the .hero-v2-slide elements every ~7 seconds. Only runs when
+// the ui-v2 flag is on (so we don't burn timers on the default UI). The
+// active slide carries the .active class + Ken-Burns animation; we move
+// the class one element forward each tick, restarting the animation by
+// removing/re-adding the class on the new active.
+(function _initHeroV2Slideshow() {
+  if (!window.USE_NEW_UI) return;
+  const start = () => {
+    const slides = document.querySelectorAll('#heroV2Slides .hero-v2-slide');
+    if (slides.length < 2) return;
+    let idx = 0;
+    setInterval(() => {
+      slides[idx].classList.remove('active');
+      idx = (idx + 1) % slides.length;
+      // Force animation restart by yanking + re-adding the class on the
+      // next frame. Without this the second cycle of the same slide
+      // doesn't re-run Ken-Burns.
+      const next = slides[idx];
+      next.classList.remove('active');
+      void next.offsetWidth;
+      next.classList.add('active');
+    }, 7000);
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
+})();
+
 // ─── ANALYTICS CONFIG (opt-in, off by default) ────────────────────────────
 // The site collects no analytics, no cookies, and no third-party trackers
 // by default — that's part of the privacy posture pitched to the chamber.
