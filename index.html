@@ -1150,9 +1150,153 @@
      own class — strip it so the row's gap controls spacing. */
   .results-row .results-count,
   .results-row .events-count { margin-bottom: 0; }
-  /* Calendar toggle in its new home: visible bm-cal-btn styling
-     is already defined elsewhere; just make sure it doesn't shrink. */
-  .results-row .bm-cal-btn { flex-shrink: 0; align-self: flex-start; }
+  /* ── View toggle (Card / List / Calendar) ───────────────────────────
+     Segmented control on the right side of the .results-row. Three
+     buttons share a single rounded border. Active button gets the
+     brown fill; Calendar dims when no events are in the browse mix. */
+  .view-toggle {
+    display: inline-flex; align-items: stretch;
+    border: 1px solid #d4c9b0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    flex-shrink: 0; align-self: flex-start;
+  }
+  .view-toggle-btn {
+    background: transparent;
+    border: none;
+    border-right: 1px solid #d4c9b0;
+    color: var(--slate);
+    cursor: pointer;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    display: inline-flex; align-items: center; gap: 6px;
+    line-height: 1;
+    transition: background 0.18s, color 0.18s;
+  }
+  .view-toggle-btn:last-child { border-right: none; }
+  .view-toggle-btn:hover { background: var(--gold-light); color: var(--brown); }
+  .view-toggle-btn.active {
+    background: var(--brown);
+    color: #fff;
+  }
+  .view-toggle-btn.disabled {
+    opacity: 0.4; cursor: not-allowed;
+    pointer-events: none;
+  }
+  /* Toggle-button glyphs — mini-pictogram per view, following the same
+     pattern as the date-quick buttons (small CSS-drawn cells, not emoji).
+     Card = 4 squares in 2x2 grid. List = 3 horizontal bars. Calendar =
+     6 cells in a 3x2 grid. */
+  .vt-glyph {
+    display: inline-grid; gap: 1.5px;
+    width: 12px; height: 12px;
+    flex-shrink: 0;
+  }
+  .vt-glyph i {
+    background: currentColor;
+    opacity: 0.85;
+    border-radius: 0.5px;
+  }
+  .vt-glyph-card { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .vt-glyph-list { grid-template-rows: 1fr 1fr 1fr; }
+  .vt-glyph-list i { height: 100%; }   /* horizontal bars */
+  .vt-glyph-cal  { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+
+  /* ── Compact list-row layout for grids (.is-list) ───────────────────
+     When the visitor picks List view, the exp-grid / events-grid flip
+     from a multi-column photo-card grid into a single column of dense
+     horizontal rows. The same card markup is reused — the row is just
+     wider, shorter, with the photo pinned on the left. */
+  .exp-grid.is-list,
+  .events-grid.is-list {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+  .exp-grid.is-list .exp-card,
+  .events-grid.is-list .exp-card {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: stretch;
+    min-height: 78px;
+  }
+  .exp-grid.is-list .exp-card .exp-photo,
+  .events-grid.is-list .exp-card .exp-photo {
+    height: 78px;
+    border-radius: 8px 0 0 8px;
+  }
+  .exp-grid.is-list .exp-card .exp-photo-overlay,
+  .exp-grid.is-list .exp-card .exp-photo-name,
+  .exp-grid.is-list .exp-card .exp-photo-area,
+  .events-grid.is-list .exp-card .exp-photo-overlay,
+  .events-grid.is-list .exp-card .exp-photo-name,
+  .events-grid.is-list .exp-card .exp-photo-area {
+    /* In list mode the photo is a thumbnail — hide the photo-overlay
+       title block; the name lives in the body instead. */
+    display: none;
+  }
+  .exp-grid.is-list .exp-card .exp-body,
+  .events-grid.is-list .exp-card .exp-body {
+    padding: 10px 14px;
+    min-height: 0;
+  }
+  /* Venue name surfaced in the body for list mode (hidden in card mode
+     since the photo-overlay carries it there). */
+  .exp-list-name { display: none; }
+  .exp-grid.is-list .exp-list-name,
+  .events-grid.is-list .exp-list-name {
+    display: flex; align-items: baseline;
+    gap: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; font-weight: 500;
+    color: var(--brown);
+    line-height: 1.2;
+    margin-bottom: 3px;
+  }
+  .exp-grid.is-list .exp-list-area,
+  .events-grid.is-list .exp-list-area {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10.5px;
+    color: #6b6055;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  /* Tighten sub-line + tags + actions in list mode so the row stays
+     dense; full-card chrome was making each row 200px+ tall. */
+  .exp-grid.is-list .exp-card .exp-sub,
+  .events-grid.is-list .exp-card .exp-sub {
+    font-size: 12px; line-height: 1.4;
+    margin-bottom: 4px;
+    color: var(--slate);
+  }
+  .exp-grid.is-list .exp-card .exp-tags,
+  .events-grid.is-list .exp-card .exp-tags {
+    margin-bottom: 0;
+  }
+  /* Hide the long notes paragraph in list mode — list is for scanning. */
+  .exp-grid.is-list .exp-body > div[style*="font-style:italic"],
+  .events-grid.is-list .exp-body > div[style*="font-style:italic"] {
+    display: none;
+  }
+  /* In list mode, surface the venue name in the body row since the
+     photo overlay's name is hidden. We do this by adding a small
+     ::before label fed from data attributes — but since the cards
+     are server-rendered with name in the photo overlay only, we
+     instead reveal a hidden .exp-list-name span that JS can fill
+     in later. For now, the meta line + sub line carry the visit. */
+  .exp-grid.is-list .exp-card .exp-meta,
+  .events-grid.is-list .exp-card .exp-meta {
+    font-size: 11px; gap: 8px;
+  }
+  .exp-grid.is-list .exp-card .exp-actions,
+  .events-grid.is-list .exp-card .exp-actions {
+    padding: 8px 12px;
+    align-self: center;
+  }
   /* ACTIVE FILTER CHIPS */
   .filter-chip-bar {
     display: flex;
@@ -1985,24 +2129,9 @@
     .bm-thumb { width: 26px; height: 26px; }
   }
 
-  /* Calendar / List toggle button — sits next to the mode toggle, only
-     visible when events are in scope (mode = events or both). */
-  .bm-cal-btn {
-    border: 1.5px solid var(--rule);
-    background: #fff; color: var(--brown);
-    cursor: pointer;
-    font-family: inherit; font-size: 12px; font-weight: 600;
-    padding: 7px 14px; border-radius: 999px;
-    letter-spacing: 0.04em;
-    white-space: nowrap;           /* never wrap — keeps pill height honest */
-    line-height: 1.2;
-    transition: all 0.15s ease;
-  }
-  .bm-cal-btn:hover { border-color: var(--gold); background: var(--fog); }
-  .bm-cal-btn.active {
-    background: var(--gold); color: #fff; border-color: var(--gold);
-  }
-  .bm-cal-btn[hidden] { display: none; }
+  /* (Old .bm-cal-btn rules removed — that single Calendar/List pill button
+     has been replaced by the 3-way .view-toggle segmented control in the
+     .results-row. See .view-toggle-btn rules below.) */
 
   /* Editorial band — sits where the old seasonal photo strip lived.
      Bordered card differentiates it from the rest of the page; inside,
@@ -2756,17 +2885,41 @@
          (see top of this section). Explore body keeps just the result
          surfaces. -->
     <div id="activeFilterBar" style="display:none"></div>
-    <!-- Results-row: places + events counts on the left, the Calendar
+    <!-- Results-row: places + events counts on the left, the view
          toggle on the right. Sits directly above the grid so the
-         visitor sees the toggle right where it changes the view. -->
+         visitor picks "how to see this" right where they see it. -->
     <div class="results-row">
       <div class="results-counts">
         <div id="resultsCount" class="results-count"></div>
         <div id="eventsCount" class="events-count"></div>
       </div>
-      <button id="bmCalendar" type="button" class="bm-cal-btn"
-              onclick="toggleCalendarView()"
-              title="Switch between list and calendar view">▦ Calendar</button>
+      <!-- 3-way view toggle: Card (default) / List / Calendar.
+           Calendar is disabled when only Venues is selected since
+           it has no events to anchor — `_applyBrowseModeVisibility`
+           toggles the disabled flag. -->
+      <div class="view-toggle" role="tablist" aria-label="View as">
+        <button id="vtCard"     type="button" class="view-toggle-btn active"
+                onclick="setGridView('card')"
+                title="Photo-card grid (default)">
+          <span class="vt-glyph vt-glyph-card"><i></i><i></i><i></i><i></i></span>
+          Card
+        </button>
+        <button id="vtList"     type="button" class="view-toggle-btn"
+                onclick="setGridView('list')"
+                title="Compact list rows — denser, faster to scan">
+          <span class="vt-glyph vt-glyph-list"><i></i><i></i><i></i></span>
+          List
+        </button>
+        <button id="vtCalendar" type="button" class="view-toggle-btn"
+                onclick="setGridView('calendar')"
+                title="Month-grid calendar (events only)">
+          <span class="vt-glyph vt-glyph-cal">
+            <i></i><i></i><i></i>
+            <i></i><i></i><i></i>
+          </span>
+          Calendar
+        </button>
+      </div>
     </div>
     <div id="expGrid"        class="exp-grid"></div>
     <div id="eventsGrid"     class="events-grid" style="display:none"></div>
@@ -4558,8 +4711,12 @@ function setBrowseMode(mode) {
   browseMode = (mode === 'venues' || mode === 'events') ? mode : 'both';
   showPlaces         = (browseMode === 'venues' || browseMode === 'both');
   showUpcomingEvents = (browseMode === 'events' || browseMode === 'both');
-  // Venues mode never wants the calendar — drop back to list.
-  if (browseMode === 'venues' && eventsView === 'calendar') eventsView = 'list';
+  // Venues mode never wants the calendar — drop back to card view if the
+  // visitor had calendar selected when they switched to venues.
+  if (browseMode === 'venues' && gridView === 'calendar') {
+    gridView = 'card';
+    _syncEventsView();
+  }
   _renderBrowseModeToggle();
   _applyBrowseModeVisibility();
   _renderActiveGrids();
@@ -4567,12 +4724,60 @@ function setBrowseMode(mode) {
 }
 
 // Flip between list and calendar within whatever mode is active.
-function toggleCalendarView() {
-  if (browseMode === 'venues') return;     // calendar not meaningful for venues
-  eventsView = (eventsView === 'calendar') ? 'list' : 'calendar';
-  _renderBrowseModeToggle();
+// ── View toggle ──────────────────────────────────────────────────────────
+// gridView controls how the Explore results render:
+//   'card'     — default. Photo-card grid (existing .exp-grid / .events-grid)
+//   'list'     — compact rows (thumbnail + title + meta on one line).
+//                Same DOM containers, just an .is-list class on the grid that
+//                flips the CSS layout. No separate render function.
+//   'calendar' — month grid for events. Only available when events are in
+//                the browse mix (browseMode !== 'venues').
+let gridView = 'card';   // persisted in setGridView; toggles bound to results-row buttons
+
+// Back-compat: some places still call eventsView to mean 'list' vs 'calendar'.
+// Keep a derived shim — `eventsView === 'calendar'` iff `gridView === 'calendar'`.
+function _syncEventsView() { eventsView = (gridView === 'calendar') ? 'calendar' : 'list'; }
+
+function setGridView(next) {
+  if (!['card', 'list', 'calendar'].includes(next)) return;
+  // Calendar mode requires events to be visible. If the visitor flips to
+  // Calendar from Venues-only, auto-switch to Both so they actually see
+  // events on the calendar; otherwise they'd see an empty grid.
+  if (next === 'calendar' && browseMode === 'venues') {
+    setBrowseMode('both');
+  }
+  gridView = next;
+  _syncEventsView();
+  _renderViewToggle();
   _applyBrowseModeVisibility();
   _renderActiveGrids();
+}
+
+// Repaint the segmented control: highlight the active view, dim Calendar
+// when only venues are visible (no events → calendar isn't meaningful).
+function _renderViewToggle() {
+  const map = { card: 'vtCard', list: 'vtList', calendar: 'vtCalendar' };
+  Object.values(map).forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.classList.remove('active');
+  });
+  const target = document.getElementById(map[gridView] || 'vtCard');
+  if (target) target.classList.add('active');
+  // Calendar button is meaningful only when events are visible.
+  const calBtn = document.getElementById('vtCalendar');
+  if (calBtn) {
+    const disabled = (browseMode === 'venues');
+    calBtn.classList.toggle('disabled', disabled);
+    calBtn.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+    if (disabled) calBtn.title = 'Switch browse mode to Events or Both to see the calendar';
+    else          calBtn.title = 'Month-grid calendar (events only)';
+  }
+}
+
+// Legacy entry-point — older callsites still reach for toggleCalendarView()
+// (the old single-button behavior). Map it to the new state machine.
+function toggleCalendarView() {
+  setGridView(gridView === 'calendar' ? 'card' : 'calendar');
 }
 
 // Render every grid that's currently visible. With calendar+list shown
@@ -4591,44 +4796,53 @@ function _renderActiveGrids() {
   }
 }
 
-// One source of truth for which grid / calendar shows in tab-experiences.
+// One source of truth for which grid / calendar shows in tab-experiences,
+// driven by (browseMode, gridView).
+//
+//   browseMode  | gridView   | what shows
+//   ------------+------------+---------------------------------------------
+//   venues      | card       | #expGrid (cards)
+//   venues      | list       | #expGrid (.is-list — compact rows)
+//   venues      | calendar   | n/a — auto-switches to Both via setGridView
+//   events      | card       | #eventsGrid (cards)
+//   events      | list       | #eventsGrid (.is-list)
+//   events      | calendar   | #eventsCalendar + #eventsGrid (list under it)
+//   both        | card       | #expGrid (cards) — events fold in here
+//   both        | list       | #expGrid (.is-list)
+//   both        | calendar   | #eventsCalendar + #expGrid
 function _applyBrowseModeVisibility() {
   const exp  = document.getElementById('expGrid');
   const lst  = document.getElementById('eventsGrid');
   const cal  = document.getElementById('eventsCalendar');
   const cnt  = document.getElementById('eventsCount');
-  const cbtn = document.getElementById('bmCalendar');
-  const calendarOn = (eventsView === 'calendar');
-  const showCalBtn = (browseMode !== 'venues');
+  const calendarOn = (gridView === 'calendar');
+  const listOn     = (gridView === 'list');
 
-  if (cbtn) {
-    cbtn.hidden = !showCalBtn;
-    cbtn.classList.toggle('active', calendarOn);
-    cbtn.textContent = calendarOn ? '☰ List' : '▦ Calendar';
-    cbtn.title = calendarOn
-      ? 'Back to list view'
-      : 'See events laid out on a month calendar';
-  }
-
-  // Decide which container(s) are visible. When the visitor turns Calendar
-  // on, we keep the matching list below it — calendar for at-a-glance "when",
-  // list for richer per-event detail. The old exclusive-toggle behavior was
-  // less useful than having both together.
+  // Decide visibility.
   let showExp = false, showList = false, showCal = false;
-  if (calendarOn && showCalBtn) {
+  if (calendarOn && browseMode !== 'venues') {
     showCal = true;
-    if (browseMode === 'events')    showList = true;   // events list under the calendar
-    else if (browseMode === 'both') showExp  = true;   // mixed strip under the calendar
+    if (browseMode === 'events')      showList = true;   // events list under the calendar
+    else if (browseMode === 'both')   showExp  = true;
   } else if (browseMode === 'events') {
     showList = true;
   } else {
-    showExp = true;             // venues or both, list mode
+    showExp = true;             // venues or both
   }
   if (exp)  exp.style.display  = showExp  ? '' : 'none';
   if (lst)  lst.style.display  = showList ? '' : 'none';
   if (cal)  cal.style.display  = showCal  ? '' : 'none';
+
+  // Apply / strip the compact-row layout class so the grid's CSS flips
+  // between card grid and 1-column dense rows.
+  if (exp)  exp.classList.toggle('is-list', listOn);
+  if (lst)  lst.classList.toggle('is-list', listOn);
+
   // The events-count badge is only meaningful when events are visible.
   if (cnt && !calendarOn && !showList) cnt.classList.remove('show');
+
+  // Keep the view-toggle UI in sync (Calendar disabled when no events).
+  _renderViewToggle();
 }
 
 function _syncBrowseModeFromFlags() {
@@ -4831,6 +5045,11 @@ function renderExperiences() {
         <div class="exp-photo-name">${e.name}</div>
       </div>
       <div class="exp-body">
+        <!-- Name lives in the photo-overlay (.exp-photo-name) in card view.
+             In list view the overlay is hidden by CSS, so we surface the
+             name here too. .exp-list-name is display:none by default and
+             revealed by .exp-grid.is-list / .events-grid.is-list. -->
+        <div class="exp-list-name">${e.name}<span class="exp-list-area">${e.area}</span></div>
         <div class="exp-sub">${e.sub}</div>
         <div class="exp-meta">
           <span>🕐 ${e.hours}</span>
@@ -5581,6 +5800,7 @@ function _eventFallbackVenues() {
         <div class="exp-photo-name">${_esc(v.name)}</div>
       </div>
       <div class="exp-body">
+        <div class="exp-list-name">${_esc(v.name)}<span class="exp-list-area">${_esc(v.area)}</span></div>
         <div class="exp-sub">${_esc(v.sub)}</div>
         ${v.hours ? `<div class="exp-meta"><span>🕐 ${_esc(v.hours)}</span></div>` : ''}
         <div class="exp-tags">
