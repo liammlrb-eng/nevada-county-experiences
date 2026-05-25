@@ -2340,6 +2340,100 @@
      has been replaced by the 3-way .view-toggle segmented control in the
      .results-row. See .view-toggle-btn rules below.) */
 
+  /* ── UI-V2 NAV BUMP ─────────────────────────────────────────────
+     The tab row was sized for v1 and got dwarfed once everything
+     around it became magazine-scale. v2-only bump: bigger dots,
+     bigger labels in Cormorant Garamond (display weight), bolder
+     tagline, stronger active state, and a soft cream band behind
+     the whole row so it reads as a deliberate section break, not
+     stray utility chrome. */
+  body.ui-v2 .tabs {
+    background: linear-gradient(180deg, #fdf9ef 0%, #fbf6e9 100%);
+    border-top: 1px solid #ece3d0;
+    border-bottom: 2px solid #e0d8c8;
+    padding: 4px clamp(8px, 2vw, 24px) 0;
+    margin: 8px calc(50% - 50vw) 28px;
+    width: 100vw;
+    border-radius: 0;
+    display: flex; align-items: stretch;
+  }
+  body.ui-v2 .tab-btn {
+    padding: 16px 28px 14px;
+    margin-bottom: -2px;
+    gap: 3px;
+    transition: background 0.18s, color 0.18s;
+  }
+  body.ui-v2 .tab-btn .tab-label {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    text-transform: none;
+    gap: 12px;
+  }
+  body.ui-v2 .tab-btn .tab-label::before {
+    width: 11px; height: 11px;
+  }
+  body.ui-v2 .tab-btn .tab-tag {
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    padding-left: 23px;          /* indent under dot */
+    color: #6b6055;
+  }
+  body.ui-v2 .tab-btn:hover {
+    background: rgba(201,168,76,0.08);
+  }
+  body.ui-v2 .tab-btn:hover .tab-tag { opacity: 0.95; }
+  body.ui-v2 .tab-btn.active {
+    border-bottom-width: 4px;
+    background: rgba(201,168,76,0.13);
+  }
+  body.ui-v2 .tab-btn.active .tab-label {
+    font-weight: 600;
+  }
+  body.ui-v2 .tab-btn.active .tab-label::before {
+    transform: scale(1.35);
+  }
+  body.ui-v2 .tab-btn.active .tab-tag { opacity: 1; color: var(--brown); font-weight: 600; }
+
+  /* Bump the Help launcher to match the bigger labels next to it. */
+  body.ui-v2 .tab-help-btn {
+    padding: 6px 14px 6px 6px;
+  }
+  body.ui-v2 .tab-help-btn .tab-help-mark {
+    width: 28px; height: 28px;
+    font-size: 14px;
+    border-width: 2px;
+  }
+  body.ui-v2 .tab-help-btn .tab-help-label {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+
+  /* Manage Database stays admin-y but matches the new row height. */
+  body.ui-v2 .tab-btn-admin .tab-label {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+  }
+
+  /* Mobile: tighten back down so the nav still scrolls cleanly. */
+  @media (max-width: 768px) {
+    body.ui-v2 .tabs {
+      background: #fdf9ef;
+      padding: 0 14px;
+      margin: 4px calc(50% - 50vw) 18px;
+    }
+    body.ui-v2 .tab-btn { padding: 11px 14px; }
+    body.ui-v2 .tab-btn .tab-label { font-size: 15px; }
+    body.ui-v2 .tab-btn .tab-tag { display: none; }
+  }
+
   /* Editorial band — sits where the old seasonal photo strip lived.
      Bordered card differentiates it from the rest of the page; inside,
      a horizontal scroll of photo cards (one per editorial slice) reuses

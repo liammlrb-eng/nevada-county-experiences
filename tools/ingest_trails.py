@@ -125,6 +125,11 @@ TRAILS = [
         "ways": [990920243, 990920244, 990920266],
     },
 ]
+# NOTE: Hank Meals will be the editorial lead for the trail catalog.
+# Pending follow-up is a phase-3 OSM bulk-add (Truckee paved, PCT
+# Sections K + L, high-Sierra wilderness lakes, Donner Pass historic
+# trails) — IDs need to be queried fresh from Overpass before being
+# added here.
 
 
 # ── Overpass API ─────────────────────────────────────────────────────────────
