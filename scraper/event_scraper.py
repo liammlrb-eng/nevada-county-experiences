@@ -52,6 +52,9 @@ from site_scrapers.tribe_events      import CrazyHorseScraper
 from site_scrapers.squarespace_events import GoldenEraScraper
 from site_scrapers.fairgrounds     import FairgroundsScraper
 from site_scrapers.nevadacity_rocks import NevadaCityRocksScraper
+from site_scrapers.friar_tucks      import FriarTucksScraper
+from site_scrapers.nc_winery        import NevadaCityWineryScraper
+from site_scrapers.alibi_truckee    import AlibiTruckeeScraper
 # NevadaTheatreScraper — built but disabled (see ALL_SCRAPERS note below)
 from auto_tagger                     import tag_events
 # Future scrapers — uncomment as they're built:
@@ -78,6 +81,9 @@ ALL_SCRAPERS = [
     GoldenEraScraper(),             # Squarespace events JSON — Golden Era Lounge live music
     FairgroundsScraper(),           # Saffire JSONP — Nevada County Fairgrounds featured events
     NevadaCityRocksScraper(),       # static HTML — nevadacity.rocks live-music calendar (400+ events)
+    FriarTucksScraper(),            # static HTML — Friar Tuck's Shopify calendar (~10 shows, ~2 wks)
+    NevadaCityWineryScraper(),      # Wix Events JSON inline — ~12 winery concerts
+    AlibiTruckeeScraper(),          # static HTML paginated — Alibi Truckee Events Manager (~150)
     # ── Disabled ──────────────────────────────────────────────────────────
     # NevadaTheatreScraper()        # MEC plugin: REST list is post-date-ordered
     #   so upcoming events are scattered through hundreds of historical
