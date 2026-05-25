@@ -1612,14 +1612,40 @@
   }
   .bm-cal-btn[hidden] { display: none; }
 
-  /* Editorial filter row — sits directly under the browse-mode row.
-     Each pill is an OR-additive curated slice (In Season, Local Guides,
-     Just Added, Favorites). Forest-green active state across all four
-     so they read as one category-of-control distinct from the gold
-     calendar view toggle. */
+  /* Editorial band — mirrors the seasonal-band visual treatment that
+     used to sit directly under the hero. Kicker + sh-rule + sub line as
+     the header, then a wrap row of toggle pills + seasonal-moment
+     shortcuts. Reads as the curated "right now" surface a visitor
+     glances at first. */
+  .editorial-band {
+    max-width: 960px;
+    margin: 30px auto 0;
+    padding: 0 24px;
+  }
+  .editorial-head {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 13px;
+  }
+  .editorial-head .eh-kicker {
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .editorial-head .eh-rule {
+    flex: 1; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .editorial-head .eh-sub {
+    font-size: 12px;
+    color: var(--slate-soft);
+    font-style: italic;
+    white-space: nowrap;
+  }
   .editorial-row {
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    margin: -8px 0 20px;
   }
   .ed-pill.active {
     background: var(--forest); color: #fff; border-color: var(--forest);
@@ -1961,9 +1987,25 @@
   <div class="hero-scroll-cue" aria-hidden="true">▾</div>
 </div>
 
-<!-- Old "In Season Now" photo band removed — its function is now carried
-     by the editorial-row above the tabs. Currently-active SEASONAL_MOMENTS
-     surface as shortcut pills inside that row (see renderSeasonalBand). -->
+<!-- EDITORIAL ROW — sits where the old "In Season Now" photo band did,
+     directly under the hero. Inherits the band's kicker + sh-rule + sub
+     visual so it reads as the curated "right now" surface. The four
+     always-on toggle pills (In Season, Local Guides, Just Added,
+     Favorites) plus up to two dynamic SEASONAL_MOMENTS shortcuts. -->
+<div class="editorial-band">
+  <div class="editorial-head">
+    <span class="eh-kicker">Showing</span>
+    <span class="eh-rule"></span>
+    <span class="eh-sub">curated slices of what's here right now</span>
+  </div>
+  <div class="editorial-row">
+    <button id="edInseason"    type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('inseason')"    title="Filter to what's happening this season">🌿 In Season</button>
+    <button id="edLocalGuides" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
+    <button id="edJustAdded"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('justadded')"   title="Venues and events added recently">🆕 Just Added</button>
+    <button id="edFavorites"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('favorites')"   title="Only items you've saved to My Itinerary">❤ Favorites</button>
+    <span id="edSeasonalMoments" class="ed-seasonal-host"></span>
+  </div>
+</div>
 
 
 <!-- THEME SELECTOR -->
@@ -1999,18 +2041,7 @@
     <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
   </div>
 
-  <!-- Editorial / curated slices. Four always-on toggle pills (additive,
-       OR-union) plus a dynamic seasonal-moment "shortcut" or two appended
-       on the right whenever a SEASONAL_MOMENTS entry is active today.
-       Replaces the old "In Season Now" photo band entirely. -->
-  <div class="editorial-row">
-    <span class="browse-mode-label">Showing:</span>
-    <button id="edInseason"    type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('inseason')"    title="Filter to what's happening this season">🌿 In Season</button>
-    <button id="edLocalGuides" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
-    <button id="edJustAdded"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('justadded')"   title="Venues and events added recently">🆕 Just Added</button>
-    <button id="edFavorites"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('favorites')"   title="Only items you've saved to My Itinerary">❤ Favorites</button>
-    <span id="edSeasonalMoments" class="ed-seasonal-host"></span>
-  </div>
+  <!-- (editorial row lives above the tabs now — see <div class="editorial-band">) -->
 
 
   <!-- Condensed search + filter bar — search, area, category and dates on one line -->
