@@ -2284,21 +2284,72 @@
      their own under the date inputs. */
   .date-quick-group { display: flex; flex-wrap: wrap; gap: 4px; }
 
-  /* ── Help · field tips ────────────────────────────────────────────── */
+  /* ── Help · field tips (graphic-novel speech bubble style) ────────
+     On hover, each [data-tip] element pops a comic-book speech bubble
+     below it: heavy black outline, hard offset shadow, slight rotation
+     for a hand-drawn feel, and a small triangular tail pointing back
+     up at the trigger. Tail is a rotated square (::before) with two
+     borders drawn so it reads as an upward-pointing arrow when seen
+     through the bubble's outline.
+
+     Notes:
+       - Hover-only (no :focus-within) so a focused input inside the
+         field doesn't keep the bubble stuck open.
+       - pointer-events:none on both pseudos so the bubble doesn't
+         interfere with clicks on whatever's under it.
+       - The bubble fades + lifts in via a short transform; CSS-only
+         entrance, no JS. */
   [data-tip] { position: relative; }
-  /* Hover-only — no :focus-within, which would keep the tip stuck open
-     while a select/input inside the field stays focused. */
+
+  /* Bubble and tail use separate keyframes because their resting
+     transforms differ — the bubble is slightly tilted (rotate(-1deg)
+     for a hand-drawn feel) and the tail is rotated 45deg to form the
+     pointer. A single animation would clobber whichever transform
+     wasn't baked into the keyframe. */
+  @keyframes tipPopIn {
+    0%   { opacity: 0; transform: translateY(-4px) rotate(-1deg) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0)    rotate(-1deg) scale(1);    }
+  }
+  @keyframes tailPopIn {
+    0%   { opacity: 0; transform: rotate(45deg) scale(0.7); }
+    100% { opacity: 1; transform: rotate(45deg) scale(1);   }
+  }
+
   [data-tip]:hover::after {
     content: attr(data-tip);
-    position: absolute; left: 0; top: calc(100% + 5px);
-    background: #fff; color: var(--slate);
-    border: 1px solid #d8cdb8;
+    position: absolute;
+    left: 6px; top: calc(100% + 14px);
+    background: #fff8e8;
+    color: #1f1a14;
+    border: 2.5px solid #1f1a14;
+    border-radius: 14px;
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 11px; font-weight: 400; line-height: 1.45;
-    padding: 7px 10px; border-radius: 6px;
-    width: max-content; max-width: 300px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    font-size: 12px; font-weight: 500; line-height: 1.5;
+    letter-spacing: 0.01em;
+    padding: 10px 14px;
+    width: max-content; max-width: 280px;
+    box-shadow: 4px 4px 0 #1f1a14;
+    transform: rotate(-1deg);
     z-index: 200; pointer-events: none;
+    animation: tipPopIn 0.16s ease-out;
+  }
+
+  /* The tail. A 14×14 square with only its top + left borders drawn
+     black; rotated 45deg so the corner with the L-shape ends up
+     pointing upward at the trigger. Half the square sits inside the
+     bubble (covering its border) so the two outlines visually merge
+     into a continuous speech-bubble outline. */
+  [data-tip]:hover::before {
+    content: '';
+    position: absolute;
+    left: 22px; top: calc(100% + 9px);
+    width: 14px; height: 14px;
+    background: #fff8e8;
+    border-left: 2.5px solid #1f1a14;
+    border-top:  2.5px solid #1f1a14;
+    transform: rotate(45deg);
+    z-index: 201; pointer-events: none;
+    animation: tailPopIn 0.16s ease-out;
   }
   /* ── Compact help launcher on the tabs row ────────────────────────
      The full-width "?" banner that used to sit above the nav has been
