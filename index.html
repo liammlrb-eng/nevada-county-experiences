@@ -1612,19 +1612,23 @@
   }
   .bm-cal-btn[hidden] { display: none; }
 
-  /* Editorial band — mirrors the seasonal-band visual treatment that
-     used to sit directly under the hero. Kicker + sh-rule + sub line as
-     the header, then a wrap row of toggle pills + seasonal-moment
-     shortcuts. Reads as the curated "right now" surface a visitor
-     glances at first. */
+  /* Editorial band — sits where the old seasonal photo strip lived.
+     Bordered card differentiates it from the rest of the page; inside,
+     a horizontal scroll of photo cards (one per editorial slice) reuses
+     the season-card visual treatment so the curated "right now" surface
+     reads as editorial, not as a filter row. */
   .editorial-band {
     max-width: 960px;
     margin: 30px auto 0;
-    padding: 0 24px;
+    padding: 18px 22px 20px;
+    background: linear-gradient(180deg, #FBF7EE 0%, #F5EFE2 100%);
+    border: 1px solid #D4C9B0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(30,21,8,0.05);
   }
   .editorial-head {
     display: flex; align-items: center; gap: 14px;
-    margin-bottom: 13px;
+    margin-bottom: 14px;
   }
   .editorial-head .eh-kicker {
     font-size: 12px;
@@ -1644,8 +1648,87 @@
     font-style: italic;
     white-space: nowrap;
   }
-  .editorial-row {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  .editorial-strip {
+    display: flex; gap: 12px;
+    overflow-x: auto;
+    padding: 2px 2px 8px;
+    scroll-snap-type: x proximity;
+  }
+  .editorial-strip::-webkit-scrollbar { height: 7px; }
+  .editorial-strip::-webkit-scrollbar-track { background: transparent; }
+  .editorial-strip::-webkit-scrollbar-thumb { background: #dbcfb4; border-radius: 4px; }
+
+  /* Editorial card — same shape as .season-card but slightly tighter,
+     since we're showing 4-6 of them in the row. */
+  .ed-card {
+    flex: 1 1 175px;
+    min-width: 168px;
+    scroll-snap-align: start;
+    background: #fff;
+    border: 1.5px solid #e6ddc9;
+    border-radius: 11px;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  .ed-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(30,21,8,0.17);
+    border-color: var(--gold);
+  }
+  .ed-card.active {
+    border-color: var(--forest);
+    box-shadow: 0 0 0 2px var(--forest), 0 8px 22px rgba(58,90,58,0.25);
+  }
+  .ed-card.shortcut { border-style: dashed; }   /* dynamic seasonal-moment cards */
+  .ed-card.shortcut:hover { border-color: var(--gold); }
+  .ed-photo {
+    position: relative;
+    height: 96px;
+    background: var(--fog);
+  }
+  .ed-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ed-photo::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 52%, rgba(0,0,0,0.4));
+    pointer-events: none;
+  }
+  .ed-badge {
+    position: absolute; top: 9px; left: 9px; z-index: 2;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: #fff; padding: 3px 9px; border-radius: 20px;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.32);
+    background: var(--gold);
+  }
+  .ed-card.active .ed-badge { background: var(--forest); }
+  .ed-body {
+    padding: 11px 13px 13px;
+    display: flex; flex-direction: column; flex: 1;
+  }
+  .ed-title {
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-size: 15.5px; font-weight: 700;
+    color: var(--brown); line-height: 1.22;
+    margin-bottom: 5px;
+  }
+  .ed-blurb {
+    font-size: 12px; color: var(--slate);
+    line-height: 1.45; margin-bottom: 9px;
+    flex: 1;
+  }
+  .ed-cta {
+    margin-top: auto; align-self: flex-start;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--gold);
+  }
+  .ed-card.active .ed-cta { color: var(--forest); }
+  @media (max-width: 640px) {
+    .ed-card { flex-basis: 78vw; }
+    .editorial-band { padding: 14px 14px 16px; }
   }
   .ed-pill.active {
     background: var(--forest); color: #fff; border-color: var(--forest);
@@ -1987,24 +2070,19 @@
   <div class="hero-scroll-cue" aria-hidden="true">▾</div>
 </div>
 
-<!-- EDITORIAL ROW — sits where the old "In Season Now" photo band did,
+<!-- EDITORIAL BAND — sits where the old "In Season Now" photo band did,
      directly under the hero. Inherits the band's kicker + sh-rule + sub
-     visual so it reads as the curated "right now" surface. The four
-     always-on toggle pills (In Season, Local Guides, Just Added,
-     Favorites) plus up to two dynamic SEASONAL_MOMENTS shortcuts. -->
+     header. Body is a strip of photo cards: four always-present toggle
+     cards (In Season / Local Guides / Just Added / Favorites) plus
+     dynamic shortcut cards for any currently-active SEASONAL_MOMENTS.
+     Bordered card to differentiate from the rest of the page. -->
 <div class="editorial-band">
   <div class="editorial-head">
     <span class="eh-kicker">Showing</span>
     <span class="eh-rule"></span>
     <span class="eh-sub">curated slices of what's here right now</span>
   </div>
-  <div class="editorial-row">
-    <button id="edInseason"    type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('inseason')"    title="Filter to what's happening this season">🌿 In Season</button>
-    <button id="edLocalGuides" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
-    <button id="edJustAdded"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('justadded')"   title="Venues and events added recently">🆕 Just Added</button>
-    <button id="edFavorites"   type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('favorites')"   title="Only items you've saved to My Itinerary">❤ Favorites</button>
-    <span id="edSeasonalMoments" class="ed-seasonal-host"></span>
-  </div>
+  <div class="editorial-strip" id="editorialStrip"></div>
 </div>
 
 
@@ -3301,50 +3379,10 @@ function _seasonalGo(id) {
   } catch (e) { console.warn('seasonal go failed', e); }
 }
 
-// Render the top 1–2 currently-active SEASONAL_MOMENTS as shortcut pills
-// inside the editorial row. Replaces the old full-width seasonal-band
-// photo strip with compact, hand-curated "click to filter to this slice"
-// buttons sitting alongside In Season / Local Guides / Just Added /
-// Favorites. Always picks the most urgent moment first (ending → peak →
-// new) and caps at 2 so the row stays readable.
-function renderSeasonalBand() {
-  const host = document.getElementById('edSeasonalMoments');
-  if (!host) return;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const live = [];
-  for (const m of liveSeasonal) {
-    const st = _seasonalStatus(m, today);
-    if (st && st.status !== 'soon') live.push({ m, status: st.status, date: st.date });
-  }
-  if (!live.length) { host.innerHTML = ''; return; }
-
-  const RANK = { ending: 0, peak: 1, new: 2 };
-  live.sort((a, b) => {
-    if (RANK[a.status] !== RANK[b.status]) return RANK[a.status] - RANK[b.status];
-    return (b.m.priority || 0) - (a.m.priority || 0);
-  });
-
-  // Compact: name + tiny prefix tag. Cap at 2 so the row stays single-line
-  // on most screens.
-  const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const prefix = it => {
-    if (it.status === 'ending') return `⏳`;
-    if (it.status === 'new')    return `✦`;
-    return `☀`;
-  };
-  const tooltip = it => {
-    const m = it.m;
-    if (it.status === 'ending') return `${m.title} — ends ${fmt(it.date)}. ${m.blurb || ''}`;
-    if (it.status === 'new')    return `${m.title} — just started. ${m.blurb || ''}`;
-    return `${m.title} — in season now. ${m.blurb || ''}`;
-  };
-  host.innerHTML = live.slice(0, 2).map(it =>
-    `<button type="button" class="bm-cal-btn ed-pill ed-moment-pill" onclick="_seasonalGo('${it.m.id}')" title="${(tooltip(it)||'').replace(/"/g,'&quot;')}">${prefix(it)} ${it.m.title}</button>`
-  ).join('');
-}
+// Legacy entry point — the seasonal-moment cards are now rendered inside
+// _renderEditorialStrip() alongside the four base editorial cards. Boot,
+// admin saves, and other callers funnel through here to refresh the strip.
+function renderSeasonalBand() { _renderEditorialStrip(); }
 
 
 // Whether to include upcoming events in the experiences grid (default: on)
@@ -3459,39 +3497,122 @@ function toggleEditorial(id) {
 // the new editorial-pill flow.
 function toggleSeasonal() { toggleEditorial('inseason'); }
 
-// Paint every editorial pill's active state + (for In Season) refresh its
-// season-aware label.
-function _renderEditorialPills() {
-  // In Season — adaptive label
-  const seas = document.getElementById('edInseason');
-  if (seas) {
-    const w = _currentSeasonalWindow();
-    const cap = w.label.replace(/\b\w/g, c => c.toUpperCase());
-    seas.classList.toggle('active', activeEditorialPills.has('inseason'));
-    seas.innerHTML = activeEditorialPills.has('inseason')
-      ? `${w.icon} ${cap}`
-      : `${w.icon} In Season`;
-    seas.title = activeEditorialPills.has('inseason')
-      ? `Showing things happening this ${w.label}. Click to clear.`
-      : `Filter to what's happening right now (${w.label})`;
-  }
-  for (const [id, elId] of [
-    ['localguides','edLocalGuides'],
-    ['justadded',  'edJustAdded'],
-    ['favorites',  'edFavorites'],
-  ]) {
-    const b = document.getElementById(elId);
-    if (b) b.classList.toggle('active', activeEditorialPills.has(id));
-  }
-  // Legacy seasonal button (no longer rendered in the layout but kept for
-  // any code path that still queries it).
-  const legacy = document.getElementById('bmSeasonal');
-  if (legacy) legacy.classList.toggle('active', activeEditorialPills.has('inseason'));
+// The four always-present editorial cards. The In Season card's blurb +
+// photo rotate with the current season; the others are static. Each
+// card's onClick toggles its editorial pill (OR-union additive).
+const _ED_PHOTOS_BY_SEASON = {
+  spring: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=480&h=320&fit=crop',
+  summer: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=480&h=320&fit=crop',
+  fall:   'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=480&h=320&fit=crop',
+  winter: 'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=480&h=320&fit=crop',
+};
+function _editorialCards() {
+  const w = _currentSeasonalWindow();
+  // Capitalize first letter of each season word for display.
+  const seasonCap = w.label.replace(/\b\w/g, c => c.toUpperCase());
+  const seasonPhoto = _ED_PHOTOS_BY_SEASON[w.label.split(' ')[0]] || _ED_PHOTOS_BY_SEASON.spring;
+  const favCount = (typeof myList !== 'undefined') ? myList.size : 0;
+  return [
+    {
+      id: 'inseason',
+      title: 'In Season',
+      blurb: `Right-now slice — what's happening this ${seasonCap}.`,
+      cta:   activeEditorialPills.has('inseason') ? 'Showing ✓' : `Filter to ${seasonCap} →`,
+      photo: seasonPhoto,
+    },
+    {
+      id: 'localguides',
+      title: 'Local Guides',
+      blurb: 'Walks, hikes and tours led by Nevada County storytellers.',
+      cta:   activeEditorialPills.has('localguides') ? 'Showing ✓' : 'See guided experiences →',
+      photo: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=480&h=320&fit=crop',
+    },
+    {
+      id: 'justadded',
+      title: 'Just Added',
+      blurb: 'Fresh venues and events from the last 30 days.',
+      cta:   activeEditorialPills.has('justadded') ? 'Showing ✓' : 'Browse new arrivals →',
+      photo: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=480&h=320&fit=crop',
+    },
+    {
+      id: 'favorites',
+      title: 'Favorites',
+      blurb: favCount === 0
+        ? 'Items you save to My Itinerary land here.'
+        : `Your ${favCount} saved item${favCount === 1 ? '' : 's'}, focused.`,
+      cta:   activeEditorialPills.has('favorites') ? 'Showing ✓' : (favCount === 0 ? 'Save things to fill this →' : 'See your saved →'),
+      photo: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=480&h=320&fit=crop',
+    },
+  ];
 }
 
-// Legacy alias — anywhere we used to call _renderSeasonalBtn() now repaints
-// every editorial pill instead.
-function _renderSeasonalBtn() { _renderEditorialPills(); }
+// Build the editorial-strip HTML — four base cards then up to two
+// currently-active SEASONAL_MOMENTS as "shortcut" cards (dashed border,
+// click-through to the moment's action rather than a toggle).
+function _renderEditorialStrip() {
+  const strip = document.getElementById('editorialStrip');
+  if (!strip) return;
+
+  const baseHtml = _editorialCards().map(c => {
+    const active = activeEditorialPills.has(c.id);
+    return `<article class="ed-card${active ? ' active' : ''}" onclick="toggleEditorial('${c.id}')"
+        title="${(c.blurb||'').replace(/"/g,'&quot;')}">
+      <div class="ed-photo">
+        ${active ? `<span class="ed-badge">✓ Active</span>` : ''}
+        <img src="${c.photo}" alt="${c.title}" loading="lazy" onerror="this.style.display='none'">
+      </div>
+      <div class="ed-body">
+        <div class="ed-title">${c.title}</div>
+        <div class="ed-blurb">${c.blurb}</div>
+        <div class="ed-cta">${c.cta}</div>
+      </div>
+    </article>`;
+  }).join('');
+
+  // Dynamic seasonal-moment cards (link to _seasonalGo, not toggles).
+  let momentHtml = '';
+  if (typeof liveSeasonal !== 'undefined' && Array.isArray(liveSeasonal)) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const live = [];
+    for (const m of liveSeasonal) {
+      const st = _seasonalStatus(m, today);
+      if (st && st.status !== 'soon') live.push({ m, status: st.status, date: st.date });
+    }
+    const RANK = { ending: 0, peak: 1, new: 2 };
+    live.sort((a, b) => {
+      if (RANK[a.status] !== RANK[b.status]) return RANK[a.status] - RANK[b.status];
+      return (b.m.priority || 0) - (a.m.priority || 0);
+    });
+    const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const badgeFor = it => {
+      if (it.status === 'ending') return { txt: `⏳ Ends ${fmt(it.date)}`,  bg: '#C0392B' };
+      if (it.status === 'new')    return { txt: '✦ Just started',           bg: '#5C8C3C' };
+      return { txt: '☀ Peak now', bg: 'var(--gold)' };
+    };
+    momentHtml = live.slice(0, 2).map(it => {
+      const m = it.m, b = badgeFor(it);
+      return `<article class="ed-card shortcut" onclick="_seasonalGo('${m.id}')"
+          title="${(m.blurb||'').replace(/"/g,'&quot;')}">
+        <div class="ed-photo">
+          <span class="ed-badge" style="background:${b.bg}">${b.txt}</span>
+          <img src="${m.photo}" alt="${m.title}" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="ed-body">
+          <div class="ed-title">${m.title}</div>
+          <div class="ed-blurb">${m.blurb || ''}</div>
+          <div class="ed-cta">${m.cta || 'Explore'} →</div>
+        </div>
+      </article>`;
+    }).join('');
+  }
+  strip.innerHTML = baseHtml + momentHtml;
+}
+
+// Legacy aliases — anywhere we used to call _renderSeasonalBtn() or
+// _renderEditorialPills() now redirects to the strip render.
+function _renderEditorialPills() { _renderEditorialStrip(); }
+function _renderSeasonalBtn()    { _renderEditorialStrip(); }
 
 function toggleEventsInGrid() {
   showUpcomingEvents = !showUpcomingEvents;
