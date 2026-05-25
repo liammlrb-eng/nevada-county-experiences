@@ -157,6 +157,7 @@ def build():
         ['Add or edit an experience',            'Section 5',                   '2 min/entry'],
         ['Update the live demo on GitHub Pages', 'Section 6',                   '2 min'],
         ['Share public feeds with a partner',    'Section 7',                   '1 min'],
+        ['Run a quality scan (monthly)',         'Section 5f',                  '~1 sec'],
         ['Stop the server',                      'Section 1c',                  '5 sec'],
         ['Something\'s broken',                  'Section 8 (Troubleshooting)', 'varies'],
         ['Where do files live?',                 'Section 9 (File map)',        'reference'],
@@ -464,6 +465,77 @@ python scraper\\event_scraper.py --site "Nevada City Chamber" """, CODE))
         'Click the × button at the right end of the row. Confirms before deleting. '
         'Click 💾 Save All to persist.',
         BODY))
+
+    flow.append(Spacer(1, 10))
+    flow.append(Paragraph('5f. Run a quality scan (monthly)', H1))
+    flow.append(Paragraph(
+        'The <b>🔍 QA Scan</b> tab inside <b>Manage Database</b> crawls every '
+        'venue, every event, and every filter pill in about one second and '
+        'reports problems that aren&apos;t obvious looking at one card at a '
+        'time. Run it about once a month, or after any bulk data edit.',
+        BODY))
+
+    flow.append(Spacer(1, 8))
+    flow.append(Paragraph('How to run it', H1))
+    qa_steps = [
+        'Open <b>⚙ Manage Database</b> (top right)',
+        'Click the <b>🔍 QA Scan</b> tab (last in the row)',
+        'Click <b>▶ Run scan now</b> — takes about one second',
+        'Review findings, fix what matters, re-run to confirm clean',
+    ]
+    for i, s in enumerate(qa_steps, 1):
+        flow.append(Paragraph(f'{i}. {s}', BULLET))
+
+    flow.append(Spacer(1, 8))
+    flow.append(Paragraph('What it checks', H1))
+    qa_rows = [
+        ['Severity', 'Check', 'What it catches'],
+        ['🔴 Critical', 'Coordinate duplicates',
+         'Two venues at the same lat/lng (~11m). Almost always the same physical place added twice. Pick the better entry, delete the other.'],
+        ['🔴 Critical', 'Empty pills',
+         'A filter pill whose match function returns zero venues. Either the regex is broken or the category went stale.'],
+        ['🟡 Warning',  'Same-name venues',
+         'Different IDs with the same normalized name. Could be a legitimate multi-location chain or a duplicate — admin decides.'],
+        ['🟡 Warning',  'Pill false positives',
+         'A pill matched a venue, but the venue&apos;s tags/type don&apos;t corroborate. Catches the kind of bug where the Tennis pill picked up a pickleball venue because the notes happened to cross-reference it.'],
+        ['🟡 Warning',  'Over-matched venues',
+         'A single venue lit by 8+ pills across the whole filter matrix. Usually means the venue&apos;s tag set is too broad — it&apos;ll surface in lots of unrelated filters.'],
+        ['🟡 Warning',  'Cross-source event dupes',
+         'Same date + title appearing under two scrapers (e.g. NCR + Friar Tuck&apos;s direct). Frontend display already dedups via Jaccard; admin queue may still show both rows.'],
+        ['🟢 Info',     'Tag orphans',
+         'Tags present on venues but no pill ever references them. Either a typo (won&apos;t surface anywhere) or a category we forgot to add a pill for.'],
+    ]
+    flow.append(build_table(qa_rows,
+        col_widths=[0.85*inch, 1.4*inch, 4.25*inch], body_size=8.8))
+
+    flow.append(Spacer(1, 10))
+    flow.append(Paragraph('Reading the report', H1))
+    flow.append(Paragraph(
+        'Findings group by severity. Each finding lists the affected venue '
+        'IDs and a short explanation. Use the Experiences tab to jump to '
+        'an offending row and fix it inline (then 💾 Save All). Re-run the '
+        'scan; resolved findings drop off, anything still present is real.',
+        BODY))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph('Cadence', H1))
+    flow.append(Paragraph(
+        'The panel shows when the scan was last run on this device. After '
+        '30 days the header goes red with "overdue (monthly cadence)" — '
+        'that&apos;s the visual nudge. The scan is fast and free; run it '
+        'whenever you&apos;ve done a batch edit or added several new '
+        'experiences in one sitting.',
+        BODY))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph('What it does <i>not</i> do', H1))
+    qa_doesnt = [
+        'Auto-fix anything — every finding is an admin decision (some "duplicates" are intentional, like Western Gateway Park entries for tennis vs. disc golf vs. pickleball, which are real separate facilities at one park).',
+        'Persist findings across devices — the last-run timestamp is in browser localStorage. Different operator, different timer.',
+        'Scan scraper output — events.json health is a separate scrape-time concern. The cross-source event check here only flags display-side redundancy.',
+    ]
+    for d in qa_doesnt:
+        flow.append(Paragraph(f'• {d}', BULLET))
 
     flow.append(PageBreak())
 
