@@ -3796,7 +3796,11 @@ const EXPERIENCES = [
 
   // ── PICKLEBALL ────────────────────────────────────────────────────
   { id: 84, name: 'South Yuba Club — Pickleball', sub: '11-court private pickleball facility with lessons & leagues', area: 'Grass Valley', type: 'Activity', tags: ['Active','Social','Sport'], hours: 'Check schedule at southyubaclub.com; open play, leagues & clinics', notes: 'Nevada County premier pickleball facility; Coach John with 30+ years experience; beginner clinics, open play, socials & leagues; membership required', icon: '🏓', url: 'https://southyubaclub.com/pickleball', directions: 'https://maps.google.com/?q=South+Yuba+Club+Grass+Valley+CA', lat: 39.2170, lng: -121.0610, photo: 'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=400&h=260&fit=crop', season: 'Year-Round' },
-  { id: 85, name: 'Grass Valley Pickleball Courts — Race Street', sub: 'Public outdoor pickleball courts with shaded areas', area: 'Grass Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to dusk; free', notes: 'Behind the aquatic complex on Race Street; multiple courts; well-maintained; bring your own paddles; great casual drop-in play', icon: '🏓', url: 'https://www.cityofgrassvalley.com/', directions: 'https://maps.google.com/?q=Race+St+Grass+Valley+CA+95945', lat: 39.2162, lng: -121.0545, photo: 'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=400&h=260&fit=crop', season: 'Year-Round' },
+  // (Removed: id 85 "Grass Valley Pickleball Courts — Race Street" was a
+  //  duplicate of id 87 "Memorial Park — Pickleball" — same coordinates
+  //  on Race St, both describing the public outdoor courts at Memorial
+  //  Park. Kept id 87 as canonical since it carries more detail (hours,
+  //  club info, accessibility).)
   { id: 86, name: 'Western Gateway Park Pickleball — Penn Valley', sub: 'Pickleball, tennis & racquetball in one park', area: 'Penn Valley', type: 'Outdoor', tags: ['Active','Social','Family','Sport'], hours: 'Dawn to dusk; free', notes: 'Western Gateway Park; pickleball + tennis + racquetball + disc golf + baseball all together; ideal for group outings', icon: '🏓', url: 'https://gonevadacounty.com/parks/', directions: 'https://maps.google.com/?q=Western+Gateway+Park+Penn+Valley+CA', lat: 39.1988, lng: -121.1681, photo: 'https://images.unsplash.com/photo-1504700610630-ac6aba3536d3?w=400&h=260&fit=crop', season: 'Year-Round' },
 
   // ── MEMORIAL PARK ─────────────────────────────────────────────────
@@ -8053,9 +8057,14 @@ const VIBE_PILLS = {
     { id: 'fishing',     label: '🎣 Fishing',          fallbackLabel: 'fishing spots',   match: e => (e.tags||[]).includes('Fishing') },
     { id: 'boating',     label: '🛶 Boating',          fallbackLabel: 'paddle and boat spots', match: e => (e.tags||[]).includes('Boating') },
     { id: 'running',     label: '🏃 Running',          fallbackLabel: 'running routes',  match: e => (e.tags||[]).includes('Running') },
-    { id: 'pickleball',  label: '🏓 Pickleball',       fallbackLabel: 'pickleball courts', match: e => /pickleball/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
-    { id: 'tennis',      label: '🎾 Tennis',           fallbackLabel: 'tennis and bocce courts', match: e => /tennis|bocce/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
-    { id: 'discgolf',    label: '🥏 Disc Golf',        fallbackLabel: 'disc-golf courses', match: e => /disc golf/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
+    // Sport pills match against name + sub only — scanning notes pulled
+    // in false positives via cross-references (e.g. the Memorial Park
+    // tennis-and-baseball entry mentions "adjacent to Race St pickleball
+    // courts" in its notes, which shouldn't make it appear under the
+    // Pickleball pill).
+    { id: 'pickleball',  label: '🏓 Pickleball',       fallbackLabel: 'pickleball courts', match: e => /pickleball/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'tennis',      label: '🎾 Tennis',           fallbackLabel: 'tennis and bocce courts', match: e => /tennis|bocce/i.test(e.name + ' ' + (e.sub||'')) },
+    { id: 'discgolf',    label: '🥏 Disc Golf',        fallbackLabel: 'disc-golf courses', match: e => /disc golf/i.test(e.name + ' ' + (e.sub||'')) },
     { id: 'daypass',     label: '🏋️ Day-Pass Gyms',    fallbackLabel: 'gyms with day passes', match: e => e.type !== 'Lodging' && /\bgym\b|health club|crossfit|day pass/i.test(e.name + ' ' + (e.sub||'') + ' ' + (e.notes||'')) },
   ],
   handson: [
