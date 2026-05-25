@@ -6501,6 +6501,9 @@ const VIBE_PILLS = {
       venueFallback: e => e.type === 'Museum' || /curious forge|miners foundry|library|cultural/i.test(e.name) },
   ],
   arts: [
+    { id: 'music',       label: '🎵 Music',            fallbackLabel: 'music venues and acts',
+      match: e => (e.tags||[]).includes('Music') || e.type === 'Music venue' || /\bband\b|\bconcert\b|\bdj\b|\bjam\b|\bopen mic\b|bluegrass|jazz|blues|acoustic|symphony|orchestra|choral|karaoke/i.test(e.name + ' ' + (e.sub||''))
+    },
     { id: 'theater',     label: '🎭 Theater',          fallbackLabel: 'theaters to bookmark',  match: e => { const t = (e.name + ' ' + (e.sub||'')).toLowerCase(); return /theat(re|er)|stages|cats\b|community asian/.test(t) && !/cinema/.test(t); } },
     { id: 'cinema',      label: '🎬 Cinema',           fallbackLabel: 'movie theaters',         match: e => /cinema|del oro|onyx|sierra cinemas/i.test(e.name) },
     { id: 'concerts',    label: '🎵 Concert Halls',    fallbackLabel: 'concert halls',          match: e => /center for the arts|miners foundry|inconcert|schoolhouse cultural|nevada theatre/i.test(e.name) },
@@ -6999,7 +7002,7 @@ function renderTripBuilderForm() {
         </div>
         <div class="tb-section" data-tip="Pace sets how many stops we plan per day.">
           <div class="tb-label">Pace</div>
-          <div class="tb-pills" id="tbPace">${pillRow('tbPace', [{v:'relaxed',l:'Relaxed · 2/day'},{v:'balanced',l:'Balanced · 3'},{v:'packed',l:'Packed · 4'}], 'balanced')}</div>
+          <div class="tb-pills" id="tbPace">${pillRow('tbPace', [{v:'relaxed',l:'Relaxed'},{v:'balanced',l:'Balanced'},{v:'packed',l:'Packed'}], 'balanced')}</div>
         </div>
       </div>
 
