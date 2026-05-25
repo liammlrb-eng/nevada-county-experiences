@@ -647,26 +647,49 @@
     margin-bottom: 28px;
   }
   .tab-btn {
-    padding: 12px 22px;
+    padding: 10px 22px 11px;
     background: none;
     border: none;
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 13px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
     color: var(--slate);
     cursor: pointer;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
     transition: all 0.18s;
+    /* Stack label + tagline vertically so the three-lane story is
+       legible at a glance. text-align:left aligns both lines under
+       the same start column (icons + taglines left-justified per tab). */
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    text-align: left;
+    line-height: 1.2;
+  }
+  .tab-btn .tab-label {
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  .tab-btn .tab-tag {
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--slate);
+    opacity: 0.6;
     font-weight: 400;
   }
   .tab-btn:hover { color: var(--brown); }
+  .tab-btn:hover .tab-tag { opacity: 0.85; }
   .tab-btn.active {
     color: var(--brown);
     border-bottom-color: var(--gold);
-    font-weight: 600;
   }
+  .tab-btn.active .tab-label { font-weight: 600; }
+  .tab-btn.active .tab-tag   { opacity: 1; color: var(--brown); }
+  /* Admin button stays single-line and gold-accented; no tagline. */
+  .tab-btn.tab-btn-admin .tab-label { color: var(--gold); }
   /* (Local Guides was briefly a tab-filter-btn here; promoted to a real
      tab with its own panel — the filter-button styles aren't needed
      anymore but kept harmless in case any callsite still references.) */
@@ -1550,11 +1573,17 @@
     .tabs::-webkit-scrollbar { display: none; }
     .tab-btn {
       padding: 10px 14px;
-      font-size: 11px;
-      letter-spacing: 0.08em;
       white-space: nowrap;
       flex-shrink: 0;
     }
+    .tab-btn .tab-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+    /* Drop the tagline sub-line on phones — the strip is already
+       horizontally scrolling and the lane semantics carry over from
+       the tooltip on tap-and-hold. */
+    .tab-btn .tab-tag { display: none; }
     /* Hide the admin Manage Database tab on phones */
     .tab-btn[onclick*="openManageData"] { display: none; }
 
@@ -2311,12 +2340,33 @@
     <button class="manage-exit" onclick="exitManage()">Done</button>
   </div>
 
+  <!-- Top-level nav. Each tab is one of three "lanes" plus a free-browse
+       starter, and the lane is communicated via a sub-line tagline:
+         Explore       → browse everything
+         Suggested     → hand-picked by us (light-touch curation)
+         Help Me Plan  → made for you (algorithmic, personalised)
+         Local Guides  → told by someone who lives here (long-form editorial)
+       Tagline + icon match user's three-lanes mental model. -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('experiences', this)" title="Browse every venue and experience — filter by vibe, area, category or date">Explore</button>
-    <button class="tab-btn" onclick="switchTab('itineraries', this)" title="Ready-made day-by-day itineraries you can copy and customize">Suggested Experiences</button>
-    <button class="tab-btn" onclick="switchTab('plan', this)" title="Answer a few questions and get a tailored day-by-day draft">✨ Help Me Plan</button>
-    <button class="tab-btn" onclick="switchTab('localguides', this)" title="Long-form articles from local historians, hikers, musicians and tribal members">🧑‍🏫 Local Guides</button>
-    <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">⚙ Manage Database</button>
+    <button class="tab-btn active" onclick="switchTab('experiences', this)" title="Browse every venue and experience — filter by vibe, area, category or date">
+      <span class="tab-label">🧭 Explore</span>
+      <span class="tab-tag">Browse everything</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('itineraries', this)" title="Hand-picked day-by-day itineraries you can copy and customize">
+      <span class="tab-label">⭐ Suggested</span>
+      <span class="tab-tag">Hand-picked by us</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('plan', this)" title="Answer a few questions and get a tailored day-by-day draft">
+      <span class="tab-label">✨ Help Me Plan</span>
+      <span class="tab-tag">Made for you</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('localguides', this)" title="Long-form articles from local historians, hikers, musicians and tribal members">
+      <span class="tab-label">🧑‍🏫 Local Guides</span>
+      <span class="tab-tag">Told by locals</span>
+    </button>
+    <button class="tab-btn tab-btn-admin" style="margin-left:auto" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">
+      <span class="tab-label">⚙ Manage Database</span>
+    </button>
   </div>
 
   <!-- (Browse mode toggle + Calendar moved into the filter bar below;
