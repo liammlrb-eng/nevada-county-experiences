@@ -1582,26 +1582,57 @@
     font-size: 11px; letter-spacing: 0.28em; color: var(--slate);
     text-transform: uppercase; font-weight: 600;
   }
+  /* Image-backed mode toggle — each option is a small horizontal tile
+     with a circular thumbnail + label. Active state lifts the tile and
+     adds a gold ring around the thumbnail. Sits at the start of the
+     filter-bar; reads as "pick what to browse" before search/dates. */
   .browse-mode-toggle {
-    display: inline-flex; gap: 0;
-    background: var(--fog); border: 1px solid var(--rule);
-    border-radius: 999px; padding: 4px;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+    display: inline-flex; gap: 4px;
+    background: transparent; border: none;
+    padding: 0;
   }
   .bm-btn {
-    border: none; background: transparent;
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1.5px solid #d8cdb8;
+    background: #fff;
     color: var(--slate); cursor: pointer;
     font-family: inherit; font-size: 13px; font-weight: 600;
-    padding: 8px 18px; border-radius: 999px;
+    padding: 5px 13px 5px 5px; border-radius: 999px;
     letter-spacing: 0.04em;
     transition: all 0.18s ease;
+    box-shadow: 0 1px 2px rgba(30,21,8,0.06);
   }
-  .bm-btn:hover { color: var(--brown); }
+  .bm-btn:hover {
+    color: var(--brown); border-color: var(--gold);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30,21,8,0.12);
+  }
   .bm-btn.active {
-    background: var(--brown); color: var(--cream);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    color: var(--brown); border-color: var(--gold);
+    background: linear-gradient(180deg, #FFFCF3 0%, #F5EFE2 100%);
+    box-shadow: 0 0 0 2px var(--gold), 0 4px 14px rgba(184,148,26,0.25);
   }
-  .bm-btn.active:hover { color: var(--cream); }
+  .bm-thumb {
+    display: inline-block;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background-size: cover; background-position: center;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+  }
+  .bm-btn.active .bm-thumb {
+    border-color: var(--gold);
+    transform: scale(1.05);
+  }
+  .bm-label {
+    line-height: 1;
+  }
+  @media (max-width: 640px) {
+    .bm-btn { padding: 4px 10px 4px 4px; font-size: 12px; }
+    .bm-thumb { width: 26px; height: 26px; }
+  }
 
   /* Calendar / List toggle button — sits next to the mode toggle, only
      visible when events are in scope (mode = events or both). */
@@ -2127,9 +2158,18 @@
          control on the filter line. Area dropdown removed; everything is
          county-wide by default. -->
     <div class="browse-mode-toggle" role="tablist" aria-label="What to show">
-      <button id="bmVenues" type="button" class="bm-btn"        onclick="setBrowseMode('venues')"  title="Just places — restaurants, lodging, museums, parks">🏠 Venues</button>
-      <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
-      <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
+      <button id="bmVenues" type="button" class="bm-btn" onclick="setBrowseMode('venues')" title="Just places — restaurants, lodging, museums, parks">
+        <span class="bm-thumb" style="background-image:url('https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=120&h=120&fit=crop')"></span>
+        <span class="bm-label">Venues</span>
+      </button>
+      <button id="bmEvents" type="button" class="bm-btn" onclick="setBrowseMode('events')" title="Just things happening — concerts, festivals, classes">
+        <span class="bm-thumb" style="background-image:url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=120&h=120&fit=crop')"></span>
+        <span class="bm-label">Events</span>
+      </button>
+      <button id="bmBoth" type="button" class="bm-btn active" onclick="setBrowseMode('both')" title="Everything — places to go and things to do">
+        <span class="bm-thumb" style="background-image:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=120&h=120&fit=crop')"></span>
+        <span class="bm-label">Both</span>
+      </button>
     </div>
     <div class="search-field" data-tip="Search for any craft, activity, venue or event — try “blacksmithing”, “wine tasting”, “live music” or “Cornish Christmas”, then press Find. Synonyms are built in, so “metalsmith” also finds a studio listed as “blacksmithing”.">
       <span class="search-icon">🔍</span>
