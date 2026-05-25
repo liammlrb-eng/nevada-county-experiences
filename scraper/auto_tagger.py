@@ -29,9 +29,13 @@ import re
 _TAG_RULES: list[tuple[str, list[str]]] = [
 
     # ── Performing Arts ───────────────────────────────────────────────────────
-    ("Music",           ["concert", "live music", "band", "orchestra", "symphony",
-                         "bluegrass", "jazz", "folk", "blues", "country music",
-                         "recital", "choir", "choral", "opera", "acoustic",
+    # Short keywords get \b word boundaries to avoid substring false-positives.
+    # ("opera" without \b matched "operate"/"operational" and tagged every
+    # Curious Forge "Learn to Use a Wood Lathe" / sewing-machine class as Music;
+    # "band" matched "abandoned"/"bandwidth"; "folk" matched "folks"; etc.)
+    ("Music",           [r"\bconcert\b", "live music", r"\bband\b", "orchestra", "symphony",
+                         "bluegrass", "jazz", r"\bfolk\b", r"\bblues\b", "country music",
+                         "recital", "choir", "choral", r"\bopera\b", "acoustic",
                          "singer-songwriter", "singer songwriter", "open mic",
                          "music festival", "caroling", "karaoke",
                          "drum circle", "jam session",

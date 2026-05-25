@@ -1,432 +1,11 @@
 {
   "feed": "Nevada County Experience — Events",
   "homepage": "https://liammlrb-eng.github.io/nevada-county-experiences/",
-  "generated_at": "2026-05-24T03:40:00Z",
-  "count": 1130,
+  "generated_at": "2026-05-25T02:50:46Z",
+  "count": 1107,
   "license": "CC BY 4.0 — attribution required",
   "attribution": "Nevada County Experience — https://liammlrb-eng.github.io/nevada-county-experiences/",
   "events": [
-    {
-      "id": "85cea3fc371e",
-      "title": "Alibi Truckee: Surf Rock Dinner Vibes Saturdays with Matt Welker",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "5:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Food & Drink"
-      ],
-      "description": "Whether you are a foodie or music lover (or just looking for a great night out), Alibi Truckee is the place to be on Saturdays! Indulge in a yummy dinner […]The postAlibi Truckee: Surf Rock Dinner Vibes Saturdays with Matt Welkerappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/alibi-truckee-surf-rock-dinner-vibes-saturdays-with-matt-welker/2026-05-23/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "ed5c0eac4364",
-      "title": "Cars and coffee grass valley",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "7:00 AM",
-      "end_time": "10:00 AM",
-      "venue": "Mcknight crossing shopping center",
-      "area": "Grass Valley",
-      "category": "Outdoor",
-      "tags": [
-        "Outdoor"
-      ],
-      "description": "Cars and coffee grass valley is a weekly car event at daily donuts in the Mcknight crossing shopping center every saturday morning from 7 to 10",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d191631918",
-      "image": "https://www.trumba.com/i/DgBKEBX2ZTHqcQNSaCHgCme2.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "4347113f9f5d",
-      "title": "Floralia",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "11:00 AM",
-      "end_time": "5:00 PM",
-      "venue": "Seven Stars Gallery",
-      "area": "Nevada City",
-      "category": "Art event",
-      "tags": [
-        "Art"
-      ],
-      "description": "Beautiful floral-themed artwork by a bevy of talented, local artists adorns the walls of the Seven Stars Gallery for the month of May.  Artist reception takes place on Friday, May 8th from 6-8 pm and includes a “fancy hat” contest.",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d202349879",
-      "image": "https://www.trumba.com/i/DgDt5W54MppN8NgyKTVw3ma7.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "b1608a1ccec4",
-      "title": "Foothills Compassionate Care: Butterfly Garden of Remembrance 2026",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "10:00 AM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Garden",
-        "Wellness"
-      ],
-      "description": "In a community where neighbors care deeply for one another, few traditions capture that spirit more beautifully than the annual Butterfly Garden of Remembrance, hosted by Foothills Compassionate Care.  This […]The postFoothills Compassionate Care: Butterfly Garden of Remembrance 2026appeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/foothills-compassionate-care-butterfly-garden-of-remembrance/2026-05-23/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "4fef2d2679a4",
-      "title": "Grateful Dead 60-Year Retrospective Closing Party",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "12:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Holiday"
-      ],
-      "description": "Please join us a we celebrate the closing of our monumental 60-year Grateful Dead retrospective from noon – 7:00 pm on Saturday May 23rd! We’re throwing a big ol’ memorial day […]The postGrateful Dead 60-Year Retrospective Closing Partyappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/grateful-dead-60-year-retrospective-closing-party/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "e197088a7757",
-      "title": "Grease, Grit, and Grime Returns to 5 Mile House",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "5:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Outdoor"
-      ],
-      "description": "This is our LAST show at 5 Mile House until October!   So, come on out – we’ll be performing on the outdoor stage, weather permitting. Join us from 5:00 – […]The postGrease, Grit, and Grime Returns to 5 Mile Houseappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/grease-grit-and-grime-returns-to-5-mile-house-2/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "d0090e231423",
-      "title": "Inaugural Wool and Wine Festival at Lucchesi Vineyards",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "12:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Festival"
-      ],
-      "description": "Lucchesi Vineyards and Siren Song Fleece Works wool mill present the inaugural (and admission-free) Wool and Wine Festival: a Celebration of Fiber and Vine featuring local bluegrass band Salt Creek […]The postInaugural Wool and Wine Festival at Lucchesi Vineyardsappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/inaugural-wool-and-wine-festival-at-lucchesi-vineyards/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "8d01a7e1fc9a",
-      "title": "Jazz Alibi Plays the Wild Eye",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "5:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Theater"
-      ],
-      "description": "Listen to good jazz while you dine and drink. Jazz Alibi is: John Girton, Nora Nausbaum, Kit Bailey, and Karl Chelette – who play guitar, flute, drums, and bass. ______________________________________________ […]The postJazz Alibi Plays the Wild Eyeappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/jazz-alibi-plays-the-wild-eye/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "a71dadcbb927",
-      "title": "Marcus Rezak Presents…PHRANK: A Collision of Phish & Zappa",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "9:30 PM",
-      "end_time": "",
-      "venue": "Crazy Horse Saloon",
-      "area": "Nevada City",
-      "category": "Music event",
-      "tags": [],
-      "description": "$20 · Marcus Rezak is one of those musicians who is never content to stand still, either stylistically or geographically. Originally from Chicago, now based in LA, the visionary guitarist has traveled a winding path to arrive at the here and now. He has an extensive catalog of original music, while also focusing on various cover projects including Shred is Dead and Gumbo: A Phish Experience (seen mul...",
-      "url": "https://crazyhorsenc.com/show/marcus-rezak-presents-phrank-a-collision-of-phish-zappa/",
-      "image": "https://crazyhorsenc.com/wp-content/uploads/2024/10/marcusrezaknew-scaled-e1729486082743.jpg",
-      "source": "Crazy Horse Saloon"
-    },
-    {
-      "id": "f541e96dbd8e",
-      "title": "Nevada Union Theatre Society Presents: “Lost Girl”",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "Discover the fierce and imaginative world of Lost Girl from 7:00 – 9:00 pm over two weekends: Thursday, May 21st through Saturday, May 23rd; also Thursday, May 28th and Friday, […]The postNevada Union Theatre Society Presents: “Lost Girl”appeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/nevada-union-theatre-society-presents-lost-girl/2026-05-23/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "439843627ca1",
-      "title": "One Riddim Band at Elixart",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "9:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "Come for the ital heady vibes of the One Riddim reggae band.  Straight outta Chico and Nevada City, these young brethren bring a presence that defies their age. With powerful […]The postOne Riddim Band at Elixartappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/one-riddim-band-at-elixart/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "11314e757ce5",
-      "title": "PLAY DATE",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "8:00 PM",
-      "end_time": "11:00 PM",
-      "venue": "Golden Era Lounge",
-      "area": "Nevada City",
-      "category": "Music event",
-      "tags": [
-        "Theater"
-      ],
-      "description": "",
-      "url": "https://www.goldeneralounge.com/events/6zcklc4a67c89zzmzen98gz5ya3pmc",
-      "image": "https://static1.squarespace.com/static/60c2861e0fba10467f8e070d/60c30937ce2ea26a03580266/69f1059e9346cd380a17bb51/1777403338454/",
-      "source": "Golden Era Lounge"
-    },
-    {
-      "id": "934818b3134a",
-      "title": "Rashomon",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "7:00 PM",
-      "end_time": "9:00 PM",
-      "venue": "Nevada Theatre",
-      "area": "Nevada City",
-      "category": "Theatre",
-      "tags": [
-        "Theater",
-        "Sport"
-      ],
-      "description": "Community Asian Theatre of the Sierra presents Rashomon, a play that explores the notions of truth and justice – a “who done it?” in medieval Japan -- challenging perceptions of eye witnesses. Based on stories by Ryunosuke Akutagawa, the play is written by Michael Kanin and Fay Kanin and directed by Sonny Alforque. There are sword fights, rain on stage, taiko percussion, and more, transporting ...",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d195740962",
-      "image": "https://www.trumba.com/i/DgB2coLosDzB2UGKqQFwk4fT.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "52f1c93beba2",
-      "title": "Roy Rogers & The Delta Rhythm Kings",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "8:00 PM",
-      "end_time": "10:00 PM",
-      "venue": "The Center for the Arts",
-      "area": "Grass Valley",
-      "category": "Music event",
-      "tags": [
-        "Music"
-      ],
-      "description": "Roy Rogers has been considered one of the world’s preeminent master Delta slide guitarists with many decades of touring the globe. Over 20 recordings to his credit, Rogers has garnered 8 Grammy nominations for producing, as a recording artist, and as a songwriter.  His collaborations have garnered major media accolades worldwide for producing critically acclaimed Grammy nominated recordings for...",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d195369999",
-      "image": "https://www.trumba.com/i/DgAIzcdhUkoY6%2A4nhn8kpU7O.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "2cc876c669dd",
-      "title": "Roy Rogers & The Delta Rhythm Kings Band",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "7:00 PM",
-      "end_time": "",
-      "venue": "Center for the Arts",
-      "area": "Grass Valley",
-      "category": "Music venue",
-      "tags": [
-        "Music"
-      ],
-      "description": "",
-      "url": "https://thecenterforthearts.my.salesforce-sites.com/ticket/#/events/a0SUZ0000052FzN2AU",
-      "image": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjUwIDI1MCIgd2lkdGg9IjI1MCIgaGVpZ2h0PSIyNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PC9zdmc+",
-      "source": "Center for the Arts"
-    },
-    {
-      "id": "1d2f30685596",
-      "title": "Roy Rogers and the Delta Rhythm Kings at the Center for the Arts",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "8:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music"
-      ],
-      "description": "“Roy Rogers means the modern master in the art of slide guitar.  His versatility with the technique is nothing short of astonishing.” – All Music Guide  “That’s not a slide on […]The postRoy Rogers and the Delta Rhythm Kings at the Center for the Artsappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/roy-rogers-and-the-delta-rhythm-kings-at-the-center-for-the-arts/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "226bf76b6f2d",
-      "title": "Saturday Get Behind the Wheel Ceramics",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "10:30 AM",
-      "end_time": "12:30 PM",
-      "venue": "The Curious Forge",
-      "area": "Nevada City",
-      "category": "Art event",
-      "tags": [
-        "Art"
-      ],
-      "description": "Saturday Get Behind the Wheel Ceramics",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d201251987",
-      "image": "https://www.trumba.com/i/DgDjb-qKo6Fbuc2W5fpbnrYc.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "544bc7bb8148",
-      "title": "Spoon Carving Workshop",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "1:00pm",
-      "end_time": "4:00pm",
-      "venue": "Wolf Craft Collective",
-      "area": "Nevada City",
-      "category": "Workshop",
-      "tags": [
-        "Workshop"
-      ],
-      "description": "Learn the basics of spoon carving as you transform a block of wood into a finished spoon using only an axe, a sloyd knife, and a scoop knife. We’ll cover safe carving techniques and shaping fundamentals so you can confidently continue carving at home. All materials provided",
-      "url": "https://wolfcraftcollective.com/products/spoon-carving-workshop-saturday-may-23-1-4pm",
-      "image": "https://cdn.shopify.com/s/files/1/0550/0810/0608/files/IMG_7066.jpg?v=1765510960",
-      "source": "Wolf Craft Collective"
-    },
-    {
-      "id": "586cb6287a94",
-      "title": "Spring 2026 Strawberry Music Festival",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "8:00 AM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Music",
-        "Festival"
-      ],
-      "description": "Featuring: Bill Kirchen Band with Nina Gerber, Della Mae, Las Cafeteras, Darrell Scott String Band feat. Rob Ickes, Crying Uncle Bluegrass Band, Mr Sun, Abby Posner & The Big Fall, […]The postSpring 2026 Strawberry Music Festivalappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/spring-2026-strawberry-music-festival/2026-05-23/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "c43b0caa3fee",
-      "title": "Third Annual Honey Hills Music Fest: Five Nights, Five Venues in Nevada County",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "6:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Festival"
-      ],
-      "description": "The Honey Hills Fest is returning for its third year.  Nestled in the foothills and natural beauty of Nevada County, this five show celebration brings together 15 women/fem-fronted music projects, […]The postThird Annual Honey Hills Music Fest: Five Nights, Five Venues in Nevada Countyappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/third-annual-honey-hills-music-fest-five-nights-five-venues-in-nevada-county-2026-05-23/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "a70e8df1f679",
-      "title": "Wool and Wine Festival",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "12:00 PM",
-      "end_time": "4:00 PM",
-      "venue": "Siren Song Fleece Works at Lucchesi Vineyards",
-      "area": "Grass Valley",
-      "category": "Art event",
-      "tags": [
-        "Craft",
-        "Food & Drink",
-        "Festival"
-      ],
-      "description": "Lucchesi Vineyards & Winery and Siren Song Fleece Works wool mill are thrilled to announce the inaugural Wool & Wine Festival — a one-of-a-kind event weaving together the art of fiber and the joy of fine wine under the open foothills sky. This free community event promises something magical for everyone — whether you're a seasoned spinner, a wine enthusiast, a craft lover, or simply looking for...",
-      "url": "https://www.nevadacountyarts.org/calendar?trumbaEmbed=view%3devent%26eventid%3d202055677",
-      "image": "https://www.trumba.com/i/DgA8mErM84LO36nj0m-hJI1s.jpg",
-      "source": "NCAC Calendar"
-    },
-    {
-      "id": "6ff83ee349a2",
-      "title": "“All About the Birds: Art Quilts and Collage” by Sandra Poteet at the Nevada City Winery Gallery",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "12:00 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Art",
-        "Food & Drink"
-      ],
-      "description": "Please come see the re-purposed fiber and mixed media exhibition, All About the Birds: Art Quilts and Collage by Sandra Poteet from Wednesday, May 20th through Sunday, June 29th at […]The post“All About the Birds: Art Quilts and Collage” by Sandra Poteet at the Nevada City Winery Galleryappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/all-about-the-birds-art-quilts-and-collage-by-sandra-poteet-at-the-nevada-city-winery-gallery/2026-05-23/",
-      "image": "",
-      "source": "KVMR"
-    },
-    {
-      "id": "48cb8b061e68",
-      "title": "“Honoring our Chinese Families, Past and Present”: Exhibit Opening Reception at the Grass Valley Museum",
-      "date": "2026-05-23",
-      "end_date": "2026-05-23",
-      "time": "12:30 PM",
-      "end_time": "",
-      "venue": "",
-      "area": "Nevada County",
-      "category": "Event",
-      "tags": [
-        "Art",
-        "Historic"
-      ],
-      "description": "Please join us from 12:30 – 3:30 pm on Saturday, May 23rd at the Grass Valley Museum and Cultural Center for the Opening Reception of this year’s exhibit: Honoring our […]The post“Honoring our Chinese Families, Past and Present”: Exhibit Opening Reception at the Grass Valley Museumappeared first onKVMR Community Radio.",
-      "url": "https://www.kvmr.org/kvmr-event/honoring-our-chinese-families-past-and-present-exhibit-opening-reception-at-the-grass-valley-museum/",
-      "image": "",
-      "source": "KVMR"
-    },
     {
       "id": "6b0e53f2f3d5",
       "title": "A Fistful of Dollars",
@@ -847,7 +426,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Workshop",
         "Hands-on"
       ],
@@ -905,6 +483,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -997,6 +576,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater",
         "Dance",
         "Workshop"
@@ -1017,6 +597,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -1527,6 +1108,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -1890,6 +1472,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -2305,6 +1888,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -2470,7 +2054,6 @@
       "area": "Nevada City",
       "category": "Art event",
       "tags": [
-        "Music",
         "Dance",
         "Workshop"
       ],
@@ -2810,6 +2393,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -3016,7 +2600,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Craft",
         "Workshop",
         "Hands-on"
@@ -3405,6 +2988,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Please join us from 6:00 – 8:00 pm every first Friday of the month at Truckee Chess Night at Alibi Ale Works! Bring a chess board and your brain.  Let’s […]The postBeers and Bishops: Truckee Chess Night at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -3589,6 +3173,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -3985,6 +3570,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -4043,7 +3629,6 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
-        "Music",
         "Film",
         "Historic"
       ],
@@ -4306,6 +3891,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Sport",
         "Food & Drink"
       ],
@@ -4383,6 +3969,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -4910,7 +4497,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Workshop"
       ],
       "description": "$99 · This class qualifies members to work independently on the domestic sewing machines at The Forge. It is also a great resource for those looking to explore sewing for the first time, or for those who want to bring in their own machine and learn the basics. Please note, this is not a project-based class — it is focused on learning how to safely operate a domestic sewing machine and follow Forge Te...",
@@ -4967,6 +4553,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -5059,6 +4646,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -5116,7 +4704,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Workshop"
       ],
       "description": "$132 · This class qualifies members to work independently in the glass flameworking lab. It is also a great resource for those looking to explore flameworking equipment for their own glass studio setup. Please note, this is not a project-based class — it is focused on learning how to safely operate glass studio equipment and follow Forge studio member processes.",
@@ -5625,6 +5212,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -5826,7 +5414,6 @@
       "area": "Nevada City",
       "category": "Music event",
       "tags": [
-        "Music",
         "Theater"
       ],
       "description": "$15 · Collectivity doesn’t play groove music so much as activate it. Their live sets unfold like a conversation between muscle memory and curiosity – deep rhythmic foundations opening into psychedelic detours, then snapping back into focus with precision and intent. Its music built for movement, but powered by listening. Formed in Shanghai and now operating out of the Bay Area, Collectivity emerged f...",
@@ -5866,6 +5453,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -6190,6 +5778,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -6454,7 +6043,6 @@
       "area": "Nevada City",
       "category": "Art event",
       "tags": [
-        "Music",
         "Family",
         "Hands-on"
       ],
@@ -6835,7 +6423,6 @@
       "area": "Nevada City",
       "category": "Art event",
       "tags": [
-        "Music",
         "Family",
         "Hands-on"
       ],
@@ -6894,7 +6481,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Workshop"
       ],
       "description": "$132 · This class teaches you how to safely use and operate an Overlock/Serger sewing machine. It qualifies you to use the Overlock/Serger Sewing Machine in the Forge Textiles Studio or can be used to learn how to use your own Overlock machine at home. This is not a class on sewing techniques. Whether you’re a current member, a soon-to-be member, or a passionate creator eager to explore working with a...",
@@ -7030,6 +6616,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -7123,7 +6710,6 @@
       "area": "Nevada City",
       "category": "Art event",
       "tags": [
-        "Music",
         "Family",
         "Hands-on"
       ],
@@ -7182,7 +6768,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Workshop"
       ],
       "description": "$66 · This class teaches you how to safely use and operate the tools and equipment in the Glass Fusing Studio, including an overview of fusible glass materials and firing glass in the kiln. Completion of this class qualifies you to work independently in the Forge Glass Fusing Studio. It is also a great resource for those looking to use their own fusing tools and equipment at home. Please note that th...",
@@ -7201,7 +6786,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Workshop"
       ],
       "description": "$156 · Learn safety and operational procedures using the lathes in the Woodturning Studio. Price includes your own set of carbide tips.  This is not a project-based class, but a class to learn how to use a wood lathe safely.",
@@ -7371,7 +6955,6 @@
       "area": "Nevada City",
       "category": "Art event",
       "tags": [
-        "Music",
         "Family",
         "Hands-on"
       ],
@@ -7640,6 +7223,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -7867,6 +7451,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Theater"
       ],
       "description": "Please join the Lyric Rose Theatre for their production of the musical, La Cage Aux Folles, for weekend matinee and evening performances from Friday, May 29th through Saturday, June 20th […]The postLyric Rose Theatre Presents: La Cage Aux Folles (The Bird Cage) at the Nevada Theatreappeared first onKVMR Community Radio.",
@@ -8661,7 +8246,6 @@
       "area": "Nevada City",
       "category": "Workshop",
       "tags": [
-        "Music",
         "Workshop",
         "Hands-on"
       ],
@@ -8719,6 +8303,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -8815,6 +8400,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -9672,7 +9258,8 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
-        "Workshop"
+        "Workshop",
+        "Wellness"
       ],
       "description": "Please join us for a music-guided movement experience designed to reconnect you with your body, breath, and creative life force in-person at Inner Path, or live via Zoom, from 5:30 […]The postMusic-Supported Mindful Movement: In-Person/Virtual Class at Inner Pathappeared first onKVMR Community Radio.",
       "url": "https://www.kvmr.org/kvmr-event/music-supported-mindful-movement-in-person-virtual-class-at-inner-path/2026-06-28/",
@@ -10203,6 +9790,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -10482,6 +10070,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Please join us from 6:00 – 8:00 pm every first Friday of the month at Truckee Chess Night at Alibi Ale Works! Bring a chess board and your brain.  Let’s […]The postBeers and Bishops: Truckee Chess Night at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -11144,6 +10733,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -11180,6 +10770,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -11833,6 +11424,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -12463,6 +12055,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -12518,6 +12111,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -13248,6 +12842,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -13948,6 +13543,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -14098,6 +13694,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Please join us from 6:00 – 8:00 pm every first Friday of the month at Truckee Chess Night at Alibi Ale Works! Bring a chess board and your brain.  Let’s […]The postBeers and Bishops: Truckee Chess Night at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -14537,6 +14134,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -14591,6 +14189,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -15073,6 +14672,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -15516,6 +15116,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -15552,6 +15153,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -15903,6 +15505,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -15921,6 +15524,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Please join us from 6:00 – 8:00 pm every first Friday of the month at Truckee Chess Night at Alibi Ale Works! Bring a chess board and your brain.  Let’s […]The postBeers and Bishops: Truckee Chess Night at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -16109,6 +15713,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -16145,6 +15750,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -16404,6 +16010,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -16668,6 +16275,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -16686,6 +16294,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -16945,6 +16554,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -16963,6 +16573,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Please join us from 6:00 – 8:00 pm every first Friday of the month at Truckee Chess Night at Alibi Ale Works! Bring a chess board and your brain.  Let’s […]The postBeers and Bishops: Truckee Chess Night at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -17169,6 +16780,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -17408,6 +17020,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -17444,6 +17057,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Dance"
       ],
       "description": "Please come out for some country line-dancing from 8:00 to 10:00 pm on the second and fourth Wednesday of each month at Alibi Ale Works in Truckee. Hayli and Lily […]The postBoots ‘n’ Besties Line Dance Nights in Truckeeappeared first onKVMR Community Radio.",
@@ -17726,6 +17340,7 @@
       "area": "Nevada County",
       "category": "Event",
       "tags": [
+        "Music",
         "Social"
       ],
       "description": "Truckee trivia Tuesdays!  It just rolls right off the tongue, doesn’t it?  Please come join our host, Craig, for a night full of brain busters and beer from 6:00 – 8:00 […]The postTruckee Trivia Tuesdays at Alibi Ale Worksappeared first onKVMR Community Radio.",
@@ -20181,7 +19796,6 @@
       "area": "Grass Valley",
       "category": "Community",
       "tags": [
-        "Music",
         "Family",
         "Festival"
       ],
