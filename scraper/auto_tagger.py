@@ -15,6 +15,8 @@ the matching is case-insensitive substring search against the combined
 """
 
 from __future__ import annotations
+import json
+import os
 import re
 
 # ── Tag rules ─────────────────────────────────────────────────────────────────
@@ -223,10 +225,94 @@ for _tag_name, _keywords in _TAG_RULES:
     _COMPILED.append((_tag_name, patterns))
 
 
+# ── Per-source override rules ───────────────────────────────────────
+# Loaded once at import time from scraper_overrides.json. Each rule is an
+# admin-authored exception that fires AFTER the regex tagging pass and
+# can add or remove tags. Rationale + schema docs live in the JSON file
+# itself.
+#
+# Example use cases:
+#   - "Every event from NevadaCity.Rocks at venue 'Friar Tucks' should
+#      always carry the Music tag, even if the title looks like a one-off."
+#   - "Events scraped from the Curious Forge whose title contains 'movie
+#      night' should NOT be tagged Workshop."
+#
+# This is the events-side equivalent of the per-venue pill_in override
+# system in index.html — surgical exceptions without forcing a regex
+# change that might affect other events.
+
+_OVERRIDES_PATH = os.path.join(os.path.dirname(__file__), "scraper_overrides.json")
+
+def _load_overrides() -> list[dict]:
+    try:
+        with open(_OVERRIDES_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        rules = data.get("rules", []) or []
+        # Pre-compile any regex fields for speed.
+        for r in rules:
+            if r.get("if_source_regex"):
+                r["_re_source"] = re.compile(r["if_source_regex"], re.I)
+            if r.get("if_title_regex"):
+                r["_re_title"]  = re.compile(r["if_title_regex"], re.I)
+        return rules
+    except FileNotFoundError:
+        return []
+    except Exception as e:
+        print(f"  [auto_tagger] WARNING: scraper_overrides.json failed to load: {e}")
+        return []
+
+_OVERRIDE_RULES = _load_overrides()
+
+
+def _rule_matches(rule: dict, event: dict) -> bool:
+    """All `if_*` conditions on a rule must match for it to apply."""
+    src = (event.get("source") or "")
+    title = (event.get("title") or event.get("name") or "")
+    loc = (event.get("location") or "").lower()
+    url = (event.get("url") or "").lower()
+
+    if "_re_source" in rule:
+        if not rule["_re_source"].search(src): return False
+    elif rule.get("if_source"):
+        if rule["if_source"] != src: return False
+
+    if "_re_title" in rule:
+        if not rule["_re_title"].search(title): return False
+
+    if rule.get("if_venue_contains"):
+        if rule["if_venue_contains"].lower() not in loc: return False
+
+    if rule.get("if_url_contains"):
+        if rule["if_url_contains"].lower() not in url: return False
+
+    return True
+
+
+def _apply_overrides(event: dict, tags: list[str]) -> list[str]:
+    """Run every matching override rule and apply its tag mods. Returns
+    the modified tag list. Operations are order-independent; adds always
+    precede removes within a single rule so an explicit remove wins if
+    both happen to mention the same tag."""
+    if not _OVERRIDE_RULES:
+        return tags
+    out = list(tags)
+    for rule in _OVERRIDE_RULES:
+        if not _rule_matches(rule, event):
+            continue
+        for t in (rule.get("force_add_tags") or []):
+            if t not in out:
+                out.append(t)
+        for t in (rule.get("force_remove_tags") or []):
+            if t in out:
+                out.remove(t)
+    return out
+
+
 def tag_event(event: dict) -> list[str]:
     """
     Return a list of tag names that apply to the event.
-    Looks at title + description + category.
+    Looks at title + description + category, then applies any
+    admin-authored overrides from scraper_overrides.json.
     """
     text = " ".join([
         event.get("title", ""),
@@ -242,7 +328,7 @@ def tag_event(event: dict) -> list[str]:
                 matched.append(tag_name)
                 break   # only add tag once
 
-    return matched
+    return _apply_overrides(event, matched)
 
 
 def tag_events(events: list[dict]) -> list[dict]:

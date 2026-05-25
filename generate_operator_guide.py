@@ -157,7 +157,8 @@ def build():
         ['Add or edit an experience',            'Section 5',                   '2 min/entry'],
         ['Update the live demo on GitHub Pages', 'Section 6',                   '2 min'],
         ['Share public feeds with a partner',    'Section 7',                   '1 min'],
-        ['Run a quality scan (monthly)',         'Section 5f',                  '~1 sec'],
+        ['Force a venue into a pill (override)',  'Section 5f',                 '30 sec'],
+        ['Run a quality scan (monthly)',         'Section 5g',                  '~1 sec'],
         ['Stop the server',                      'Section 1c',                  '5 sec'],
         ['Something\'s broken',                  'Section 8 (Troubleshooting)', 'varies'],
         ['Where do files live?',                 'Section 9 (File map)',        'reference'],
@@ -467,7 +468,74 @@ python scraper\\event_scraper.py --site "Nevada City Chamber" """, CODE))
         BODY))
 
     flow.append(Spacer(1, 10))
-    flow.append(Paragraph('5f. Run a quality scan (monthly)', H1))
+    flow.append(Paragraph('5f. Force a venue into a pill (override the filter)', H1))
+    flow.append(Paragraph(
+        'Sometimes a venue should appear under a specific filter pill '
+        '(say, <b>Family</b> under the <b>Active</b> vibe) but the pill&apos;s '
+        'regex doesn&apos;t catch it. Instead of changing the regex (which '
+        'might affect other venues), add a per-venue override.',
+        BODY))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph('How to add an override', H1))
+    ovr_steps = [
+        'Open <b>⚙ Manage Database → Experiences</b>',
+        'Find the venue row',
+        'Click the <b>Pill Overrides</b> cell (next to Tags column)',
+        'In the dropdown: check the pill you want to force-include. A small "override" badge appears.',
+        'Click <b>💾 Save All</b>',
+    ]
+    for i, s in enumerate(ovr_steps, 1):
+        flow.append(Paragraph(f'{i}. {s}', BULLET))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph('When to override vs. when to edit the regex', H1))
+    flow.append(Paragraph(
+        '<b>Override:</b> a single venue (or two) is missing from a pill, '
+        'and the regex catches everything else correctly. Surgical fix.',
+        BODY))
+    flow.append(Paragraph(
+        '<b>Edit the regex:</b> several venues with a shared name pattern '
+        'are all missing — the regex is systematically wrong. Code change, '
+        'ping the developer. (The regex lives in index.html&apos;s '
+        'VIBE_PILLS constant.)',
+        BODY))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph('Reading the dropdown states', H1))
+    state_rows = [
+        ['Badge',     'Meaning',                                                 'Toggle?'],
+        ['regex',     'Pill&apos;s regex already catches this venue automatically.', 'No (info only in v1)'],
+        ['override',  'Admin manually force-included this venue. Bold + brown.',     'Yes — uncheck to remove'],
+        ['(none)',    'Venue isn&apos;t in this pill. Check to add an override.',     'Yes — check to add'],
+    ]
+    flow.append(build_table(state_rows,
+        col_widths=[0.9*inch, 3.4*inch, 2.2*inch], body_size=8.8))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph('Stale overrides', H1))
+    flow.append(Paragraph(
+        'Over time, the regex may evolve to catch a venue that was previously '
+        'overridden. The QA Scan (5g) flags these as <i>stale overrides</i> '
+        '— safe-to-remove entries that aren&apos;t doing any work anymore. '
+        'About once a year, open the QA Scan, look at the stale list, and '
+        'clean up. Keeps the override list lean.',
+        BODY))
+
+    flow.append(Spacer(1, 6))
+    flow.append(Paragraph('Events vs. venues', H1))
+    flow.append(Paragraph(
+        'The override system above is for <b>venues</b> only. For events '
+        '(which are scraped fresh every cycle), the equivalent system is '
+        '<i>per-source pattern rules</i> in <font face="Courier">scraper/'
+        'scraper_overrides.json</font>. Edit that file when a scraper '
+        'consistently mis-tags events the same way (e.g. "every event '
+        'from NevadaCity.Rocks at Friar Tucks should carry the Music tag"). '
+        'The JSON file&apos;s top has the schema docs.',
+        BODY))
+
+    flow.append(Spacer(1, 10))
+    flow.append(Paragraph('5g. Run a quality scan (monthly)', H1))
     flow.append(Paragraph(
         'The <b>🔍 QA Scan</b> tab inside <b>Manage Database</b> crawls every '
         'venue, every event, and every filter pill in about one second and '
@@ -502,6 +570,10 @@ python scraper\\event_scraper.py --site "Nevada City Chamber" """, CODE))
          'A single venue lit by 8+ pills across the whole filter matrix. Usually means the venue&apos;s tag set is too broad — it&apos;ll surface in lots of unrelated filters.'],
         ['🟡 Warning',  'Cross-source event dupes',
          'Same date + title appearing under two scrapers (e.g. NCR + Friar Tuck&apos;s direct). Frontend display already dedups via Jaccard; admin queue may still show both rows.'],
+        ['🟡 Warning',  'Unresolvable overrides',
+         'A pill_in entry references a pill that no longer exists in VIBE_PILLS (renamed / deleted). Lists offending venues so the override can be fixed.'],
+        ['🟢 Info',     'Stale overrides',
+         'A pill_in override the regex now catches on its own — safe to remove. Helps prevent the override list from growing forever.'],
         ['🟢 Info',     'Tag orphans',
          'Tags present on venues but no pill ever references them. Either a typo (won&apos;t surface anywhere) or a category we forgot to add a pill for.'],
     ]

@@ -1,0 +1,18 @@
+{
+  "_doc": "Per-source / per-pattern tag overrides applied by auto_tagger.py AFTER the regex tagging pass. Each rule's `if_*` conditions all have to match (AND); `force_add_tags` and `force_remove_tags` then modify the resulting tags. Edit this file when a scraper is consistently mis-tagging events the same way — it's the events-side equivalent of the per-venue pill_in override system in index.html.",
+  "_schema": {
+    "rules": [
+      {
+        "name":              "human-readable label for this rule (required, helps debug)",
+        "if_source":         "exact match against event.source (optional)",
+        "if_source_regex":   "regex against event.source (optional, takes precedence over if_source)",
+        "if_title_regex":    "regex against event.title (optional, case-insensitive)",
+        "if_venue_contains": "substring match against event.location (optional, case-insensitive)",
+        "if_url_contains":   "substring match against event.url (optional, case-insensitive)",
+        "force_add_tags":    ["list of tag names to add"],
+        "force_remove_tags": ["list of tag names to remove"]
+      }
+    ]
+  },
+  "rules": []
+}
