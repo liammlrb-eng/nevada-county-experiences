@@ -1850,6 +1850,37 @@
     text-transform: uppercase; color: var(--slate);
     border-bottom: 1px solid var(--fog); margin-bottom: 2px;
   }
+  /* Pill override editor — extends the tag dropdown with grouped
+     sections per vibe and a state badge (regex / override) next to each
+     pill row. */
+  .pill-override-dropdown { min-width: 280px; }
+  .pill-dd-vibe {
+    padding: 7px 12px 4px; font-size: 9px; letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 700;
+    color: var(--brown); background: #fdf5e0;
+    border-top: 1px solid #efe7d6; border-bottom: 1px solid #efe7d6;
+    margin-top: 4px;
+  }
+  .pill-dd-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 12px; cursor: pointer; font-size: 11.5px;
+    color: var(--dark);
+  }
+  .pill-dd-item:hover { background: var(--cream); }
+  .pill-dd-item .pill-dd-label { flex: 1; }
+  .pill-dd-item .pill-dd-state {
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 10px;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .pill-dd-item.state-regex .pill-dd-state {
+    color: #888; background: #f0ebe0;
+  }
+  .pill-dd-item.state-override .pill-dd-state {
+    color: #fff; background: var(--brown);
+  }
+  .pill-dd-item.state-override .pill-dd-label { font-weight: 700; color: var(--brown); }
+  .pill-dd-item.state-regex .pill-dd-label { color: #6b6055; }
   .btn-del-row {
     background: none;
     border: none;
@@ -8995,6 +9026,7 @@ function renderManageData() {
               ${thSort('hours', 'Hours', '140px')}
               ${thSort('notes', 'Notes', '160px')}
               ${thSort('tags', 'Tags', '120px')}
+              <th style="min-width:110px" title="Per-venue pill overrides — force a venue into a pill the regex misses">Pill Overrides</th>
               ${thSort('season', 'Season', '120px')}
               <th style="min-width:200px">Website URL</th>
               ${thSort('lat', 'Lat')}
@@ -9908,6 +9940,129 @@ function toggleTagDropdown(expId, evt) {
   setTimeout(() => document.addEventListener('click', closeTagDropdown, { once: true }), 10);
 }
 
+// ── Pill override editor ────────────────────────────────────────────
+// A second dropdown, parallel to the tags editor, that lets the admin
+// force-include this venue in specific pills the regex misses (the
+// slow-drift workaround). Layout walks VIBE_PILLS grouped by vibe; each
+// row shows the pill label + a state indicator + a checkbox.
+//
+//   • regex match (auto-checked, faded badge "regex") — info only,
+//     not toggleable in v1; the regex already covers this venue
+//   • manual override (bold check, badge "override") — toggle to remove
+//   • neither (unchecked) — toggle to add a pill_in override
+//
+// Saves to dirtyData like every other field; persists on Save All.
+let openPillDropdownId = null;
+function togglePillOverrideDropdown(expId, evt) {
+  evt.stopPropagation();
+  if (openPillDropdownId && openPillDropdownId !== expId) closePillOverrideDropdown();
+  if (openPillDropdownId === expId) { closePillOverrideDropdown(); return; }
+
+  const exp = liveExperiences.find(e => e.id === expId);
+  if (!exp) return;
+  const cell = document.getElementById(`pillcell-${expId}`);
+  if (!cell) return;
+
+  const overrides = new Set((exp.pill_in || []));
+  // For each pill across every vibe, figure out current state:
+  //   - regex matches? (display "auto")
+  //   - in pill_in?     (display "override")
+  const sections = [];
+  for (const [vibeId, pills] of Object.entries(VIBE_PILLS || {})) {
+    const rows = (pills || []).map(p => {
+      const compound = `${vibeId}/${p.id}`;
+      const isOverride = overrides.has(compound) || overrides.has(p.id);
+      let regexHit = false;
+      try { regexHit = !!p.match(exp); } catch (_) {}
+      const state = isOverride ? 'override' : (regexHit ? 'regex' : 'off');
+      return `
+        <label class="pill-dd-item state-${state}">
+          <input type="checkbox" ${isOverride ? 'checked' : ''}
+            onchange="updatePillOverride(${expId}, '${compound}', this.checked)">
+          <span class="pill-dd-label">${p.label}</span>
+          <span class="pill-dd-state">${state === 'regex' ? 'regex' : state === 'override' ? 'override' : ''}</span>
+        </label>`;
+    }).join('');
+    if (!rows) continue;
+    sections.push(`
+      <div class="pill-dd-vibe">${vibeId}</div>
+      ${rows}
+    `);
+  }
+
+  const dd = document.createElement('div');
+  dd.className = 'tag-dropdown pill-override-dropdown';
+  dd.id = `pilldd-${expId}`;
+  dd.innerHTML = `<div class="tag-dropdown-header">Force-include in pills</div>
+    <div style="padding:8px 14px;font-size:11px;color:#888;border-bottom:1px solid #eee;line-height:1.4">
+      Check a pill to <strong>force-include</strong> this venue even if the regex misses it.
+      <span style="color:#888">"regex"</span> = already caught automatically;
+      <span style="color:var(--brown)"><strong>"override"</strong></span> = manually added.
+    </div>
+    ${sections.join('')}`;
+
+  dd.addEventListener('click', e => e.stopPropagation());
+  document.body.appendChild(dd);
+  const rect = cell.getBoundingClientRect();
+  dd.style.top  = Math.min(rect.bottom + 2, window.innerHeight - 380) + 'px';
+  dd.style.left = Math.max(rect.left, 8) + 'px';
+  dd.style.maxHeight = '380px';
+  dd.style.overflowY = 'auto';
+
+  openPillDropdownId = expId;
+  setTimeout(() => document.addEventListener('click', closePillOverrideDropdown, { once: true }), 10);
+}
+
+function closePillOverrideDropdown() {
+  if (!openPillDropdownId) return;
+  const dd = document.getElementById(`pilldd-${openPillDropdownId}`);
+  if (dd) dd.remove();
+  openPillDropdownId = null;
+}
+
+function updatePillOverride(expId, compound, isOn) {
+  const exp = liveExperiences.find(e => e.id === expId);
+  if (!exp) return;
+  const current = new Set(exp.pill_in || []);
+  // Remove any legacy bare-id form that maps to the same compound, then
+  // add or remove the compound version.
+  const bareId = compound.split('/').pop();
+  if (isOn) {
+    current.add(compound);
+  } else {
+    current.delete(compound);
+    current.delete(bareId);
+  }
+  const newArr = [...current];
+  exp.pill_in = newArr;
+  // Persist through the standard dirty queue used by Save All.
+  if (!dirtyData[expId]) dirtyData[expId] = {};
+  dirtyData[expId].pill_in = newArr;
+  // Repaint the cell chip strip immediately so the visitor sees the
+  // result without needing to close + reopen the dropdown.
+  const cell = document.getElementById(`pillcell-${expId}`);
+  if (cell) {
+    const inner = cell.querySelector('.tag-pills');
+    if (inner) {
+      inner.innerHTML = newArr.length
+        ? newArr.map(p => `<span class="tag-pill" style="background:#5A3D22;color:#fff">${p}</span>`).join('')
+        : '<span class="tag-pill-empty">+ override</span>';
+    }
+  }
+  // Update the .state-* indicator on the dropdown row itself.
+  const item = (document.getElementById(`pilldd-${expId}`) || document)
+    .querySelector(`input[onchange*="${compound}"]`);
+  if (item) {
+    const label = item.closest('label');
+    if (label) {
+      label.classList.remove('state-off', 'state-override', 'state-regex');
+      label.classList.add(isOn ? 'state-override' : 'state-off');
+      const stateEl = label.querySelector('.pill-dd-state');
+      if (stateEl) stateEl.textContent = isOn ? 'override' : '';
+    }
+  }
+}
+
 function closeTagDropdown() {
   if (!openTagDropdownId) return;
   const dd = document.getElementById(`tagdd-${openTagDropdownId}`);
@@ -9965,6 +10120,13 @@ function manageRow(e, i, isNew = false) {
     <td class="tag-cell" id="tagcell-${e.id}">
       <div class="tag-pills" onclick="toggleTagDropdown(${e.id}, event)">
         ${(e.tags||[]).length ? (e.tags||[]).map(t => `<span class="tag-pill">${t}</span>`).join('') : '<span class="tag-pill-empty">+ tags</span>'}
+      </div>
+    </td>
+    <td class="tag-cell" id="pillcell-${e.id}">
+      <div class="tag-pills" onclick="togglePillOverrideDropdown(${e.id}, event)" title="Click to force-include this venue in specific pills">
+        ${(e.pill_in||[]).length
+          ? (e.pill_in||[]).map(p => `<span class="tag-pill" style="background:#5A3D22;color:#fff">${p}</span>`).join('')
+          : '<span class="tag-pill-empty">+ override</span>'}
       </div>
     </td>
     <td><select data-field="season" data-id="${e.id}" onchange="markDirty(${e.id},'season',this.value)" style="font-family:'Inter', system-ui, sans-serif,sans-serif;font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--dark);cursor:pointer;width:100%;min-width:110px">
