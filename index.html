@@ -2106,24 +2106,20 @@
     <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">⚙ Manage Database</button>
   </div>
 
-  <!-- Browse-mode toggle promoted out of the Explore tab body so it's the
-       first decision the visitor makes — sits between the tabs and the
-       fine-grained filters. Default = Both. -->
-  <div class="browse-mode-row">
-    <span class="browse-mode-label">Looking for:</span>
+  <!-- (Browse mode toggle + Calendar moved into the filter bar below;
+       editorial row lives above the tabs — see <div class="editorial-band">) -->
+
+
+  <!-- Condensed search + filter bar — search, area, category and dates on one line -->
+  <div class="filter-bar">
+    <!-- Browse-mode toggle lives here now (was its own row above) — first
+         control on the filter line. Area dropdown removed; everything is
+         county-wide by default. -->
     <div class="browse-mode-toggle" role="tablist" aria-label="What to show">
       <button id="bmVenues" type="button" class="bm-btn"        onclick="setBrowseMode('venues')"  title="Just places — restaurants, lodging, museums, parks">🏠 Venues</button>
       <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
       <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
     </div>
-    <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
-  </div>
-
-  <!-- (editorial row lives above the tabs now — see <div class="editorial-band">) -->
-
-
-  <!-- Condensed search + filter bar — search, area, category and dates on one line -->
-  <div class="filter-bar">
     <div class="search-field" data-tip="Search for any craft, activity, venue or event — try “blacksmithing”, “wine tasting”, “live music” or “Cornish Christmas”, then press Find. Synonyms are built in, so “metalsmith” also finds a studio listed as “blacksmithing”.">
       <span class="search-icon">🔍</span>
       <input type="text" id="expSearch" autocomplete="off"
@@ -2132,31 +2128,6 @@
       <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:none" title="Clear search" aria-label="Clear search">✕</button>
     </div>
     <button class="search-go" onclick="runSearch()">Find</button>
-    <select id="filterArea" title="Limit results to one town — county-wide events still appear for every area">
-      <option value="">All Areas</option>
-      <optgroup label="Western Nevada County">
-        <option value="Nevada City">Nevada City</option>
-        <option value="Grass Valley">Grass Valley</option>
-        <option value="Near Nevada City">Near Nevada City</option>
-        <option value="Penn Valley">Penn Valley</option>
-        <option value="Chicago Park">Chicago Park</option>
-        <option value="North San Juan">North San Juan</option>
-        <option value="Washington">Washington</option>
-        <option value="Rough and Ready">Rough and Ready</option>
-        <option value="Smartsville">Smartsville</option>
-      </optgroup>
-      <optgroup label="Adjacent">
-        <option value="Colfax">Colfax</option>
-      </optgroup>
-      <optgroup label="County-Wide">
-        <option value="Nevada County">County-Wide</option>
-      </optgroup>
-    </select>
-    <!-- Category dropdown removed — superseded by Vibes (with their pill
-         rows), the Stays tile, and the 🌿 In Season toggle. The unified
-         pill model covers every category-narrowing use case the dropdown
-         offered, without the second navigation surface. -->
-
     <input type="date" id="filterDateFrom" class="fb-date" title="Visit start date"
       onchange="visitorDateFrom=this.value;if(visitorDateTo&&visitorDateTo<visitorDateFrom){visitorDateTo=visitorDateFrom;var t=document.getElementById('filterDateTo');if(t)t.value=visitorDateTo;}_visApplyDate()">
     <span style="color:#bbb;flex-shrink:0">–</span>
@@ -2168,6 +2139,7 @@
       <button class="date-quick-btn"        id="vqBtnWeekend" onclick="_visSetWeekend()" title="This coming Saturday and Sunday">Weekend</button>
       <button class="date-quick-btn"        id="vqBtnWeek"    onclick="_visSetWeek()"    title="The next 7 days">Week</button>
     </div>
+    <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
   </div>
   <div id="subPillsRow" style="display:none;margin:2px 0 14px;padding-top:10px;border-top:1px dashed #e0d8c8;flex-wrap:wrap;gap:6px;align-items:center"></div>
 
@@ -4012,11 +3984,7 @@ function renderActiveFilters() {
     );
   });
 
-  // Area chip
-  const areaEl = document.getElementById('filterArea');
-  if (areaEl.value) chips.push(
-    `<span class="filter-chip chip-meta">${areaEl.options[areaEl.selectedIndex].text}<span class="filter-chip-x" onclick="document.getElementById('filterArea').value='';renderExperiences();renderActiveFilters()">✕</span></span>`
-  );
+  // (Area chip removed — the area dropdown is gone. Default is county-wide.)
 
   // (Category chip removed — the dropdown is gone. Vibes / Stays / In
   // Season pills render their own active-state chips above.)
@@ -4051,8 +4019,6 @@ function clearAllFilters() {
   seasonalActive = false;
   const stayCard = document.querySelector('.theme-card.stays-card');
   if (stayCard) stayCard.classList.remove('selected');
-  const areaEl = document.getElementById('filterArea');
-  if (areaEl) areaEl.value = '';
   _visClearDate();    // resets date state + re-renders events
   renderThemes();
   if (typeof renderVibePills === 'function')   renderVibePills();
@@ -6287,14 +6253,8 @@ function printItinerary() {
 }
 
 // Event listeners
-document.getElementById('filterArea').addEventListener('change', () => {
-  renderExperiences();
-  renderActiveFilters();
-  // The Area dropdown also scopes the Upcoming Events tab — refresh it if open.
-  // Events now live inside Explore — re-render whenever they're in scope.
-  if (showUpcomingEvents) renderEventsView();
-});
-// (filterType change listener removed along with the Category dropdown.)
+// (filterArea + filterType change listeners removed along with their dropdowns.
+//  Default is now county-wide — visitors don't pre-filter by town.)
 
 // ── PERSISTENT STORAGE ──────────────────────────────────────────────
 // Storage priority: localStorage (works everywhere) → window.storage (Claude artifacts)
