@@ -362,9 +362,38 @@
     padding: 4px 9px;
     white-space: nowrap;
     letter-spacing: 0.02em;
+    /* Lay glyph + label on a single baseline. */
+    display: inline-flex; align-items: center; gap: 6px;
   }
   .date-quick-btn:hover { background: var(--gold-light); border-color: var(--gold); }
   .date-quick-btn.active { background: var(--brown); color: #fff; border-color: var(--brown); }
+  /* ── Quick-date button glyph (mini week strip) ─────────────────────
+     Each glyph is either a continuous bar (.dqb-glyph-all) or a row of
+     seven cells representing the days of the week, with the selected
+     days set to .on. Uses currentColor so the glyph automatically
+     follows label color through hover / active states. */
+  .dqb-glyph {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    height: 6px;
+  }
+  .dqb-glyph i {
+    display: inline-block;
+    width: 3px; height: 6px;
+    background: currentColor;
+    opacity: 0.22;
+    border-radius: 0.5px;
+  }
+  .dqb-glyph i.on { opacity: 1; }
+  .dqb-glyph-all {
+    /* Continuous bar = "no specific range, all of time". Different shape
+       from the 7-cell strips deliberately so All ≠ Week at a glance. */
+    width: 24px;
+    background: currentColor;
+    opacity: 0.85;
+    border-radius: 1px;
+  }
 
   /* EXPERIENCE CARDS */
   .exp-grid {
@@ -2458,11 +2487,26 @@
         <input type="date" id="filterDateTo" class="fb-date" title="Visit end date"
           onchange="visitorDateTo=this.value;if(visitorDateFrom&&visitorDateFrom>visitorDateTo){visitorDateFrom=visitorDateTo;var f=document.getElementById('filterDateFrom');if(f)f.value=visitorDateFrom;}_visApplyDate()">
       </div>
+      <!-- Each quick-date button carries a mini "week strip" glyph that
+           visualises which days the button covers — a non-emoji,
+           non-photo visual cue that's literally a tiny calendar slice.
+           All  = solid bar (no specific range, continuous time)
+           Today    = 7-cell strip, one cell lit
+           Weekend  = 7-cell strip, last two cells lit (Sat + Sun)
+           Week     = 7-cell strip, all seven lit -->
       <div class="date-quick-group">
-        <button class="date-quick-btn active" id="vqBtnAll"     onclick="_visSetAll()"     title="Show all upcoming dates">All</button>
-        <button class="date-quick-btn"        id="vqBtnToday"   onclick="_visSetToday()"   title="Today only">Today</button>
-        <button class="date-quick-btn"        id="vqBtnWeekend" onclick="_visSetWeekend()" title="This coming Saturday and Sunday">Weekend</button>
-        <button class="date-quick-btn"        id="vqBtnWeek"    onclick="_visSetWeek()"    title="The next 7 days">Week</button>
+        <button class="date-quick-btn active" id="vqBtnAll"     onclick="_visSetAll()"     title="Show all upcoming dates">
+          <span class="dqb-glyph dqb-glyph-all"></span>All
+        </button>
+        <button class="date-quick-btn"        id="vqBtnToday"   onclick="_visSetToday()"   title="Today only">
+          <span class="dqb-glyph"><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i></span>Today
+        </button>
+        <button class="date-quick-btn"        id="vqBtnWeekend" onclick="_visSetWeekend()" title="This coming Saturday and Sunday">
+          <span class="dqb-glyph"><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i></span>Weekend
+        </button>
+        <button class="date-quick-btn"        id="vqBtnWeek"    onclick="_visSetWeek()"    title="The next 7 days">
+          <span class="dqb-glyph"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Week
+        </button>
       </div>
     </div>
     <button id="bmCalendar" type="button" class="bm-cal-btn" onclick="toggleCalendarView()" title="Switch between list and calendar view">▦ Calendar</button>
