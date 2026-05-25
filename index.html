@@ -3071,6 +3071,81 @@
     .section-banner-caption .sb-tagline { letter-spacing: 0.12em; font-size: 10px; }
   }
 
+  /* ── UI-V2 TOWN STRIP ───────────────────────────────────────────
+     Three photo-cards giving geographic context. Sits between the
+     section-break banner and the tab nav. Click → filter the grid
+     to that town + scroll into view. */
+  .town-strip { display: none; }
+  body.ui-v2 .town-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin: 0 0 28px;
+  }
+  .town-card {
+    position: relative;
+    height: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #1f1a14;
+    transition: transform 0.2s ease;
+  }
+  .town-card:hover { transform: translateY(-2px); }
+  .town-card-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    filter: brightness(0.78);
+    transition: transform 0.4s ease, filter 0.3s ease;
+  }
+  .town-card:hover .town-card-img {
+    transform: scale(1.05);
+    filter: brightness(0.92);
+  }
+  .town-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+      rgba(31,26,20,0.10) 0%,
+      rgba(31,26,20,0.20) 45%,
+      rgba(31,26,20,0.80) 100%);
+    pointer-events: none;
+  }
+  .town-card-content {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 18px 20px 16px;
+    color: #fff;
+    z-index: 2;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.45);
+  }
+  .town-kicker {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 5px;
+  }
+  .town-name {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(22px, 2.6vw, 30px);
+    line-height: 1.1;
+    margin: 0 0 5px;
+  }
+  .town-blurb {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.92);
+    margin: 0;
+    line-height: 1.35;
+    max-width: 92%;
+  }
+  @media (max-width: 768px) {
+    body.ui-v2 .town-strip { grid-template-columns: 1fr; gap: 10px; }
+    .town-card { height: 160px; }
+  }
+
   /* ── UI-V2 BIGGER CARDS ─────────────────────────────────────────
      Pump up the card photo height + give each card more horizontal
      room so the grid reads as a magazine layout instead of a dense
@@ -3287,6 +3362,12 @@
   <div class="editorial-magazine" id="editorialMagazine"></div>
 </div>
 
+<!-- Hidden area-filter input — the existing filter logic in
+     filterExperiences/renderEvents reads document.getElementById('filterArea').value
+     to narrow by town. The dropdown was retired earlier but the read
+     stayed; this hidden input gives _filterByTown() somewhere to write. -->
+<input type="hidden" id="filterArea" value="">
+
 <!-- UI-V2 SECTION-BREAK BANNER — full-bleed landscape photo between
      the editorial spread and the functional nav/filter area. Gives the
      page rhythm: editorial moment → visual pause → functional zone.
@@ -3297,6 +3378,38 @@
     <span class="sb-kicker">Western Nevada County</span>
     <span class="sb-tagline">Nevada City · Grass Valley · Penn Valley · North San Juan</span>
   </div>
+</div>
+
+<!-- UI-V2 "WHERE YOU ARE" TOWN STRIP — three photo-cards giving
+     geographic context to visitors who don't know the area yet.
+     Clicking a card sets the area filter + scrolls to the grid so
+     they land in pre-filtered results for that town. Hidden on
+     default UI. -->
+<div class="town-strip v2-only" aria-label="Pick a town to explore">
+  <article class="town-card" onclick="_filterByTown('Nevada City')">
+    <div class="town-card-img" style="background-image:url('https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=1200&h=800&fit=crop')"></div>
+    <div class="town-card-content">
+      <div class="town-kicker">Town</div>
+      <h3 class="town-name">Nevada City</h3>
+      <p class="town-blurb">Victorian downtown, music + arts hub, walkable historic core.</p>
+    </div>
+  </article>
+  <article class="town-card" onclick="_filterByTown('Grass Valley')">
+    <div class="town-card-img" style="background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&h=800&fit=crop')"></div>
+    <div class="town-card-content">
+      <div class="town-kicker">Town</div>
+      <h3 class="town-name">Grass Valley</h3>
+      <p class="town-blurb">Working downtown, Empire Mine, Cornish heritage, family-friendly.</p>
+    </div>
+  </article>
+  <article class="town-card" onclick="_filterByTown('Penn Valley')">
+    <div class="town-card-img" style="background-image:url('https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=800&fit=crop')"></div>
+    <div class="town-card-content">
+      <div class="town-kicker">Town</div>
+      <h3 class="town-name">Penn Valley</h3>
+      <p class="town-blurb">Rural west county — Western Gateway Park, oak savanna, river access.</p>
+    </div>
+  </article>
 </div>
 
 
@@ -3746,6 +3859,36 @@
   };
   apply();
 })();
+
+// ─── UI-V2 "WHERE YOU ARE" TOWN STRIP ───────────────────────────────────
+// Clicking a town card sets the (hidden) #filterArea input, re-renders
+// the current Explore view, and scrolls the grid into view so the
+// visitor lands in pre-filtered results for that town.
+// Filter logic in filterExperiences() / _eventsForView() already reads
+// from #filterArea — we just supply the value.
+function _filterByTown(area) {
+  const fa = document.getElementById('filterArea');
+  if (fa) fa.value = area || '';
+  // Make sure the visitor is on the Explore tab — town strip is meant
+  // to land them in the venue/event grid.
+  if (typeof switchTab === 'function') {
+    const expBtn = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
+    if (expBtn && !expBtn.classList.contains('active')) {
+      switchTab('experiences', expBtn);
+    }
+  }
+  if (typeof _renderActiveGrids === 'function') _renderActiveGrids();
+  else if (typeof renderExperiences === 'function') renderExperiences();
+  if (typeof renderActiveFilters === 'function') renderActiveFilters();
+  // Smooth-scroll the grid into the visitor's viewport.
+  setTimeout(() => {
+    const grid = document.getElementById('expGrid');
+    if (grid && grid.offsetParent !== null) {
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 80);
+  if (typeof track === 'function') track('town_strip_click', { area });
+}
 
 // ─── UI-V2 HERO SLIDESHOW ────────────────────────────────────────────────
 // Crossfades the .hero-v2-slide elements every ~7 seconds. Only runs when
