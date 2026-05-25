@@ -2300,35 +2300,69 @@
     box-shadow: 0 3px 10px rgba(0,0,0,0.12);
     z-index: 200; pointer-events: none;
   }
-  .help-banner {
-    width: 100%;
-    display: flex; align-items: center; gap: 11px;
-    background: var(--fog);
-    border: 1px solid #e6ddc9;
-    border-left: 4px solid var(--gold);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 18px;
-    cursor: pointer;
+  /* ── Compact help launcher on the tabs row ────────────────────────
+     The full-width "?" banner that used to sit above the nav has been
+     retired. The launcher is now a small circle that pairs visually
+     with the lane dots in the nav above it. */
+  .tab-help-btn {
+    align-self: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid #d8cdb8;
+    background: transparent;
+    color: var(--brown);
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 13px; color: var(--slate);
-    text-align: left;
+    font-size: 13px; font-weight: 600;
+    line-height: 1; padding: 0;
+    cursor: pointer;
+    margin-right: 6px;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
   }
-  .help-banner:hover { background: #ece3d0; border-color: var(--gold); }
-  .help-banner .hb-icon { font-size: 18px; flex-shrink: 0; }
-  .help-banner .hb-arrow { margin-left: auto; color: var(--gold); font-weight: 700; flex-shrink: 0; }
-  .help-strat {
-    display: flex; gap: 12px; padding: 11px 2px;
+  .tab-help-btn:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #fff;
+  }
+
+  /* ── Help modal — lane-coloured-dot rows, no emoji ────────────────
+     Each "how to use" row gets one of the four nav-lane dot colors so
+     visitors absorb the lane vocabulary while they read. */
+  .help-row {
+    display: flex; gap: 14px; padding: 13px 4px;
     border-bottom: 1px solid #efe7d6;
     font-size: 13px; color: var(--slate); line-height: 1.5;
   }
-  .help-strat:last-of-type { border-bottom: none; }
-  .help-emoji { font-size: 22px; flex-shrink: 0; width: 30px; text-align: center; }
-  .help-strat strong { color: var(--brown); font-size: 13.5px; }
+  .help-row:last-of-type { border-bottom: none; }
+  .help-row .help-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .help-row.lane-explore   .help-dot { background: var(--forest); }
+  .help-row.lane-suggested .help-dot { background: var(--gold); }
+  .help-row.lane-plan      .help-dot { background: var(--rust); }
+  .help-row.lane-guides    .help-dot { background: var(--brown); }
+  .help-row.lane-search    .help-dot { background: #6b6055; }
+  .help-row.lane-dates     .help-dot { background: #6b6055; }
+  .help-row strong {
+    color: var(--brown); font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .help-row em {
+    color: var(--brown);
+    font-style: normal;
+    font-weight: 600;
+    background: #f7f1e2;
+    padding: 0 4px;
+    border-radius: 2px;
+  }
   .help-tips {
-    margin-top: 14px; background: var(--fog);
-    border-radius: 8px; padding: 12px 14px;
-    font-size: 12px; color: var(--slate); line-height: 1.6;
+    margin-top: 16px; background: var(--fog);
+    border-radius: 6px; padding: 13px 15px;
+    font-size: 12.5px; color: var(--slate); line-height: 1.65;
+    border-left: 3px solid var(--gold);
   }
   .help-tips strong { color: var(--brown); }
   .tb-section { margin-bottom: 18px; }
@@ -2404,11 +2438,10 @@
 
 <!-- THEME SELECTOR -->
 <div class="section">
-  <button class="help-banner" onclick="openHelp()">
-    <span class="hb-icon">❓</span>
-    <span>New here? See all the ways to find what you want — search, vibes, the planner &amp; more</span>
-    <span class="hb-arrow">→</span>
-  </button>
+  <!-- (The large yellow "New here? See all the ways…" help banner used
+       to live here. Replaced with a compact "?" button on the right of
+       the tab nav so the top of the page belongs to editorial content
+       — the help is one click away when needed, invisible otherwise.) -->
 
   <div id="manageBanner" class="manage-banner">
     <span>✏️ <strong>Manage Mode</strong> — Click × on any card to remove it from your itinerary.</span>
@@ -2439,7 +2472,13 @@
       <span class="tab-label">Local Guides</span>
       <span class="tab-tag">Told by locals</span>
     </button>
-    <button class="tab-btn tab-btn-admin" style="margin-left:auto" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">
+    <!-- Compact help launcher — lives on the tabs row so it's always
+         findable but never dominates the page. Sits at the right end
+         next to (or, on phones, in place of) Manage Database. -->
+    <button class="tab-help-btn" style="margin-left:auto" onclick="openHelp()"
+            title="First time here? See how to use the site — search, vibes, the planner, calendar &amp; more"
+            aria-label="Help">?</button>
+    <button class="tab-btn tab-btn-admin" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">
       <span class="tab-label">Manage Database</span>
     </button>
   </div>
@@ -2610,50 +2649,53 @@
   </div>
 </div>
 
-<!-- HELP MODAL -->
+<!-- HELP MODAL — lane-coloured-dot rows that mirror the nav above.
+     Each row tells the visitor which lane to enter for a given intent;
+     the dot colour matches the nav lane it sends them to so they
+     absorb the vocabulary while they read. -->
 <div class="modal-overlay" id="helpOverlay" onclick="if(event.target===this)closeHelp()" style="z-index:1100">
-  <div class="modal" style="max-width:620px">
+  <div class="modal" style="max-width:640px">
     <div class="modal-header">
       <button class="modal-close" onclick="closeHelp()">✕</button>
-      <h2>❓ How to find what you want</h2>
-      <p>There's no wrong way to explore — pick the path that fits you.</p>
+      <h2>How to use this site</h2>
+      <p>There's no wrong way to explore — pick the path that fits.</p>
     </div>
     <div class="modal-body">
-      <div class="help-strat">
-        <div class="help-emoji">🔍</div>
+      <div class="help-row lane-search">
+        <span class="help-dot"></span>
         <div><strong>You already know what you want</strong><br>
-          Use the <em>Search</em> box at the top — type it and press <em>Find</em>. Synonyms are built in, so "metalsmith" still finds a studio listed as "blacksmithing".</div>
+          Use the <em>search box</em> on the Explore tab — type it and press <em>Find</em>. Synonyms are built in, so "metalsmith" still finds a studio listed as "blacksmithing".</div>
       </div>
-      <div class="help-strat">
-        <div class="help-emoji">🎭</div>
+      <div class="help-row lane-explore">
+        <span class="help-dot"></span>
         <div><strong>You're browsing — inspire me</strong><br>
-          Pick one or more <em>vibes</em> in the <em>Browse by Vibe</em> section (Historic, Arts, Foodie, Active…). Cards filter instantly; combine vibes to widen, add Area/Category/date to narrow.</div>
+          On <em>Explore</em>, pick one or more <em>vibes</em> (Historic, Arts, Foodie, Active…). Cards filter instantly; combine vibes to widen, add the date filter to narrow.</div>
       </div>
-      <div class="help-strat">
-        <div class="help-emoji">✨</div>
+      <div class="help-row lane-plan">
+        <span class="help-dot"></span>
         <div><strong>Plan it for me</strong><br>
-          Open the <em>✨ Help Me Plan</em> tab. Answer a few questions — days, pace, who's coming, activity level, interests — and get a tailored day-by-day draft you can edit.</div>
+          Open the <em>Help Me Plan</em> tab. Answer a few questions — days, pace, who's coming, activity level, interests — and get a tailored day-by-day draft you can edit.</div>
       </div>
-      <div class="help-strat">
-        <div class="help-emoji">📅</div>
-        <div><strong>You have set dates</strong><br>
-          Set the <em>When?</em> filter, then open <em>Upcoming Events → Calendar</em> to see exactly what's on each day of your visit.</div>
-      </div>
-      <div class="help-strat">
-        <div class="help-emoji">🧭</div>
+      <div class="help-row lane-suggested">
+        <span class="help-dot"></span>
         <div><strong>You want a ready-made trip</strong><br>
-          Open <em>Suggested Experiences</em> — curated itineraries. Hit <em>Customize this trip</em> on any of them to copy it into your own planner and tweak it.</div>
+          Open <em>Suggested</em> — hand-picked itineraries from us. Hit <em>Customize this trip</em> on any of them to copy it into your own planner and tweak it.</div>
       </div>
-      <div class="help-strat">
-        <div class="help-emoji">🏠</div>
-        <div><strong>You just need a place to stay</strong><br>
-          Tap the <em>🏠 Lodging</em> tile alongside the vibes — it jumps straight to every hotel, B&amp;B, cabin and campground.</div>
+      <div class="help-row lane-guides">
+        <span class="help-dot"></span>
+        <div><strong>Tell me what's worth knowing</strong><br>
+          <em>Local Guides</em> are long-form pieces written by people who live here — historians, hikers, musicians, tribal members — on the places and stories that don't show up in a venue card.</div>
+      </div>
+      <div class="help-row lane-dates">
+        <span class="help-dot"></span>
+        <div><strong>You have set dates</strong><br>
+          Set the <em>date range</em> in the filter bar (or hit <em>Today / Weekend / Week</em>), then flip the Explore tab to <em>Calendar</em> view to see exactly what's on each day.</div>
       </div>
       <div class="help-tips">
         <strong>Good to know</strong><br>
         • Anything you add lands in <strong>My Itinerary</strong> — organize it by day, view it on a map (with parking &amp; restrooms), or share a link.<br>
-        • The <strong>In Season Now</strong> strip near the top flags what's special this week — wildflowers, swimming season, festivals.<br>
-        • Filters stack: Area + Category + dates + a vibe all narrow together.
+        • The strip near the top flags what's <strong>In Season</strong> this week — wildflowers, swimming season, festivals.<br>
+        • Filters stack: vibes + browse-mode + date range all narrow together.
       </div>
     </div>
   </div>
