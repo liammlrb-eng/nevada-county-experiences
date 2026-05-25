@@ -3005,6 +3005,65 @@
     .em-feature { grid-row: auto; min-height: 280px; }
   }
 
+  /* ── UI-V2 BIGGER CARDS ─────────────────────────────────────────
+     Pump up the card photo height + give each card more horizontal
+     room so the grid reads as a magazine layout instead of a dense
+     directory table. Default size (140px tall, 280px min-col) stays
+     for non-v2 users. */
+  body.ui-v2 .exp-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 22px;
+  }
+  body.ui-v2 .exp-card {
+    border-radius: 12px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.08);
+  }
+  body.ui-v2 .exp-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+    transform: translateY(-2px);
+  }
+  body.ui-v2 .exp-photo { height: 240px; }
+  body.ui-v2 .exp-photo-name {
+    padding: 14px 18px;
+    font-size: 18px;
+    letter-spacing: 0.005em;
+  }
+  body.ui-v2 .exp-photo-area {
+    top: 12px; right: 14px;
+    font-size: 10px;
+    padding: 4px 10px;
+    background: rgba(31,26,20,0.45);
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+  }
+  /* Strengthen the photo overlay gradient at the bottom so the name
+     stays legible against bright photos. */
+  body.ui-v2 .exp-photo-overlay {
+    background: linear-gradient(to top,
+      rgba(10,6,2,0.88) 0%,
+      rgba(10,6,2,0.45) 30%,
+      rgba(10,6,2,0.12) 55%,
+      transparent 80%);
+  }
+  /* The card body — give a little more vertical breathing so the
+     longer cards don't feel top-heavy with the bigger photo. */
+  body.ui-v2 .exp-card .exp-body { padding: 16px 18px 18px; }
+  body.ui-v2 .exp-card .exp-sub {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  /* Mobile: keep the card photo tall-ish but not 240px. */
+  @media (max-width: 768px) {
+    body.ui-v2 .exp-photo { height: 200px; }
+    body.ui-v2 .exp-photo-name { font-size: 16px; padding: 12px 14px; }
+  }
+
+  /* List view in v2 is unchanged — the cards stay compact (90px
+     thumbnail) since the whole point of list view is density. The
+     above rules don't apply because .exp-grid.is-list / .events-grid
+     .is-list already override exp-photo dimensions. */
+
   /* ── Help modal — lane-coloured-dot rows, no emoji ────────────────
      Each "how to use" row gets one of the four nav-lane dot colors so
      visitors absorb the lane vocabulary while they read. */
