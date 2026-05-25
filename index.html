@@ -1889,6 +1889,12 @@
   }
   .ed-card.shortcut { border-style: dashed; }   /* dynamic seasonal-moment cards */
   .ed-card.shortcut:hover { border-color: var(--gold); }
+  /* External-link editorial card (e.g. Audio Walking Tour). Subtle rust
+     outline + CTA color so visitors register it's a destination, not a
+     filter toggle, before they click. */
+  .ed-card.ed-card-external { border-color: rgba(139,74,42,0.45); }
+  .ed-card.ed-card-external:hover { border-color: var(--rust); }
+  .ed-card.ed-card-external .ed-cta { color: var(--rust); }
   .ed-photo {
     position: relative;
     height: 96px;
@@ -2926,7 +2932,7 @@ const EXPERIENCES = [
   { id: 34, name: 'North Star Mining Museum & Pelton Wheel', sub: "Worlds largest Pelton Wheel exhibit", area: 'Grass Valley', type: 'Museum', tags: ['Historic','Gold Rush'], hours: 'May–Oct daily 10–5; check off-season', notes: '30-ft Pelton Wheel laid foundation for modern hydroelectric power; free admission', icon: '⚙️', url: 'https://northstarminingmuseum.com/', directions: 'https://maps.google.com/?q=North+Star+Mining+Museum+Grass+Valley+CA', lat: 39.2091, lng: -121.0559, photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop', season: 'Year-Round' },
   { id: 44, name: 'Firehouse No. 1 Museum', sub: 'Victorian-era firehouse with Gold Country artifacts', area: 'Nevada City', type: 'Museum', tags: ['Historic','Gold Rush'], hours: 'Wed–Sun 11–4; check seasonal hours', notes: "Houses the Hou Wang Temple altar from Grass Valley Chinatown; free entry", icon: '🏛️', url: 'https://nevadacountyhistory.org/', directions: 'https://maps.google.com/?q=Firehouse+No+1+Museum+Nevada+City+CA', lat: 39.2619, lng: -121.0173, photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop', season: 'Year-Round' },
   { id: 33, name: 'Nevada Theatre', sub: 'Oldest continuously operated theater in California (1865)', area: 'Nevada City', type: 'Music venue', tags: ['Historic','Music','Artistic','Film'], hours: 'Check event calendar; box office varies', notes: 'Built 1865; stunning murals by Sarah Coleman; hosts Wild & Scenic, film festivals', icon: '🎭', url: 'https://nevadatheatre.com/', directions: 'https://maps.google.com/?q=Nevada+Theatre+401+Broad+St+Nevada+City+CA', lat: 39.2618, lng: -121.018, photo: 'https://nevadatheatre.com/wp-content/uploads/2021/09/nevada-theatre-header.png', season: 'Year-Round' },
-  { id: 55, name: 'Nevada City Smartphone Walking Tour', sub: '90-minute self-guided historic downtown audio tour', area: 'Nevada City', type: 'Activity', tags: ['Historic','Gold Rush','Family'], hours: 'Any time; self-guided', notes: 'Covers architecture & stories from 1850–1970s; free or low-cost', icon: '🚶', url: 'https://gonevadacounty.com/things-to-do-nevada-city/', directions: 'https://maps.google.com/?q=Nevada+City+Chamber+of+Commerce+CA', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop', season: 'Year-Round' },
+  { id: 55, name: 'Nevada City Audio Walking Tour', sub: 'Self-guided audio tour of the Historic District (Stqry)', area: 'Nevada City', type: 'Activity', tags: ['Historic','Gold Rush','Family','Guide'], hours: 'Any time; self-guided', notes: 'Free audio-guided tour from the Grass Valley / Nevada City Cultural Districts — open the link on your phone and walk Broad Street, Pine, and Commercial at your own pace.', icon: '🎧', url: 'https://gvncculturedistricts.stqry.app/en/tour/29298', directions: 'https://maps.google.com/?q=Nevada+City+CA+Downtown', lat: 39.2617, lng: -121.0178, photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=400&h=260&fit=crop', season: 'Year-Round' },
   // MUSIC & NIGHTLIFE
   { id: 10, name: 'Crazy Horse Saloon & Grill', sub: 'Live music + dining', area: 'Nevada City', type: 'Music venue', tags: ['Music','Rustic','Social'], hours: 'Shows vary; see venue calendar', notes: 'Live bands most weekends; good evening stop', icon: '🎤', url: 'https://crazyhorsenc.com/venue/crazy-horse-grill/', directions: 'https://maps.google.com/?q=Crazy+Horse+Saloon+Nevada+City+CA', lat: 39.2616, lng: -121.0185, photo: 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=400&h=260&fit=crop', season: 'Year-Round' },
   { id: 57, name: 'Music in the Mountains', sub: 'Annual classical music festival', area: 'Grass Valley', type: 'Music venue', tags: ['Music','Artistic','Festival'], hours: 'Annual — typically June; musicinthemountains.org', notes: 'World-class classical & chamber music; community tradition since 1982', icon: '🎻', url: 'https://musicinthemountains.org/', directions: 'https://maps.google.com/?q=The+Center+for+the+Arts+Grass+Valley+CA', lat: 39.2188, lng: -121.0597, photo: 'https://images.unsplash.com/photo-1541367777708-7905fe3296c0?w=400&h=260&fit=crop', season: 'Summer' },
@@ -3785,6 +3791,14 @@ function _currentSeasonalWindow() {
   };
 }
 
+// Open an editorial-card external link in a new tab + fire analytics so
+// we can see how often the Audio Walking Tour (and future external cards)
+// get used. `noopener` is critical — Stqry is a third-party host.
+function _edCardOpenExternal(url, trackId) {
+  if (typeof track === 'function') track('editorial_external_open', { id: trackId, url });
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 // Toggle a single editorial pill. OR-union semantics — pills add to a set,
 // re-rendering everything that's filterable.
 function toggleEditorial(id) {
@@ -3815,11 +3829,20 @@ function _editorialCards() {
   // Capitalize first letter of each season word for display.
   const seasonCap = w.label.replace(/\b\w/g, c => c.toUpperCase());
   const seasonPhoto = _ED_PHOTOS_BY_SEASON[w.label.split(' ')[0]] || _ED_PHOTOS_BY_SEASON.spring;
-  const favCount = (typeof myList !== 'undefined') ? myList.size : 0;
-  // Local Guides moved out — it lives as a filter button on the Explore
-  // line now, so the editorial band stays focused on "curated slices" the
-  // visitor doesn't expect as a filter.
+  // Cards in display order. The Audio Walking Tour is a featured external
+  // link (not a filter toggle) — it lives at position 1 so first-time
+  // visitors see "here's a thing to do right now" before anything else.
+  // `external_url` opts the card out of toggleEditorial and into open-in-tab.
   return [
+    {
+      id: 'audiotour',
+      title: 'Audio Walking Tour',
+      blurb: 'Self-guided tour of Nevada City\'s Historic District — open on your phone, walk Broad Street at your own pace.',
+      cta:   'Start the tour →',
+      photo: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?w=480&h=320&fit=crop',
+      external_url: 'https://gvncculturedistricts.stqry.app/en/tour/29298',
+      track_id: 'audio_walking_tour_nc',
+    },
     {
       id: 'inseason',
       title: 'In Season',
@@ -3834,15 +3857,6 @@ function _editorialCards() {
       cta:   activeEditorialPills.has('justadded') ? 'Showing ✓' : 'Browse new arrivals →',
       photo: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=480&h=320&fit=crop',
     },
-    {
-      id: 'favorites',
-      title: 'Favorites',
-      blurb: favCount === 0
-        ? 'Items you save to My Itinerary land here.'
-        : `Your ${favCount} saved item${favCount === 1 ? '' : 's'}, focused.`,
-      cta:   activeEditorialPills.has('favorites') ? 'Showing ✓' : (favCount === 0 ? 'Save things to fill this →' : 'See your saved →'),
-      photo: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=480&h=320&fit=crop',
-    },
   ];
 }
 
@@ -3854,6 +3868,24 @@ function _renderEditorialStrip() {
   if (!strip) return;
 
   const baseHtml = _editorialCards().map(c => {
+    // External-link cards (e.g. the Audio Walking Tour) skip the filter-
+    // toggle handler and open the link in a new tab instead.
+    if (c.external_url) {
+      const trackId = c.track_id || c.id;
+      return `<article class="ed-card ed-card-external"
+          onclick="_edCardOpenExternal('${c.external_url}','${trackId}')"
+          title="${(c.blurb||'').replace(/"/g,'&quot;')}">
+        <div class="ed-photo">
+          <span class="ed-badge" style="background:var(--rust)">↗ External</span>
+          <img src="${c.photo}" alt="${c.title}" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="ed-body">
+          <div class="ed-title">${c.title}</div>
+          <div class="ed-blurb">${c.blurb}</div>
+          <div class="ed-cta">${c.cta}</div>
+        </div>
+      </article>`;
+    }
     const active = activeEditorialPills.has(c.id);
     return `<article class="ed-card${active ? ' active' : ''}" onclick="toggleEditorial('${c.id}')"
         title="${(c.blurb||'').replace(/"/g,'&quot;')}">
