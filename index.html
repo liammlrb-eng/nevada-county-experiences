@@ -667,6 +667,16 @@
     border-bottom-color: var(--gold);
     font-weight: 600;
   }
+  /* tab-filter-btn — a filter toggle that sits on the tabs row alongside
+     the real navigation tabs. Forest-green underline + label color when
+     active so it never gets confused with the currently-selected tab
+     (which uses the gold accent). */
+  .tab-filter-btn.active {
+    color: var(--forest);
+    border-bottom-color: var(--forest);
+    font-weight: 600;
+  }
+  .tab-filter-btn:hover { color: var(--forest); }
   .tab-panel { display: none; margin-top: 8px; scroll-margin-top: 20px; }
   .tab-panel.active { display: block; }
   /* Centered decorative divider between page sections */
@@ -2103,6 +2113,7 @@
     <button class="tab-btn active" onclick="switchTab('experiences', this)" title="Browse every venue and experience — filter by vibe, area, category or date">Explore</button>
     <button class="tab-btn" onclick="switchTab('itineraries', this)" title="Ready-made day-by-day itineraries you can copy and customize">Suggested Experiences</button>
     <button class="tab-btn" onclick="switchTab('plan', this)" title="Answer a few questions and get a tailored day-by-day draft">✨ Help Me Plan</button>
+    <button id="edLocalGuidesFilter" type="button" class="tab-btn tab-filter-btn" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
     <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">⚙ Manage Database</button>
   </div>
 
@@ -2120,7 +2131,6 @@
       <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
       <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
     </div>
-    <button id="edLocalGuidesFilter" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
     <div class="search-field" data-tip="Search for any craft, activity, venue or event — try “blacksmithing”, “wine tasting”, “live music” or “Cornish Christmas”, then press Find. Synonyms are built in, so “metalsmith” also finds a studio listed as “blacksmithing”.">
       <span class="search-icon">🔍</span>
       <input type="text" id="expSearch" autocomplete="off"
