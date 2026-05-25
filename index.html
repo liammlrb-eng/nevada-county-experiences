@@ -2355,21 +2355,42 @@
      The full-width "?" banner that used to sit above the nav has been
      retired. The launcher is now a small circle that pairs visually
      with the lane dots in the nav above it. */
+  /* Pill-style help launcher: circular "?" mark on the left + the word
+     "Help" on the right so the affordance is obvious to visitors who
+     don't read a bare "?" as actionable. The circle keeps its own
+     border so it reads as an icon-in-a-chip; the wrapping button has
+     no border, just a hover background fill that wraps both pieces. */
   .tab-help-btn {
     align-self: center;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    border: 1.5px solid #d8cdb8;
+    display: inline-flex; align-items: center;
+    gap: 7px;
+    padding: 4px 10px 4px 4px;
+    border: none;
+    border-radius: 999px;
     background: transparent;
     color: var(--brown);
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 13px; font-weight: 600;
-    line-height: 1; padding: 0;
     cursor: pointer;
     margin-right: 6px;
+    transition: background 0.18s, color 0.18s;
+  }
+  .tab-help-btn .tab-help-mark {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid #d8cdb8;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    line-height: 1;
     transition: background 0.18s, border-color 0.18s, color 0.18s;
   }
-  .tab-help-btn:hover {
+  .tab-help-btn .tab-help-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .tab-help-btn:hover                { color: var(--brown); }
+  .tab-help-btn:hover .tab-help-mark {
     background: var(--gold);
     border-color: var(--gold);
     color: #fff;
@@ -2525,10 +2546,16 @@
     </button>
     <!-- Compact help launcher — lives on the tabs row so it's always
          findable but never dominates the page. Sits at the right end
-         next to (or, on phones, in place of) Manage Database. -->
+         next to (or, on phones, in place of) Manage Database.
+         The "?" circle acts as a visual marker; the word "Help" beside
+         it spells out what the affordance does for first-time visitors
+         who don't read "?" as actionable. -->
     <button class="tab-help-btn" style="margin-left:auto" onclick="openHelp()"
             title="First time here? See how to use the site — search, vibes, the planner, calendar &amp; more"
-            aria-label="Help">?</button>
+            aria-label="Help">
+      <span class="tab-help-mark">?</span>
+      <span class="tab-help-label">Help</span>
+    </button>
     <button class="tab-btn tab-btn-admin" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">
       <span class="tab-label">Manage Database</span>
     </button>
