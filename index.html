@@ -2347,90 +2347,34 @@
      tagline, stronger active state, and a soft cream band behind
      the whole row so it reads as a deliberate section break, not
      stray utility chrome. */
+  /* Tabs row in v2: stays within the content column (no full-bleed
+     cream band — that was too loud). Just a clean border underneath
+     like the default UI, with bumped-up label typography. */
   body.ui-v2 .tabs {
-    background: linear-gradient(180deg, #fdf9ef 0%, #fbf6e9 100%);
-    border-top: 1px solid #ece3d0;
+    background: transparent;
     border-bottom: 2px solid #e0d8c8;
-    padding: 4px clamp(8px, 2vw, 24px) 0;
-    margin: 8px calc(50% - 50vw) 28px;
-    width: 100vw;
-    border-radius: 0;
+    padding: 0;
+    margin: 4px 0 22px;
     display: flex; align-items: stretch;
   }
   body.ui-v2 .tab-btn {
-    padding: 16px 28px 14px;
-    margin-bottom: -2px;
-    gap: 3px;
-    transition: background 0.18s, color 0.18s;
-  }
-  body.ui-v2 .tab-btn .tab-label {
-    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-    font-size: 19px;
-    font-weight: 500;
-    letter-spacing: 0.005em;
-    text-transform: none;
-    gap: 12px;
+    padding: 11px 22px 11px;
+    gap: 2px;
+    transition: color 0.18s;
   }
   body.ui-v2 .tab-btn .tab-label::before {
-    width: 11px; height: 11px;
-  }
-  body.ui-v2 .tab-btn .tab-tag {
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    opacity: 0.75;
-    padding-left: 23px;          /* indent under dot */
-    color: #6b6055;
-  }
-  body.ui-v2 .tab-btn:hover {
-    background: rgba(201,168,76,0.08);
-  }
-  body.ui-v2 .tab-btn:hover .tab-tag { opacity: 0.95; }
-  body.ui-v2 .tab-btn.active {
-    border-bottom-width: 4px;
-    background: rgba(201,168,76,0.13);
-  }
-  body.ui-v2 .tab-btn.active .tab-label {
-    font-weight: 600;
+    width: 9px; height: 9px;
   }
   body.ui-v2 .tab-btn.active .tab-label::before {
-    transform: scale(1.35);
+    transform: scale(1.25);
   }
-  body.ui-v2 .tab-btn.active .tab-tag { opacity: 1; color: var(--brown); font-weight: 600; }
-
-  /* Bump the Help launcher to match the bigger labels next to it. */
-  body.ui-v2 .tab-help-btn {
-    padding: 6px 14px 6px 6px;
-  }
-  body.ui-v2 .tab-help-btn .tab-help-mark {
-    width: 28px; height: 28px;
-    font-size: 14px;
-    border-width: 2px;
-  }
-  body.ui-v2 .tab-help-btn .tab-help-label {
-    font-size: 13px;
-    letter-spacing: 0.1em;
+  body.ui-v2 .tab-btn.active {
+    border-bottom-width: 3px;
   }
 
-  /* Manage Database stays admin-y but matches the new row height. */
-  body.ui-v2 .tab-btn-admin .tab-label {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-weight: 600;
-  }
-
-  /* Mobile: tighten back down so the nav still scrolls cleanly. */
+  /* Mobile: scroll strip preserved. */
   @media (max-width: 768px) {
-    body.ui-v2 .tabs {
-      background: #fdf9ef;
-      padding: 0 14px;
-      margin: 4px calc(50% - 50vw) 18px;
-    }
-    body.ui-v2 .tab-btn { padding: 11px 14px; }
-    body.ui-v2 .tab-btn .tab-label { font-size: 15px; }
+    body.ui-v2 .tab-btn { padding: 10px 14px; }
     body.ui-v2 .tab-btn .tab-tag { display: none; }
   }
 
@@ -3108,77 +3052,68 @@
   body.ui-v2 .v2-only { display: block; }
 
   /* ── UI-V2 TOWN STRIP ───────────────────────────────────────────
-     Four photo-cards anchoring geography directly under the hero
-     (Nevada City · Grass Valley · Penn Valley · Washington). Click
-     → filter grid to that town + scroll into view. */
+     Compact horizontal town chips with a small thumbnail + name +
+     short blurb. Calmer than the full-bleed photo cards we had
+     before — those were too loud. Now reads as a quiet "pick your
+     starting point" row, not a competing hero. */
   .town-strip { display: none; }
   body.ui-v2 .town-strip {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin: 22px 0 28px;
+    gap: 10px;
+    margin: 18px 0 24px;
   }
   .town-card {
     position: relative;
-    height: 220px;
-    border-radius: 10px;
-    overflow: hidden;
+    display: flex; align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 8px;
     cursor: pointer;
-    background: #1f1a14;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    overflow: hidden;
   }
   .town-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    border-color: var(--gold);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
   .town-card-img {
-    position: absolute; inset: 0;
+    flex-shrink: 0;
+    width: 56px; height: 56px;
+    border-radius: 6px;
     background-size: cover; background-position: center;
-    filter: brightness(0.74);
-    transition: transform 0.4s ease, filter 0.3s ease;
   }
-  .town-card:hover .town-card-img {
-    transform: scale(1.06);
-    filter: brightness(0.92);
-  }
-  .town-card::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(180deg,
-      rgba(31,26,20,0.10) 0%,
-      rgba(31,26,20,0.20) 45%,
-      rgba(31,26,20,0.82) 100%);
-    pointer-events: none;
-  }
+  /* Drop the dark gradient + the kicker — we don't need them at
+     this smaller size; the photo just becomes a thumbnail accent. */
+  .town-card::after { content: none; }
   .town-card-content {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 18px 20px 16px;
-    color: #fff;
-    z-index: 2;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.45);
+    display: flex; flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
   }
-  .town-kicker {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 9.5px; font-weight: 700;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 5px;
-  }
+  .town-kicker { display: none; }
   .town-name {
     font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
     font-weight: 500;
-    font-size: clamp(20px, 2.2vw, 28px);
+    font-size: 17px;
+    color: var(--brown);
     line-height: 1.1;
-    margin: 0 0 5px;
+    margin: 0;
   }
   .town-blurb {
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 11.5px;
-    color: rgba(255,255,255,0.92);
+    font-size: 11px;
+    color: #6b6055;
     margin: 0;
     line-height: 1.35;
-    max-width: 95%;
+    /* Clamp to one line of blurb so the strip stays compact */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   /* Tablets: 2x2 grid. */
   @media (max-width: 980px) {
@@ -3186,8 +3121,7 @@
   }
   /* Phones: single column. */
   @media (max-width: 560px) {
-    body.ui-v2 .town-strip { grid-template-columns: 1fr; gap: 10px; }
-    .town-card { height: 170px; }
+    body.ui-v2 .town-strip { grid-template-columns: 1fr; gap: 8px; }
   }
 
   /* ── UI-V2 BIGGER CARDS ─────────────────────────────────────────
