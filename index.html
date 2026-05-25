@@ -667,16 +667,181 @@
     border-bottom-color: var(--gold);
     font-weight: 600;
   }
-  /* tab-filter-btn — a filter toggle that sits on the tabs row alongside
-     the real navigation tabs. Forest-green underline + label color when
-     active so it never gets confused with the currently-selected tab
-     (which uses the gold accent). */
-  .tab-filter-btn.active {
-    color: var(--forest);
-    border-bottom-color: var(--forest);
-    font-weight: 600;
+  /* (Local Guides was briefly a tab-filter-btn here; promoted to a real
+     tab with its own panel — the filter-button styles aren't needed
+     anymore but kept harmless in case any callsite still references.) */
+
+  /* ── LOCAL GUIDES — article cards + reader ──────────────────────── */
+  .lg-intro { margin-bottom: 22px; }
+  .lg-intro-kicker {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11px; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--gold); font-weight: 700;
+    margin-bottom: 6px;
   }
-  .tab-filter-btn:hover { color: var(--forest); }
+  .lg-intro-sub {
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-variation-settings: "opsz" 96, "SOFT" 30;
+    font-size: 19px; line-height: 1.45; color: var(--brown);
+    max-width: 640px;
+  }
+  .lg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 22px;
+    margin-bottom: 40px;
+  }
+  .lg-card {
+    background: #fff; border: 1px solid #e6ddc9; border-radius: 12px;
+    overflow: hidden; cursor: pointer;
+    display: flex; flex-direction: column;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .lg-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(30,21,8,0.16);
+    border-color: var(--gold);
+  }
+  .lg-card-cover {
+    position: relative;
+    height: 180px; background: var(--fog);
+  }
+  .lg-card-cover img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .lg-card-cover::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42));
+    pointer-events: none;
+  }
+  .lg-card-tag {
+    position: absolute; top: 11px; left: 11px; z-index: 2;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #fff;
+    padding: 4px 10px; border-radius: 20px;
+    background: rgba(30,21,8,0.65);
+  }
+  .lg-card-body { padding: 16px 18px 18px; display: flex; flex-direction: column; flex: 1; }
+  .lg-card-title {
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-variation-settings: "opsz" 96, "SOFT" 30;
+    font-size: 20px; font-weight: 600; color: var(--brown);
+    line-height: 1.22; margin-bottom: 6px;
+  }
+  .lg-card-sub {
+    font-size: 13px; color: var(--slate); line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .lg-card-byline {
+    display: flex; align-items: center; gap: 9px; margin-top: auto;
+    padding-top: 11px; border-top: 1px dashed #e6ddc9;
+    font-size: 12px; color: var(--slate-soft);
+  }
+  .lg-byline-photo {
+    width: 28px; height: 28px; border-radius: 50%;
+    background-size: cover; background-position: center;
+    flex-shrink: 0; border: 1.5px solid #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  }
+  .lg-byline-name { color: var(--brown); font-weight: 600; }
+  .lg-byline-meta { margin-left: auto; }
+
+  /* Article reader modal */
+  .lg-modal {
+    max-width: 760px; max-height: 92vh; overflow-y: auto;
+    padding: 0; border-radius: 14px;
+  }
+  .lg-body { padding: 0 0 36px; }
+  .lg-body-cover {
+    position: relative; height: 340px; overflow: hidden;
+    border-radius: 14px 14px 0 0;
+  }
+  .lg-body-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lg-body-cover::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55));
+  }
+  .lg-body-headline {
+    position: absolute; left: 0; right: 0; bottom: 22px;
+    padding: 0 36px; color: #fff;
+  }
+  .lg-body-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-light); margin-bottom: 10px;
+  }
+  .lg-body-title {
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: 34px; font-weight: 700; line-height: 1.1;
+    margin-bottom: 8px;
+    text-shadow: 0 3px 18px rgba(0,0,0,0.55);
+  }
+  .lg-body-sub {
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-size: 17px; font-style: italic; font-weight: 400;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.4;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.55);
+  }
+  .lg-byline {
+    display: flex; align-items: center; gap: 12px;
+    padding: 22px 36px 6px;
+    border-bottom: 1px solid #e6ddc9;
+    margin-bottom: 24px;
+  }
+  .lg-byline-large-photo {
+    width: 48px; height: 48px; border-radius: 50%;
+    background-size: cover; background-position: center;
+    flex-shrink: 0; border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .lg-byline-text { font-size: 13px; color: var(--slate); }
+  .lg-byline-text strong { color: var(--brown); font-weight: 600; }
+  .lg-body-prose {
+    padding: 0 36px;
+    font-size: 16px; line-height: 1.72; color: var(--dark);
+    max-width: 640px; margin: 0 auto 24px;
+  }
+  .lg-body-prose p { margin-bottom: 18px; }
+  .lg-body-prose strong { color: var(--brown); }
+  .lg-author-card {
+    margin: 30px 36px 0;
+    padding: 22px 24px;
+    background: linear-gradient(180deg, #FBF7EE 0%, #F5EFE2 100%);
+    border: 1px solid #D4C9B0;
+    border-radius: 10px;
+    display: flex; gap: 18px; align-items: flex-start;
+  }
+  .lg-author-photo {
+    width: 76px; height: 76px; border-radius: 50%;
+    background-size: cover; background-position: center;
+    flex-shrink: 0; border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .lg-author-meta { flex: 1; }
+  .lg-author-name {
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-size: 19px; font-weight: 700; color: var(--brown);
+    margin-bottom: 2px;
+  }
+  .lg-author-role {
+    font-size: 12px; letter-spacing: 0.05em; color: var(--slate);
+    text-transform: uppercase; font-weight: 600; margin-bottom: 8px;
+  }
+  .lg-author-bio { font-size: 13.5px; color: var(--slate); line-height: 1.55; }
+  @media (max-width: 640px) {
+    .lg-body-cover { height: 220px; }
+    .lg-body-headline { padding: 0 20px; bottom: 16px; }
+    .lg-body-title { font-size: 24px; }
+    .lg-body-sub { font-size: 14px; }
+    .lg-byline { padding: 16px 20px 4px; }
+    .lg-body-prose { padding: 0 20px; font-size: 15px; }
+    .lg-author-card { margin: 24px 20px 0; flex-direction: column; }
+  }
   .tab-panel { display: none; margin-top: 8px; scroll-margin-top: 20px; }
   .tab-panel.active { display: block; }
   /* Centered decorative divider between page sections */
@@ -2144,7 +2309,7 @@
     <button class="tab-btn active" onclick="switchTab('experiences', this)" title="Browse every venue and experience — filter by vibe, area, category or date">Explore</button>
     <button class="tab-btn" onclick="switchTab('itineraries', this)" title="Ready-made day-by-day itineraries you can copy and customize">Suggested Experiences</button>
     <button class="tab-btn" onclick="switchTab('plan', this)" title="Answer a few questions and get a tailored day-by-day draft">✨ Help Me Plan</button>
-    <button id="edLocalGuidesFilter" type="button" class="tab-btn tab-filter-btn" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
+    <button class="tab-btn" onclick="switchTab('localguides', this)" title="Long-form articles from local historians, hikers, musicians and tribal members">🧑‍🏫 Local Guides</button>
     <button class="tab-btn" style="margin-left:auto;color:var(--gold)" onclick="openManageData()" title="Chamber staff — review events, edit venues & itineraries">⚙ Manage Database</button>
   </div>
 
@@ -2223,9 +2388,30 @@
     <div id="tripBuilderBody"></div>
   </div>
 
+  <!-- LOCAL GUIDES — long-form articles from local historians, hikers,
+       musicians, tribal members. Switches tab; renderLocalGuides paints
+       the article-card strip + opens article reader on click. -->
+  <div id="tab-localguides" class="tab-panel">
+    <div class="lg-intro">
+      <div class="lg-intro-kicker">Local Guides</div>
+      <p class="lg-intro-sub">Long-form pieces from people who actually live here — historians, trail walkers, musicians, tribal members — on what's worth knowing before you visit.</p>
+    </div>
+    <div id="guidesGrid" class="lg-grid"></div>
+  </div>
+
   <!-- (formerly tab-events) — Events list + Calendar mounts now live
        inside #tab-experiences above; the browse-mode + Calendar toggle
        drives which one is visible. The legacy tab panel is gone. -->
+</div>
+
+<!-- ARTICLE READER MODAL — overlays the page; opened by clicking a card
+     in the Local Guides grid. Long-form layout with cover, byline, body,
+     author bio. -->
+<div class="modal-overlay" id="guideOverlay" onclick="handleGuideOverlayClick(event)" style="z-index:1300">
+  <div class="modal lg-modal" id="guideModal">
+    <button class="modal-close" onclick="closeGuide()" aria-label="Close article">✕</button>
+    <div id="guideBody" class="lg-body"></div>
+  </div>
 </div>
 
 <!-- FLOATING BUTTON -->
@@ -2623,6 +2809,101 @@ function saveSeasonal() {
     if (typeof flashSaved === 'function') flashSaved();
   } catch (e) { console.warn('Could not save seasonal moments:', e); }
 }
+
+// ─── LOCAL GUIDES — AUTHORS + ARTICLES ────────────────────────────────
+// Long-form editorial content from local historians, hikers, musicians,
+// chefs, tribal members. Each guide carries an author byline + bio block.
+//
+// IMPORTANT: The seed entries below are PLACEHOLDERS drafted from public
+// information so the surface is real to demo. Replace with chamber-vetted
+// content — including written permission from each named author and any
+// indigenous source — before going live with a public audience.
+const AUTHORS = [
+  {
+    id: 'terry-mcateer',
+    name: 'Terry McAteer',
+    role: 'Walking-tour guide & local historian',
+    bio: 'Lifelong Nevada City resident and retired educator. Leads downtown walking tours that connect Gold Rush stone to modern storefronts — three blocks, two hours, a hundred stories.',
+    photo: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=320&h=320&fit=crop',
+    expertise: ['History', 'Gold Rush'],
+  },
+  {
+    id: 'hank-meals',
+    name: 'Hank Meals',
+    role: 'Trail historian & writer',
+    bio: 'Photographer, mapper and trail historian. Author of three books on Western Nevada County\'s forgotten paths. Walks every trail he writes about — usually twice.',
+    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=320&h=320&fit=crop',
+    expertise: ['Hiking', 'Local History'],
+  },
+  {
+    id: 'kvmr-collective',
+    name: 'KVMR Music Desk',
+    role: 'Community radio music programmers',
+    bio: 'KVMR\'s rotating group of music programmers — twenty-plus DJs covering bluegrass to ambient — write about what they hear at the venues they champion.',
+    photo: 'https://images.unsplash.com/photo-1485579149621-3123dd979885?w=320&h=320&fit=crop',
+    expertise: ['Music', 'Live performance'],
+  },
+];
+
+const GUIDES = [
+  {
+    id: 'broad-street-stories',
+    title: 'The Brick Behind Broad Street',
+    subtitle: 'How one 1856 fire reshaped downtown — and why every storefront still looks like a fort',
+    author_id: 'terry-mcateer',
+    cover_photo: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=1200&h=600&fit=crop',
+    tags: ['History', 'Gold Rush', 'Architecture'],
+    related_venues: [25, 44],   // Holbrooke Hotel, Firehouse No. 1 Museum
+    date_published: '2026-06-01',
+    read_minutes: 7,
+    body_html: `
+      <p>If you walk Broad Street today and look up — really up, above the awnings — you'll notice almost every building wears the same belt of brick and stone. That uniform skyline isn't an accident of taste. It's the legacy of July 19, 1856, when a fire that started in a boarding-house kitchen tore through a downtown still mostly built of pine.</p>
+      <p>By morning most of what is now the historic core had burned to the ground. The city's response was direct: rebuild in brick or don't rebuild at all. The ordinance was passed inside a month. Within two years, the storefronts you can still touch today were standing — Empire iron shutters, granite sills, hand-cut brick fired at local kilns.</p>
+      <p>Three places on the modern walking tour preserve the moment most clearly:</p>
+      <p><strong>The Holbrooke Hotel</strong> — 1862, but built atop the foundation of the 1851 Exchange that burned twice before the brick ordinance. The Holbrooke's lobby still uses the pre-fire foundation as its basement floor; you can see the seam where the new walls meet the old.</p>
+      <p><strong>National Hotel</strong> — 1856, the first major rebuild after the fire. Three stories of brick and a fire-rated tin ceiling on every floor. It's the oldest continuously operating hotel west of the Mississippi by some measures.</p>
+      <p><strong>Firehouse No. 1</strong> — built in 1861 specifically because the city had learned its lesson the hard way. Today a museum; pay close attention to the bell tower, which was sized to be audible county-wide.</p>
+      <p>The walking tour I lead starts at Robinson Plaza and ends at the Firehouse. Each storefront on Broad Street has a story like this — usually written in the difference between its first floor (rebuilt many times) and its second (untouched for 160 years). Look up.</p>
+    `,
+  },
+  {
+    id: 'tribute-trail-history',
+    title: 'The Tribute Trail Doesn\'t Tell You What It Is',
+    subtitle: 'A loop above town that took twenty years and one tragedy to build',
+    author_id: 'hank-meals',
+    cover_photo: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&h=600&fit=crop',
+    tags: ['Hiking', 'History', 'Land'],
+    related_venues: [],
+    date_published: '2026-06-08',
+    read_minutes: 6,
+    body_html: `
+      <p>The Tribute Trail is the most-walked path in Nevada City. Almost nobody who walks it knows what it is.</p>
+      <p>It's a 3.2-mile loop that begins at the Pioneer Park footbridge, drops down to the South Yuba canyon, crosses Gold Run Creek, and climbs back through Douglas-fir to town. The grade is gentle. The views are casually spectacular. Most days it carries dog-walkers, joggers, and families — easy to read as just another nice trail.</p>
+      <p>It was built as a memorial. The Tribute is named for the victims of September 11, 2001 — specifically the four Nevada County residents who died at the World Trade Center, and by extension the others. The Nevada County Land Trust spent twenty years assembling the easements that made the loop possible. The final bridge was poured in 2017.</p>
+      <p>The trail tells you none of this. There's no plaque at the trailhead. The only mention is a small dedication stone halfway around, easy to walk past. That's deliberate. The community wanted a trail that would <em>be</em> something, not <em>say</em> something.</p>
+      <p>If you walk it, do it slowly. The first quarter mile is the engineering — switchbacks down a slope that drops a hundred feet in a few hundred yards. Pause at the bridge. The bridge is where the loop closes; everything else is approach and return.</p>
+      <p>The peak weeks are mid-March (when Gold Run Creek is loudest) and late October (when the bigleaf maples turn). Avoid the trail after winter storms — the canyon traps mud for days. Bring water; there's no source after the bridge.</p>
+    `,
+  },
+  {
+    id: 'concert-halls-before-the-show',
+    title: 'Before the Show: What to Know About Nevada County\'s Three Big Rooms',
+    subtitle: 'A working musician\'s tour of Miners Foundry, Center for the Arts, and Nevada Theatre',
+    author_id: 'kvmr-collective',
+    cover_photo: 'https://images.unsplash.com/photo-1501612780327-45045538702b?w=1200&h=600&fit=crop',
+    tags: ['Music', 'Venues', 'Insider'],
+    related_venues: [9, 8, 33],   // Miners Foundry, Center for the Arts, Nevada Theatre
+    date_published: '2026-06-15',
+    read_minutes: 5,
+    body_html: `
+      <p>Three rooms carry most of the live music that visitors come for: Miners Foundry, Center for the Arts, Nevada Theatre. They're easy to confuse — all downtown-ish, all hosting concerts most weeks. They're also very different rooms.</p>
+      <p><strong>The Miners Foundry</strong> is the old one. Built in 1856 as a literal foundry — they cast iron stamps for the local mines here. The brick is original. The acoustics are accidental and excellent for acoustic music: bluegrass, folk, chamber, anything string-forward. The room is rectangular and not deep; everyone in it feels close to the stage. Avoid if you need an aisle seat — there are very few.</p>
+      <p><strong>The Center for the Arts</strong> is the purpose-built room. Renovated to 21,000 square feet in 2020, formal seating, proper sound and lighting design. Best room in the county for amplified music, touring acts, and shows that depend on production values. Tickets sell first for the front orchestra; the balcony has the best mix.</p>
+      <p><strong>The Nevada Theatre</strong> is the oldest still-operating theater west of the Rockies — 1865. Steep raked seating, ornate Victorian interior, intimate. Books mostly film, occasional small ensembles. The room is small enough that no seat is bad; tall people should still pick row F or further back to avoid the upward angle.</p>
+      <p>If you're choosing between two shows on the same night, the room is half the experience. A bluegrass band sounds different at the Foundry than at the Center — and a touring rock show belongs at the Center, not the Foundry. Pay attention to the venue, not just the headliner.</p>
+    `,
+  },
+];
 
 const EXPERIENCES = [
   // HANDS-ON CREATIVE
@@ -5318,6 +5599,7 @@ function switchTab(tab, btn) {
   if (panel) panel.classList.add('active');
   if (tab === 'itineraries') renderItineraries();
   if (tab === 'plan') renderTripBuilderForm();
+  if (tab === 'localguides') renderLocalGuides();
   // The panels sit below the vibes — scroll the chosen content into view so a
   // tab click carries the visitor to what they picked. Explore is the
   // exception: its grid depends on the search/vibe filters directly above it,
@@ -5438,6 +5720,173 @@ function getSuggestedEvents(maxN = 4) {
     .sort((a, b) => (a.dateStart || '9999').localeCompare(b.dateStart || '9999'))
     .slice(0, maxN);
 }
+
+// ── LOCAL GUIDES (long-form articles) ────────────────────────────────
+// The Local Guides tab surfaces editorial pieces from named local
+// authors (historians, hikers, musicians). Articles are stored inline
+// in the GUIDES array; authors in AUTHORS. Cards live in #guidesGrid;
+// clicking one opens the reader modal #guideOverlay / #guideModal.
+function _guideAuthor(authorId) {
+  return AUTHORS.find(a => a.id === authorId) || null;
+}
+
+function _escapeHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function _formatGuideDate(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  } catch (_) { return iso; }
+}
+
+function renderLocalGuides() {
+  const grid = document.getElementById('guidesGrid');
+  if (!grid) return;
+  if (!Array.isArray(GUIDES) || !GUIDES.length) {
+    grid.innerHTML = '<div class="no-results">No guides published yet.</div>';
+    return;
+  }
+  // Newest first by date_published
+  const sorted = [...GUIDES].sort((a, b) =>
+    (b.date_published || '').localeCompare(a.date_published || '')
+  );
+  grid.innerHTML = sorted.map(g => {
+    const author = _guideAuthor(g.author_id);
+    const tag = (g.tags && g.tags[0]) ? `<span class="lg-card-tag">${_escapeHtml(g.tags[0])}</span>` : '';
+    const bylinePhoto = author
+      ? `<img class="lg-byline-photo" src="${_escapeHtml(author.photo)}" alt="" loading="lazy">`
+      : '';
+    const bylineName = author ? _escapeHtml(author.name) : '';
+    const readMins = g.read_minutes ? `${g.read_minutes} min read` : '';
+    return `
+      <article class="lg-card" onclick="openGuide('${_escapeHtml(g.id)}')"
+               role="button" tabindex="0"
+               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openGuide('${_escapeHtml(g.id)}')}">
+        <div class="lg-card-cover">
+          <img src="${_escapeHtml(g.cover_photo)}" alt="" loading="lazy">
+          ${tag}
+        </div>
+        <div class="lg-card-body">
+          <h3 class="lg-card-title">${_escapeHtml(g.title)}</h3>
+          <p class="lg-card-sub">${_escapeHtml(g.subtitle || '')}</p>
+          <div class="lg-card-byline">
+            ${bylinePhoto}
+            <span class="lg-byline-name">${bylineName}</span>
+            <span class="lg-byline-meta">${_escapeHtml(readMins)}</span>
+          </div>
+        </div>
+      </article>`;
+  }).join('');
+}
+
+function openGuide(id) {
+  const g = GUIDES.find(x => x.id === id);
+  if (!g) return;
+  const author = _guideAuthor(g.author_id);
+  const tag = (g.tags && g.tags[0]) ? `<span class="lg-body-tag">${_escapeHtml(g.tags[0])}</span>` : '';
+  const dateLine = _formatGuideDate(g.date_published);
+  const readMins = g.read_minutes ? `${g.read_minutes} min read` : '';
+  const meta = [dateLine, readMins].filter(Boolean).join(' · ');
+  const bylineBlock = author ? `
+    <div class="lg-byline">
+      <img class="lg-byline-large-photo" src="${_escapeHtml(author.photo)}" alt="" loading="lazy">
+      <div class="lg-byline-text">
+        <strong>${_escapeHtml(author.name)}</strong> · ${_escapeHtml(author.role)}<br>
+        ${_escapeHtml(meta)}
+      </div>
+    </div>` : '';
+
+  // Optional cross-link block — surface related venues from EXPERIENCES.
+  // related_venues is an array of EXPERIENCES ids; resolve and link them.
+  let relatedBlock = '';
+  if (Array.isArray(g.related_venues) && g.related_venues.length) {
+    const linked = g.related_venues
+      .map(vid => liveExperiences.find(e => String(e.id) === String(vid)))
+      .filter(Boolean);
+    if (linked.length) {
+      const links = linked.map(v =>
+        `<a href="#" onclick="_jumpToVenueFromGuide(${v.id});return false;"
+            style="color:var(--rust);text-decoration:underline;font-weight:600">${_escapeHtml(v.name)}</a>`
+      ).join(' · ');
+      relatedBlock = `
+        <div style="margin:24px 20px 0;padding:14px 16px;border-left:3px solid var(--rust);
+                    background:#f8f4ec;font-size:13.5px;color:var(--slate)">
+          <strong style="color:var(--brown)">Mentioned in this guide:</strong> ${links}
+        </div>`;
+    }
+  }
+
+  const authorCard = author ? `
+    <div class="lg-author-card">
+      <img class="lg-author-photo" src="${_escapeHtml(author.photo)}" alt="" loading="lazy">
+      <div class="lg-author-meta">
+        <div class="lg-author-name">${_escapeHtml(author.name)}</div>
+        <div class="lg-author-role">${_escapeHtml(author.role)}</div>
+        <div class="lg-author-bio">${_escapeHtml(author.bio)}</div>
+      </div>
+    </div>` : '';
+
+  const body = document.getElementById('guideBody');
+  body.innerHTML = `
+    <div class="lg-body-cover">
+      <img src="${_escapeHtml(g.cover_photo)}" alt="" loading="lazy">
+      <div class="lg-body-headline">
+        ${tag}
+        <h1 class="lg-body-title">${_escapeHtml(g.title)}</h1>
+        <p class="lg-body-sub">${_escapeHtml(g.subtitle || '')}</p>
+      </div>
+    </div>
+    ${bylineBlock}
+    <div class="lg-body-prose">${g.body_html || ''}</div>
+    ${relatedBlock}
+    ${authorCard}
+  `;
+  document.getElementById('guideOverlay').classList.add('open');
+  // Reset scroll on the modal so each open starts at the top.
+  const modal = document.getElementById('guideModal');
+  if (modal) modal.scrollTop = 0;
+  if (typeof track === 'function') track('guide_open', { id: g.id });
+}
+
+function closeGuide() {
+  const ov = document.getElementById('guideOverlay');
+  if (ov) ov.classList.remove('open');
+}
+
+function handleGuideOverlayClick(e) {
+  if (e.target === document.getElementById('guideOverlay')) closeGuide();
+}
+
+// Cross-link from a guide's "Mentioned in this guide" block → close the
+// reader, switch to Explore, ensure Venues are visible, scroll the card
+// into view and pulse it briefly so the visitor can spot which one.
+function _jumpToVenueFromGuide(expId) {
+  closeGuide();
+  const exploreBtn = document.querySelector('.tab-btn[onclick*="\'experiences\'"]');
+  if (exploreBtn) switchTab('experiences', exploreBtn);
+  if (typeof setBrowseMode === 'function') setBrowseMode('venues');
+  setTimeout(() => {
+    const card = document.getElementById('exp-card-' + expId);
+    if (!card) return;
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.style.transition = 'box-shadow 0.4s';
+    const prevShadow = card.style.boxShadow;
+    card.style.boxShadow = '0 0 0 3px var(--rust)';
+    setTimeout(() => { card.style.boxShadow = prevShadow; }, 1600);
+  }, 220);
+}
+
+// Keyboard: Esc closes the guide reader (matches itinerary modal behavior).
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  const ov = document.getElementById('guideOverlay');
+  if (ov && ov.classList.contains('open')) closeGuide();
+});
 
 function renderModal() {
   const body = document.getElementById('modalBody');
