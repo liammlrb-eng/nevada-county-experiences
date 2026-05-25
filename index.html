@@ -1369,6 +1369,71 @@
     width: 100%;
     position: relative;
   }
+  /* Trail map legend — chip at top-right of the map showing which color
+     belongs to which trail. Clicking a row toggles that trail's
+     visibility on the map. */
+  .trail-legend {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,248,232,0.96);
+    border: 2px solid #1f1a14;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px; color: #1f1a14;
+    box-shadow: 3px 3px 0 #1f1a14;
+    max-width: 240px;
+    z-index: 1000;
+    pointer-events: auto;
+  }
+  .trail-legend-title {
+    font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; font-size: 10px;
+    margin-bottom: 8px; color: #5A3D22;
+  }
+  .trail-legend-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 3px 0;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  .trail-legend-row .tl-swatch {
+    width: 18px; height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .trail-legend-row .tl-name { flex: 1; font-weight: 500; }
+  .trail-legend-row .tl-len  { color: #6b6055; font-size: 11px; }
+  .trail-legend-row.off { opacity: 0.35; }
+  .trail-legend-row:hover { color: var(--rust); }
+  /* Trailhead marker — small black-outlined dot keyed by trail color. */
+  .trail-marker {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid #1f1a14;
+    box-shadow: 1px 1px 0 #1f1a14;
+  }
+  /* Trail popup styling (Leaflet's built-in popup, with our palette). */
+  .trail-popup .leaflet-popup-content-wrapper {
+    background: #fff8e8; color: #1f1a14;
+    border: 2px solid #1f1a14;
+    border-radius: 10px;
+    box-shadow: 3px 3px 0 #1f1a14 !important;
+    padding: 0;
+  }
+  .trail-popup .leaflet-popup-tip { background: #fff8e8 !important; border: 2px solid #1f1a14; }
+  .trail-popup .leaflet-popup-content { margin: 12px 14px; font-family: 'Inter', system-ui, sans-serif; font-size: 12.5px; line-height: 1.5; }
+  .trail-popup .tp-name { font-weight: 700; font-size: 14px; color: #5A3D22; margin-bottom: 4px; }
+  .trail-popup .tp-meta { font-size: 11px; color: #6b6055; margin-bottom: 6px; letter-spacing: 0.02em; }
+  .trail-popup .tp-meta span { margin-right: 8px; }
+  .trail-popup .tp-blurb { margin-bottom: 8px; }
+  .trail-popup .tp-guide-link {
+    display: inline-block;
+    color: var(--rust); font-weight: 600;
+    text-decoration: underline;
+    font-size: 12px;
+  }
+  .trail-popup .tp-guide-link:hover { color: var(--brown); }
+
   #leafletMap {
     width: 100%;
     height: 100%;
@@ -1980,6 +2045,11 @@
   .ed-card.ed-card-external { border-color: rgba(139,74,42,0.45); }
   .ed-card.ed-card-external:hover { border-color: var(--rust); }
   .ed-card.ed-card-external .ed-cta { color: var(--rust); }
+  /* In-app action cards (e.g. Trail Map) — forest accent so they read
+     as "stays on this site" vs. the external-link rust accent. */
+  .ed-card.ed-card-action { border-color: rgba(58,90,58,0.45); }
+  .ed-card.ed-card-action:hover { border-color: var(--forest); }
+  .ed-card.ed-card-action .ed-cta { color: var(--forest); }
   .ed-photo {
     position: relative;
     height: 96px;
@@ -2793,6 +2863,29 @@
   </div>
 </div>
 
+<!-- TRAIL MAP — opens via the Trails entry point. Renders the seven
+     curated trails as colored polylines + trailhead markers over the
+     OSM base layer. Reuses the .map-overlay / .map-modal CSS chrome
+     from the itinerary map but is a separate Leaflet instance so the
+     two maps don't fight over the same #leafletMap container. -->
+<div class="map-overlay" id="trailMapOverlay" onclick="if(event.target===this)closeTrailMap()" style="z-index:1200">
+  <div class="map-modal">
+    <div class="map-header">
+      <div style="flex:1">
+        <h3>Trail Map — Nevada County</h3>
+        <p id="trailMapSubtitle">Hand-picked hiking + biking trails · click any line or marker for details</p>
+      </div>
+      <button class="map-close" onclick="closeTrailMap()">✕</button>
+    </div>
+    <div id="mapContainer" style="position:relative">
+      <div id="trailLeafletMap" style="width:100%;height:100%;border-radius:0 0 8px 8px"></div>
+      <!-- Legend chip — sits in the top-right corner of the map, fades
+           in once the geometry has loaded. -->
+      <div id="trailLegend" class="trail-legend"></div>
+    </div>
+  </div>
+</div>
+
 <footer>
   Nevada County, California · Gold Country · Data sourced from public venue &amp; tourism listings
   &nbsp;·&nbsp;
@@ -3176,6 +3269,138 @@ const GUIDES = [
       <p><strong>The Nevada Theatre</strong> is the oldest still-operating theater west of the Rockies — 1865. Steep raked seating, ornate Victorian interior, intimate. Books mostly film, occasional small ensembles. The room is small enough that no seat is bad; tall people should still pick row F or further back to avoid the upward angle.</p>
       <p>If you're choosing between two shows on the same night, the room is half the experience. A bluegrass band sounds different at the Foundry than at the Center — and a touring rock show belongs at the Center, not the Foundry. Pay attention to the venue, not just the headliner.</p>
     `,
+  },
+];
+
+// ── TRAILS ─────────────────────────────────────────────────────────────────
+// Curated hiking + biking trails for the Trail Map view. Editorial metadata
+// only — route geometry lives in /data/trails.geojson (regenerated via
+// tools/ingest_trails.py from OpenStreetMap). Trails are joined to their
+// geometry by `id`. The `color` field controls the Leaflet polyline stroke
+// so each trail reads as distinct on the map.
+//
+// Future swap: when Nevada County's ArcGIS trail data becomes available,
+// replace trails.geojson + the ingest script — the TRAILS array here stays
+// untouched.
+const TRAILS = [
+  {
+    id: 'independence-trail',
+    name: 'Independence Trail',
+    area: 'Nevada City',
+    difficulty: 'Easy',
+    surface: 'Flume / packed dirt',
+    distance_mi: 2.4,
+    elevation_ft: 50,
+    dog_ok: true,
+    bike_ok: false,
+    horse_ok: false,
+    season: 'Year-Round',
+    blurb: 'Country\'s first wheelchair-accessible wilderness trail — converted from an 1859 mining flume that hugs the South Yuba canyon at constant grade. East + west sections both leave from Highway 49.',
+    photo: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=400&fit=crop',
+    color: '#3A5A3A',
+    guide_id: null,
+  },
+  {
+    id: 'south-yuba-trail',
+    name: 'South Yuba Trail',
+    area: 'Nevada City / Washington',
+    difficulty: 'Moderate',
+    surface: 'Dirt singletrack',
+    distance_mi: 20,
+    elevation_ft: 1200,
+    dog_ok: true,
+    bike_ok: false,
+    horse_ok: true,
+    season: 'Year-Round',
+    blurb: 'Twenty miles of canyon-side singletrack along the wild South Yuba — swimming holes every couple of miles in summer, wildflower bloom in spring, deep snow rare. Most hikers do 4–8 mile out-and-backs from one of the bridges.',
+    photo: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=600&h=400&fit=crop',
+    color: '#8B4A2A',
+    guide_id: null,
+  },
+  {
+    id: 'pioneer-trail',
+    name: 'Pioneer Trail',
+    area: 'Nevada City → Empire Mine',
+    difficulty: 'Moderate',
+    surface: 'Dirt + gravel',
+    distance_mi: 25,
+    elevation_ft: 1800,
+    dog_ok: true,
+    bike_ok: true,
+    horse_ok: true,
+    season: 'Year-Round',
+    blurb: 'Backbone trail of Western Nevada County — links Pioneer Park, Hirschman Pond, and Empire Mine across 25 miles of forested track. Multi-use; bikers, hikers, and equestrians share comfortably given the width.',
+    photo: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=400&fit=crop',
+    color: '#C9A84C',
+    guide_id: null,
+  },
+  {
+    id: 'tribute-trail',
+    name: 'Deer Creek Tribute Trail',
+    area: 'Nevada City',
+    difficulty: 'Easy',
+    surface: 'Dirt singletrack',
+    distance_mi: 3.2,
+    elevation_ft: 250,
+    dog_ok: true,
+    bike_ok: false,
+    horse_ok: false,
+    season: 'Year-Round',
+    blurb: 'A 3.2-mile loop above town, built as a memorial to the four Nevada County residents lost on 9/11. The trail doesn\'t announce that — by design. Read Hank Meals\' guide for the full story.',
+    photo: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop',
+    color: '#5A3D22',
+    guide_id: 'tribute-trail-history',
+  },
+  {
+    id: 'buttermilk-bend',
+    name: 'Buttermilk Bend Trail',
+    area: 'Bridgeport',
+    difficulty: 'Easy',
+    surface: 'Packed dirt',
+    distance_mi: 1.4,
+    elevation_ft: 30,
+    dog_ok: true,
+    bike_ok: false,
+    horse_ok: false,
+    season: 'Spring',
+    blurb: 'Short, level trail along the South Yuba River in Bridgeport — peak wildflower bloom mid-March through April with 60+ species in a single mile. Family-friendly, picnic-table accessible.',
+    photo: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop',
+    color: '#D17B8B',
+    guide_id: null,
+  },
+  {
+    id: 'hirschmans-trail',
+    name: "Hirschman's Trail",
+    area: 'Nevada City',
+    difficulty: 'Easy',
+    surface: 'Dirt singletrack',
+    distance_mi: 2.1,
+    elevation_ft: 180,
+    dog_ok: true,
+    bike_ok: true,
+    horse_ok: false,
+    season: 'Year-Round',
+    blurb: 'Pond-loop trail through a former hydraulic-mining basin, now reclaimed forest and oak-savanna meadow. Easy walking, popular with dog-walkers, wildflowers in spring.',
+    photo: 'https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?w=600&h=400&fit=crop',
+    color: '#4A6741',
+    guide_id: null,
+  },
+  {
+    id: 'cascade-canal-trail',
+    name: 'Cascade Canal Trail',
+    area: 'Nevada City',
+    difficulty: 'Easy',
+    surface: 'Packed dirt',
+    distance_mi: 4,
+    elevation_ft: 50,
+    dog_ok: true,
+    bike_ok: false,
+    horse_ok: false,
+    season: 'Year-Round',
+    blurb: 'Gentle canal-side walk on Nevada Irrigation District property — water runs continuously, shade is consistent, grade is essentially flat. Best summer-heat trail in the area.',
+    photo: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop',
+    color: '#4A6FA5',
+    guide_id: null,
   },
 ];
 
@@ -4068,6 +4293,19 @@ function _edCardOpenExternal(url, trackId) {
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
+// Run a named in-app handler from an editorial-card action. Whitelist
+// keeps this safe — we only allow function names declared here, not
+// arbitrary global function names from the DOM.
+const _ED_CARD_ACTIONS = {
+  openTrailMap: () => openTrailMap(),
+};
+function _edCardRunAction(name, trackId) {
+  const fn = _ED_CARD_ACTIONS[name];
+  if (!fn) { console.warn('Unknown editorial card action:', name); return; }
+  if (typeof track === 'function') track('editorial_action_run', { id: trackId, action: name });
+  fn();
+}
+
 // Toggle a single editorial pill. OR-union semantics — pills add to a set,
 // re-rendering everything that's filterable.
 function toggleEditorial(id) {
@@ -4113,6 +4351,17 @@ function _editorialCards() {
       track_id: 'audio_walking_tour_nc',
     },
     {
+      id: 'trailmap',
+      title: 'Trail Map',
+      blurb: 'Seven curated hiking & biking trails — see the routes on the map, then pick one.',
+      cta:   'Open trail map →',
+      photo: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=480&h=320&fit=crop',
+      // `action` cards run a named handler on click rather than toggling
+      // an editorial filter or opening an external URL.
+      action: 'openTrailMap',
+      track_id: 'trail_map_card',
+    },
+    {
       id: 'inseason',
       title: 'In Season',
       blurb: `Right-now slice — what's happening this ${seasonCap}.`,
@@ -4137,6 +4386,26 @@ function _renderEditorialStrip() {
   if (!strip) return;
 
   const baseHtml = _editorialCards().map(c => {
+    // Action cards (e.g. Trail Map) run a named handler on click — used
+    // for entry points into other in-app views that aren't filter
+    // toggles. Rendered before the external-link branch so action takes
+    // priority if both were set on the same card.
+    if (c.action) {
+      const trackId = c.track_id || c.id;
+      return `<article class="ed-card ed-card-action"
+          onclick="_edCardRunAction('${c.action}','${trackId}')"
+          title="${(c.blurb||'').replace(/"/g,'&quot;')}">
+        <div class="ed-photo">
+          <span class="ed-badge" style="background:var(--forest)">▸ In app</span>
+          <img src="${c.photo}" alt="${c.title}" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="ed-body">
+          <div class="ed-title">${c.title}</div>
+          <div class="ed-blurb">${c.blurb}</div>
+          <div class="ed-cta">${c.cta}</div>
+        </div>
+      </article>`;
+    }
     // External-link cards (e.g. the Audio Walking Tour) skip the filter-
     // toggle handler and open the link in a new tab instead.
     if (c.external_url) {
@@ -6643,6 +6912,161 @@ function closeMap() {
 function handleMapOverlayClick(e) {
   if (e.target === document.getElementById('mapOverlay')) closeMap();
 }
+
+// ── TRAIL MAP ────────────────────────────────────────────────────────────
+// Separate Leaflet instance from the My-Itinerary map. Loads route
+// geometry once from /data/trails.geojson, joins each feature to its
+// editorial entry in TRAILS by `id`, and renders coloured polylines +
+// trailhead markers. Map is created lazily on first open and torn down
+// on close so the two maps never collide on the same DOM container.
+let _trailMap = null;
+let _trailGeojsonCache = null;
+let _trailLayers = {};   // id → { polyline, marker } so legend can toggle visibility
+
+async function openTrailMap() {
+  document.getElementById('trailMapOverlay').classList.add('open');
+  if (typeof track === 'function') track('trail_map_open', {});
+
+  // Load geometry (cached after first hit)
+  if (!_trailGeojsonCache) {
+    try {
+      const r = await fetch('data/trails.geojson');
+      _trailGeojsonCache = await r.json();
+    } catch (e) {
+      console.error('Trail geojson load failed:', e);
+      document.getElementById('trailMapSubtitle').textContent = 'Could not load trail geometry — please try again.';
+      return;
+    }
+  }
+
+  // Wait a tick so the modal is laid out before Leaflet measures.
+  setTimeout(() => {
+    if (_trailMap) { _trailMap.remove(); _trailMap = null; _trailLayers = {}; }
+
+    _trailMap = L.map('trailLeafletMap', { zoomControl: true }).setView([39.27, -121.05], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18,
+    }).addTo(_trailMap);
+
+    const features = _trailGeojsonCache.features || [];
+    const trailById = Object.fromEntries(TRAILS.map(t => [t.id, t]));
+    const allBounds = [];
+
+    features.forEach(f => {
+      const meta = trailById[f.id || f.properties?.id];
+      if (!meta) return;
+      const color = meta.color || '#5A3D22';
+
+      // Polyline — handle both LineString and MultiLineString.
+      const coords = f.geometry.coordinates;
+      const lines = (f.geometry.type === 'MultiLineString') ? coords : [coords];
+      // Leaflet wants [lat, lng]; GeoJSON is [lng, lat] — swap.
+      const latlngLines = lines.map(seg => seg.map(([lon, lat]) => [lat, lon]));
+
+      const polyline = L.polyline(latlngLines, {
+        color, weight: 4, opacity: 0.85, lineCap: 'round',
+      }).addTo(_trailMap);
+
+      // Trailhead marker — small circle in the trail's color.
+      const th = f.properties?.trailhead || {};
+      let marker = null;
+      if (th.lat && th.lon) {
+        marker = L.marker([th.lat, th.lon], {
+          icon: L.divIcon({
+            className: '',
+            html: `<div class="trail-marker" style="background:${color}"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+          }),
+        }).addTo(_trailMap);
+      }
+
+      // Shared click → popup
+      const popupHtml = _trailPopupHtml(meta, f.properties?.length_miles);
+      const popupOpts = { className: 'trail-popup', maxWidth: 280 };
+      polyline.bindPopup(popupHtml, popupOpts);
+      if (marker) marker.bindPopup(popupHtml, popupOpts);
+
+      _trailLayers[meta.id] = { polyline, marker };
+      latlngLines.forEach(seg => seg.forEach(p => allBounds.push(p)));
+    });
+
+    if (allBounds.length) _trailMap.fitBounds(allBounds, { padding: [40, 40] });
+
+    _renderTrailLegend(trailById, features);
+  }, 80);
+}
+
+function closeTrailMap() {
+  document.getElementById('trailMapOverlay').classList.remove('open');
+  // Clean up the Leaflet instance so re-open starts clean.
+  if (_trailMap) { _trailMap.remove(); _trailMap = null; _trailLayers = {}; }
+}
+
+function _trailPopupHtml(meta, computedMiles) {
+  const miles = (meta.distance_mi || computedMiles || 0).toFixed(1);
+  const flags = [];
+  flags.push(meta.bike_ok   ? 'Bikes ok'  : 'No bikes');
+  flags.push(meta.dog_ok    ? 'Dogs ok'   : 'No dogs');
+  if (meta.horse_ok) flags.push('Horses ok');
+  const guideLink = meta.guide_id
+    ? `<a href="#" class="tp-guide-link" onclick="closeTrailMap();openGuide('${meta.guide_id}');return false;">Read the guide →</a>`
+    : '';
+  return `
+    <div class="tp-name">${meta.name}</div>
+    <div class="tp-meta">
+      <span>${miles} mi</span>
+      <span>${meta.difficulty || ''}</span>
+      <span>${meta.surface || ''}</span>
+    </div>
+    <div class="tp-meta">
+      ${flags.map(f => `<span>· ${f}</span>`).join('')}
+    </div>
+    <div class="tp-blurb">${(meta.blurb || '').replace(/\\n/g, ' ')}</div>
+    ${guideLink}
+  `;
+}
+
+function _renderTrailLegend(trailById, features) {
+  const legend = document.getElementById('trailLegend');
+  if (!legend) return;
+  const rows = features.map(f => {
+    const meta = trailById[f.id || f.properties?.id];
+    if (!meta) return '';
+    const miles = (meta.distance_mi || f.properties?.length_miles || 0).toFixed(1);
+    return `
+      <div class="trail-legend-row" data-trail-id="${meta.id}" onclick="_toggleTrailLayer('${meta.id}', this)">
+        <span class="tl-swatch" style="background:${meta.color}"></span>
+        <span class="tl-name">${meta.name}</span>
+        <span class="tl-len">${miles} mi</span>
+      </div>`;
+  }).join('');
+  legend.innerHTML = `
+    <div class="trail-legend-title">Trails</div>
+    ${rows}
+  `;
+}
+
+function _toggleTrailLayer(id, rowEl) {
+  const layers = _trailLayers[id];
+  if (!layers || !_trailMap) return;
+  const isOff = rowEl.classList.toggle('off');
+  if (isOff) {
+    layers.polyline.remove();
+    if (layers.marker) layers.marker.remove();
+  } else {
+    layers.polyline.addTo(_trailMap);
+    if (layers.marker) layers.marker.addTo(_trailMap);
+  }
+}
+
+// Close on Escape (matches other modals).
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  const ov = document.getElementById('trailMapOverlay');
+  if (ov && ov.classList.contains('open')) closeTrailMap();
+});
 
 function clearAll() {
   if (confirm('Clear your entire itinerary list?')) {
