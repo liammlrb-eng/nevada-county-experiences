@@ -2120,6 +2120,7 @@
       <button id="bmEvents" type="button" class="bm-btn"        onclick="setBrowseMode('events')"  title="Just things happening — concerts, festivals, classes">📅 Events</button>
       <button id="bmBoth"   type="button" class="bm-btn active" onclick="setBrowseMode('both')"    title="Everything — places to go and things to do">✨ Both</button>
     </div>
+    <button id="edLocalGuidesFilter" type="button" class="bm-cal-btn ed-pill" onclick="toggleEditorial('localguides')" title="Person-led experiences — guided tours, lessons, programs">🧑‍🏫 Local Guides</button>
     <div class="search-field" data-tip="Search for any craft, activity, venue or event — try “blacksmithing”, “wine tasting”, “live music” or “Cornish Christmas”, then press Find. Synonyms are built in, so “metalsmith” also finds a studio listed as “blacksmithing”.">
       <span class="search-icon">🔍</span>
       <input type="text" id="expSearch" autocomplete="off"
@@ -3484,6 +3485,9 @@ function _editorialCards() {
   const seasonCap = w.label.replace(/\b\w/g, c => c.toUpperCase());
   const seasonPhoto = _ED_PHOTOS_BY_SEASON[w.label.split(' ')[0]] || _ED_PHOTOS_BY_SEASON.spring;
   const favCount = (typeof myList !== 'undefined') ? myList.size : 0;
+  // Local Guides moved out — it lives as a filter button on the Explore
+  // line now, so the editorial band stays focused on "curated slices" the
+  // visitor doesn't expect as a filter.
   return [
     {
       id: 'inseason',
@@ -3491,13 +3495,6 @@ function _editorialCards() {
       blurb: `Right-now slice — what's happening this ${seasonCap}.`,
       cta:   activeEditorialPills.has('inseason') ? 'Showing ✓' : `Filter to ${seasonCap} →`,
       photo: seasonPhoto,
-    },
-    {
-      id: 'localguides',
-      title: 'Local Guides',
-      blurb: 'Walks, hikes and tours led by Nevada County storytellers.',
-      cta:   activeEditorialPills.has('localguides') ? 'Showing ✓' : 'See guided experiences →',
-      photo: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=480&h=320&fit=crop',
     },
     {
       id: 'justadded',
@@ -3579,6 +3576,11 @@ function _renderEditorialStrip() {
     }).join('');
   }
   strip.innerHTML = baseHtml + momentHtml;
+
+  // Local Guides lives as a standalone filter button on the Explore line —
+  // mirror its active state so the band + button stay in sync.
+  const lgBtn = document.getElementById('edLocalGuidesFilter');
+  if (lgBtn) lgBtn.classList.toggle('active', activeEditorialPills.has('localguides'));
 }
 
 // Legacy aliases — anywhere we used to call _renderSeasonalBtn() or
