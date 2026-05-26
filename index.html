@@ -40,155 +40,6 @@
      TODO: rotate the background image by season (spring=wildflowers,
      summer=river, fall=oak leaves, winter=pines). For now the spring
      foothills shot stands in. */
-  /* ── UI-V2 HERO TAKEOVER ───────────────────────────────────────
-     Hidden by default; revealed when body.ui-v2 is set. The
-     existing text-only .hero hides simultaneously so the two
-     don't stack. */
-  .hero-v2 { display: none; }
-  body.ui-v2 .hero        { display: none; }
-  body.ui-v2 .hero-v2 {
-    display: block;
-    position: relative;
-    width: 100vw;
-    margin-left: calc(50% - 50vw);          /* break out of body padding */
-    height: 62vh; min-height: 480px;
-    overflow: hidden;
-    color: #fff;
-    background: #1f1a14;                    /* prevents pre-load flash */
-  }
-  .hero-v2-slides {
-    position: absolute; inset: 0;
-  }
-  .hero-v2-slide {
-    position: absolute; inset: 0;
-    background-size: cover; background-position: center;
-    opacity: 0;
-    transition: opacity 1.4s ease-in-out;
-    /* Ken-Burns: each visible slide slowly zooms 4% so the still
-       image still feels alive. Animation reverses on each cycle so
-       the zoom doesn't pop on re-show. */
-    transform: scale(1);
-    will-change: opacity, transform;
-  }
-  .hero-v2-slide.active {
-    opacity: 1;
-    animation: heroKenBurns 14s ease-out forwards;
-  }
-  @keyframes heroKenBurns {
-    0%   { transform: scale(1.02); }
-    100% { transform: scale(1.10); }
-  }
-  /* Bottom-to-top gradient ensures the headline stays legible no
-     matter how bright the photo is at the bottom edge. */
-  .hero-v2-gradient {
-    position: absolute; inset: 0;
-    background: linear-gradient(180deg,
-      rgba(31,26,20,0.10) 0%,
-      rgba(31,26,20,0.15) 40%,
-      rgba(31,26,20,0.55) 75%,
-      rgba(31,26,20,0.80) 100%);
-    pointer-events: none;
-  }
-  .hero-v2-content {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 44px clamp(20px, 6vw, 80px);
-    max-width: 1280px;
-    margin: 0 auto;
-  }
-  .hero-v2-kicker {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 11.5px; font-weight: 600;
-    letter-spacing: 0.28em; text-transform: uppercase;
-    color: rgba(255,255,255,0.85);
-    margin-bottom: 18px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-  }
-  .hero-v2-title {
-    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-    font-weight: 400;
-    font-size: clamp(36px, 5.4vw, 72px);
-    line-height: 1.12;
-    color: #fff;
-    margin: 0 0 18px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
-    max-width: 920px;
-  }
-  /* Cascaded three-line headline — each sentence on its own line,
-     each line indented further than the previous so the trio reads
-     like a magazine pull-quote / poem stanza. On narrow screens the
-     indents collapse (the cascade is already redundant when each
-     line wraps tight). */
-  .hero-v2-line {
-    display: block;
-  }
-  .hero-v2-line:nth-of-type(2) { padding-left: 1.3em; }
-  .hero-v2-line:nth-of-type(3) { padding-left: 2.6em; }
-  @media (max-width: 768px) {
-    .hero-v2-line:nth-of-type(2),
-    .hero-v2-line:nth-of-type(3) { padding-left: 0; }
-  }
-  .hero-v2-sub {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: clamp(14px, 1.4vw, 17px);
-    color: rgba(255,255,255,0.92);
-    margin: 0 0 26px;
-    max-width: 640px;
-    line-height: 1.5;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-  }
-  .hero-v2-cta {
-    display: inline-block;
-    background: rgba(255,255,255,0.95); color: var(--brown);
-    padding: 13px 28px;
-    border-radius: 999px;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    text-decoration: none;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.18);
-    transition: transform 0.18s, background 0.18s;
-  }
-  .hero-v2-cta:hover {
-    background: #fff;
-    transform: translateY(-1px);
-  }
-  /* Mobile: reduce height + scale typography */
-  @media (max-width: 768px) {
-    body.ui-v2 .hero-v2 { height: 56vh; min-height: 380px; }
-    .hero-v2-content { padding: 28px 22px; }
-    .hero-v2-kicker { font-size: 10px; letter-spacing: 0.22em; margin-bottom: 12px; }
-    .hero-v2-cta { padding: 11px 22px; font-size: 11px; }
-  }
-
-  /* Small "preview mode" badge — pinned bottom-right when the v2
-     flag is on. Quietly reminds the operator they're previewing the
-     redesign and offers a one-click escape hatch. */
-  .ui-v2-badge { display: none; }
-  body.ui-v2 .ui-v2-badge {
-    display: flex; align-items: center; gap: 8px;
-    position: fixed; bottom: 18px; left: 18px;
-    background: rgba(31,26,20,0.92); color: #fff;
-    padding: 8px 14px; border-radius: 999px;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 11px; letter-spacing: 0.06em;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    z-index: 9000;
-    pointer-events: auto;
-  }
-  body.ui-v2 .ui-v2-badge .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--gold);
-    box-shadow: 0 0 0 2px rgba(184,148,26,0.35);
-  }
-  body.ui-v2 .ui-v2-badge button {
-    background: transparent; border: none; color: rgba(255,255,255,0.7);
-    font-family: inherit; font-size: 10.5px; cursor: pointer;
-    text-decoration: underline;
-    margin-left: 4px;
-  }
-  body.ui-v2 .ui-v2-badge button:hover { color: #fff; }
-
   .hero {
     position: relative;
     min-height: 62vh;
@@ -2340,44 +2191,6 @@
      has been replaced by the 3-way .view-toggle segmented control in the
      .results-row. See .view-toggle-btn rules below.) */
 
-  /* ── UI-V2 NAV BUMP ─────────────────────────────────────────────
-     The tab row was sized for v1 and got dwarfed once everything
-     around it became magazine-scale. v2-only bump: bigger dots,
-     bigger labels in Cormorant Garamond (display weight), bolder
-     tagline, stronger active state, and a soft cream band behind
-     the whole row so it reads as a deliberate section break, not
-     stray utility chrome. */
-  /* Tabs row in v2: stays within the content column (no full-bleed
-     cream band — that was too loud). Just a clean border underneath
-     like the default UI, with bumped-up label typography. */
-  body.ui-v2 .tabs {
-    background: transparent;
-    border-bottom: 2px solid #e0d8c8;
-    padding: 0;
-    margin: 4px 0 22px;
-    display: flex; align-items: stretch;
-  }
-  body.ui-v2 .tab-btn {
-    padding: 11px 22px 11px;
-    gap: 2px;
-    transition: color 0.18s;
-  }
-  body.ui-v2 .tab-btn .tab-label::before {
-    width: 9px; height: 9px;
-  }
-  body.ui-v2 .tab-btn.active .tab-label::before {
-    transform: scale(1.25);
-  }
-  body.ui-v2 .tab-btn.active {
-    border-bottom-width: 3px;
-  }
-
-  /* Mobile: scroll strip preserved. */
-  @media (max-width: 768px) {
-    body.ui-v2 .tab-btn { padding: 10px 14px; }
-    body.ui-v2 .tab-btn .tab-tag { display: none; }
-  }
-
   /* Editorial band — sits where the old seasonal photo strip lived.
      Bordered card differentiates it from the rest of the page; inside,
      a horizontal scroll of photo cards (one per editorial slice) reuses
@@ -2879,185 +2692,12 @@
     color: #fff;
   }
 
-  /* ── UI-V2 MAGAZINE EDITORIAL BAND ──────────────────────────────
-     Replaces the small-chip .editorial-strip on the ui-v2 path with
-     a proper magazine spread: one large featured card + 3-4 smaller
-     secondary cards laid out next to it.
-
-     Default UI: .editorial-magazine is hidden, .editorial-strip shows.
-     v2 UI:      .editorial-strip is hidden, .editorial-magazine shows. */
-  .editorial-magazine { display: none; }
-  body.ui-v2 .editorial-strip   { display: none; }
-  body.ui-v2 .editorial-magazine {
-    display: grid;
-    grid-template-columns: 1.65fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 14px;
-    min-height: 360px;
-  }
-
-  /* Featured card — spans both rows on the left, full-bleed photo
-     with a darkened bottom gradient + editorial text overlay. */
-  .em-feature {
-    grid-row: 1 / 3;
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #1f1a14;
-    cursor: pointer;
-    transition: transform 0.2s ease-out;
-  }
-  .em-feature:hover { transform: translateY(-2px); }
-  .em-feature .em-feature-img {
-    position: absolute; inset: 0;
-    background-size: cover; background-position: center;
-    transform: scale(1.0);
-    transition: transform 0.6s ease-out, filter 0.3s;
-    filter: brightness(0.92);
-  }
-  .em-feature:hover .em-feature-img {
-    transform: scale(1.04);
-    filter: brightness(1);
-  }
-  .em-feature::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(180deg,
-      rgba(31,26,20,0.08) 0%,
-      rgba(31,26,20,0.10) 35%,
-      rgba(31,26,20,0.55) 75%,
-      rgba(31,26,20,0.88) 100%);
-    pointer-events: none;
-  }
-  .em-feature .em-feature-content {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 24px 26px;
-    color: #fff;
-    z-index: 2;
-  }
-  .em-feature .em-kicker {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 8px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  }
-  .em-feature .em-title {
-    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-    font-weight: 500;
-    font-size: clamp(22px, 2.4vw, 30px);
-    line-height: 1.15;
-    color: #fff;
-    margin: 0 0 8px;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  }
-  .em-feature .em-sub {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 12.5px;
-    color: rgba(255,255,255,0.92);
-    margin: 0 0 12px;
-    line-height: 1.45;
-    max-width: 92%;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.45);
-  }
-  .em-feature .em-cta {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 10.5px; font-weight: 700;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    color: #fff;
-    border-bottom: 1.5px solid var(--gold);
-    padding-bottom: 2px;
-    display: inline-block;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-  }
-
-  /* Secondary cards — small editorial chips on the right column,
-     same data as the default .editorial-strip cards but in a
-     compact stacked layout. */
-  .em-secondary {
-    position: relative;
-    border-radius: 6px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid #e0d8c8;
-    cursor: pointer;
-    display: flex;
-    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
-  }
-  .em-secondary:hover {
-    transform: translateY(-1px);
-    border-color: var(--gold);
-    box-shadow: 0 4px 14px rgba(31,26,20,0.10);
-  }
-  .em-secondary .em-sec-img {
-    width: 38%; flex-shrink: 0;
-    background-size: cover; background-position: center;
-    border-right: 1px solid #efe7d6;
-  }
-  .em-secondary .em-sec-body {
-    padding: 12px 14px;
-    display: flex; flex-direction: column;
-    flex: 1; min-width: 0;
-  }
-  .em-secondary .em-sec-kicker {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 9px; font-weight: 700;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 4px;
-  }
-  .em-secondary .em-sec-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--brown);
-    line-height: 1.15;
-    margin-bottom: 4px;
-  }
-  .em-secondary .em-sec-blurb {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 11px;
-    color: var(--slate);
-    line-height: 1.4;
-    flex: 1;
-    /* Keep the description honest — clamp to ~2 lines */
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  .em-secondary.em-sec-active {
-    border-color: var(--forest);
-    background: #f6fbf4;
-  }
-  .em-secondary.em-sec-active .em-sec-title { color: var(--forest); }
-
-  /* Mobile: stack everything in one column, drop the feature spans. */
-  @media (max-width: 768px) {
-    body.ui-v2 .editorial-magazine {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto;
-    }
-    .em-feature { grid-row: auto; min-height: 280px; }
-  }
-
-  /* ── UI-V2 ELEMENTS visible only when body.ui-v2 is on. ─────────
-     (Section-break banner removed — its "Western Nevada County /
-     town list" tagline was redundant with the town strip below the
-     hero. Town strip moved up to live directly under the hero so
-     visitors can drill from regional → town in one scroll.) */
-  .v2-only { display: none; }
-  body.ui-v2 .v2-only { display: block; }
-
-  /* ── UI-V2 TOWN STRIP ───────────────────────────────────────────
+  /* ── "WHICH TOWN" STRIP ─────────────────────────────────────────
      Compact horizontal town chips with a small thumbnail + name +
      short blurb. Calmer than the full-bleed photo cards we had
      before — those were too loud. Now reads as a quiet "pick your
      starting point" row, not a competing hero. */
-  .town-strip { display: none; }
-  body.ui-v2 .town-strip {
+  .town-strip {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
@@ -3117,71 +2757,12 @@
   }
   /* Tablets: 2x2 grid. */
   @media (max-width: 980px) {
-    body.ui-v2 .town-strip { grid-template-columns: 1fr 1fr; }
+    .town-strip { grid-template-columns: 1fr 1fr; }
   }
   /* Phones: single column. */
   @media (max-width: 560px) {
-    body.ui-v2 .town-strip { grid-template-columns: 1fr; gap: 8px; }
+    .town-strip { grid-template-columns: 1fr; gap: 8px; }
   }
-
-  /* ── UI-V2 BIGGER CARDS ─────────────────────────────────────────
-     Pump up the card photo height + give each card more horizontal
-     room so the grid reads as a magazine layout instead of a dense
-     directory table. Default size (140px tall, 280px min-col) stays
-     for non-v2 users. */
-  body.ui-v2 .exp-grid {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 22px;
-  }
-  body.ui-v2 .exp-card {
-    border-radius: 12px;
-    box-shadow: 0 3px 14px rgba(0,0,0,0.08);
-  }
-  body.ui-v2 .exp-card:hover {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.14);
-    transform: translateY(-2px);
-  }
-  body.ui-v2 .exp-photo { height: 240px; }
-  body.ui-v2 .exp-photo-name {
-    padding: 14px 18px;
-    font-size: 18px;
-    letter-spacing: 0.005em;
-  }
-  body.ui-v2 .exp-photo-area {
-    top: 12px; right: 14px;
-    font-size: 10px;
-    padding: 4px 10px;
-    background: rgba(31,26,20,0.45);
-    border-radius: 999px;
-    backdrop-filter: blur(4px);
-  }
-  /* Strengthen the photo overlay gradient at the bottom so the name
-     stays legible against bright photos. */
-  body.ui-v2 .exp-photo-overlay {
-    background: linear-gradient(to top,
-      rgba(10,6,2,0.88) 0%,
-      rgba(10,6,2,0.45) 30%,
-      rgba(10,6,2,0.12) 55%,
-      transparent 80%);
-  }
-  /* The card body — give a little more vertical breathing so the
-     longer cards don't feel top-heavy with the bigger photo. */
-  body.ui-v2 .exp-card .exp-body { padding: 16px 18px 18px; }
-  body.ui-v2 .exp-card .exp-sub {
-    font-size: 13px;
-    line-height: 1.45;
-  }
-
-  /* Mobile: keep the card photo tall-ish but not 240px. */
-  @media (max-width: 768px) {
-    body.ui-v2 .exp-photo { height: 200px; }
-    body.ui-v2 .exp-photo-name { font-size: 16px; padding: 12px 14px; }
-  }
-
-  /* List view in v2 is unchanged — the cards stay compact (90px
-     thumbnail) since the whole point of list view is density. The
-     above rules don't apply because .exp-grid.is-list / .events-grid
-     .is-list already override exp-photo dimensions. */
 
   /* ── Help modal — lane-coloured-dot rows, no emoji ────────────────
      Each "how to use" row gets one of the four nav-lane dot colors so
@@ -3271,15 +2852,6 @@
 </head>
 <body>
 
-<!-- ui-v2 preview badge: only visible when body.ui-v2 is on. Lets the
-     operator see at a glance that they're in the redesign preview and
-     bail out with one click. -->
-<div class="ui-v2-badge" role="status" aria-live="polite">
-  <span class="dot"></span>
-  <span>Preview · new look</span>
-  <button onclick="try{localStorage.removeItem('ncexp:newui')}catch(_){};location.search=location.search.replace(/[?&]newui=\d/,'')||location.pathname">Exit</button>
-</div>
-
 <div class="hero">
   <div class="hero-eyebrow">Nevada City · Grass Valley · Penn Valley · &amp; the Western Foothills</div>
   <h1>Western Nevada County<br><em>Trip Planner</em></h1>
@@ -3288,37 +2860,6 @@
   <div class="hero-scroll-cue" aria-hidden="true">▾</div>
 </div>
 
-<!-- ─── UI-V2 HERO TAKEOVER ────────────────────────────────────────
-     Full-bleed rotating-photo hero shown only when body.ui-v2 is on.
-     Five slides crossfade every ~7 seconds with a slow Ken-Burns
-     scale on each so the page feels alive even when static. Photos
-     are placeholders curated to match Nevada-County mood (foothills,
-     South Yuba canyon, downtown Victorian, live music, oak savanna);
-     the right long-term move is sourcing actual Nevada County
-     photography via the public upload pipeline (memo idea #4).
-     The existing text-only .hero above stays in the DOM as the
-     default-UI fallback. ui-v2 hides one, shows the other. -->
-<div class="hero-v2" id="heroV2">
-  <div class="hero-v2-slides" id="heroV2Slides">
-    <div class="hero-v2-slide active" style="background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1920&h=1200&fit=crop')"></div>
-    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=1200&fit=crop')"></div>
-    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1920&h=1200&fit=crop')"></div>
-    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1485579149621-3123dd979885?w=1920&h=1200&fit=crop')"></div>
-    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&h=1200&fit=crop')"></div>
-    <div class="hero-v2-slide"        style="background-image:url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1920&h=1200&fit=crop')"></div>
-  </div>
-  <div class="hero-v2-gradient" aria-hidden="true"></div>
-  <div class="hero-v2-content">
-    <div class="hero-v2-kicker">Nevada County · California</div>
-    <h1 class="hero-v2-title">
-      <span class="hero-v2-line">Year-round arts.</span>
-      <span class="hero-v2-line">Outdoor adventure.</span>
-      <span class="hero-v2-line">Gold Country history.</span>
-    </h1>
-    <p class="hero-v2-sub">Curated experiences, live events, trail maps, and stories told by the people who live here.</p>
-    <a class="hero-v2-cta" href="#tab-experiences" onclick="document.getElementById('tab-experiences')?.scrollIntoView({behavior:'smooth'});return false;">Start exploring &nbsp;↓</a>
-  </div>
-</div>
 
 <!-- Hidden area-filter input — the existing filter chain reads
      document.getElementById('filterArea').value to narrow by town.
@@ -3326,11 +2867,11 @@
      gives _filterByTown() somewhere to write. -->
 <input type="hidden" id="filterArea" value="">
 
-<!-- UI-V2 "WHICH TOWN" STRIP — four photo-cards anchoring geography
-     directly under the hero. Each captures one town's character in a
-     single editorial sentence + a photo. Click → filter to that area
-     + scroll the grid into view. Hidden on default UI. -->
-<div class="town-strip v2-only" aria-label="Pick a town to explore">
+<!-- "WHICH TOWN" STRIP — four compact chips anchoring geography
+     under the hero. Each captures one town's character in a single
+     sentence + a small thumbnail. Click → filter the grid to that
+     area + scroll the grid into view. -->
+<div class="town-strip" aria-label="Pick a town to explore">
   <article class="town-card" onclick="_filterByTown('Nevada City')">
     <div class="town-card-img" style="background-image:url('https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=1200&h=800&fit=crop')"></div>
     <div class="town-card-content">
@@ -3377,12 +2918,7 @@
     <span class="eh-rule"></span>
     <span class="eh-sub">curated slices of what's here right now</span>
   </div>
-  <!-- DEFAULT UI strip: small chip cards in a horizontal row. -->
   <div class="editorial-strip" id="editorialStrip"></div>
-  <!-- UI-V2 magazine band: one large featured spread + 3-4 secondary
-       cards on the right. Only renders when body.ui-v2 is on; rendered
-       by _renderEditorialMagazine(). -->
-  <div class="editorial-magazine" id="editorialMagazine"></div>
 </div>
 
 
@@ -3800,41 +3336,7 @@
 </div>
 
 <script>
-// ─── UI-V2 FEATURE FLAG (visual makeover preview) ─────────────────────────
-// Flip on by adding ?newui=1 to the URL (one-shot) or running
-//   localStorage.setItem('ncexp:newui','1')
-// in the console for a persistent preview on this device. Setting it via
-// query param also persists for the session so reloads keep the new look.
-// Disable: ?newui=0  or  localStorage.removeItem('ncexp:newui')
-//
-// All v2 code paths key off body.ui-v2 (CSS) or the USE_NEW_UI boolean
-// (JS). Keeps the new design behind a flag so chamber/team see the
-// current site by default until we cut over.
-(function _initUiV2Flag() {
-  try {
-    const qp = new URLSearchParams(location.search).get('newui');
-    if (qp === '1') localStorage.setItem('ncexp:newui', '1');
-    if (qp === '0') localStorage.removeItem('ncexp:newui');
-  } catch (_) {}
-  let on = false;
-  try { on = (localStorage.getItem('ncexp:newui') === '1'); } catch (_) {}
-  window.USE_NEW_UI = on;
-  // Apply the body class as soon as the body exists. If the script runs
-  // before <body> parses (it shouldn't — this script lives mid-page —
-  // but defend anyway), defer to DOMContentLoaded.
-  const apply = () => {
-    if (document.body) {
-      document.body.classList.toggle('ui-v2', on);
-    } else {
-      document.addEventListener('DOMContentLoaded', () => {
-        document.body.classList.toggle('ui-v2', on);
-      }, { once: true });
-    }
-  };
-  apply();
-})();
-
-// ─── UI-V2 "WHERE YOU ARE" TOWN STRIP ───────────────────────────────────
+// ─── "WHICH TOWN" STRIP ─────────────────────────────────────────────────
 // Clicking a town card sets the (hidden) #filterArea input, re-renders
 // the current Explore view, and scrolls the grid into view so the
 // visitor lands in pre-filtered results for that town.
@@ -3863,37 +3365,6 @@ function _filterByTown(area) {
   }, 80);
   if (typeof track === 'function') track('town_strip_click', { area });
 }
-
-// ─── UI-V2 HERO SLIDESHOW ────────────────────────────────────────────────
-// Crossfades the .hero-v2-slide elements every ~7 seconds. Only runs when
-// the ui-v2 flag is on (so we don't burn timers on the default UI). The
-// active slide carries the .active class + Ken-Burns animation; we move
-// the class one element forward each tick, restarting the animation by
-// removing/re-adding the class on the new active.
-(function _initHeroV2Slideshow() {
-  if (!window.USE_NEW_UI) return;
-  const start = () => {
-    const slides = document.querySelectorAll('#heroV2Slides .hero-v2-slide');
-    if (slides.length < 2) return;
-    let idx = 0;
-    setInterval(() => {
-      slides[idx].classList.remove('active');
-      idx = (idx + 1) % slides.length;
-      // Force animation restart by yanking + re-adding the class on the
-      // next frame. Without this the second cycle of the same slide
-      // doesn't re-run Ken-Burns.
-      const next = slides[idx];
-      next.classList.remove('active');
-      void next.offsetWidth;
-      next.classList.add('active');
-    }, 7000);
-  };
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start, { once: true });
-  } else {
-    start();
-  }
-})();
 
 // ─── ANALYTICS CONFIG (opt-in, off by default) ────────────────────────────
 // The site collects no analytics, no cookies, and no third-party trackers
@@ -5521,127 +4992,7 @@ function _editorialCards() {
 // Build the editorial-strip HTML — four base cards then up to two
 // currently-active SEASONAL_MOMENTS as "shortcut" cards (dashed border,
 // click-through to the moment's action rather than a toggle).
-// ── UI-V2 Magazine band: one large feature + 4 secondary cards ─────
-// Pick what goes in the featured slot by priority:
-//   1. An active SEASONAL_MOMENT at "ending" or "peak" status (most
-//      time-sensitive thing happening right now)
-//   2. The newest GUIDES article (long-form editorial that's currently
-//      under-promoted on the home)
-//   3. The first existing editorial card with a photo (fallback)
-// Returns { kicker, title, sub, photo, cta, onclick } where onclick is
-// the inline-string handler to invoke when the featured card is clicked.
-function _featuredEditorial() {
-  // 1. Seasonal moment in active window
-  if (typeof liveSeasonal !== 'undefined' && Array.isArray(liveSeasonal)) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const live = [];
-    for (const m of liveSeasonal) {
-      const st = (typeof _seasonalStatus === 'function') ? _seasonalStatus(m, today) : null;
-      if (st && (st.status === 'ending' || st.status === 'peak')) {
-        live.push({ m, status: st.status });
-      }
-    }
-    if (live.length) {
-      live.sort((a, b) => (a.status === 'ending' ? 0 : 1) - (b.status === 'ending' ? 0 : 1));
-      const it = live[0];
-      const kicker = it.status === 'ending'
-        ? 'In season · ending soon'
-        : 'In season now';
-      return {
-        kicker,
-        title: it.m.name || it.m.title || '',
-        sub:   it.m.description || it.m.tagline || '',
-        photo: it.m.photo || it.m.image || '',
-        cta:   'See what\'s on →',
-        onclick: `_seasonalGo('${it.m.id}')`,
-      };
-    }
-  }
-  // 2. Newest Local Guide
-  if (typeof GUIDES !== 'undefined' && Array.isArray(GUIDES) && GUIDES.length) {
-    const sorted = [...GUIDES].sort((a, b) =>
-      (b.date_published || '').localeCompare(a.date_published || '')
-    );
-    const g = sorted[0];
-    const author = (typeof _guideAuthor === 'function') ? _guideAuthor(g.author_id) : null;
-    return {
-      kicker: author ? `From the Guides · By ${author.name}` : 'From the Local Guides',
-      title:  g.title || '',
-      sub:    g.subtitle || '',
-      photo:  g.cover_photo || '',
-      cta:    'Read the guide →',
-      onclick: `openGuide('${g.id}')`,
-    };
-  }
-  // 3. Fallback — promote whatever's at the top of the editorial-cards list
-  const cards = (typeof _editorialCards === 'function') ? _editorialCards() : [];
-  if (cards.length) {
-    const c = cards[0];
-    let onclick;
-    if (c.action)       onclick = `_edCardRunAction('${c.action}','${c.track_id || c.id}')`;
-    else if (c.external_url) onclick = `_edCardOpenExternal('${c.external_url}','${c.track_id || c.id}')`;
-    else                onclick = `toggleEditorial('${c.id}')`;
-    return {
-      kicker: 'Right now',
-      title:  c.title || '',
-      sub:    c.blurb || '',
-      photo:  c.photo || '',
-      cta:    c.cta || 'See more →',
-      onclick,
-    };
-  }
-  return null;
-}
-
-function _renderEditorialMagazine() {
-  const container = document.getElementById('editorialMagazine');
-  if (!container) return;
-  const featured = _featuredEditorial();
-  if (!featured) { container.innerHTML = ''; return; }
-
-  // Featured: full-bleed card with photo + overlay text
-  const featuredHtml = `
-    <article class="em-feature" onclick="${featured.onclick}">
-      <div class="em-feature-img" style="background-image:url('${(featured.photo||'').replace(/"/g,'&quot;')}')"></div>
-      <div class="em-feature-content">
-        <div class="em-kicker">${featured.kicker}</div>
-        <h2 class="em-title">${featured.title}</h2>
-        <p class="em-sub">${featured.sub}</p>
-        <span class="em-cta">${featured.cta}</span>
-      </div>
-    </article>`;
-
-  // Secondaries: pull from the existing editorial-cards list. We use up to
-  // 4 so the magazine grid stays balanced. Same click semantics as the
-  // strip (toggle / external / action) — visitors who recognized them in
-  // the chip strip get the same behavior here.
-  const cards = (typeof _editorialCards === 'function') ? _editorialCards() : [];
-  const secondaryHtml = cards.slice(0, 4).map(c => {
-    const active = activeEditorialPills.has(c.id);
-    let onclick;
-    if (c.action)            onclick = `_edCardRunAction('${c.action}','${c.track_id || c.id}')`;
-    else if (c.external_url) onclick = `_edCardOpenExternal('${c.external_url}','${c.track_id || c.id}')`;
-    else                     onclick = `toggleEditorial('${c.id}')`;
-    return `
-      <article class="em-secondary${active ? ' em-sec-active' : ''}" onclick="${onclick}"
-               title="${(c.blurb||'').replace(/"/g,'&quot;')}">
-        <div class="em-sec-img" style="background-image:url('${(c.photo||'').replace(/"/g,'&quot;')}')"></div>
-        <div class="em-sec-body">
-          <div class="em-sec-kicker">${c.title}</div>
-          <div class="em-sec-blurb">${c.blurb}</div>
-        </div>
-      </article>`;
-  }).join('');
-
-  container.innerHTML = featuredHtml + secondaryHtml;
-}
-
 function _renderEditorialStrip() {
-  // V2: paint the magazine band too. Both DOM nodes exist; CSS chooses
-  // which one is visible based on body.ui-v2.
-  if (typeof _renderEditorialMagazine === 'function') _renderEditorialMagazine();
-
   const strip = document.getElementById('editorialStrip');
   if (!strip) return;
 
