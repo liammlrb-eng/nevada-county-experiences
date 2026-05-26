@@ -2805,6 +2805,63 @@
     border-left: 3px solid var(--gold);
   }
   .help-tips strong { color: var(--brown); }
+
+  /* ── 5-step trip-planning stepper (second half of help modal) ─────
+     Sequenced workflow alternative to the lane rows above. Numbered
+     circles + short copy per step; visitors who think "itinerary"
+     rather than "interests" land here. */
+  .help-stepper-head {
+    margin: 22px 0 10px;
+    padding-top: 18px;
+    border-top: 1px solid #efe7d6;
+    text-align: center;
+  }
+  .help-stepper-head span {
+    display: inline-block;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--brown);
+    background: var(--fog);
+    padding: 4px 14px;
+    border-radius: 999px;
+  }
+  .help-stepper {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 4px;
+    counter-reset: hs;
+  }
+  .help-stepper li {
+    display: flex;
+    gap: 14px;
+    padding: 11px 4px;
+    border-bottom: 1px solid #efe7d6;
+    font-size: 13px;
+    color: var(--slate);
+    line-height: 1.5;
+  }
+  .help-stepper li:last-of-type { border-bottom: none; }
+  .help-stepper .hs-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .help-stepper li > div {
+    display: flex; flex-direction: column;
+    gap: 3px;
+  }
+  .help-stepper strong {
+    color: var(--brown);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
   .tb-section { margin-bottom: 18px; }
   .tb-label {
     font-size: 13px; font-weight: 700; color: var(--brown);
@@ -3221,6 +3278,52 @@
         <div><strong>You have set dates</strong><br>
           Set the <em>date range</em> in the filter bar (or hit <em>Today / Weekend / Week</em>), then flip the Explore tab to <em>Calendar</em> view to see exactly what's on each day.</div>
       </div>
+
+      <!-- 5-step trip-planning paradigm — the same site, viewed as a
+           sequenced workflow rather than parallel lanes. Visitors who
+           think in itinerary terms can use this checklist; the lane
+           pattern above suits visitors who think in interests. -->
+      <div class="help-stepper-head">
+        <span>Or — plan a trip step by step</span>
+      </div>
+      <ol class="help-stepper">
+        <li>
+          <span class="hs-num">1</span>
+          <div>
+            <strong>Where to go &amp; what to do</strong>
+            Pick a town from the strip above (Nevada City, Grass Valley, Penn Valley, Washington) and a vibe or two on <em>Explore</em>. Cards filter to that area + mood.
+          </div>
+        </li>
+        <li>
+          <span class="hs-num">2</span>
+          <div>
+            <strong>Getting there &amp; around</strong>
+            Most visitors arrive via I-80 + Hwy 49. Free Gold Country Stage buses run between Nevada City &amp; Grass Valley + to the river crossings. Each venue card has a Google Maps button for directions.
+          </div>
+        </li>
+        <li>
+          <span class="hs-num">3</span>
+          <div>
+            <strong>Where to stay</strong>
+            Tap the <em>Lodging</em> tile next to the vibes — hotels, B&amp;Bs, cabins, glamping, campgrounds. Filter by Stays sub-pills (cozy / opulent / rustic / camping).
+          </div>
+        </li>
+        <li>
+          <span class="hs-num">4</span>
+          <div>
+            <strong>Food, drink &amp; entertainment</strong>
+            Pick <em>Foodie</em> for restaurants / wineries / breweries / markets, and <em>Arts &amp; Culture</em> for live music, theater, galleries. Set dates to see what's actually on those nights.
+          </div>
+        </li>
+        <li>
+          <span class="hs-num">5</span>
+          <div>
+            <strong>Before you go</strong>
+            Open <em>My Itinerary</em> (top right), drag items into day order, check the map for parking + restrooms, then share the link with whoever you're traveling with.
+          </div>
+        </li>
+      </ol>
+
       <div class="help-tips">
         <strong>Good to know</strong><br>
         • Anything you add lands in <strong>My Itinerary</strong> — organize it by day, view it on a map (with parking &amp; restrooms), or share a link.<br>
