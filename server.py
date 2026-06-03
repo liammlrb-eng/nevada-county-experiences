@@ -489,12 +489,20 @@ def _run_ai_categorize(limit=None, force=False, source=None):
             _ai_status["last_error"] = str(e)
 
 
+# Full crawl budget. The scraper walks ~21 sources; the Selenium-driven ones
+# (especially under Edge, which starts slower than Chrome) push a complete run
+# past the old 5-minute cap, so it was timing out mid-crawl. 15 minutes gives
+# every source room to finish while still bounding a hung run.
+SCRAPER_TIMEOUT_SECONDS = 900
+
+
 def _run_scraper():
     """Run event_scraper.py as a subprocess."""
     try:
         result = subprocess.run(
             [sys.executable, "-X", "utf8", SCRAPER_PY],
-            capture_output=True, text=True, timeout=300, encoding="utf-8"
+            capture_output=True, text=True,
+            timeout=SCRAPER_TIMEOUT_SECONDS, encoding="utf-8"
         )
         # Parse counts from stdout
         import re
