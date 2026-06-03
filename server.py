@@ -489,10 +489,12 @@ def _run_ai_categorize(limit=None, force=False, source=None):
             _ai_status["last_error"] = str(e)
 
 
-# Full crawl budget. The scraper walks ~21 sources; the Selenium-driven ones
-# (especially under Edge, which starts slower than Chrome) push a complete run
-# past the old 5-minute cap, so it was timing out mid-crawl. 15 minutes gives
-# every source room to finish while still bounding a hung run.
+# Outer crawl budget — a hard backstop, NOT the primary guard. event_scraper.py
+# now gives each of the ~21 sources its own per-source timeout
+# (NCEXP_SOURCE_TIMEOUT, default 120s) and moves on if one hangs, so a single
+# wedged site can't sink the run. This subprocess-level cap only exists to kill
+# a catastrophically stuck process (e.g. many sources hanging at once). 15 min
+# leaves ample room for a normal full crawl plus a few slow/timed-out sources.
 SCRAPER_TIMEOUT_SECONDS = 900
 
 

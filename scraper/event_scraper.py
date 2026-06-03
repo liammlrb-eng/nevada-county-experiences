@@ -20,7 +20,7 @@ Deployment:
   traditional server (Linux/Apache, systemd, cron). No cloud services needed.
 """
 
-import os, sys, json, argparse
+import os, sys, json, argparse, threading
 from datetime import datetime
 
 # Force UTF-8 stdout/stderr. On Windows the console defaults to cp1252,
@@ -199,6 +199,48 @@ def _needs_selenium(scraper) -> bool:
     return "requests.get" not in src or "super().scrape" in src
 
 
+# ── Per-source timeout ────────────────────────────────────────────────────────
+#
+# Each source is scraped one at a time with its own hard wall-clock budget, so a
+# single hung site (a stalled socket, a wedged Selenium command, an infinite
+# JS wait) can't eat the whole run and sink every other source's results. The
+# scrape runs in a *daemon* thread we join() with a timeout: if it overruns we
+# stop waiting and move on. The thread is a daemon precisely because a hung
+# blocking call can't be killed from Python — making it a daemon means it can
+# never keep the process alive past the run.
+#
+# Override the default with the NCEXP_SOURCE_TIMEOUT env var (seconds).
+PER_SOURCE_TIMEOUT = int(os.environ.get("NCEXP_SOURCE_TIMEOUT", "120"))
+
+
+class SourceTimeout(Exception):
+    """Raised when a single source exceeds its per-source time budget."""
+
+
+def _scrape_one(scraper, driver, discover, timeout):
+    """Run scraper.scrape() under a hard timeout.
+
+    Returns the event list on success. Re-raises whatever the scraper raised.
+    Raises SourceTimeout if it runs longer than `timeout` seconds.
+    """
+    holder = {}
+
+    def _work():
+        try:
+            holder["result"] = scraper.scrape(driver, discover=discover)
+        except Exception as e:  # propagate to the main thread via the holder
+            holder["error"] = e
+
+    t = threading.Thread(target=_work, name=f"scrape:{scraper.name}", daemon=True)
+    t.start()
+    t.join(timeout)
+    if t.is_alive():
+        raise SourceTimeout(f"exceeded {timeout}s")
+    if "error" in holder:
+        raise holder["error"]
+    return holder.get("result", []) or []
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def run(scrapers, discover=False):
@@ -226,13 +268,29 @@ def run(scrapers, discover=False):
         for scraper in scrapers:
             print(f"\n-- {scraper.name} --")
             try:
-                events = scraper.scrape(driver, discover=discover)
+                events = _scrape_one(scraper, driver, discover, PER_SOURCE_TIMEOUT)
                 all_fresh.extend(events)
+            except SourceTimeout as e:
+                print(f"  TIMEOUT: {e} -- skipping {scraper.name}, moving on")
+                # If a Selenium source timed out, the shared browser may be
+                # wedged mid-command; the abandoned daemon thread might still
+                # be holding it, so don't quit it (that could deadlock) -- just
+                # drop the reference and spin up a fresh driver for the rest.
+                if driver is not None and _needs_selenium(scraper):
+                    try:
+                        driver = make_driver()
+                        print("  Restarted browser after timeout.")
+                    except Exception as de:
+                        print(f"  Could not restart browser: {de}")
+                        driver = None
             except Exception as e:
                 print(f"  ERROR: {e}")
     finally:
         if driver:
-            driver.quit()
+            try:
+                driver.quit()
+            except Exception:
+                pass
 
     # Auto-tag all freshly scraped events before merging
     tag_events(all_fresh)
