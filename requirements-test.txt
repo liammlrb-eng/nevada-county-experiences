@@ -1,0 +1,10 @@
+# Test dependencies — install with:  pip install -r requirements-test.txt
+# Then once:                          playwright install --with-deps chromium
+#
+# Test infrastructure for the Nevada County Experience project. Runs
+# headless smoke tests against the static frontend so any commit that
+# breaks the homepage gets flagged within ~2 minutes of pushing.
+
+pytest>=8.0
+pytest-playwright>=0.5
+playwright>=1.45
