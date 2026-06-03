@@ -9578,7 +9578,7 @@ async function renderEventsQueue() {
         ${scrapeStatus ? `
           <span style="font-size:11px;color:var(--slate)">Last refresh: <strong>${scrapeStatus.last_run||'Never'}</strong></span>
           ${scrapeStatus.running ? '<span style="margin-left:12px;color:var(--gold);font-size:11px">⟳ Refreshing…</span>' : ''}
-          ${scrapeStatus.last_error ? `<span style="margin-left:12px;color:#c0392b;font-size:11px">⚠ ${scrapeStatus.last_error.slice(0,60)}</span>` : ''}
+          ${scrapeStatus.last_error ? `<span title="${_escapeHtml(scrapeStatus.last_error)}" style="margin-left:12px;color:#c0392b;font-size:11px;cursor:help">⚠ ${_escapeHtml(_friendlyScrapeError(scrapeStatus.last_error))}</span>` : ''}
           ${aiStatus && aiStatus.last_run ? `<span style="margin-left:12px;font-size:11px;color:var(--slate)">AI: <strong>${aiStatus.last_run.split(' ')[1]||aiStatus.last_run}</strong>${aiStatus.last_processed ? ` (${aiStatus.last_processed})` : ''}</span>` : ''}
           ${aiBusy ? '<span style="margin-left:12px;color:var(--gold);font-size:11px">🤖 Categorizing…</span>' : ''}
           ${aiStatus && aiStatus.last_error ? `<span style="margin-left:12px;color:#c0392b;font-size:11px">⚠ AI: ${aiStatus.last_error.slice(0,60)}</span>` : ''}
@@ -9816,8 +9816,34 @@ function _syncEqScrollbar() {
   });
 }
 
+// Condense a raw multi-line Python traceback into the one line that matters:
+// the final exception message. Falls back to the raw string for anything that
+// isn't a traceback. The full text is still available via the span's title.
+function _friendlyScrapeError(raw) {
+  if (!raw) return '';
+  const lines = String(raw).trim().split('\n').map(l => l.trim()).filter(Boolean);
+  let msg = lines.length ? lines[lines.length - 1] : String(raw);
+  // Drop the dotted module path in front of the exception class for readability:
+  //   selenium.common.exceptions.SessionNotCreatedException: Message: ...
+  //   → SessionNotCreatedException: Message: ...
+  msg = msg.replace(/^[\w.]+\.(\w*(?:Error|Exception|Exit)\b)/, '$1');
+  if (msg.length > 90) msg = msg.slice(0, 87) + '…';
+  return msg;
+}
+
 async function triggerScrape() {
   if (API_BASE === null) { alert('Start the server first:\n\npython server.py'); return; }
+  // Immediate acknowledgement: flip the button to a disabled "Scraping…" state
+  // before we even hit the network, so a double-click can't fire two scrapes
+  // and the user isn't left wondering whether the click registered.
+  const btn = (typeof event !== 'undefined' && event && event.target) ? event.target : null;
+  let btnReset = null;
+  if (btn && btn.tagName === 'BUTTON') {
+    const prevHTML = btn.innerHTML, prevDisabled = btn.disabled;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Scraping…';
+    btnReset = () => { btn.disabled = prevDisabled; btn.innerHTML = prevHTML; };
+  }
   try {
     const r = await fetch(`${API_BASE}/api/scrape`, { method: 'POST' });
     const d = await r.json();
@@ -9828,12 +9854,19 @@ async function triggerScrape() {
         const s = await sr.json();
         if (!s.running) {
           clearInterval(interval);
-          renderEventsQueue();
+          renderEventsQueue();  // re-render surfaces any last_error in the status bar
         }
       }, 3000);
       renderEventsQueue();  // show "running" state immediately
+    } else {
+      // Server refused to start the scrape (e.g. one already running).
+      if (btnReset) btnReset();
+      alert(d.message || 'Could not start the scrape. Please try again.');
     }
-  } catch(e) { alert('Could not reach server. Make sure server.py is running.'); }
+  } catch(e) {
+    if (btnReset) btnReset();
+    alert('Could not reach server. Make sure server.py is running.');
+  }
 }
 
 async function triggerAiCategorize() {

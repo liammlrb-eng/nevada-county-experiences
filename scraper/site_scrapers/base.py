@@ -39,10 +39,13 @@ from dateutil import parser as dateparser
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 SNAPSHOT_DIR = os.path.join(
     os.path.dirname(__file__), '..', '..', 'scraper_output', 'snapshots'
@@ -62,21 +65,63 @@ _REQUESTS_HEADERS = {
 _PACIFIC = timezone(timedelta(hours=-7))   # PDT (summer); switch to -8 for PST
 
 
-def make_driver() -> webdriver.Chrome:
-    """Create a headless Chrome driver (auto-downloads matching ChromeDriver)."""
+_HEADLESS_ARGS = (
+    "--headless=new",
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--window-size=1280,900",
+)
+_DRIVER_UA = (
+    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
+
+
+def _make_chrome():
+    """Headless Chrome via Selenium (auto-downloads matching ChromeDriver)."""
     opts = Options()
-    opts.add_argument("--headless=new")
-    opts.add_argument("--no-sandbox")
-    opts.add_argument("--disable-dev-shm-usage")
-    opts.add_argument("--disable-gpu")
-    opts.add_argument("--window-size=1280,900")
-    opts.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    )
+    for arg in _HEADLESS_ARGS:
+        opts.add_argument(arg)
+    opts.add_argument(_DRIVER_UA)
     service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=opts)
+
+
+def _make_edge():
+    """Headless Microsoft Edge — same Chromium engine, used as a fallback when
+    Chrome isn't installed (Edge ships with Windows)."""
+    opts = EdgeOptions()
+    for arg in _HEADLESS_ARGS:
+        opts.add_argument(arg)
+    opts.add_argument(_DRIVER_UA)
+    service = EdgeService(EdgeChromiumDriverManager().install())
+    return webdriver.Edge(service=service, options=opts)
+
+
+def make_driver():
+    """Return a headless Chromium-family WebDriver.
+
+    Prefers Google Chrome; if Chrome isn't installed (common on stock Windows
+    machines that only ship Edge) the launch raises and we transparently fall
+    back to Microsoft Edge, which runs the same Chromium engine so every
+    site-specific scraper behaves identically.
+    """
+    try:
+        return _make_chrome()
+    except Exception as chrome_err:
+        try:
+            driver = _make_edge()
+            print(f"[make_driver] Chrome unavailable ({chrome_err.__class__.__name__}); "
+                  f"using Microsoft Edge instead.")
+            return driver
+        except Exception as edge_err:
+            raise RuntimeError(
+                "Could not start a browser for scraping. Tried Google Chrome "
+                f"(failed: {chrome_err}) and Microsoft Edge (failed: {edge_err}). "
+                "Install Chrome or Edge to enable Selenium-based scrapers."
+            ) from edge_err
 
 
 # ── RSS autodiscovery ─────────────────────────────────────────────────────────
