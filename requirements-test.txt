@@ -8,3 +8,9 @@
 pytest>=8.0
 pytest-playwright>=0.5
 playwright>=1.45
+
+# Visual-regression suite only (pytest -m visual). The default `pytest` run
+# and CI never import this — the visual test importorskips it — so it's safe
+# to leave installed or not. Pillow does the snapshot pixel diffing.
+Pillow>=10.0
+

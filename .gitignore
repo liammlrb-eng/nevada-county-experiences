@@ -18,3 +18,11 @@ scraper_output/snapshots/
 
 # Excel inventory (large binary)
 inventory.xlsx
+
+# Test runtime outputs. The visual-regression BASELINES
+# (tests/__snapshots__/home-*.png) ARE committed — they're the reference
+# images. Only the per-run diff artifacts and pytest/Playwright scratch are
+# ignored.
+.pytest_cache/
+test-results/
+tests/__snapshots__/_diffs/

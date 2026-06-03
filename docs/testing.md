@@ -44,7 +44,9 @@ If port 8765 is busy on your machine, override it:
 $env:NCEXP_TEST_PORT = "8766"; pytest
 ```
 
-## What the suite covers today (Day 1)
+## What the suite covers today
+
+### Smoke (`tests/test_smoke.py`, marker `smoke`)
 
   • Page loads with no JavaScript console errors
   • All four lane tabs (Explore / Suggested / Help Me Plan / Local
@@ -55,9 +57,52 @@ $env:NCEXP_TEST_PORT = "8766"; pytest
   • At least one experience card renders in the default grid
 
 These are the "if any of this is broken, the site is broken" checks.
-They intentionally don't cover deep filter logic, modals beyond Help,
-or admin features — those live in higher-tier suites that come in
-later phases.
+
+### State combinations (`tests/test_filters.py`, marker `combo`)
+
+One test loads the page once and, from inside the browser, walks the
+**entire vibe × pill filter space** — every vibe on its own and every
+vibe paired with each of its editorial pills (~66 combinations as of
+this writing). For each it asserts:
+
+  • no combination throws while applying + rendering
+  • no async window error / unhandled rejection fires during the sweep
+  • `#expGrid` stays present and queryable for every combo
+  • every vibe renders at least one card in *some* state (no dead tiles)
+
+This is the tier that catches "a specific vibe+pill breaks its regex /
+render path" — the kind of thing nobody clicks through by hand before a
+release. It runs in CI alongside the smoke tests and finishes in ~6s.
+
+### Visual regression (`tests/test_visual.py`, marker `visual`) — opt-in
+
+Pixel-diff snapshots of the homepage chrome at desktop (1280×800) and
+mobile (390×844) widths, compared against committed baselines in
+`tests/__snapshots__/`.
+
+**This suite is deselected by default and does NOT gate CI** (pytest.ini
+carries `-m "not visual"`). Pixel snapshots depend on the rendering OS —
+font hinting and emoji glyphs differ between Windows and the Linux CI
+runner — so the baselines are only valid on the machine that generated
+them. Run it deliberately, on that machine:
+
+```powershell
+pytest -m visual
+```
+
+To make the shots deterministic the suite freezes animations, hides the
+date-dependent editorial band, and flattens every external photo to a
+solid color (no network interception — that's both faster and means the
+shot doesn't depend on which images loaded). A mismatch drops the current
+shot + a red-tinted diff into `tests/__snapshots__/_diffs/` (gitignored).
+
+If you intentionally change the look of the page chrome, regenerate the
+baselines: delete the relevant `tests/__snapshots__/home-*.png`, run
+`pytest -m visual` once (it recreates them and skips), eyeball the new
+PNGs, and commit them.
+
+Higher tiers still to come don't cover deep modal chains, admin features,
+or feeds — those arrive in later phases.
 
 ## How CI uses this
 
@@ -103,13 +148,13 @@ Both arrive in Day 3 of the Phase 0 test rollout.
 
 ## Roadmap for the suite
 
-| Phase | Coverage |
-|---|---|
-| Day 1 (this file) | Smoke tests, CI wired up |
-| Day 2 | State-combination tests + visual regression baseline |
-| Day 3 | `bug_log.md` + `qa_checklist.md` artifacts |
-| Day 4 | Error-surfacing tier (loud caught-error banner, console capture, Report-bug button) |
-| Later | Feed validation, mobile snapshots, admin-flow tests |
+| Phase | Coverage | Status |
+|---|---|---|
+| Day 1 | Smoke tests, CI wired up | ✅ done |
+| Day 2 | State-combination sweep (CI) + visual regression baseline (opt-in) | ✅ done |
+| Day 3 | `bug_log.md` + `qa_checklist.md` artifacts | next |
+| Day 4 | Error-surfacing tier (loud caught-error banner, console capture, Report-bug button) | |
+| Later | Feed validation, mobile snapshots, admin-flow tests | |
 
 ## Troubleshooting
 
