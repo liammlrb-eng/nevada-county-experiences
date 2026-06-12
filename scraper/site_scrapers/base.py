@@ -412,7 +412,14 @@ class EventScraper:
             dtstart = field("DTSTART")
             date_str, time_str = "", ""
             try:
+                # A trailing Z means the stamp is UTC (Google Calendar exports
+                # most events this way) — convert to Pacific or evening shows
+                # land at ~1 AM on the wrong day. TZID/floating stamps are
+                # already wall-clock local.
+                is_utc = dtstart.rstrip().endswith("Z")
                 dt = dateparser.parse(dtstart.replace("T", " ").rstrip("Z"))
+                if dt and is_utc:
+                    dt = dt.replace(tzinfo=timezone.utc).astimezone(_PACIFIC).replace(tzinfo=None)
                 if dt:
                     if dt.replace(tzinfo=None) < cutoff:
                         continue
