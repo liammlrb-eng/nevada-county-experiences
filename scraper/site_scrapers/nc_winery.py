@@ -100,6 +100,24 @@ def _extract_events_json(html: str) -> list[dict]:
         return []
 
 
+def _detect_detail_prefix(html: str, records: list[dict]) -> str:
+    """Find the detail-page path prefix the site currently uses.
+
+    Wix has renamed this once already (/event-details/ -> /events-1/), so we
+    don't hardcode it: the rendered page links each event card to its detail
+    page, so locating any record's slug in an ncwinery.com URL reveals the
+    live prefix. Falls back to the last known one.
+    """
+    for rec in records:
+        slug = rec.get("slug") or ""
+        if not slug:
+            continue
+        m = re.search(rf'www\.ncwinery\.com/([^"/\s]+)/{re.escape(slug)}', html)
+        if m:
+            return m.group(1)
+    return "events-1"
+
+
 def _parse_tbd_date(message: str, today: datetime) -> tuple[str, str]:
     """
     Parse a Wix TBD-message date string like 'Sunday, May 24th, 3:00 - 5:00 PM'
@@ -125,11 +143,16 @@ def _parse_tbd_date(message: str, today: datetime) -> tuple[str, str]:
     elif start_ampm == "AM" and hour == 12:
         h24 = 0
 
-    # Year inference: try current year, roll forward if past.
+    # Year inference: the TBD message has no year. Try the current year; only
+    # roll forward when the date is FAR past (a December listing scraped in
+    # January). A date past by mere days/weeks is a stale listing for a show
+    # that already happened — rolling it forward would manufacture a phantom
+    # next-year event, so keep the past date and let the caller's
+    # past-event filter drop it.
     year = today.year
     try:
         dt = dateparser.parse(f"{month} {day} {year} {h24:02d}:{minute:02d}")
-        if dt and dt.date() < today.date():
+        if dt and dt.date() < today.date() and (today.date() - dt.date()).days > 60:
             year += 1
             dt = dateparser.parse(f"{month} {day} {year} {h24:02d}:{minute:02d}")
     except Exception:
@@ -160,6 +183,7 @@ class NevadaCityWineryScraper(EventScraper):
         events = []
         today      = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         future_cap = today + timedelta(days=365)
+        detail_prefix = _detect_detail_prefix(html, records)
 
         for rec in records:
             title = (rec.get("title") or "").strip()
@@ -192,9 +216,9 @@ class NevadaCityWineryScraper(EventScraper):
                 if image and not image.startswith("http"):
                     image = f"https://static.wixstatic.com/media/{image}"
 
-            # Detail page slug → canonical URL
+            # Detail page slug → canonical URL (prefix detected from the page)
             slug = rec.get("slug") or ""
-            event_url = urljoin("https://www.ncwinery.com/event-details/", slug) if slug else _SOURCE
+            event_url = f"https://www.ncwinery.com/{detail_prefix}/{slug}" if slug else _SOURCE
 
             # Wix `about` field carries plain-text description; fallback to msg
             about = (rec.get("about") or "").strip() or msg
