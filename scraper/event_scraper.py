@@ -57,6 +57,7 @@ from site_scrapers.nc_winery        import NevadaCityWineryScraper
 from site_scrapers.alibi_truckee    import AlibiTruckeeScraper
 from site_scrapers.gold_vibe        import GoldVibeScraper
 from site_scrapers.wild_eye_pub     import WildEyePubScraper
+from site_scrapers.bylt             import BYLTScraper
 # NevadaTheatreScraper — built but disabled (see ALL_SCRAPERS note below)
 from auto_tagger                     import tag_events
 # Future scrapers — uncomment as they're built:
@@ -88,6 +89,7 @@ ALL_SCRAPERS = [
     AlibiTruckeeScraper(),          # static HTML paginated — Alibi Truckee Events Manager (~150)
     GoldVibeScraper(),              # Google Calendar ICS — taproom music/dance/trivia
     WildEyePubScraper(),            # Wix Events JSON — Wild Eye Pub ticketed concerts
+    BYLTScraper(),                  # Event Organiser iCal — Bear Yuba Land Trust hikes/art/trail events
     # ── Disabled ──────────────────────────────────────────────────────────
     # NevadaTheatreScraper()        # MEC plugin: REST list is post-date-ordered
     #   so upcoming events are scattered through hundreds of historical

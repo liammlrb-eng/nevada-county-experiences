@@ -80,6 +80,14 @@
     "url": "https://www.nevadacountyfair.com/events/"
   },
   {
+    "enabled": true,
+    "id": "bylt",
+    "interval_hours": 168,
+    "name": "Bear Yuba Land Trust",
+    "notes": "Event Organiser iCal feed (?feed=eo-events). Guided hikes, trail art installations, hike challenges, Celebration of Trails. Multi-day programs anchored to their end date so they stay visible while running. No Selenium.",
+    "url": "https://www.bylt.org/events/"
+  },
+  {
     "enabled": false,
     "id": "go_nevada_festivals",
     "interval_hours": 336,
