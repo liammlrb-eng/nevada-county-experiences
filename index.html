@@ -2918,6 +2918,190 @@
 </head>
 <body>
 
+<script>
+/* ── Error surfacing (Phase 0 Day 4) ──────────────────────────────────
+   Installed first in <body>, before the main inline script parses, so
+   boot-phase errors are caught too. Every uncaught error, unhandled
+   promise rejection, and console.error lands in a ring buffer
+   (window.__ncexpErrors). Visitors get a quiet bottom-corner pill;
+   diagnostic mode gets a loud top banner with the full detail.
+   Diagnostic mode: ?diag=1 in the URL (persists on this device until
+   ?diag=0), or the toggle in Manage → Quality scan. */
+(function () {
+  'use strict';
+  var MAX = 50;
+  var errors = [];
+  var total = 0;
+  window.__ncexpErrors = errors;
+
+  var diag = false;
+  try {
+    var m = location.search.match(/[?&]diag=(0|1)\b/);
+    if (m) localStorage.setItem('ncexp_diag', m[1]);
+    diag = localStorage.getItem('ncexp_diag') === '1';
+  } catch (e) {}
+
+  function record(kind, msg, src) {
+    total++;
+    errors.push({ when: new Date().toISOString(), kind: kind,
+                  msg: String(msg).slice(0, 500), src: src || '' });
+    if (errors.length > MAX) errors.shift();
+    schedule();
+  }
+
+  // Non-capture listener on purpose: resource-load failures (images,
+  // fonts) don't bubble to window, so only real script errors land here.
+  window.addEventListener('error', function (e) {
+    record('error', e.message || 'Script error',
+           (e.filename || '') + (e.lineno ? ':' + e.lineno : ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason;
+    record('promise', (r && (r.message || r)) || 'Unhandled rejection', '');
+  });
+  var _cerr = console.error;
+  console.error = function () {
+    try {
+      record('console', Array.prototype.map.call(arguments, function (a) {
+        if (a instanceof Error) return a.message;
+        if (a && typeof a === 'object') { try { return JSON.stringify(a).slice(0, 200); } catch (_) { return String(a); } }
+        return String(a);
+      }).join(' '), '');
+    } catch (_) {}
+    return _cerr.apply(console, arguments);
+  };
+
+  function diagText() {
+    var lines = [
+      'Nevada County Experience — diagnostics',
+      'URL: ' + location.href,
+      'UA: ' + navigator.userAgent,
+      'Viewport: ' + innerWidth + 'x' + innerHeight,
+      'Errors (' + total + ' total, last ' + errors.length + '):', ''
+    ];
+    for (var i = 0; i < errors.length; i++) {
+      var er = errors[i];
+      lines.push('[' + er.when + '] ' + er.kind + ': ' + er.msg + (er.src ? '  @ ' + er.src : ''));
+    }
+    return lines.join('\n');
+  }
+
+  function copyDiag(btn) {
+    var t = diagText();
+    var done = function () {
+      btn.textContent = 'Copied ✓';
+      setTimeout(function () { btn.textContent = 'Copy details'; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(t).then(done, function () { prompt('Copy diagnostics:', t); });
+    else prompt('Copy diagnostics:', t);
+  }
+
+  function reportUrl() {
+    var last = errors[errors.length - 1] || {};
+    var body = 'What I was doing:\n\n(please describe)\n\n---\n' + diagText();
+    return 'https://github.com/liammlrb-eng/nevada-county-experiences/issues/new' +
+      '?title=' + encodeURIComponent('Bug: ' + String(last.msg || 'page error').slice(0, 80)) +
+      '&body=' + encodeURIComponent(body.slice(0, 1500));
+  }
+
+  function el(tag, css, text) {
+    var n = document.createElement(tag);
+    if (css) n.style.cssText = css;
+    if (text) n.textContent = text;
+    return n;
+  }
+  function btn(label, css, onclick) {
+    var b = el('button', 'cursor:pointer;font-family:inherit;border-radius:4px;' + css, label);
+    b.onclick = onclick;
+    return b;
+  }
+
+  var ui = null, msgNode = null, countNode = null, listNode = null, dismissed = false;
+
+  function schedule() {
+    if (dismissed) return;
+    if (document.body) render();
+    else document.addEventListener('DOMContentLoaded', render);
+  }
+
+  function update() {
+    var last = errors[errors.length - 1];
+    if (msgNode && last) msgNode.textContent = last.msg + (last.src ? '  @ ' + last.src : '');
+    if (countNode) countNode.textContent = total === 1 ? '1 error' : total + ' errors';
+    if (listNode) listNode.textContent = diagText();
+  }
+
+  function render() {
+    if (dismissed || !errors.length || !document.body) return;
+    if (ui) { update(); return; }
+
+    ui = el('div', '');
+    ui.id = 'ncexpErrUi';
+
+    if (diag) {
+      ui.style.cssText =
+        'position:fixed;top:0;left:0;right:0;z-index:2147483000;' +
+        'background:#7b241c;color:#fff;font:13px/1.5 system-ui,sans-serif;' +
+        'padding:10px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.4)';
+      var row = el('div', 'display:flex;align-items:center;gap:12px;flex-wrap:wrap');
+      row.appendChild(el('strong', 'letter-spacing:0.04em', '⚠ DIAGNOSTICS'));
+      countNode = el('span', 'background:#c0392b;padding:1px 8px;border-radius:10px;font-size:11px');
+      row.appendChild(countNode);
+      msgNode = el('code', 'flex:1;min-width:200px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap');
+      row.appendChild(msgNode);
+      var details = btn('Details', 'background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);padding:3px 10px;font-size:11px', function () {
+        listNode.style.display = listNode.style.display === 'none' ? 'block' : 'none';
+        update();
+      });
+      row.appendChild(details);
+      row.appendChild(btn('Copy details', 'background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);padding:3px 10px;font-size:11px', function () { copyDiag(this); }));
+      var rep = el('a', 'color:#fff;font-size:11px;border:1px solid rgba(255,255,255,0.5);border-radius:4px;padding:3px 10px;text-decoration:none', 'Report bug');
+      rep.target = '_blank';
+      rep.onclick = function () { rep.href = reportUrl(); };
+      row.appendChild(rep);
+      row.appendChild(btn('×', 'background:transparent;color:#fff;border:none;font-size:16px;padding:0 6px', function () {
+        dismissed = true; ui.remove(); ui = null;
+      }));
+      ui.appendChild(row);
+      listNode = el('pre', 'display:none;margin:10px 0 0;max-height:40vh;overflow:auto;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;font-size:11px;white-space:pre-wrap');
+      ui.appendChild(listNode);
+    } else {
+      ui.style.cssText =
+        'position:fixed;bottom:16px;left:16px;z-index:2147483000;max-width:330px;' +
+        'background:#fff;color:#333;font:12.5px/1.5 system-ui,sans-serif;' +
+        'border-left:4px solid #c0392b;border-radius:8px;padding:12px 14px;' +
+        'box-shadow:0 4px 18px rgba(0,0,0,0.18)';
+      ui.appendChild(el('div', 'font-weight:600;margin-bottom:2px', '⚠ Something glitched on this page'));
+      ui.appendChild(el('div', 'color:#777;font-size:11.5px;margin-bottom:8px',
+        'You can keep browsing — reloading usually clears it.'));
+      var prow = el('div', 'display:flex;gap:8px;align-items:center');
+      prow.appendChild(btn('Reload', 'background:#2f4f3e;color:#fff;border:none;padding:4px 12px;font-size:11.5px', function () { location.reload(); }));
+      var rep2 = el('a', 'color:#8B6914;font-size:11.5px', 'Report it');
+      rep2.target = '_blank';
+      rep2.onclick = function () { rep2.href = reportUrl(); };
+      prow.appendChild(rep2);
+      prow.appendChild(btn('×', 'background:transparent;color:#999;border:none;font-size:15px;margin-left:auto;padding:0 4px', function () {
+        dismissed = true; ui.remove(); ui = null;
+      }));
+      ui.appendChild(prow);
+      msgNode = el('span', 'display:none');  // visitors don't see raw messages
+      countNode = el('span', 'display:none');
+      ui.appendChild(msgNode); ui.appendChild(countNode);
+    }
+    document.body.appendChild(ui);
+    update();
+  }
+
+  window.NCEXP_DIAG = {
+    isOn: function () { return diag; },
+    enable: function () { try { localStorage.setItem('ncexp_diag', '1'); } catch (_) {} location.reload(); },
+    disable: function () { try { localStorage.setItem('ncexp_diag', '0'); } catch (_) {} location.reload(); },
+    errors: errors
+  };
+})();
+</script>
+
 <div class="hero">
   <div class="hero-eyebrow">Nevada City · Grass Valley · Penn Valley · &amp; the Western Foothills</div>
   <h1>Western Nevada County<br><em>Trip Planner</em></h1>
@@ -11124,6 +11308,7 @@ function renderQAPanel() {
   } else {
     lastRunNote = '<span style="color:#888">Never run on this device.</span>';
   }
+  const diagOn = window.NCEXP_DIAG && NCEXP_DIAG.isOn();
   return `
     <div class="qa-panel" style="padding:24px;overflow-y:auto;flex:1;min-height:0">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap">
@@ -11131,7 +11316,14 @@ function renderQAPanel() {
           <h3 style="margin:0 0 4px;color:var(--brown);font-family:'Cormorant Garamond',serif;font-weight:500">Quality scan</h3>
           <p style="font-size:12px;color:#6b6055;margin:0">${lastRunNote}</p>
         </div>
-        <button onclick="_qaTriggerScan()" style="padding:10px 18px;background:var(--forest);color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer">▶ Run scan now</button>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button onclick="NCEXP_DIAG.isOn() ? NCEXP_DIAG.disable() : NCEXP_DIAG.enable()"
+                  title="When on, page errors show a loud red banner with full detail on this device (instead of the small visitor pill). Survives reloads; turn off when done."
+                  style="padding:10px 14px;background:${diagOn ? '#7b241c' : '#e8e0d0'};color:${diagOn ? '#fff' : 'var(--slate)'};border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer">
+            ${diagOn ? '🔴 Diagnostics on' : 'Diagnostics off'}
+          </button>
+          <button onclick="_qaTriggerScan()" style="padding:10px 18px;background:var(--forest);color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer">▶ Run scan now</button>
+        </div>
       </div>
       <div id="qaResults" style="font-size:13px;line-height:1.55;color:var(--slate)">
         <div style="padding:32px;border:1px dashed #d4c9b0;border-radius:6px;background:#fffdf7;color:#6b6055;text-align:center">

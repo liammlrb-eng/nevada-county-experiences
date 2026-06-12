@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static-site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8770", "--bind", "127.0.0.1"],
+      "port": 8770
+    },
+    {
+      "name": "flask-admin",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["server.py", "--port", "5001"],
+      "port": 5001
+    }
+  ]
+}

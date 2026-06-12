@@ -15,6 +15,12 @@ teeth). See [testing.md](testing.md) for the suite layout.
 
 ## Open
 
+- [2026-06-12] tests · smoke-suite `loaded_page` fixture intermittently
+  times out (45s) on this laptop under load — 8 errors one run, 1 the
+  next, different tests each time, same code green on CI. Environmental
+  (3MB page parse + OneDrive/Defender contention). Treat CI as
+  authoritative; consider a longer local-only timeout if it keeps
+  burning time.
 - [2026-06-12] index.html · clicking a lane tab during initial load throws
   `switchTab is not defined` — the 3MB inline script hasn't parsed yet.
   Planned fix: "still loading" overlay until the script is live.

@@ -101,6 +101,24 @@ baselines: delete the relevant `tests/__snapshots__/home-*.png`, run
 `pytest -m visual` once (it recreates them and skips), eyeball the new
 PNGs, and commit them.
 
+### Error surfacing (`tests/test_error_surfacing.py`, marker `smoke`)
+
+The page carries a tiny error-capture script as the *first* thing in
+`<body>` (so it's alive before the main script parses). Every uncaught
+error, unhandled promise rejection, and `console.error` lands in
+`window.__ncexpErrors`. What renders depends on the device mode:
+
+  • **Visitors** see a small bottom-corner pill — "Something glitched on
+    this page" with Reload / Report / dismiss. No raw error text.
+  • **Diagnostic mode** shows a loud red top banner with the live error
+    message, an expandable detail list, Copy-details, and a Report-bug
+    button that opens a prefilled GitHub issue.
+
+Toggle diagnostic mode with `?diag=1` in the URL (persists on the device
+until `?diag=0`) or the **Diagnostics** button in Manage → Quality scan.
+The tests assert capture + pill behavior for visitors and full-detail
+banner behavior in diag mode.
+
 Higher tiers still to come don't cover deep modal chains, admin features,
 or feeds — those arrive in later phases.
 
@@ -151,7 +169,7 @@ Two companion files in this folder feed back into the test suite:
 | Day 1 | Smoke tests, CI wired up | ✅ done |
 | Day 2 | State-combination sweep (CI) + visual regression baseline (opt-in) | ✅ done |
 | Day 3 | `bug_log.md` + `qa_checklist.md` artifacts | ✅ done |
-| Day 4 | Error-surfacing tier (loud caught-error banner, console capture, Report-bug button) | next |
+| Day 4 | Error-surfacing tier (loud caught-error banner, console capture, Report-bug button) | ✅ done |
 | Later | Feed validation, mobile snapshots, admin-flow tests | |
 
 ## Troubleshooting
