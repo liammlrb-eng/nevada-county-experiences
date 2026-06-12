@@ -136,15 +136,13 @@ marker via the file-level `pytestmark = pytest.mark.smoke`.
 
 Two companion files in this folder feed back into the test suite:
 
-  • **`docs/bug_log.md`** — drop one-liners as you find them in normal
-    use. Reviewed in batches. Cleared bugs typically get a new
-    regression test added here.
-  • **`docs/qa_checklist.md`** — manual scenarios for human runs
-    before a substantial release. Test what the smoke suite can't
+  • **[`docs/bug_log.md`](bug_log.md)** — drop one-liners as you find
+    them in normal use. Reviewed in batches. Cleared bugs typically get
+    a new regression test added here.
+  • **[`docs/qa_checklist.md`](qa_checklist.md)** — ~20-minute manual
+    pass before a substantial release. Tests what the smoke suite can't
     practically cover: visual judgment, mobile feel, modal interaction
     chains.
-
-Both arrive in Day 3 of the Phase 0 test rollout.
 
 ## Roadmap for the suite
 
@@ -152,8 +150,8 @@ Both arrive in Day 3 of the Phase 0 test rollout.
 |---|---|---|
 | Day 1 | Smoke tests, CI wired up | ✅ done |
 | Day 2 | State-combination sweep (CI) + visual regression baseline (opt-in) | ✅ done |
-| Day 3 | `bug_log.md` + `qa_checklist.md` artifacts | next |
-| Day 4 | Error-surfacing tier (loud caught-error banner, console capture, Report-bug button) | |
+| Day 3 | `bug_log.md` + `qa_checklist.md` artifacts | ✅ done |
+| Day 4 | Error-surfacing tier (loud caught-error banner, console capture, Report-bug button) | next |
 | Later | Feed validation, mobile snapshots, admin-flow tests | |
 
 ## Troubleshooting
