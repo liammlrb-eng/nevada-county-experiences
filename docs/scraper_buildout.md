@@ -151,6 +151,51 @@ standout — a genuine cultural venue we don't cover, on the easy bylt.py
 iCal pattern. Re-run `tools/chamber_sources.py --probe` periodically to
 catch members who add calendars later.
 
+## Can we actually replace Trumba? (2026-06-12) — the load-bearing finding
+
+Goal: own the source layer so NCexp's direct scrapers can replace Trumba
+(the NCAC + Nevada City Chamber feeds, currently the calendar backbone).
+To find the build list, censused the venues actually producing events in
+those Trumba feeds, ranked by volume, minus what we already scrape:
+
+| Events | Venue | Has own scrapable calendar? |
+|---|---|---|
+| 207 | Seven Stars Gallery (Odd Fellows) | **No** — site has no event feed; Trumba IS its calendar |
+| 190 | McKnight Crossing shopping center | Yes — Tribe REST (buildable, but promo events) |
+| 161 | Inner Path | recurring meditation classes → Experiences |
+| 97 | Members' homes | private |
+| 82 | Bee Well Chiropractic | recurring wellness classes → Experiences |
+| 62 | Kidzone Museum (Truckee) | out of region |
+| 57 | Eric Rood Center | county civic meetings |
+| 40 | NC Narrow Gauge RR Museum | **No** — no event feed; Trumba only |
+| — | Dark Horse / Truckee Library / Atelier / Tahoe-Truckee… | out of region |
+
+**The hard truth: Trumba cannot be fully replaced by scraping.** Its two
+biggest contributors (Seven Stars 207, Railroad Museum 40) have *no
+independent calendar* — someone manually types their events into the
+chamber's Trumba. The same is true of the long tail of small organizers.
+That manual community submission IS Trumba's value, and it isn't
+scrapable from anywhere else. The rest of the census is out-of-region
+(Truckee), recurring classes (→ Experiences), or civic meetings.
+
+So "replace Trumba" is really two problems:
+1. **Scrape the finite set of venues that have their own calendars** —
+   mostly already covered (Crazy Horse, Center for the Arts, Miners
+   Foundry, NC Winery, BYLT, the music venues). New buildable ones are
+   few: McKnight Crossing (Tribe, promo-heavy), California Bluegrass
+   Assn (Tribe, 302 but statewide — needs region filter). Low marginal
+   value.
+2. **Become the calendar for the long tail** — the only way to own Seven
+   Stars, the Railroad Museum, and the dozens of small organizers is an
+   **event-submission path** (they post to NCexp directly), not a
+   scraper. THIS is the real Trumba-replacement lever, and it's a
+   feature, not a scraper.
+
+Recommendation: keep the Trumba feeds as the bridge; build the 1–2
+worthwhile direct calendars opportunistically; and treat "direct event
+submission" as the actual roadmap item for displacing Trumba. Discuss
+before building either path further.
+
 ## Chamber audit (2026-06-12) — the other consolidators
 
 Ran the KVMR-style audit on both chamber scrapers. Unlike KVMR, **neither
