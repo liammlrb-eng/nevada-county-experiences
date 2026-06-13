@@ -159,8 +159,10 @@ _COVERED = {
 # scraper candidates; excluded from the census so they stop reappearing.
 # (See docs/scraper_buildout.md "Open question" — these may eventually be
 # filtered from the KVMR import itself.)
+# Match substrings that avoid apostrophes — KVMR uses a curly ' (U+2019),
+# so "sammie's" written with a straight quote would silently never match.
 _NOT_EVENT_ORGS = {
-    "sammie's friends", "sammies friends",
+    "sammie",
     "california solar electric", "cal-solar", "cal solar",
 }
 
