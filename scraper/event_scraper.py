@@ -69,14 +69,12 @@ from auto_tagger                     import tag_events
 # complete quickly before Selenium starts for the JS-rendered sites.
 #
 ALL_SCRAPERS = [
-    NevadaCityChamberScraper(),     # static HTML — no Selenium
     GVChamberScraper(),             # static HTML — Elementor page
     TheUnionScraper(),              # RSS first, Selenium fallback
     CenterForTheArtsScraper(),      # requests first, Selenium fallback (~20 concerts)
     GoNevadaScraper(),              # Selenium — Smart Post Show JS (Cloudflare blocked)
     EventbriteNevadaScraper(),      # Selenium — React-rendered cards
     MinersFoundryScraper(),         # Selenium — site 403s direct requests
-    NCACCalendarScraper(),          # Trumba JSON feed (~180 western county events)
     CuriousForgeScraper(),          # WooCommerce Store API — maker classes, one event per session
     WolfCraftScraper(),             # Shopify products.json — craft workshops, one event per class
     CrazyHorseScraper(),            # The Events Calendar REST API — live music, DJs, trivia
@@ -90,8 +88,12 @@ ALL_SCRAPERS = [
     WildEyePubScraper(),            # Wix Events JSON — Wild Eye Pub ticketed concerts
     BYLTScraper(),                  # Event Organiser iCal — Bear Yuba Land Trust hikes/art/trail events
     # ── Consolidators LAST ────────────────────────────────────────────────
-    # KVMR republishes events that direct scrapers above also produce.
-    # Running it last lets merge()'s URL+date dedup prefer the direct copy.
+    # These aggregate events that direct scrapers above also produce. Running
+    # them last lets merge()'s (url|date) and (title|date|area) dedup prefer
+    # the direct copy. The two Trumba calendars also overlap each other ~50%;
+    # whichever runs first wins, the other's copies are deduped away.
+    NCACCalendarScraper(),          # Trumba JSON — NCAC arts & culture calendar
+    NevadaCityChamberScraper(),     # Trumba JSON — Nevada City Chamber community calendar (~800 events)
     KVMRScraper(),                  # Tribe Events REST API — venue city, organizer, original URL
     # ── Disabled ──────────────────────────────────────────────────────────
     # NevadaTheatreScraper()        # MEC plugin: REST list is post-date-ordered
@@ -186,46 +188,74 @@ def _norm_url(u: str) -> str:
     return u.rstrip("/")
 
 
+def _title_sig(e: dict) -> tuple:
+    """(normalized title, date, area) — the cross-source signature for the
+    same event surfaced by two consolidators under different URLs. Trumba
+    calendars (NCAC, Nevada City Chamber) give the same event different
+    permaLinks, so URL dedup can't see they're identical; this can. Safe
+    against collapsing genuinely-distinct events: verified that every
+    (title,date,area) collision in the queue is a real cross-source dup
+    (different areas keep same-named events apart, e.g. two Farmers Markets)."""
+    t = re.sub(r"[^a-z0-9]+", " ", (e.get("title") or "").lower()).strip()
+    return (t, e.get("date", ""), (e.get("area") or "").lower())
+
+
 def merge(existing: list, fresh: list) -> tuple:
     by_key    = {event_key(e): e for e in existing}
     dismissed = {event_key(e) for e in existing if e.get("status") == "dismissed"}
 
-    # Cross-source URL dedup: consolidators (KVMR) republish events that we
-    # also scrape directly from the organizer, under a different title and
-    # source — so the title-based key misses them. But the consolidator's
-    # `website` field is the organizer's own event URL, identical to what the
-    # direct scraper produces. Same normalized URL + same date from a
-    # DIFFERENT source = same event, skip it. Same-source collisions are
-    # exempt: several scrapers fall back to one landing URL for events
-    # without per-event pages, and those are legitimately distinct events.
-    # Direct sources win because consolidators run last (see ALL_SCRAPERS).
-    url_owner: dict[tuple, str] = {}
+    # Cross-source dedup. Consolidators (KVMR, the two Trumba community
+    # calendars) republish events that we also scrape directly from the
+    # organizer, under a different source — so the title-based event_key
+    # misses them. Two independent signatures catch these:
+    #   • (url|date)        — KVMR carries the organizer's original URL,
+    #                         identical to what the direct scraper produces.
+    #   • (title|date|area) — Trumba calendars give the same event different
+    #                         permaLinks, so only title+date+area matches.
+    # A fresh event whose signature is already owned by a DIFFERENT source is
+    # skipped. Same-source collisions are exempt (several scrapers share one
+    # landing URL across distinct events; the title sig is naturally
+    # source-distinct via dismissal/key). Direct sources win because
+    # consolidators run last (see ALL_SCRAPERS).
+    url_owner:   dict[tuple, str] = {}
+    title_owner: dict[tuple, str] = {}
     for e in existing:
         nu = _norm_url(e.get("url", ""))
         if nu:
             url_owner.setdefault((nu, e.get("date", "")), e.get("source", ""))
+        title_owner.setdefault(_title_sig(e), e.get("source", ""))
 
-    merged       = list(existing)
-    added        = 0
-    url_deduped  = 0
+    merged        = list(existing)
+    added         = 0
+    url_deduped   = 0
+    title_deduped = 0
     for ev in fresh:
         k = event_key(ev)
         if k in dismissed or k in by_key:
             continue
-        nu = _norm_url(ev.get("url", ""))
+        src = ev.get("source", "")
+        nu  = _norm_url(ev.get("url", ""))
         if nu:
             owner = url_owner.get((nu, ev.get("date", "")))
-            if owner and owner != ev.get("source", ""):
+            if owner and owner != src:
                 url_deduped += 1
                 continue
-            url_owner.setdefault((nu, ev.get("date", "")), ev.get("source", ""))
+        sig = _title_sig(ev)
+        if sig[0]:   # has a real title
+            t_owner = title_owner.get(sig)
+            if t_owner and t_owner != src:
+                title_deduped += 1
+                continue
+        if nu:
+            url_owner.setdefault((nu, ev.get("date", "")), src)
+        title_owner.setdefault(sig, src)
         assign_id(ev)
         merged.append(ev)
         by_key[k] = ev
         added += 1
-    if url_deduped:
-        print(f"  Cross-source dedup: skipped {url_deduped} consolidator repost(s) "
-              f"already covered by a direct source")
+    if url_deduped or title_deduped:
+        print(f"  Cross-source dedup: skipped {url_deduped} by url+date, "
+              f"{title_deduped} by title+date+area (consolidator reposts)")
     merged.sort(key=lambda e: (0 if e.get("status") == "pending" else 1, e.get("date", "9999")))
     return merged, added
 
