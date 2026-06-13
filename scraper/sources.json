@@ -20,7 +20,7 @@
     "id": "kvmr",
     "interval_hours": 168,
     "name": "KVMR",
-    "notes": "RSS feed (Tribe Events). Covers KVMR-hosted and community events across Nevada County.",
+    "notes": "Tribe Events REST API (wp-json/tribe/events/v1). Consolidator — community events across the county with venue city, organizer, and the original event URL. City-allowlist region filter; merge dedupes reposts against direct sources by URL+date. Runs last in ALL_SCRAPERS so direct sources win.",
     "url": "https://www.kvmr.org/events/"
   },
   {

@@ -20,7 +20,7 @@ Deployment:
   traditional server (Linux/Apache, systemd, cron). No cloud services needed.
 """
 
-import os, sys, json, argparse, threading
+import os, re, sys, json, argparse, threading
 from datetime import datetime
 
 # Force UTF-8 stdout/stderr. On Windows the console defaults to cp1252,
@@ -71,7 +71,6 @@ from auto_tagger                     import tag_events
 ALL_SCRAPERS = [
     NevadaCityChamberScraper(),     # static HTML — no Selenium
     GVChamberScraper(),             # static HTML — Elementor page
-    KVMRScraper(),                  # RSS — Tribe Events feed
     TheUnionScraper(),              # RSS first, Selenium fallback
     CenterForTheArtsScraper(),      # requests first, Selenium fallback (~20 concerts)
     GoNevadaScraper(),              # Selenium — Smart Post Show JS (Cloudflare blocked)
@@ -90,6 +89,10 @@ ALL_SCRAPERS = [
     GoldVibeScraper(),              # Google Calendar ICS — taproom music/dance/trivia
     WildEyePubScraper(),            # Wix Events JSON — Wild Eye Pub ticketed concerts
     BYLTScraper(),                  # Event Organiser iCal — Bear Yuba Land Trust hikes/art/trail events
+    # ── Consolidators LAST ────────────────────────────────────────────────
+    # KVMR republishes events that direct scrapers above also produce.
+    # Running it last lets merge()'s URL+date dedup prefer the direct copy.
+    KVMRScraper(),                  # Tribe Events REST API — venue city, organizer, original URL
     # ── Disabled ──────────────────────────────────────────────────────────
     # NevadaTheatreScraper()        # MEC plugin: REST list is post-date-ordered
     #   so upcoming events are scattered through hundreds of historical
@@ -172,19 +175,57 @@ def prune_expired(events: list) -> tuple:
     return kept, pruned
 
 
+def _norm_url(u: str) -> str:
+    """Normalize a URL for cross-source equality: strip scheme, www, and
+    trailing slash. Query strings are kept (they can identify the event)."""
+    u = (u or "").strip().lower()
+    if not u:
+        return ""
+    u = re.sub(r"^https?://", "", u)
+    u = re.sub(r"^www\.", "", u)
+    return u.rstrip("/")
+
+
 def merge(existing: list, fresh: list) -> tuple:
     by_key    = {event_key(e): e for e in existing}
     dismissed = {event_key(e) for e in existing if e.get("status") == "dismissed"}
-    merged    = list(existing)
-    added     = 0
+
+    # Cross-source URL dedup: consolidators (KVMR) republish events that we
+    # also scrape directly from the organizer, under a different title and
+    # source — so the title-based key misses them. But the consolidator's
+    # `website` field is the organizer's own event URL, identical to what the
+    # direct scraper produces. Same normalized URL + same date from a
+    # DIFFERENT source = same event, skip it. Same-source collisions are
+    # exempt: several scrapers fall back to one landing URL for events
+    # without per-event pages, and those are legitimately distinct events.
+    # Direct sources win because consolidators run last (see ALL_SCRAPERS).
+    url_owner: dict[tuple, str] = {}
+    for e in existing:
+        nu = _norm_url(e.get("url", ""))
+        if nu:
+            url_owner.setdefault((nu, e.get("date", "")), e.get("source", ""))
+
+    merged       = list(existing)
+    added        = 0
+    url_deduped  = 0
     for ev in fresh:
         k = event_key(ev)
         if k in dismissed or k in by_key:
             continue
+        nu = _norm_url(ev.get("url", ""))
+        if nu:
+            owner = url_owner.get((nu, ev.get("date", "")))
+            if owner and owner != ev.get("source", ""):
+                url_deduped += 1
+                continue
+            url_owner.setdefault((nu, ev.get("date", "")), ev.get("source", ""))
         assign_id(ev)
         merged.append(ev)
         by_key[k] = ev
         added += 1
+    if url_deduped:
+        print(f"  Cross-source dedup: skipped {url_deduped} consolidator repost(s) "
+              f"already covered by a direct source")
     merged.sort(key=lambda e: (0 if e.get("status") == "pending" else 1, e.get("date", "9999")))
     return merged, added
 
