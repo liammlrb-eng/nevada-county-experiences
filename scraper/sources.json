@@ -81,6 +81,22 @@
   },
   {
     "enabled": true,
+    "id": "mcknight_crossing",
+    "interval_hours": 168,
+    "name": "McKnight Crossing",
+    "notes": "Tribe Events REST API. Grass Valley shopping center — recurring Cars & Coffee, seasonal markets/community days. Found via chamber-directory build-out. Single-venue subclass of TribeEventsScraper.",
+    "url": "https://mcknightcrossing.net/events/"
+  },
+  {
+    "enabled": true,
+    "id": "california_bluegrass",
+    "interval_hours": 168,
+    "name": "California Bluegrass Association",
+    "notes": "Tribe Events REST API, statewide org region-filtered to western Nevada County by venue city (~10 of 600 events): CBA Father's Day Festival + Summer Music Camp at the Fairgrounds, recurring Bluegrass Jam at Wild Eye Pub. Subclass of TribeEventsScraper with keep_cities set.",
+    "url": "https://californiabluegrass.org/events/"
+  },
+  {
+    "enabled": true,
     "id": "bylt",
     "interval_hours": 168,
     "name": "Bear Yuba Land Trust",

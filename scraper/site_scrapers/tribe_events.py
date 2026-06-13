@@ -41,6 +41,33 @@ _CAT_MAP = {
     "karaoke":    ("Music event", ["Music", "Social"]),
 }
 
+# Western Nevada County cities — used by region-filtered (multi-venue /
+# statewide) Tribe sources to keep only in-area events. Single-venue sources
+# leave keep_cities=None and skip filtering entirely.
+_NEVCO_CITIES = {
+    "nevada city", "grass valley", "penn valley", "north san juan",
+    "rough and ready", "rough & ready", "cedar ridge", "alta sierra",
+    "lake of the pines", "lake wildwood", "washington", "chicago park",
+    "smartsville", "north columbia", "camptonville",
+}
+
+
+def _venue_dict(ev: dict) -> dict:
+    """Tribe's `venue` is usually a dict, sometimes a list, sometimes absent."""
+    v = ev.get("venue")
+    if isinstance(v, list):
+        v = v[0] if v else None
+    return v if isinstance(v, dict) else {}
+
+
+def _area_from_city(city: str) -> str:
+    c = (city or "").lower()
+    if "nevada city" in c:  return "Nevada City"
+    if "grass valley" in c: return "Grass Valley"
+    if "penn valley" in c:  return "Penn Valley"
+    if "north san juan" in c: return "North San Juan"
+    return "Nevada County"
+
 
 def _clean_description(raw: str) -> str:
     """Tribe descriptions often carry page-builder shortcodes
@@ -54,11 +81,22 @@ def _clean_description(raw: str) -> str:
 
 
 class TribeEventsScraper(EventScraper):
-    """Generic 'The Events Calendar' REST API scraper. Subclass + configure."""
+    """Generic 'The Events Calendar' REST API scraper. Subclass + configure.
+
+    Single-venue sources (a bar, a shopping center) just set name/url/
+    store_root/area — every event is at that venue, no filtering.
+
+    Multi-venue or statewide sources (e.g. an association that lists events
+    all over California) set `keep_cities` to a city allowlist; events are
+    then region-filtered by their venue city and each event's location/area
+    comes from its own venue rather than the source name.
+    """
     name          = "Tribe Events"
     url           = ""             # human-facing events page
     store_root    = ""             # site root, e.g. "https://crazyhorsenc.com"
     area          = "Nevada County"
+    keep_cities   = None           # None = single-venue (no filter); set = region-filter
+    default_music = True           # single music venues default uncategorized events to Music
     skip_rss      = True
     skip_selenium = True
 
@@ -111,6 +149,18 @@ class TribeEventsScraper(EventScraper):
             if not title:
                 continue
 
+            # ── Region filter (multi-venue / statewide sources only) ────────
+            venue = _venue_dict(ev)
+            if self.keep_cities is not None:
+                city = (venue.get("city") or "").strip().lower()
+                if not city or not any(c in city for c in self.keep_cities):
+                    continue   # no in-area city → drop (conservative for wide sources)
+                ev_location = html.unescape(venue.get("venue") or "") or self.name
+                ev_area     = _area_from_city(city)
+            else:
+                ev_location = self.name
+                ev_area     = self.area
+
             # ── Date / time (start_date is local venue time) ────────────────
             start = ev.get("start_date") or ""
             date_str, time_str = "", ""
@@ -140,7 +190,7 @@ class TribeEventsScraper(EventScraper):
                 if cname in _CAT_MAP:
                     category, extra = _CAT_MAP[cname]
                     tags = list(dict.fromkeys(tags + extra))
-            if not tags:                       # music venue default
+            if not tags and self.default_music:   # single music venues lean Music
                 category, tags = "Music event", ["Music"]
 
             # ── Cost into the description note ──────────────────────────────
@@ -164,8 +214,8 @@ class TribeEventsScraper(EventScraper):
                 date=date_str,
                 time=time_str,
                 end_time=end_time,
-                location=self.name,
-                area=self.area,
+                location=ev_location,
+                area=ev_area,
                 description=desc,
                 category=category,
                 tags=tags,
@@ -189,3 +239,25 @@ class CrazyHorseScraper(TribeEventsScraper):
     url        = "https://crazyhorsenc.com/events/"
     store_root = "https://crazyhorsenc.com"
     area       = "Nevada City"
+
+
+class McKnightCrossingScraper(TribeEventsScraper):
+    """McKnight Crossing — Grass Valley shopping center. Single-venue Tribe
+    calendar (markets, community days, seasonal events). Found via the
+    chamber-directory build-out; not music-leaning, so no Music default."""
+    name          = "McKnight Crossing"
+    url           = "https://mcknightcrossing.net/events/"
+    store_root    = "https://mcknightcrossing.net"
+    area          = "Grass Valley"
+    default_music = False
+
+
+class CaliforniaBluegrassScraper(TribeEventsScraper):
+    """California Bluegrass Association — statewide bluegrass org whose Tribe
+    calendar lists events across CA. Region-filtered to western Nevada County
+    by venue city (the CBA Father's Day Festival and local jams/concerts)."""
+    name          = "California Bluegrass Association"
+    url           = "https://californiabluegrass.org/events/"
+    store_root    = "https://californiabluegrass.org"
+    keep_cities   = _NEVCO_CITIES
+    default_music = True   # bluegrass org — uncategorized events are music

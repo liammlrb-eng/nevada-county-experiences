@@ -48,7 +48,9 @@ from site_scrapers.ncac_calendar     import NCACCalendarScraper
 from site_scrapers.go_nevada_festivals import GoNevadaFestivalsScraper
 from site_scrapers.woocommerce       import CuriousForgeScraper
 from site_scrapers.shopify           import WolfCraftScraper
-from site_scrapers.tribe_events      import CrazyHorseScraper
+from site_scrapers.tribe_events      import (
+    CrazyHorseScraper, McKnightCrossingScraper, CaliforniaBluegrassScraper,
+)
 from site_scrapers.squarespace_events import GoldenEraScraper
 from site_scrapers.fairgrounds     import FairgroundsScraper
 from site_scrapers.nevadacity_rocks import NevadaCityRocksScraper
@@ -78,6 +80,8 @@ ALL_SCRAPERS = [
     CuriousForgeScraper(),          # WooCommerce Store API — maker classes, one event per session
     WolfCraftScraper(),             # Shopify products.json — craft workshops, one event per class
     CrazyHorseScraper(),            # The Events Calendar REST API — live music, DJs, trivia
+    McKnightCrossingScraper(),      # Tribe REST — GV shopping center (Cars & Coffee, markets)
+    CaliforniaBluegrassScraper(),   # Tribe REST, region-filtered — CBA festival + local jams
     GoldenEraScraper(),             # Squarespace events JSON — Golden Era Lounge live music
     FairgroundsScraper(),           # Saffire JSONP — Nevada County Fairgrounds featured events
     NevadaCityRocksScraper(),       # static HTML — nevadacity.rocks live-music calendar (400+ events)
