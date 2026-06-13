@@ -114,6 +114,78 @@ direction those belong as recurring **EXPERIENCES** (one entry, a
 schedule, a story) rather than hundreds of near-identical scraped
 events. KVMR coverage suffices until those entries are written.
 
+## Chambers as a SOURCE-DISCOVERY tool (2026-06-12)
+
+The better use of a chamber isn't its events page — it's its **member
+directory**, a list of every local business and organization, i.e.
+candidate event *sources*. `tools/chamber_sources.py` harvests both:
+
+- Nevada City (GrowthZone) — `FindStartsWith?term=<A-Z>`, 331 members
+- Grass Valley (`gvclisting` RSS) — 239 members
+
+…then probes each member's website and keeps those running a real event
+platform. ~570 members, 443 unique sites probed.
+
+**Honest caveat:** the probe flags platform *presence*, not an actual
+events calendar. A Shopify jerky shop and a WooCommerce chocolate shoppe
+run that software but host no events — so the raw "191 candidates" is
+mostly false positives. WooCommerce/Shopify are stores; discount them
+entirely. The real signal is event-PLUGIN platforms, and even those need
+an "does it have upcoming events?" check.
+
+After that check (query each plugin's feed for events in the next 120
+days), the genuinely actionable shortlist is small and high-confidence:
+
+| Source | Platform | Upcoming | Pattern | Notes |
+|---|---|---|---|---|
+| **California Bluegrass Association** | Tribe REST | 302 | tribe_events.py | on-brand; but CBA runs statewide — needs region filter |
+| **North Columbia Schoolhouse Cultural Center** | Event Organiser iCal | 107 | bylt.py | real San Juan Ridge cultural venue — high value |
+| **Congregation B'nai Harim** | Event Organiser iCal | 64 | bylt.py | |
+| **Eastern Sierra Interpretive Association** | Tribe REST | 48 | tribe_events.py | nature/interpretive; check locality |
+| **Gold Country Senior Services** | Event Organiser iCal | 15 | bylt.py | |
+
+Everything else flagged had 0 upcoming events (plugin installed, dormant:
+Inn Town Campground, Avanguardia Wines, Roamin' Angels, Alta Sierra Wine
+Shop, Classic Cars West) or is a store. North Columbia Schoolhouse is the
+standout — a genuine cultural venue we don't cover, on the easy bylt.py
+iCal pattern. Re-run `tools/chamber_sources.py --probe` periodically to
+catch members who add calendars later.
+
+## Chamber audit (2026-06-12) — the other consolidators
+
+Ran the KVMR-style audit on both chamber scrapers. Unlike KVMR, **neither
+has a structured backend**: no event post type, no Tribe REST, no embedded
+ChamberMaster/GrowthZone widget. Events are hand-typed into WordPress pages
+(Nevada City = Essential Grid items; Grass Valley = bare Elementor
+headings). So there is no API to upgrade to — the fragile HTML parsing is
+the only option, and these are the most brittle sources we have.
+
+What they actually contribute today:
+
+- **Nevada City Chamber** — 11 events, but only 4 parse to real dates; the
+  other 7 are raw strings ("April 2026", "2025 Concert Dates",
+  "October – November"). Those 7 are the city's *signature recurring
+  events*: Farmers Market, Sidewalk Sale, First Friday Art Walks, Hot
+  Summer Nights, Victorian Christmas, Fall Colors, Fourth of July. Only 1
+  duplicate (Film Festival, via NCAC). Editorially gold, but trapped in
+  unparseable data and recurring by nature.
+  → **Better home: curated EXPERIENCES** (annual canon, hand-authored with
+  real dates), then retire the scraper. Matches the "essentials canon"
+  editorial idea.
+
+- **GV Chamber** — page now holds just 2 events, and neither has a title
+  heading, so the scraper's fallback grabs junk ("Please join the Greater
+  Grass Valley Chamber o…", "FREE COMMUNITY EVENT"). Not broken code — the
+  page is nearly empty and unstructured. Near-zero value; chamber
+  mixers/meetings aren't visit-driving anyway.
+  → **Recommend disabling** until/unless the chamber rebuilds its events
+  page on a real platform. Re-probe periodically with platform_probe.
+
+Net: the chambers confirm the thesis harder than KVMR did. KVMR at least
+had a clean API; the chambers are thin, structureless, and shedding
+content to venue-direct + KVMR already. Their best contribution
+(NC Chamber's signature events) belongs as hand-curated canon, not scraping.
+
 ## Keep via KVMR (no independent site to scrape)
 
 Hosted platforms (Momence, Mobilize, Facebook-only organizers, WeTravel
