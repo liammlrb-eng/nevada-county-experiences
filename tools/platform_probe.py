@@ -154,6 +154,16 @@ _COVERED = {
     "wolf craft", "alibi", "chamber",
 }
 
+# Businesses that surface in KVMR's calendar as self-promotion (adoption
+# days, info sessions, sales) rather than visit-driving events. Not direct-
+# scraper candidates; excluded from the census so they stop reappearing.
+# (See docs/scraper_buildout.md "Open question" — these may eventually be
+# filtered from the KVMR import itself.)
+_NOT_EVENT_ORGS = {
+    "sammie's friends", "sammies friends",
+    "california solar electric", "cal-solar", "cal solar",
+}
+
 
 def census(top_n: int = 14) -> list[dict]:
     """Aggregate KVMR's organizer data, probe each uncovered organizer's site."""
@@ -164,7 +174,8 @@ def census(top_n: int = 14) -> list[dict]:
     by_org: dict[str, dict] = {}
     for e in events:
         org = (e.get("organizer") or "").strip()
-        if not org or any(c in org.lower() for c in _COVERED):
+        ol = org.lower()
+        if not org or any(c in ol for c in _COVERED) or any(n in ol for n in _NOT_EVENT_ORGS):
             continue
         rec = by_org.setdefault(org, {"organizer": org, "count": 0,
                                       "hosts": Counter(), "categories": Counter()})

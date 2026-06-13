@@ -29,14 +29,21 @@ lesson (see below).
 | 2 | Inner Path | 28 | WooCommerce | recurring classes → Experience |
 | 3 | Fly HiFi Stereo | 26 | static | http-only, no inline feed; JS/subpage — custom |
 | 4 | Nevada City Odd Fellows | 12 | WordPress | "events" are **blog posts** about gallery shows; no event feed — KVMR adds the dates |
-| 5 | Sammie's Friends | 12 | Wix | `/events` 404s; real path unknown — investigate |
+| 5 | Sammie's Friends | 12 | Wix | ❌ **not an event org** — animal rescue; business self-promo |
 | 6 | Soulspace Collective | 9 | hosted: Momence | keep via KVMR |
 | 7 | Nevada County Democrats | 7 | hosted: Mobilize | keep via KVMR |
 | 8 | Off Broadstreet Theatre | 6 | static | **403s** direct requests (like Miners Foundry) — Selenium |
 | 9 | Gold Country Ultimate | 6 | none | KVMR-only |
-| 10 | California Solar Electric Co-op | 6 | Squarespace | `/events` 404s; find collection URL |
+| 10 | California Solar Electric Co-op | 6 | Squarespace | ❌ **not an event org** — solar co-op; business self-promo |
 | 11 | NorCal Resist | 6 | Google Calendar ICS | promising — gold_vibe.py pattern |
 | 12 | Lyric Rose Theatre Company | 5 | static | external ticketing widget (`olspage=cart`) — parse the widget |
+
+**Not event organizers (don't build, and arguably filter from KVMR):**
+Sammie's Friends (animal rescue) and California Solar Electric Co-op
+(solar business) appear in KVMR's calendar as self-promotion — adoption
+days, info sessions, sales — not visit-driving events. They're a third
+category beyond "build a scraper" / "keep via KVMR": *noise we may want
+KVMR to stop importing.* See "Open question" below.
 
 ## What verification revealed (the actual strategic finding)
 
@@ -75,12 +82,29 @@ and we replace planks intentionally, highest editorial value first.
 4. **Lyric Rose Theatre Company** — second theatre; events live in an
    embedded ticketing widget — identify the widget vendor, parse its
    feed.
-5. **Sammie's Friends / Cal Solar** — both have findable event pages
-   once the right URL is located; defer until the higher-value venues
-   land.
+5. *(was Sammie's Friends / Cal Solar — removed; they're businesses, not
+   event organizers.)*
 
 Re-run `python tools/platform_probe.py --census` after any scrape to
 refresh volumes and catch new organizers entering the calendar.
+
+## Open question: filtering business self-promo out of KVMR
+
+Sammie's Friends and Cal Solar showing up at all means KVMR's calendar
+carries business self-promotion (adoption days, solar info sessions,
+retail sales) that isn't visit-driving and probably shouldn't be on the
+public grid. The census makes these easy to spot by organizer. Options
+when we decide to act:
+
+- **Organizer blocklist** in `kvmr.py` — cheapest; a small set of
+  organizer names whose events are skipped. Brittle as the list grows.
+- **AI categorizer signal** — let the existing AI pass flag
+  "business-promo / not-a-public-event" so it works across *all*
+  sources, not just KVMR. More robust, fits the editorial-quality
+  direction, but more work.
+
+Deferred until we see how much of the queue this actually is. Flagging
+here so the pattern isn't forgotten.
 
 ## Experience candidates, not event scrapers
 
